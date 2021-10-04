@@ -24,7 +24,7 @@ const providerOptions = {
 // setup web3 modal
 const web3Modal = new Web3Modal({
   network: 'rinkeby', // optional
-  cacheProvider: false, // optional
+  cacheProvider: true, // optional
   providerOptions // required
   // theme: 'dark'
 })

@@ -10,16 +10,18 @@ store.dispatch('init')
 
 <template lang="pug">
 .max-w-screen-2xl.mx-auto.p-3
-  header.h-20.rounded-full.bg-indigo-700.flex.items-center.justify-between
-    div.pl-9
+  header.h-20.rounded-full.bg-indigo-700.flex.items-center.justify-between.px-9
+    router-link(to="/")
       svg-logo.h-5.text-white
     .flex
+      router-link.ml-4(:to="{name: 'create'}") Create
       template(v-if="$store.state.address")
-        div {{ $store.state.address }}
-        button(@click="$store.dispatch('disconnect')") Disconnect
+        .ml-4 {{ $store.state.address }}
+        button.ml-4(@click="$store.dispatch('disconnect')") Disconnect
       template(v-else)
-        button(@click="$store.dispatch('connect')") Connect
-  //- main#main
+        button.ml-4(@click="$store.dispatch('connect')") Connect
+
+  main#main
     router-view
 </template>
 
