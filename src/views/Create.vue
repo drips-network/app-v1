@@ -6,7 +6,9 @@ const owner = computed(() => store.state.address)
 
 // on-chain project
 const project = reactive({
-  name: ''
+  name: '',
+  symbol: '',
+  minAmount: 0
   // owner: address
 })
 
@@ -18,6 +20,10 @@ const projectMeta = reactive({
   // discord: ''
 })
 
+function submit () {
+  store.dispatch('newProject', project)
+}
+
 </script>
 
 <template lang="pug">
@@ -26,12 +32,23 @@ article.create
   form.mx-auto.max-w-sm.text-center.text-blue-500(@submit.prevent, validate)
     section
       div
-        input(v-model="project.name", placeholder="name")
+        input(v-model="project.name", placeholder="name", required)
+      div
+        input(v-model="project.symbol", placeholder="symbol", required)
       div
         input(v-model="owner", placeholder="owner", disabled)
-      div
+      //- div
         input(v-model="projectMeta.descrip", placeholder="description")
-      button(type="submit") Save
+      div
+        label Min Amount
+        input(v-model="project.minAmount", type="number", required)
+
+      div
+        button(type="submit", @click="submit") Save
+
+  div
+    button(@click="$store.dispatch('getEventLog')") Log...
+
 </template>
 
 <style>

@@ -17,7 +17,7 @@ store.dispatch('init')
       router-link.ml-4(:to="{name: 'create'}") Create
       template(v-if="$store.state.address")
         .ml-4 {{ $store.state.address }}
-        button.ml-4(@click="$store.dispatch('disconnect')") Disconnect
+        button.ml-4(@click="$store.dispatch('disconnect')") ✖️
       template(v-else)
         button.ml-4(@click="$store.dispatch('connect')") Connect
 

@@ -1,40 +1,43 @@
 import { createStore } from 'vuex'
-import { ethers } from 'ethers'
+//
+import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+// contracts
+import { RadicleRegistry } from '../../contracts'
+// modules
+import create from './create.js'
 
 let provider, signer, walletProvider
 
+const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
   rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }
 }
 
-// provider options
-const providerOptions = {
-  /* See Provider Options Section */
-  walletconnect: {
-    package: WalletConnectProvider, // required
-    options: {
-      infuraId: '1cf5614cae9f49968fe604b818804be6' // required
-    }
-  }
-}
-
 // setup web3 modal
 const web3Modal = new Web3Modal({
-  network: 'rinkeby', // optional
+  network, // optional
   cacheProvider: true, // optional
-  providerOptions // required
-  // theme: 'dark'
+  providerOptions: { // required
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        infuraId: '1cf5614cae9f49968fe604b818804be6' // required
+      }
+    }
+  },
+  theme: 'dark'
 })
 
 export default createStore({
-  // modules: {},
+  modules: { create },
   state () {
     return {
       address: null,
-      networkId: null
+
+      RadicleRegistryContract: null
     }
   },
   mutations: {
@@ -43,11 +46,11 @@ export default createStore({
     },
     SIGN_OUT (state) {
       state.address = null
-    },
-    SET_NETWORK (state, id) {
-      state.networkId = id
-      console.log('network:', id)
     }
+    // SET_CONTRACTS (state, provider) {
+    //   console.log('registry', RadicleRegistry.address)
+    //   state.RadicleRegistryContract = new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
+    // }
   },
   actions: {
     /* setup web3, contracts */
@@ -63,47 +66,42 @@ export default createStore({
           await dispatch('setupFallbackProvider')
         }
 
-        const networkId = (await provider.getNetwork()).chainId
-        commit('SET_NETWORK', networkId)
-
-        // listen to provider events
-        // dispatch('listenToWalletProvider')
+        // const network = await provider.getNetwork()
+        // console.log(network.name)
       } catch (e) {
         console.error('@init', e)
       }
     },
 
-    async setupFallbackProvider ({ dispatch }) {
+    async setupFallbackProvider ({ commit, dispatch }) {
       try {
         if (window.ethereum) {
           // metamask...
-          provider = new ethers.providers.Web3Provider(window.ethereum)
+          provider = new Ethers.providers.Web3Provider(window.ethereum)
         } else {
-          // infura
-          const n = process.env.NODE_ENV === 'development' ? 'rinkeby' : 'mainnet'
-          provider = new ethers.getDefaultProvider(networks[n].infura)
+          // infura...
+          provider = new Ethers.getDefaultProvider(networks[network].infura)
         }
-        console.log('fallback provider')
+
+        // commit('SET_CONTRACTS', provider)
       } catch (e) {
         console.error(e)
       }
     },
 
     /* connect wallet */
-    async connect ({ commit, dispatch }) {
+    async connect ({ state, commit, dispatch }) {
       try {
         // connect and update provider, signer
         walletProvider = await web3Modal.connect()
-        provider = new ethers.providers.Web3Provider(walletProvider)
+        const provider = new Ethers.providers.Web3Provider(walletProvider)
         signer = provider.getSigner()
 
         // set user address
         const address = await signer.getAddress()
         commit('SIGN_IN', address)
 
-        // set network id
-        const networkId = (await provider.getNetwork()).chainId
-        commit('SET_NETWORK', networkId)
+        // commit('SET_CONTRACTS', provider)
 
         dispatch('listenToWalletProvider')
       } catch (e) {
@@ -117,10 +115,10 @@ export default createStore({
     disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
       web3Modal.clearCachedProvider()
-      if (walletProvider) {
-        walletProvider.off('accountsChanged')
-        walletProvider.off('disconnect')
-      }
+      // if (walletProvider.off) {
+      //   walletProvider.off('accountsChanged')
+      //   walletProvider.off('disconnect')
+      // }
       commit('SIGN_OUT')
 
       dispatch('setupFallbackProvider')
@@ -151,6 +149,37 @@ export default createStore({
         console.error('disconnected?', error)
         dispatch('disconnect')
       })
+    },
+
+    // async getProvider () {
+    //   if (!provider) await dispatch('setupFallbackProvider')
+    //   return provider
+    // },
+
+    // async getSigner ({ dispatch }) {
+    //   if (!signer) await dispatch('connect')
+    //   return signer
+    // },
+
+    async newProject ({ state }, { name, symbol, minAmount }) {
+      try {
+        let contract = new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
+        contract = contract.connect(signer)
+        console.log('new project...', name, symbol, state.address, minAmount)
+        const resp = await contract.newProject(name, symbol, state.address, minAmount)
+        console.log(resp)
+      } catch (e) {
+        console.error('@newProject', e)
+      }
     }
+
+    // async getEventLog() {
+    //   const contract = new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
+    //   const events = await contract.queryFilter('NewProject')
+    //   console.log(events)
+    //   events.forEach(async event => {
+    //     console.log(await event.decode())
+    //   })
+    // }
   }
 })
