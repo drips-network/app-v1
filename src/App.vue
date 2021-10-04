@@ -10,6 +10,9 @@ import SvgLogo from './components/SvgLogo.vue'
   header.h-20.rounded-full.bg-indigo-700.flex.items-center.justify-between
     div.pl-9
       svg-logo.h-5.text-white
+    .flex
+      button(@click="$store.dispatch('connect')") Connect
+      button(@click="$store.dispatch('disconnect')") Disconnect
   //- main#main
     router-view
 </template>
