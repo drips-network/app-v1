@@ -1,12 +1,9 @@
 import { createStore } from 'vuex'
-
-// web3
 import { ethers } from 'ethers'
-// import Web3 from 'web3'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
-let provider, signer
+let provider, signer, walletProvider
 
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
@@ -70,13 +67,13 @@ export default createStore({
         commit('SET_NETWORK', networkId)
 
         // listen to provider events
-        // dispatch('listenToProvider')
+        // dispatch('listenToWalletProvider')
       } catch (e) {
         console.error('@init', e)
       }
     },
 
-    async setupFallbackProvider () {
+    async setupFallbackProvider ({ dispatch }) {
       try {
         if (window.ethereum) {
           // metamask...
@@ -96,8 +93,8 @@ export default createStore({
     async connect ({ commit, dispatch }) {
       try {
         // connect and update provider, signer
-        provider = await web3Modal.connect()
-        provider = new ethers.providers.Web3Provider(provider)
+        walletProvider = await web3Modal.connect()
+        provider = new ethers.providers.Web3Provider(walletProvider)
         signer = provider.getSigner()
 
         // set user address
@@ -107,10 +104,12 @@ export default createStore({
         // set network id
         const networkId = (await provider.getNetwork()).chainId
         commit('SET_NETWORK', networkId)
+
+        dispatch('listenToWalletProvider')
       } catch (e) {
         console.error('@connect', e)
         // clear in case
-        web3Modal.clearCachedProvider()
+        dispatch('disconnect')
       }
     },
 
@@ -118,38 +117,40 @@ export default createStore({
     disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
       web3Modal.clearCachedProvider()
-      // provider.off('accountsChanged')
-      // provider.off('disconnect')
+      if (walletProvider) {
+        walletProvider.off('accountsChanged')
+        walletProvider.off('disconnect')
+      }
       commit('SIGN_OUT')
 
       dispatch('setupFallbackProvider')
-    }
+    },
 
     /* wallet events */
-    // listenToProvider ({ commit, dispatch }) {
-    //   if (!provider?.on) return
+    listenToWalletProvider ({ commit, dispatch }) {
+      if (!walletProvider?.on) return
 
-    //   // account changed (or disconnected)
-    //   provider.on('accountsChanged', accounts => {
-    //     console.log('accountsChanged', accounts)
-    //     if (!accounts.length) {
-    //       return dispatch('disconnect')
-    //     }
-    //     commit('SIGN_IN', accounts[0])
-    //   })
+      // account changed (or disconnected)
+      walletProvider.on('accountsChanged', accounts => {
+        console.log('accountsChanged', accounts)
+        if (!accounts.length) {
+          return dispatch('disconnect')
+        }
+        commit('SIGN_IN', accounts[0])
+      })
 
-    //   // changed network
-    //   provider.on('chainChanged', chainId => {
-    //     console.log('network changed', chainId)
-    //     // reload page so data is correct...
-    //     window.location.reload()
-    //   })
+      // changed network
+      walletProvider.on('chainChanged', chainId => {
+        console.log('network changed', chainId)
+        // reload page so data is correct...
+        window.location.reload()
+      })
 
-    //   // random disconnection? (doesn't fire on account disconnect)
-    //   provider.on('disconnect', error => {
-    //     console.error('disconnected?', error)
-    //     dispatch('disconnect')
-    //   })
-    // },
+      // random disconnection? (doesn't fire on account disconnect)
+      walletProvider.on('disconnect', error => {
+        console.error('disconnected?', error)
+        dispatch('disconnect')
+      })
+    }
   }
 })
