@@ -3,6 +3,9 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 // import HelloWorld from './components/HelloWorld.vue'
 import SvgLogo from './components/SvgLogo.vue'
+import store from '@/store'
+
+store.dispatch('init')
 </script>
 
 <template lang="pug">
@@ -11,8 +14,11 @@ import SvgLogo from './components/SvgLogo.vue'
     div.pl-9
       svg-logo.h-5.text-white
     .flex
-      button(@click="$store.dispatch('connect')") Connect
-      button(@click="$store.dispatch('disconnect')") Disconnect
+      template(v-if="$store.state.address")
+        div {{ $store.state.address }}
+        button(@click="$store.dispatch('disconnect')") Disconnect
+      template(v-else)
+        button(@click="$store.dispatch('connect')") Connect
   //- main#main
     router-view
 </template>

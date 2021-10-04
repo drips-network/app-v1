@@ -4,7 +4,7 @@ import { createStore } from 'vuex'
 import { ethers } from 'ethers'
 // import Web3 from 'web3'
 import Web3Modal from 'web3modal'
-// import WalletConnectProvider from '@walletconnect/web3-provider'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 
 let provider, signer
 
@@ -16,12 +16,12 @@ const networks = {
 // provider options
 const providerOptions = {
   /* See Provider Options Section */
-  // walletconnect: {
-  //   package: WalletConnectProvider, // required
-  //   options: {
-  //     infuraId: '1cf5614cae9f49968fe604b818804be6' // required
-  //   }
-  // }
+  walletconnect: {
+    package: WalletConnectProvider, // required
+    options: {
+      infuraId: '1cf5614cae9f49968fe604b818804be6' // required
+    }
+  }
 }
 
 // setup web3 modal
@@ -29,6 +29,7 @@ const web3Modal = new Web3Modal({
   network: 'rinkeby', // optional
   cacheProvider: false, // optional
   providerOptions // required
+  // theme: 'dark'
 })
 
 export default createStore({
@@ -48,61 +49,64 @@ export default createStore({
     },
     SET_NETWORK (state, id) {
       state.networkId = id
+      console.log('network:', id)
     }
   },
   actions: {
     /* setup web3, contracts */
-    // async init ({ state, commit, dispatch }) {
-    //   try {
-    //     // auto-connect?
-    //     if (web3Modal.cachedProvider) {
-    //       await dispatch('connect')
-    //     }
+    async init ({ state, commit, dispatch }) {
+      try {
+        // auto-connect?
+        if (web3Modal.cachedProvider) {
+          await dispatch('connect')
+        }
 
-    //     // setup web3
-    //     if (!web3) {
-    //       if (provider) {
-    //         web3 = new Web3(provider)
-    //       } else {
-    //         // const n = process.env.NODE_ENV === 'development' ? 'rinkeby' : 'mainnet'
-    //         // web3 = new Web3(new Web3.providers.WebsocketProvider(networks[n].infura))
-    //         console.warn('no fallback provder set!')
-    //       }
-    //     }
+        // setup ethers ?
+        if (!provider) {
+          await dispatch('setupFallbackProvider')
+        }
 
-    //     // setup contracts
-    //     const networkId = state.networkId || await web3.eth.net.getId() || networks.mainnet.id
-    //     console.log('network:', networkId)
-    //     commit('SET_NETWORK', networkId)
-    //     // commit('SET_CONTRACTS', { web3, networkId })
+        const networkId = (await provider.getNetwork()).chainId
+        commit('SET_NETWORK', networkId)
 
-    //     // listen to provider events
-    //     dispatch('listenToProvider')
-    //   } catch (e) {
-    //     console.error('@init', e)
-    //   }
-    // },
+        // listen to provider events
+        // dispatch('listenToProvider')
+      } catch (e) {
+        console.error('@init', e)
+      }
+    },
+
+    async setupFallbackProvider () {
+      try {
+        if (window.ethereum) {
+          // metamask...
+          provider = new ethers.providers.Web3Provider(window.ethereum)
+        } else {
+          // infura
+          const n = process.env.NODE_ENV === 'development' ? 'rinkeby' : 'mainnet'
+          provider = new ethers.getDefaultProvider(networks[n].infura)
+        }
+        console.log('fallback provider')
+      } catch (e) {
+        console.error(e)
+      }
+    },
 
     /* connect wallet */
     async connect ({ commit, dispatch }) {
       try {
-        // connect and update provider, web3
+        // connect and update provider, signer
         provider = await web3Modal.connect()
-        console.log(provider)
         provider = new ethers.providers.Web3Provider(provider)
-        console.log(provider)
         signer = provider.getSigner()
-        console.log(await signer.getAddress())
-        return
 
-        // web3 = new Web3(provider)
-        // // save account
-        // const accounts = await web3.eth.getAccounts()
-        // const address = accounts[0]
-        // const networkId = await web3.eth.net.getId()
-        // // const chainId = await web3.eth.chainId(); // not a function??
-        // commit('SIGN_IN', address)
-        // commit('SET_NETWORK', networkId)
+        // set user address
+        const address = await signer.getAddress()
+        commit('SIGN_IN', address)
+
+        // set network id
+        const networkId = (await provider.getNetwork()).chainId
+        commit('SET_NETWORK', networkId)
       } catch (e) {
         console.error('@connect', e)
         // clear in case
@@ -111,12 +115,14 @@ export default createStore({
     },
 
     /* disconnect wallet */
-    disconnect ({ commit }) {
+    disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
       web3Modal.clearCachedProvider()
       // provider.off('accountsChanged')
       // provider.off('disconnect')
       commit('SIGN_OUT')
+
+      dispatch('setupFallbackProvider')
     }
 
     /* wallet events */

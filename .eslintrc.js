@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-unused-vars': 'off' // for vue3 <script setup> support
+    'no-unused-vars': 'off', // for vue3 <script setup> support
+    'new-cap': 'off' // ethers: new ethers...
   }
 }
