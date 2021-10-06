@@ -5,8 +5,6 @@ import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 // contracts
 import { RadicleRegistry } from '../../contracts'
-// modules
-import create from './create.js'
 
 let provider, signer, walletProvider
 
@@ -32,7 +30,7 @@ const web3Modal = new Web3Modal({
 })
 
 export default createStore({
-  modules: { create },
+  // modules: { },
   state () {
     return {
       address: null,
@@ -161,25 +159,94 @@ export default createStore({
     //   return signer
     // },
 
-    async newProject ({ state }, { name, symbol, minAmount }) {
+    async createProject ({ state, dispatch }, { project, projectMeta }) {
+      // let ipfsHash
       try {
-        let contract = new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
-        contract = contract.connect(signer)
-        console.log('new project...', name, symbol, state.address, minAmount)
-        const resp = await contract.newProject(name, symbol, state.address, minAmount)
-        console.log(resp)
-      } catch (e) {
-        console.error('@newProject', e)
-      }
-    }
+        // ensure wallet connected
+        if (!state.address) {
+          await dispatch('connect')
+        }
 
-    // async getEventLog() {
-    //   const contract = new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
-    //   const events = await contract.queryFilter('NewProject')
-    //   console.log(events)
-    //   events.forEach(async event => {
-    //     console.log(await event.decode())
-    //   })
-    // }
+        // save full data to IPFS/pinata...
+        const projectFull = { ...project, ...projectMeta }
+        const ipfsHash = await pinJSONToIPFS(projectFull)
+        console.log('project meta:', `https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
+
+        // create project on chain
+        const tx = await newProject(project)
+        console.log('new project tx:', tx)
+
+        return { ipfsHash, tx }
+      } catch (e) {
+        console.error('@createProject', e)
+        throw e
+      }
+    },
+
+    waitForProjectCreate (_, { txFrom }) {
+      const contract = getRadicleRegistryContract()
+      return new Promise((resolve) => {
+        // listener
+        const onNewProject = (projectContractAddress) => {
+          console.log('@NewProject', projectContractAddress)
+          contract.off('NewProject', onNewProject)
+          return resolve(projectContractAddress)
+
+          // TODO: filter by owner? (event just returns address right now...)
+          // console.log('ev', event)
+          // const eventFrom = (await event.getTransaction()).from
+          // // if matches sender...
+          // if (eventFrom.toLowerCase() === txFrom.toLowerCase()) {
+          //   console.log('matches owner...')
+          //   // unlisten!
+          //   contract.off('NewProject', onNewProject)
+          //   console.log('unlisten!')
+          //   return resolve(event)
+          // }
+        }
+
+        // listen!
+        console.log('listen for new project...')
+        contract.on('NewProject', onNewProject)
+      })
+    },
+
+    // async waitForTx (_, txHash) {
+    //   return provider.waitForTransaction(txHash)
+    // },
+
+    async getEventLog () {
+      const contract = getRadicleRegistryContract()
+      const events = await contract.queryFilter('NewProject')
+      console.log('new project events:', events)
+    }
   }
 })
+
+// helpers
+
+function getRadicleRegistryContract () {
+  return new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
+}
+
+function newProject ({ name, owner, symbol, minAmount }) {
+  let contract = getRadicleRegistryContract()
+  contract = contract.connect(signer)
+  console.log('new project...', arguments)
+  return contract.newProject(name, symbol, owner, minAmount)
+}
+
+async function pinJSONToIPFS (json) {
+  let resp = await fetch('/.netlify/functions/pin', {
+    method: 'POST',
+    body: JSON.stringify(json)
+  })
+  resp = await resp.json()
+  return resp.IpfsHash
+}
+
+// should have some sort of owner auth...
+// async function unpinFromIPFS (hash) {
+//   let resp = await fetch(`/.netlify/functions/unpin?hash=${hash}`)
+//   return await resp.json()
+// }
