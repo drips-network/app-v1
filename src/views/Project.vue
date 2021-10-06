@@ -7,6 +7,11 @@ export default {
       project
     }
   },
+  computed: {
+    projectAddress () {
+      return this.$route.params.address
+    }
+  },
   async beforeRouteEnter (to, from, next) {
     const resp = await fetch(`https://gateway.pinata.cloud/ipfs/${to.query.ipfs}`)
     project = await resp.json()
@@ -20,4 +25,6 @@ article.profile
   h1 name: {{ project.name }}
   p symbol: {{ project.symbol.toUpperCase() }}
   p descrip: {{ project.descrip }}
+  p
+    a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 </template>
