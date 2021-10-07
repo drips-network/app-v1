@@ -38,6 +38,7 @@ module.exports = {
         12: '1.2rem',
         14: '1.4rem',
         16: '1.6rem',
+        18: '1.8rem',
         20: '2.0rem',
         24: '2.4rem',
         28: '2.8rem',
@@ -59,7 +60,8 @@ module.exports = {
       fontSize: {
         '2xs': ['0.8rem', { lineHeight: '1.2rem' }],
         xs: ['1rem', { lineHeight: '1.4rem' }],
-        sm: ['1.2rem', { lineHeight: '1.8rem' }],
+        sm: ['1.2rem', { lineHeight: '1.6rem' }],
+        ms: ['1.5rem', { lineHeight: '1.8rem' }],
         base: ['1.6rem', { lineHeight: '2rem' }],
         md: ['1.8rem', { lineHeight: '2.2rem' }],
         lg: ['2rem', { lineHeight: '2.4rem' }],
@@ -90,7 +92,9 @@ module.exports = {
     }
   },
   variants: {
-    extend: {}
+    extend: {
+      display: ['group-hover']
+    }
   },
   plugins: []
 }

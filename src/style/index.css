@@ -15,10 +15,16 @@ html {
 }
 
 .btn {
-  @apply rounded-full flex items-center justify-center transform transition duration-150 notouch_hover_scale-102;
+  @apply rounded-full flex items-center justify-center;
+}
+.btn-md {
+  @apply h-40;
+}
+.btn-dark{
+  @apply bg-indigo-800;
 }
 .btn-xl{
-  @apply h-112 max-w-lg text-2xl font-semibold;
+  @apply h-112 max-w-lg text-2xl font-semibold transform transition duration-150 notouch_hover_scale-102;
 }
 .btn-white{
   @apply bg-white text-blue-900;
