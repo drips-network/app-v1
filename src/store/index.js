@@ -38,6 +38,9 @@ export default createStore({
       RadicleRegistryContract: null
     }
   },
+  getters: {
+    addrShort: () => (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...'
+  },
   mutations: {
     SIGN_IN (state, address) {
       state.address = address

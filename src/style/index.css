@@ -11,5 +11,15 @@ html {
 }
 
 .panel{
-  @apply bg-indigo-700 rounded-2xl;
+  @apply bg-indigo-700 rounded-2xlb;
+}
+
+.btn {
+  @apply rounded-full flex items-center justify-center transform transition duration-150 notouch_hover_scale-102;
+}
+.btn-xl{
+  @apply h-112 max-w-lg text-2xl font-semibold;
+}
+.btn-white{
+  @apply bg-white text-blue-900;
 }

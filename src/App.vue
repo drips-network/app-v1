@@ -1,7 +1,6 @@
 <script setup>
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-// import HelloWorld from './components/HelloWorld.vue'
 import SvgLogo from './components/SvgLogo.vue'
 import store from '@/store'
 
@@ -9,8 +8,8 @@ store.dispatch('init')
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.p-10.text-base
-  header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between.px-24
+#app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans
+  header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between.px-36
     router-link(to="/")
       svg-logo.h-16.text-white
     .flex
