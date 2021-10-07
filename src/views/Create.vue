@@ -1,5 +1,7 @@
 <script setup>
 import { computed, reactive } from 'vue'
+import CreatePanel from '@/components/CreatePanel'
+import InputBody from '@/components/InputBody'
 // import { useRouter } from 'vue-router'
 import store from '@/store'
 
@@ -48,20 +50,27 @@ async function submit () {
 <template lang="pug">
 article.create
   h1 Create
-  .mx-auto.max-w-sm.text-center
-    form.text-blue-500(@submit.prevent="submit", validate)
+  form(@submit.prevent="submit", validate)
+    create-panel(icon="✨")
+      template(v-slot:header)
+        h2 Project
       section
-        div
-          input(v-model="project.name", placeholder="name", required)
-        div
-          input(v-model="project.symbol", placeholder="symbol", required)
-        div
-          input(v-model="owner", placeholder="owner", disabled)
-        div
-          textarea(v-model="projectMeta.descrip", placeholder="description")
-        //- div
-          label Min Amount
-          input(v-model="project.minAmount", type="number", required)
+        template(v-if="owner")
+          //- .my-10
+            input-body(label="Owner", :isFilled="owner.length", format="code")
+              input(v-model="owner", placeholder="owner", disabled)
+          .my-10
+            input-body(label="Name*", :isFilled="project.name.length")
+              input(v-model="project.name", placeholder="Name*", required)
+          .my-10
+            input-body(label="Symbol*", :isFilled="project.name.length")
+              input(v-model="project.symbol", placeholder="Symbol*", required)
+          .my-10
+            input-body(label="Description", :isFilled="projectMeta.descrip.length")
+              textarea(v-model="projectMeta.descrip", placeholder="Description")
+          //- div
+            label Min Amount
+            input(v-model="project.minAmount", type="number", required)
 
         div
           button(type="submit") Create
