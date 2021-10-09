@@ -2,7 +2,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract FundingPool",
+        "internalType": "contract DaiPool",
         "name": "pool_",
         "type": "address"
       },
@@ -22,9 +22,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint128",
-        "name": "minAmtPerSec_",
-        "type": "uint128"
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
       }
     ],
     "stateMutability": "nonpayable",
@@ -128,8 +128,14 @@
       },
       {
         "indexed": false,
-        "internalType": "uint128",
+        "internalType": "uint64",
         "name": "limit",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "minAmtPerSec",
         "type": "uint128"
       }
     ],
@@ -181,6 +187,19 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "WITHDRAW_ALL",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -202,13 +221,37 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "activeUntil",
+    "outputs": [
+      {
         "internalType": "uint128",
-        "name": "nftTypeId",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "newTypeId",
         "type": "uint128"
       },
       {
-        "internalType": "uint128",
+        "internalType": "uint64",
         "name": "limit",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint128",
+        "name": "minAmtPerSec",
         "type": "uint128"
       }
     ],
@@ -227,8 +270,13 @@
             "type": "uint128"
           },
           {
-            "internalType": "uint128",
+            "internalType": "uint64",
             "name": "limit",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint128",
+            "name": "minAmtPerSec",
             "type": "uint128"
           }
         ],
@@ -299,6 +347,26 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      }
+    ],
+    "name": "changeIPFSHash",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "collect",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "contractURI",
     "outputs": [
@@ -337,6 +405,19 @@
   },
   {
     "inputs": [],
+    "name": "currLeftSecsInCycle",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "dai",
     "outputs": [
       {
@@ -362,6 +443,25 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "influence",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "influenceScore",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -405,7 +505,7 @@
       },
       {
         "internalType": "uint128",
-        "name": "topUp",
+        "name": "topUpAmt",
         "type": "uint128"
       },
       {
@@ -423,6 +523,25 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "minted",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -449,13 +568,18 @@
     "name": "nftTypes",
     "outputs": [
       {
-        "internalType": "uint128",
+        "internalType": "uint64",
         "name": "limit",
-        "type": "uint128"
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "minted",
+        "type": "uint64"
       },
       {
         "internalType": "uint128",
-        "name": "minted",
+        "name": "minAmtPerSec",
         "type": "uint128"
       }
     ],
@@ -499,7 +623,7 @@
     "name": "pool",
     "outputs": [
       {
-        "internalType": "contract FundingPool",
+        "internalType": "contract DaiPool",
         "name": "",
         "type": "address"
       }
@@ -563,25 +687,6 @@
     "name": "safeTransferFrom",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "secsUntilInactive",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -675,6 +780,24 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "topUpAmt",
+        "type": "uint128"
+      }
+    ],
+    "name": "topUp",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -705,6 +828,30 @@
     ],
     "name": "transferOwnership",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "withdrawAmt",
+        "type": "uint128"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "withdrawn",
+        "type": "uint128"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },

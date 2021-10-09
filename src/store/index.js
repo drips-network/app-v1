@@ -174,12 +174,13 @@ export default createStore({
         const projectFull = { ...project, ...projectMeta }
         const ipfsHash = await pinJSONToIPFS(projectFull)
         console.log('project meta:', `https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
+        project = { ipfsHash, ...project }
 
         // create project on chain
         const tx = await newProject(project)
         console.log('new project tx:', tx)
 
-        return { ipfsHash, tx }
+        return { tx, ipfsHash }
       } catch (e) {
         console.error('@createProject', e)
         throw e
@@ -232,11 +233,11 @@ function getRadicleRegistryContract () {
   return new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
 }
 
-function newProject ({ name, owner, symbol, minAmount }) {
+function newProject ({ name, owner, symbol, ipfsHash }) {
   let contract = getRadicleRegistryContract()
   contract = contract.connect(signer)
   console.log('new project...', arguments)
-  return contract.newProject(name, symbol, owner, minAmount)
+  return contract.newProject(name, symbol, owner, ipfsHash)
 }
 
 async function pinJSONToIPFS (json) {

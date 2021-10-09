@@ -2,7 +2,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract FundingPool",
+        "internalType": "contract DaiPool",
         "name": "pool_",
         "type": "address"
       }
@@ -24,12 +24,6 @@
         "internalType": "address",
         "name": "projectOwner",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint128",
-        "name": "minAmtPerSec",
-        "type": "uint128"
       }
     ],
     "name": "NewProject",
@@ -66,9 +60,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint128",
-        "name": "minAmtPerSec",
-        "type": "uint128"
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
       }
     ],
     "name": "newProject",
@@ -87,7 +81,7 @@
     "name": "pool",
     "outputs": [
       {
-        "internalType": "contract FundingPool",
+        "internalType": "contract DaiPool",
         "name": "",
         "type": "address"
       }

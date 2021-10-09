@@ -17,8 +17,9 @@ const owner = computed(() => store.state.address)
 // on-chain project
 const project = reactive({
   name: '',
+  // owner added in dispatch action
   symbol: '',
-  minAmount: 0
+  ipfsHash: ''
 })
 
 // meta to save to ipfs/pinata

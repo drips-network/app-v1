@@ -91,6 +91,74 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "senderAddr",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "amtPerSec",
+        "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "endTime",
+        "type": "uint64"
+      }
+    ],
+    "name": "SubSenderToReceiverUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "senderAddr",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "balance",
+        "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "amtPerSec",
+        "type": "uint128"
+      }
+    ],
+    "name": "SubSenderUpdated",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "AMT_PER_SEC_UNCHANGED",
     "outputs": [
@@ -146,7 +214,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "id",
+        "name": "receiverAddr",
         "type": "address"
       }
     ],
@@ -159,24 +227,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "id",
+        "name": "receiverAddr",
         "type": "address"
       }
     ],
     "name": "collectable",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "currLeftSecsInCycle",
     "outputs": [
       {
         "internalType": "uint128",
@@ -217,7 +272,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "id",
+        "name": "senderAddr",
         "type": "address"
       }
     ],
@@ -248,7 +303,43 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "id",
+        "name": "senderAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAllReceiversSubSender",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct ReceiverWeight[]",
+        "name": "weights",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "senderAddr",
         "type": "address"
       }
     ],
@@ -267,160 +358,24 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "id",
+        "name": "senderAddr",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
       }
     ],
-    "name": "maxWithdraw",
+    "name": "getAmtPerSecSubSender",
     "outputs": [
       {
         "internalType": "uint128",
-        "name": "",
+        "name": "amt",
         "type": "uint128"
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "nftRegistry",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "nftID",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "id",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "id",
-        "type": "address"
-      },
-      {
-        "internalType": "uint128",
-        "name": "topUpAmt",
-        "type": "uint128"
-      }
-    ],
-    "name": "topUp",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "id",
-        "type": "address"
-      },
-      {
-        "internalType": "uint128",
-        "name": "topUpAmt",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nonce",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "expiry",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "v",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "r",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "s",
-        "type": "bytes32"
-      }
-    ],
-    "name": "topUpAndPermit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "nftRegistry",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint128",
-        "name": "topUpAmt",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint128",
-        "name": "withdraw",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint128",
-        "name": "amtPerSec",
-        "type": "uint128"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "receiver",
-            "type": "address"
-          },
-          {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
-          }
-        ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "updatedReceivers",
-        "type": "tuple[]"
-      }
-    ],
-    "name": "updateSender",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "withdrawn",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -543,12 +498,163 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "topUpAmt",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "withdraw",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "amtPerSec",
+        "type": "uint128"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct ReceiverWeight[]",
+        "name": "updatedReceivers",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "updateSubSender",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "withdrawn",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "topUpAmt",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "withdraw",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "amtPerSec",
+        "type": "uint128"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct ReceiverWeight[]",
+        "name": "updatedReceivers",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expiry",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      }
+    ],
+    "name": "updateSubSenderAndPermit",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "withdrawn",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
-        "name": "id",
+        "name": "senderAddr",
         "type": "address"
       }
     ],
     "name": "withdrawable",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "senderAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawableSubSender",
     "outputs": [
       {
         "internalType": "uint128",
