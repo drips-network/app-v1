@@ -15,6 +15,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': 'off', // for vue3 <script setup> support
     'new-cap': 'off', // ethers library has many lowercase constructors...
-    'no-undef': 'warn'
+    'no-undef': 'off' // vue 3 defineProps...
   }
 }

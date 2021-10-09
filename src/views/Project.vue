@@ -1,13 +1,16 @@
 <script>
 import AvatarBlockie from '@/components/AvatarBlockie'
+import InputBody from '@/components/InputBody'
+import Modal from '@/components/Modal'
 let project
 
 export default {
   name: 'Project',
-  components: { AvatarBlockie },
+  components: { AvatarBlockie, InputBody, Modal },
   data () {
     return {
-      project
+      project,
+      mintModal: false
     }
   },
   computed: {
@@ -25,7 +28,7 @@ export default {
 
 <template lang="pug">
 article.profile
-  section.panel.my-10.py-12
+  section.panel-indigo.my-10.py-12
     //- progress bar
     .h-80.rounded-full.bg-indigo-800.mx-10
 
@@ -44,7 +47,17 @@ article.profile
       //- links
       ul.flex.justify-center
 
-      button.btn.btn-xl.btn-white.w-full.mx-auto.mt-44 Fund 🌈
+      .mt-44
+        //- TEMP MINT
+        //- .max-w-sm.mx-auto
+          input-body.my-10(label="Rate", :isFilled="mint.rate !== null")
+            input(v-model="mint.rate", type="number", placeholder="Rate", required)
+          input-body.my-10.mb-36(label="Pre-pay", :isFilled="mint.topUp !== null")
+            input(v-model="mint.topUp", type="number", placeholder="Pre-pay", required)
+
+        button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal") Fund 🌈
       //- p
         a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
+
+    modal(:open="mintModal", @close="mintModal = false", :projectAddress="projectAddress")
 </template>

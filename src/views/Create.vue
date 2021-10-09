@@ -1,6 +1,6 @@
 <script setup>
 import { computed, reactive } from 'vue'
-import CreatePanel from '@/components/CreatePanel'
+import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 // import { useRouter } from 'vue-router'
 import store from '@/store'
@@ -52,7 +52,7 @@ async function submit () {
 article.create
   h1 Create
   form(@submit.prevent="submit", validate)
-    create-panel(icon="✨")
+    panel(icon="✨")
       template(v-slot:header)
         h2 Project
       section

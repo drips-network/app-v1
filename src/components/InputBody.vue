@@ -3,7 +3,7 @@ import { useSlots, computed } from 'vue'
 
 const props = defineProps({
   label: String,
-  isFilled: Number, // input has content
+  isFilled: [Number, Boolean], // input has content
   format: String
 })
 

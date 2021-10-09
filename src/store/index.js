@@ -4,7 +4,7 @@ import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 // contracts
-import { RadicleRegistry } from '../../contracts'
+import { RadicleRegistry, DAI, FundingNFT } from '../../contracts'
 
 let provider, signer, walletProvider
 
@@ -223,6 +223,32 @@ export default createStore({
       const contract = getRadicleRegistryContract()
       const events = await contract.queryFilter('NewProject')
       console.log('new project events:', events)
+    },
+
+    async approveDAIContract (_, { projectAddress, amount }) {
+      const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
+      console.log(contract)
+      const contractSigner = contract.connect(signer)
+      console.log(contractSigner)
+
+      try {
+        const tx = await contractSigner.approve(projectAddress, amount.toString())
+        return tx
+      } catch (e) {
+        console.error('@approveDAIContract', e)
+      }
+    },
+
+    async mintProjectNFT ({ state }, { projectAddress, typeId = 0, topUpAmt, amtPerSec }) {
+      const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
+      const contractSigner = contract.connect(signer)
+
+      try {
+        const tx = await contractSigner.mint(state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
+        return tx
+      } catch (e) {
+        console.error('@mintProjectNFT', e)
+      }
     }
   }
 })
