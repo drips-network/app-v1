@@ -54,7 +54,7 @@ export default createStore({
     // }
   },
   actions: {
-    /* setup web3, contracts */
+    /* setup provider */
     async init ({ state, commit, dispatch }) {
       try {
         // auto-connect?
@@ -62,31 +62,18 @@ export default createStore({
           await dispatch('connect')
         }
 
-        // setup ethers ?
+        // fallback provider
         if (!provider) {
-          await dispatch('setupFallbackProvider')
+          if (window.ethereum) {
+            // metamask
+            provider = new Ethers.providers.Web3Provider(window.ethereum)
+          } else {
+            // infura
+            provider = new Ethers.getDefaultProvider(networks[network].infura)
+          }
         }
-
-        // const network = await provider.getNetwork()
-        // console.log(network.name)
       } catch (e) {
         console.error('@init', e)
-      }
-    },
-
-    async setupFallbackProvider ({ commit, dispatch }) {
-      try {
-        if (window.ethereum) {
-          // metamask...
-          provider = new Ethers.providers.Web3Provider(window.ethereum)
-        } else {
-          // infura...
-          provider = new Ethers.getDefaultProvider(networks[network].infura)
-        }
-
-        // commit('SET_CONTRACTS', provider)
-      } catch (e) {
-        console.error(e)
       }
     },
 
@@ -174,7 +161,7 @@ export default createStore({
         const projectFull = { ...project, ...projectMeta }
         const ipfsHash = await pinJSONToIPFS(projectFull)
         console.log('project meta:', `https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
-        project = { ipfsHash, ...project }
+        project.ipfsHash = ipfsHash
 
         // create project on chain
         const tx = await newProject(project)
@@ -191,22 +178,14 @@ export default createStore({
       const contract = getRadicleRegistryContract()
       return new Promise((resolve) => {
         // listener
-        const onNewProject = (projectContractAddress) => {
-          console.log('@NewProject', projectContractAddress)
-          contract.off('NewProject', onNewProject)
-          return resolve(projectContractAddress)
+        const onNewProject = async (projectAddress, projectOwner) => {
+          console.log('@NewProject', projectAddress, projectOwner)
 
-          // TODO: filter by owner? (event just returns address right now...)
-          // console.log('ev', event)
-          // const eventFrom = (await event.getTransaction()).from
-          // // if matches sender...
-          // if (eventFrom.toLowerCase() === txFrom.toLowerCase()) {
-          //   console.log('matches owner...')
-          //   // unlisten!
-          //   contract.off('NewProject', onNewProject)
-          //   console.log('unlisten!')
-          //   return resolve(event)
-          // }
+          // if owner matches tx sender...
+          if (projectOwner.toLowerCase() === txFrom.toLowerCase()) {
+            contract.off('NewProject', onNewProject)
+            return resolve(projectAddress)
+          }
         }
 
         // listen!
@@ -215,14 +194,28 @@ export default createStore({
       })
     },
 
-    // async waitForTx (_, txHash) {
-    //   return provider.waitForTransaction(txHash)
-    // },
-
     async getEventLog () {
       const contract = getRadicleRegistryContract()
       const events = await contract.queryFilter('NewProject')
       console.log('new project events:', events)
+    },
+
+    async getProjectMeta ({ dispatch }, projectAddress) {
+      if (!provider) {
+        await dispatch('init')
+      }
+      try {
+        // get hash...
+        const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
+        const ipfsHash = await contract.contractURI()
+        // fetch...
+        const resp = await fetch(`https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
+        const meta = resp.json()
+        return meta
+      } catch (e) {
+        console.error('@getProjectMeta', e)
+        throw e
+      }
     },
 
     async approveDAIContract (_, { projectAddress, amount }) {
@@ -274,9 +267,3 @@ async function pinJSONToIPFS (json) {
   resp = await resp.json()
   return resp.IpfsHash
 }
-
-// should have some sort of owner auth...
-// async function unpinFromIPFS (hash) {
-//   let resp = await fetch(`/.netlify/functions/unpin?hash=${hash}`)
-//   return await resp.json()
-// }
