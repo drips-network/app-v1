@@ -26,7 +26,7 @@ html {
   @apply h-40;
 }
 .btn-lg {
-  @apply h-80 min-w-sm px-32 text-xl font-semibold;
+  @apply h-80 px-32 text-xl font-semibold;
 }
 .btn-xl{
   @apply h-112 max-w-lg text-2xl font-semibold transform transition duration-150 notouch_hover_scale-102;

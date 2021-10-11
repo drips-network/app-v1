@@ -10,7 +10,7 @@ const props = defineProps({
 
 const state = reactive({
   typeId: 0,
-  minimum: null,
+  minimum: 1,
   tx: null,
   txReceipt: null
 })
@@ -64,7 +64,7 @@ panel.mx-auto(icon="🌈")
 
     .mt-40
       //- submit btn
-      button.btn.btn-lg.btn-white.mx-auto(type="submit", :disabled="state.tx !== null")
+      button.btn.btn-lg.btn-white.mx-auto.min-w-sm(type="submit", :disabled="state.tx !== null")
         template(v-if="state.txReceipt") Added!
         template(v-else-if="state.tx") Adding...
         template(v-else) Confirm

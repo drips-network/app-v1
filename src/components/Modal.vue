@@ -16,10 +16,12 @@ const props = defineProps({
 })
 
 const state = reactive({
-  rate: 1,
+  rate: 2,
   topUp: 5184000,
   approved: false,
-  nft: null
+  nft: null,
+  approveTx: null,
+  mintTx: null
 })
 
 const emit = defineEmits(['close'])
@@ -27,9 +29,15 @@ const close = () => emit('close')
 
 const approve = async () => {
   try {
-    const tx = await store.dispatch('approveDAIContract', { projectAddress: props.projectAddress, amount: state.topUp })
-    console.log('approve tx', tx)
-    console.log(await tx.wait()) // receipt
+    // send...
+    state.approveTx = await store.dispatch('approveDAIContract', {
+      projectAddress: props.projectAddress,
+      amount: state.topUp
+    })
+    console.log('approve tx', state.approveTx)
+
+    // wait for confirmation...
+    await state.approveTx.wait() // receipt
 
     state.approved = state.topUp.toString()
   } catch (e) {
@@ -40,10 +48,17 @@ const approve = async () => {
 
 const mint = async () => {
   try {
-    const tx = await store.dispatch('mintProjectNFT', { projectAddress: props.projectAddress, topUpAmt: state.topUp, amtPerSec: state.rate })
-    console.log('mint tx', tx)
+    // mint...
+    state.mintTx = await store.dispatch('mintProjectNFT', {
+      projectAddress: props.projectAddress,
+      topUpAmt: state.topUp,
+      amtPerSec: state.rate
+    })
+    console.log('mint tx', state.mintTx)
+
     // console.log(await tx.wait()) // receipt
 
+    // on confirmation...
     state.nft = await store.dispatch('waitForNFTMint', { projectAddress: props.projectAddress })
   } catch (e) {
     console.error(e)
@@ -73,17 +88,25 @@ const mint = async () => {
         <input v-model="state.topUp" type="number" placeholder="Pre-pay (DAI-WEI)" required>
       </input-body>
 
-      <template v-if="state.nft">
-        <router-link :to="{name: 'user', params: {address: $store.state.address}, query: state.nft }" class="btn btn-lg btn-white mx-auto" @click="approve">View NFT</router-link>
-      </template>
+      <div class="flex justify-center">
+        <template v-if="state.nft">
+          <router-link :to="{name: 'user', params: {address: $store.state.address}, query: state.nft }" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
+        </template>
 
-      <template v-else-if="!state.approved">
-        <button class="btn btn-lg btn-white mx-auto" @click="approve">Approve...</button>
-      </template>
+        <template v-else-if="!state.approved">
+          <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="approve">
+            <template v-if="state.approveTx">Approving...</template>
+            <template v-else>Approve</template>
+          </button>
+        </template>
 
-      <template v-else>
-        <button class="btn btn-lg btn-white mx-auto" @click="mint">Subscribe</button>
-      </template>
+        <template v-else>
+          <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="mint">
+            <template v-if="state.mintTx">Subscribing...</template>
+            <template v-else>Subscribe</template>
+          </button>
+        </template>
+      </div>
     </Panel>
 
   </Dialog>

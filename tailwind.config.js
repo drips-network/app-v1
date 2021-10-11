@@ -55,7 +55,7 @@ module.exports = {
       black: 'black',
 
       violet: {
-        400: '#382099', // nft thumb title
+        // 400: '#382099', // nft thumb title
         600: '#4949DD',
         700: '#28258E' // bright borders
       },

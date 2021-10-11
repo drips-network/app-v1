@@ -78,7 +78,7 @@ panel.mx-auto(icon="✨")
 
         div.mt-40
           //- create btn
-          button.btn.btn-lg.btn-white.mx-auto(type="submit", :disabled="state.tx !== null")
+          button.btn.btn-lg.btn-white.mx-auto.min-w-sm(type="submit", :disabled="state.tx !== null")
             template(v-if="state.projectAddress") Created!
             template(v-else-if="state.tx") Creating...
             template(v-else) Create
