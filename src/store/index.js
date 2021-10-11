@@ -194,6 +194,12 @@ export default createStore({
       })
     },
 
+    async addProjectNFTType (_, { projectAddress, typeId = 0, limit = 999, minAmtPerSec = 0 }) {
+      const contract = getProjectContract(projectAddress)
+      const contractSigner = contract.connect(signer)
+      return contractSigner.addType(typeId, limit, minAmtPerSec)
+    },
+
     async getEventLog () {
       const contract = getRadicleRegistryContract()
       const events = await contract.queryFilter('NewProject')

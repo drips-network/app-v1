@@ -74,15 +74,15 @@ const mint = async () => {
       </input-body>
 
       <template v-if="state.nft">
-        <router-link :to="{name: 'user', params: {address: $store.state.address}, query: state.nft }" class="btn btn-lg btn-white mx-auto w-full" @click="approve">View NFT</router-link>
+        <router-link :to="{name: 'user', params: {address: $store.state.address}, query: state.nft }" class="btn btn-lg btn-white mx-auto" @click="approve">View NFT</router-link>
       </template>
 
       <template v-else-if="!state.approved">
-        <button class="btn btn-lg btn-white mx-auto w-full" @click="approve">Approve...</button>
+        <button class="btn btn-lg btn-white mx-auto" @click="approve">Approve...</button>
       </template>
 
       <template v-else>
-        <button class="btn btn-lg btn-white mx-auto w-full" @click="mint">Subscribe</button>
+        <button class="btn btn-lg btn-white mx-auto" @click="mint">Subscribe</button>
       </template>
     </Panel>
 

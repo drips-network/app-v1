@@ -32,7 +32,7 @@ export default {
 
 <template lang="pug">
 article.profile
-  section.panel-indigo.my-10.py-12
+  section.panel-indigo.my-10.py-12.pb-48
     //- progress bar
     .h-80.rounded-full.bg-indigo-800.mx-10
 
