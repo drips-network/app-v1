@@ -46,14 +46,16 @@ module.exports = {
       80: '8.0rem',
       96: '9.6rem',
       112: '11.2rem',
-      144: '14.4rem'
+      144: '14.4rem',
+      160: '16rem',
+      180: '18rem'
     },
     colors: {
       transparent: 'transparent',
-      white: 'white',
       black: 'black',
 
       violet: {
+        400: '#382099', // nft thumb title
         600: '#4949DD',
         700: '#28258E' // bright borders
       },
@@ -64,7 +66,9 @@ module.exports = {
       },
       blue: {
         900: '#101828'
-      }
+      },
+
+      white: 'white'
     },
     fontSize: {
       '2xs': ['0.8rem', { lineHeight: '1.2rem' }],
@@ -514,18 +518,30 @@ module.exports = {
       prose: '65ch',
       ...breakpoints(theme('screens'))
     }),
-    minHeight: (theme) => ({
+    minHeight: (theme, { breakpoints }) => ({
       0: '0',
-      ...theme('spacing'),
       full: '100%',
       screen: '100vh'
+      // ...breakpoints(theme('screens'))
     }),
-    minWidth: {
+    minWidth: (theme) => ({
       0: '0px',
+      ...theme('spacing'),
+      xs: '20rem',
+      sm: '24rem',
+      md: '28rem',
+      lg: '32rem',
+      xl: '36rem',
+      '2xl': '42rem',
+      '3xl': '48rem',
+      '4xl': '56rem',
+      '5xl': '64rem',
+      '6xl': '72rem',
+      '7xl': '80rem',
       full: '100%',
       min: 'min-content',
       max: 'max-content'
-    },
+    }),
     objectPosition: {
       bottom: 'bottom',
       center: 'center',
@@ -947,5 +963,7 @@ module.exports = {
     wordBreak: ['responsive'],
     zIndex: ['responsive', 'focus-within', 'focus']
   },
-  plugins: []
+  plugins: [
+    require('@tailwindcss/aspect-ratio')
+  ]
 }

@@ -49,10 +49,9 @@ async function submit () {
 </script>
 
 <template lang="pug">
-article.create
-  h1 Create
+article.create.py-80
   form(@submit.prevent="submit", validate)
-    panel(icon="✨")
+    panel.mx-auto(icon="✨")
       template(v-slot:header)
         h2 Project
       section
@@ -68,21 +67,21 @@ article.create
               input(v-model="project.symbol", placeholder="Symbol*", required)
           .my-10
             input-body(label="Description", :isFilled="projectMeta.descrip.length")
-              textarea(v-model="projectMeta.descrip", placeholder="Description")
-          //- div
-            label Min Amount
-            input(v-model="project.minAmount", type="number", required)
+              input(v-model="projectMeta.descrip", placeholder="Description")
 
-        div
-          button(type="submit") Create
+          div.mt-40
+            button.btn.btn-lg.btn-white.mx-auto(type="submit") Create
+
+        template(v-else)
+            button.btn.btn-lg.btn-white.mx-auto(@click="$store.dispatch('connect')") Connect Wallet
 
     .mt-4(v-if="state.tx")
       a(:href="`https://rinkeby.etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
     .mt-4(v-if="state.projectAddress")
-      router-link(:to="{name: 'project', params: { address: state.projectAddress }, query: { ipfs: state.projectIpfsHash }}") View Project
+      router-link(:to="{name: 'project', params: { address: state.projectAddress }}") View Project
 
-  div
+  //- div
     button(@click="$store.dispatch('getEventLog')") Log Projects in Console...
 
 </template>

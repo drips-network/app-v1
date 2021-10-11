@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.4.1",
     "@pinata/sdk": "^1.1.23",
+    "@tailwindcss/aspect-ratio": "^0.3.0",
     "@walletconnect/web3-provider": "^1.6.5",
     "core-js": "^3.6.5",
     "ethereum-blockies": "^0.1.1",

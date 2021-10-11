@@ -9,7 +9,7 @@ const props = defineProps({
 </script>
 
 <template lang="pug">
-section.panel.panel-dark.w-full.max-w-screen-sm.text-center.pt-44.px-20.pb-20
+section.panel.panel-dark.w-full.max-w-screen-sm.text-center.pt-44.px-24.pb-24
   header.mb-40.text-center
     .mb-20.text-2xl(v-if="icon") {{ icon }}
 

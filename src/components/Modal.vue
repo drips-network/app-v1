@@ -16,9 +16,10 @@ const props = defineProps({
 })
 
 const state = reactive({
-  rate: null,
-  topUp: null,
-  approved: false
+  rate: 1,
+  topUp: 5184000,
+  approved: false,
+  nft: null
 })
 
 const emit = defineEmits(['close'])
@@ -41,7 +42,9 @@ const mint = async () => {
   try {
     const tx = await store.dispatch('mintProjectNFT', { projectAddress: props.projectAddress, topUpAmt: state.topUp, amtPerSec: state.rate })
     console.log('mint tx', tx)
-    console.log(await tx.wait()) // receipt
+    // console.log(await tx.wait()) // receipt
+
+    state.nft = await store.dispatch('waitForNFTMint', { projectAddress: props.projectAddress })
   } catch (e) {
     console.error(e)
   }
@@ -70,7 +73,11 @@ const mint = async () => {
         <input v-model="state.topUp" type="number" placeholder="Pre-pay (DAI-WEI)" required>
       </input-body>
 
-      <template v-if="!state.approved">
+      <template v-if="state.nft">
+        <router-link :to="{name: 'user', params: {address: $store.state.address}, query: state.nft }" class="btn btn-lg btn-white mx-auto w-full" @click="approve">View NFT</router-link>
+      </template>
+
+      <template v-else-if="!state.approved">
         <button class="btn btn-lg btn-white mx-auto w-full" @click="approve">Approve...</button>
       </template>
 

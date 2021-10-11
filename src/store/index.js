@@ -218,13 +218,14 @@ export default createStore({
       }
     },
 
-    async approveDAIContract (_, { projectAddress, amount }) {
-      const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
-      console.log(contract)
-      const contractSigner = contract.connect(signer)
-      console.log(contractSigner)
+    async approveDAIContract ({ state }, { projectAddress, amount }) {
+      // TODO: check existing DAI allowance
+      // const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
+      // await contract.allowance(state.address, projectAddress)
 
       try {
+        const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
+        const contractSigner = contract.connect(signer)
         const tx = await contractSigner.approve(projectAddress, amount.toString())
         return tx
       } catch (e) {
@@ -241,7 +242,37 @@ export default createStore({
         return tx
       } catch (e) {
         console.error('@mintProjectNFT', e)
+        throw e
       }
+    },
+
+    async waitForNFTMint ({ state }, { projectAddress }) {
+      const contract = getProjectContract(projectAddress)
+
+      return new Promise((resolve) => {
+        // listener
+        const onNewNFT = async (newTokenId, nftReceiver, typeId, topUpAmt, amtPerSec) => {
+          const nft = {
+            tokenId: newTokenId.toString(),
+            nftReceiver,
+            projectAddress,
+            typeId: typeId.toString(),
+            topUpAmt: typeId.toString(),
+            amtPerSec: amtPerSec.toString()
+          }
+          console.log('@NewNFT', nft)
+
+          // if owner matches tx sender...
+          if (nftReceiver.toLowerCase() === state.address.toLowerCase()) {
+            contract.off('NewNFT', onNewNFT)
+            return resolve(nft)
+          }
+        }
+
+        // listen!
+        console.log('listen for new NFT...')
+        contract.on('NewNFT', onNewNFT)
+      })
     }
   }
 })
@@ -250,6 +281,10 @@ export default createStore({
 
 function getRadicleRegistryContract () {
   return new Ethers.Contract(RadicleRegistry.address, RadicleRegistry.abi, provider)
+}
+
+function getProjectContract (address) {
+  return new Ethers.Contract(address, FundingNFT.abi, provider)
 }
 
 function newProject ({ name, owner, symbol, ipfsHash }) {
