@@ -520,9 +520,9 @@ module.exports = {
     }),
     minHeight: (theme, { breakpoints }) => ({
       0: '0',
+      ...theme('spacing'),
       full: '100%',
       screen: '100vh'
-      // ...breakpoints(theme('screens'))
     }),
     minWidth: (theme) => ({
       0: '0px',

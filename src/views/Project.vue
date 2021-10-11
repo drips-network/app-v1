@@ -38,7 +38,7 @@ article.profile
 
     header.text-center.relative.pt-44
       //- owner
-      .absolute.top-0.left-0.pl-16.pt-20
+      .absolute.top-0.left-0.p-18
         router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full.-m-8(:to="{name: 'user', params: {address: meta.owner}}")
           avatar-blockie.w-36.mr-12(:address="meta.owner", width="36")
           .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(meta.owner) }}
