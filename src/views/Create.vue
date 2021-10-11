@@ -21,6 +21,8 @@ const onAddedNFTType = () => {
     router.push({ name: 'project', params: { address: state.projectAddress } })
   }, 1000)
 }
+
+const isDev = process.env.NODE_ENV !== 'production'
 </script>
 
 <template lang="pug">
@@ -29,7 +31,7 @@ article.create.py-80.relative
 
   create-project-funding-panel.my-24(v-if="state.projectAddress", :projectAddress="state.projectAddress", @addedNFTType="onAddedNFTType")
 
-  button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(@click="$store.dispatch('getEventLog')") Log project events...
+  button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
 
 <style>
