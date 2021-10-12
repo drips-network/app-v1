@@ -279,6 +279,20 @@ export default createStore({
         console.log('listen for new NFT...')
         contract.on('NewNFT', onNewNFT)
       })
+    },
+
+    async collectProjectFunds (_, { projectAddress }) {
+      try {
+        const contract = getProjectContract(projectAddress)
+        const contractSigner = contract.connect(signer)
+
+        const tx = await contractSigner.collect()
+        console.log('collect tx', tx)
+        console.log(await tx.wait())
+      } catch (e) {
+        console.error('@collectProjectFunds', e)
+        throw e
+      }
     }
   }
 })
