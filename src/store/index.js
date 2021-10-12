@@ -43,7 +43,7 @@ export default createStore({
   },
   mutations: {
     SIGN_IN (state, address) {
-      state.address = address
+      state.address = address.toLowerCase()
     },
     SIGN_OUT (state) {
       state.address = null

@@ -25,9 +25,9 @@ onBeforeMount(async () => {
     //- filler graphic
     .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative
       .absolute.overlay.flex.items-center.justify-center.text-center
-        //- | NFT {{ '#' + nft.id }}<br>
-        | {{ nft.amtPerSec }} DAI-WEI/sec<br>
-        | Type {{ nft.nftTypeId.toString() }}
+        | NFT {{ '#' + nft.id }}<br>
+        | Type {{ nft.nftTypeId.toString() }}<br>
+        | {{ nft.amtPerSec }} DAI-WEI/sec
 
   footer.flex.justify-end
     a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${nft.id}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
