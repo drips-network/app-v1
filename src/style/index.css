@@ -40,6 +40,9 @@ html {
 .btn-white{
   @apply bg-white text-blue-900;
 }
+.btn-active-white {
+  &.router-link-exact-active { @apply btn-white }
+}
 
 /* fields */
 input, textarea {

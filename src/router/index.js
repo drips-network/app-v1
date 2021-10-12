@@ -22,8 +22,19 @@ const routes = [
   },
   {
     path: '/:address',
-    name: 'user',
-    component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')
+    component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
+    children: [
+      {
+        path: '',
+        name: 'user',
+        component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
+      },
+      {
+        path: 'funds',
+        name: 'user-funds',
+        component: () => import(/* webpackChunkName: "user-funds" */ '../views/user/UserFunds.vue')
+      }
+    ]
   }
 ]
 

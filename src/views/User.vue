@@ -1,6 +1,5 @@
 <script setup>
 import AvatarBlockie from '@/components/AvatarBlockie'
-import UserNft from '@/components/UserNFT'
 </script>
 
 <template lang="pug">
@@ -12,12 +11,10 @@ article.profile.pb-80
         h1.text-2xl.font-semibold.pr-60 {{ $store.getters.addrShort($route.params.address) }}
 
     nav.my-40.flex
-      .btn.btn-dark.btn-lg.w-180 Projects
-      .btn.btn-lg.btn-white.w-180 Funds
+      router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user', params: $route.params }") Projects
+      router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user-funds', params: $route.params }") Funds
 
   main#main
-    section
-      ul.flex.flex-wrap.px-20.w-full
-        li.px-20.w-1x2
-          user-nft(:nft="$route.query")
+    router-view
+
 </template>
