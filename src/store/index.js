@@ -160,7 +160,7 @@ export default createStore({
         // save full data to IPFS/pinata...
         const projectFull = { ...project, ...projectMeta }
         const ipfsHash = await pinJSONToIPFS(projectFull)
-        console.log('project meta:', `https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
+        console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         project.ipfsHash = ipfsHash
 
         // create project on chain
@@ -215,7 +215,7 @@ export default createStore({
         const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
         const ipfsHash = await contract.contractURI()
         // fetch...
-        const resp = await fetch(`https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
+        const resp = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         const meta = resp.json()
         return meta
       } catch (e) {

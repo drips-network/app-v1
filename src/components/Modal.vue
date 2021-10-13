@@ -90,7 +90,7 @@ const mint = async () => {
         <input-body class="my-10" label="Rate (DAI-WEI/sec)" :isFilled="typeof state.rate === 'number'">
           <input v-model="state.rate" type="number" placeholder="Rate (DAI-WEI/sec)" :min="props.nftType.minAmtPerSec.toString()" step="1" required>
         </input-body>
-        <input-body class="my-10 mb-36" label="Pre-pay (DAI-WEI)" :isFilled="typeof topUp === 'number'">
+        <input-body class="my-10 mb-36" label="Pay 30 days (DAI-WEI)" :isFilled="typeof topUp === 'number'">
           <input class="opacity-50" v-model="topUp" type="number" placeholder="Pay 30 days (DAI-WEI)" disabled required>
         </input-body>
 
