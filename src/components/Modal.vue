@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import {
   Dialog,
   DialogOverlay,
@@ -9,6 +9,7 @@ import {
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import store from '@/store'
+import { BigNumber as bn, constants } from 'ethers'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -16,8 +17,21 @@ const props = defineProps({
   nftType: Object
 })
 
+const fromWEI = (wei) => {
+  wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
+  return wei.div(constants.WeiPerEther)
+}
+
+const minDAIPerSec = fromWEI(props.nftType.minAmtPerSec) // bn
+const minDAIPerMonth = minDAIPerSec.mul(30 * 24 * 60 * 60) // bn
+
+const rate = ref(Math.max(1, minDAIPerMonth.toNumber())) // min at least 1...
+const prePayMonths = ref(1)
+const payTotalDAI = computed(() => rate.value * prePayMonths.value)
+
 const state = reactive({
-  rate: 2,
+  // rate: 2, // DAI
+  // prePayMonths: 1,
   // topUp: 5184000,
   approved: false,
   nft: null,
@@ -26,8 +40,13 @@ const state = reactive({
 })
 
 // set mins
-state.rate = Number(props.nftType.minAmtPerSec.toString())
-const topUp = computed(() => state.rate * 30 * 24 * 60 * 60) // 30 days / 1 term
+
+const topUpWei = computed(() => {
+  return constants.WeiPerEther.mul(payTotalDAI.value)
+})
+const weiPerSec = computed(() => {
+  return constants.WeiPerEther.mul(rate.value).div(30 * 24 * 60 * 60)
+})
 
 const emit = defineEmits(['close'])
 const close = () => emit('close')
@@ -37,14 +56,14 @@ const approve = async () => {
     // send...
     state.approveTx = await store.dispatch('approveDAIContract', {
       projectAddress: props.projectAddress,
-      amount: topUp.value
+      amount: topUpWei.value
     })
     console.log('approve tx', state.approveTx)
 
     // wait for confirmation...
     await state.approveTx.wait() // receipt
 
-    state.approved = topUp.value.toString()
+    state.approved = topUpWei.value.toString()
   } catch (e) {
     console.error(e)
     state.approved = false
@@ -56,8 +75,8 @@ const mint = async () => {
     // mint...
     state.mintTx = await store.dispatch('mintProjectNFT', {
       projectAddress: props.projectAddress,
-      topUpAmt: topUp.value,
-      amtPerSec: state.rate
+      topUpAmt: topUpWei.value,
+      amtPerSec: weiPerSec.value
     })
     console.log('mint tx', state.mintTx)
 
@@ -87,14 +106,27 @@ const mint = async () => {
       </template>
 
       <form @submit.prevent validate>
-        <input-body class="my-10" label="Rate (DAI-WEI/sec)" :isFilled="typeof state.rate === 'number'">
-          <input v-model="state.rate" type="number" placeholder="Rate (DAI-WEI/sec)" :min="props.nftType.minAmtPerSec.toString()" step="1" required>
-        </input-body>
-        <input-body class="my-10 mb-36" label="Pay 30 days (DAI-WEI)" :isFilled="typeof topUp === 'number'">
-          <input class="opacity-50" v-model="topUp" type="number" placeholder="Pay 30 days (DAI-WEI)" disabled required>
+        <input-body class="my-10" label="Monthly Rate (DAI)" :isFilled="typeof rate === 'number'">
+          <input v-model="rate" type="number" placeholder="Monthly Rate (DAI)" :min="props.nftType.minAmtPerSec.toString()" step="1" required>
         </input-body>
 
-        <div class="flex justify-center">
+        <input-body class="my-10" label="Pre-pay (Months)" :isFilled="typeof prePayMonths === 'number'">
+          <input v-model="prePayMonths" type="number" placeholder="Pre-pay (Months)" min="1" step="1" required>
+        </input-body>
+
+        <!-- total due -->
+        <div class="rounded-full px-24 h-80 bg-indigo-700 flex justify-between items-center font-semibold">
+          <div class="text-lg">TOTAL</div>
+          <div class="text-2xl"> {{ payTotalDAI }} DAI</div>
+        </div>
+
+        <!-- <p> {{ topUpWei.value.toString() }} WEI</p> -->
+
+        <!-- <input-body class="my-10 mb-36" label="Pay 30 days (DAI-WEI)" :isFilled="typeof topUp === 'number'">
+          <input class="opacity-50" v-model="topUp" type="number" placeholder="Pay 30 days (DAI-WEI)" disabled required>
+        </input-body> -->
+
+        <div class="flex justify-center mt-40">
           <template v-if="state.nft">
             <router-link :to="{name: 'user-funds', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
           </template>
