@@ -11,7 +11,8 @@ export default {
   data () {
     return {
       meta,
-      mintModal: false
+      mintModal: false,
+      nftType: null
     }
   },
   computed: {
@@ -26,6 +27,9 @@ export default {
     } catch (e) {
       console.error(e)
     }
+  },
+  async created () {
+    this.nftType = await this.$store.dispatch('getNFTType', { projectAddress: this.projectAddress })
   }
 }
 </script>
@@ -52,9 +56,11 @@ article.profile
       ul.flex.justify-center
 
       .mt-44
-        button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal") Fund 🌈
+        button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Fund 🌈
+
+        .mt-16.text-violet-600(v-if="nftType") Min. {{ nftType.minAmtPerSec.toString() }} DAI-WEI/sec
       //- p
         a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 
-    modal(:open="mintModal", @close="mintModal = false", :projectAddress="projectAddress")
+    modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 </template>

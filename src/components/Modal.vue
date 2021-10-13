@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, computed } from 'vue'
 import {
   Dialog,
   DialogOverlay,
@@ -12,17 +12,22 @@ import store from '@/store'
 
 const props = defineProps({
   isOpen: Boolean,
-  projectAddress: String
+  projectAddress: String,
+  nftType: Object
 })
 
 const state = reactive({
   rate: 2,
-  topUp: 5184000,
+  // topUp: 5184000,
   approved: false,
   nft: null,
   approveTx: null,
   mintTx: null
 })
+
+// set mins
+state.rate = Number(props.nftType.minAmtPerSec.toString())
+const topUp = computed(() => state.rate * 30 * 24 * 60 * 60) // 30 days / 1 term
 
 const emit = defineEmits(['close'])
 const close = () => emit('close')
@@ -32,14 +37,14 @@ const approve = async () => {
     // send...
     state.approveTx = await store.dispatch('approveDAIContract', {
       projectAddress: props.projectAddress,
-      amount: state.topUp
+      amount: topUp.value
     })
     console.log('approve tx', state.approveTx)
 
     // wait for confirmation...
     await state.approveTx.wait() // receipt
 
-    state.approved = state.topUp.toString()
+    state.approved = topUp.value.toString()
   } catch (e) {
     console.error(e)
     state.approved = false
@@ -51,7 +56,7 @@ const mint = async () => {
     // mint...
     state.mintTx = await store.dispatch('mintProjectNFT', {
       projectAddress: props.projectAddress,
-      topUpAmt: state.topUp,
+      topUpAmt: topUp.value,
       amtPerSec: state.rate
     })
     console.log('mint tx', state.mintTx)
@@ -81,32 +86,35 @@ const mint = async () => {
         </DialogDescription>
       </template>
 
-      <input-body class="my-10" label="Rate (DAI-WEI/sec)" :isFilled="typeof state.rate === 'number'">
-        <input v-model="state.rate" type="number" placeholder="Rate (DAI-WEI/sec)" required>
-      </input-body>
-      <input-body class="my-10 mb-36" label="Pre-pay (DAI-WEI)" :isFilled="typeof state.topUp === 'number'">
-        <input v-model="state.topUp" type="number" placeholder="Pre-pay (DAI-WEI)" required>
-      </input-body>
+      <form @submit.prevent validate>
+        <input-body class="my-10" label="Rate (DAI-WEI/sec)" :isFilled="typeof state.rate === 'number'">
+          <input v-model="state.rate" type="number" placeholder="Rate (DAI-WEI/sec)" :min="props.nftType.minAmtPerSec.toString()" step="1" required>
+        </input-body>
+        <input-body class="my-10 mb-36" label="Pre-pay (DAI-WEI)" :isFilled="typeof topUp === 'number'">
+          <input class="opacity-50" v-model="topUp" type="number" placeholder="Pay 30 days (DAI-WEI)" disabled required>
+        </input-body>
 
-      <div class="flex justify-center">
-        <template v-if="state.nft">
-          <router-link :to="{name: 'user', params: {address: $store.state.address}, query: state.nft }" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
-        </template>
+        <div class="flex justify-center">
+          <template v-if="state.nft">
+            <router-link :to="{name: 'user-funds', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
+          </template>
 
-        <template v-else-if="!state.approved">
-          <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="approve">
-            <template v-if="state.approveTx">Approving...</template>
-            <template v-else>Approve</template>
-          </button>
-        </template>
+          <template v-else-if="!state.approved">
+            <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="approve">
+              <template v-if="state.approveTx">Approving...</template>
+              <template v-else>Approve</template>
+            </button>
+          </template>
 
-        <template v-else>
-          <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="mint">
-            <template v-if="state.mintTx">Subscribing...</template>
-            <template v-else>Subscribe</template>
-          </button>
-        </template>
-      </div>
+          <template v-else>
+            <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="mint">
+              <template v-if="state.mintTx">Subscribing...</template>
+              <template v-else>Subscribe</template>
+            </button>
+          </template>
+        </div>
+      </form>
+
     </Panel>
 
   </Dialog>

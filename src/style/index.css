@@ -44,6 +44,12 @@ html {
   &.router-link-exact-active { @apply btn-white }
 }
 
+button{
+  &[disabled] {
+    @apply cursor-not-allowed;
+  }
+}
+
 /* fields */
 input, textarea {
   appearance:none;

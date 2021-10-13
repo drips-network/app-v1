@@ -229,6 +229,7 @@ export default createStore({
       // const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
       // await contract.allowance(state.address, projectAddress)
 
+      console.log(amount, amount.toString())
       try {
         const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
         const contractSigner = contract.connect(signer)
@@ -248,6 +249,9 @@ export default createStore({
         return tx
       } catch (e) {
         console.error('@mintProjectNFT', e)
+        if (e.message) {
+          alert(e.message)
+        }
         throw e
       }
     },
@@ -291,6 +295,16 @@ export default createStore({
         console.log(await tx.wait())
       } catch (e) {
         console.error('@collectProjectFunds', e)
+        throw e
+      }
+    },
+
+    async getNFTType (_, { projectAddress, nftTypeId = 0 }) {
+      try {
+        const contract = getProjectContract(projectAddress)
+        return await contract.nftTypes(nftTypeId)
+      } catch (e) {
+        console.error('@getNFTType', e)
         throw e
       }
     }
