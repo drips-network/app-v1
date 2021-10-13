@@ -16,7 +16,7 @@ onBeforeMount(async () => {
 </script>
 
 <template lang="pug">
-.project-thumb-progress.h-80.rounded-full.bg-indigo-800.flex.border.border-violet-700
+.project-thumb-progress.h-80.rounded-full.bg-indigo-800.flex.border.border-violet-700.hover_bg-indigo-700
   router-link.flex.items-center.px-8(:to="{name: 'user', params: {address: props.project.projectOwner}}").flex.items-center
     .border-6.border-transparent.notouch_hover_border-violet-700.rounded-full
       avatar-blockie.w-54(:address="props.project.projectOwner", width="54")

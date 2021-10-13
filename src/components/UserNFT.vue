@@ -19,7 +19,7 @@ onBeforeMount(async () => {
 .user-nft.shadow-md-blue.rounded-2xl.p-32
   h6.-mt-3.text-violet-600.text-xl.font-semibold
     router-link(:to="{name: 'project', params: { address: projectAddress }}")
-      | {{ projectMeta.name || '...' }}
+      | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
 
   figure.my-40
     //- filler graphic
