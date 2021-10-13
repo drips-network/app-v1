@@ -15,7 +15,7 @@ let icon
 
 function generate () {
   icon = blockies.create({ // All options are optional
-    seed: props.address, // seed used to generate icon data, default: random
+    seed: props.address.toLowerCase(), // seed used to generate icon data, default: random
     // color: '#dfe', // to manually specify the icon color, default: random
     // bgcolor: '#aaa', // choose a different background color, default: random
     size: columns, // width/height of the icon in blocks, default: 8

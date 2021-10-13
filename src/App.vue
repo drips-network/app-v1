@@ -16,7 +16,7 @@ store.dispatch('init')
       svg-logo.h-18.text-white
     .flex.items-center
       router-link.mr-28(:to="{name: 'create'}") Create
-      //- router-link.mr-28(:to="{name: 'home'}") Explore
+      router-link.mr-28(:to="{name: 'home'}") Explore
       template(v-if="$store.state.address")
         .group.btn.btn-md.btn-darker.pl-6.pr-10
           router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")

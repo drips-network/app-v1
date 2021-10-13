@@ -39,6 +39,7 @@ module.exports = {
       44: '4.4rem',
       48: '4.8rem',
       52: '5.2rem',
+      54: '5.4rem',
       56: '5.6rem',
       60: '6.0rem',
       64: '6.4rem',
@@ -179,6 +180,7 @@ module.exports = {
       0: '0px',
       2: '2px',
       4: '4px',
+      6: '6px',
       8: '8px'
     },
     boxShadow: {
