@@ -21,12 +21,12 @@ export default {
       return this.$route.params.address
     },
     minDAI () {
-      return fromWei(this.nftType.minAmtPerSec).toString()
+      return fromWei(this.nftType.minAmtPerSec).toNumber() || 1
     }
   },
   async beforeRouteEnter (to, from, next) {
     try {
-      meta = await store.dispatch('getProjectMeta', to.params.address)
+      meta = await getMeta(to.params.address)
       next()
     } catch (e) {
       console.error(e)
@@ -34,8 +34,13 @@ export default {
     }
   },
   async created () {
+    meta = meta || await getMeta(this.$route.params.address)
     this.nftType = await this.$store.dispatch('getNFTType', { projectAddress: this.projectAddress })
   }
+}
+
+const getMeta = async (address) => {
+  return await store.dispatch('getProjectMeta', address)
 }
 </script>
 
