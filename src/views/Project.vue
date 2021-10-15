@@ -30,6 +30,7 @@ export default {
       next()
     } catch (e) {
       console.error(e)
+      next()
     }
   },
   async created () {

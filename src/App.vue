@@ -36,4 +36,8 @@ store.dispatch('init')
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.web3modal-modal-lightbox{
+  @apply z-50;
+}
 </style>

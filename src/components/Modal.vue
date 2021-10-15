@@ -102,10 +102,12 @@ const mint = async () => {
       </template>
 
       <form @submit.prevent validate>
+        <!-- input rate -->
         <input-body class="my-10" label="Monthly Rate (DAI)" :isFilled="typeof rate === 'number'">
-          <input v-model="rate" type="number" placeholder="Monthly Rate (DAI)" :min="props.nftType.minAmtPerSec.toString()" step="1" required>
+          <input v-model="rate" type="number" placeholder="Monthly Rate (DAI)" :min="minDAIPerMonth.toString()" step="1" required>
         </input-body>
 
+        <!-- input months -->
         <input-body class="my-10" label="Pre-pay (Months)" :isFilled="typeof prePayMonths === 'number'">
           <input v-model="prePayMonths" type="number" placeholder="Pre-pay (Months)" min="1" step="1" required>
         </input-body>

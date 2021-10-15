@@ -64,16 +64,24 @@ export default createStore({
 
         // fallback provider
         if (!provider) {
-          if (window.ethereum) {
-            // metamask
-            provider = new Ethers.providers.Web3Provider(window.ethereum)
-          } else {
-            // infura
-            provider = new Ethers.getDefaultProvider(networks[network].infura)
-          }
+          dispatch('setupFallbackProvider')
         }
       } catch (e) {
         console.error('@init', e)
+      }
+    },
+
+    async setupFallbackProvider () {
+      try {
+        if (window.ethereum) {
+          // metamask
+          provider = new Ethers.providers.Web3Provider(window.ethereum)
+        } else {
+          // infura
+          provider = new Ethers.getDefaultProvider(networks[network].infura)
+        }
+      } catch (e) {
+        console.error(e)
       }
     },
 
@@ -224,13 +232,16 @@ export default createStore({
       }
     },
 
-    async approveDAIContract ({ state }, { projectAddress, amount }) {
+    async approveDAIContract ({ state, dispatch }, { projectAddress, amount }) {
       // TODO: check existing DAI allowance
       // const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
       // await contract.allowance(state.address, projectAddress)
 
-      console.log(amount, amount.toString())
       try {
+        if (!state.address) {
+          await dispatch('connect')
+        }
+
         const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
         const contractSigner = contract.connect(signer)
         const tx = await contractSigner.approve(projectAddress, amount.toString())
@@ -240,11 +251,15 @@ export default createStore({
       }
     },
 
-    async mintProjectNFT ({ state }, { projectAddress, typeId = 0, topUpAmt, amtPerSec }) {
-      const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
-      const contractSigner = contract.connect(signer)
-
+    async mintProjectNFT ({ state, dispatch }, { projectAddress, typeId = 0, topUpAmt, amtPerSec }) {
       try {
+        if (!state.address) {
+          await dispatch('connect')
+        }
+
+        const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
+        const contractSigner = contract.connect(signer)
+
         const tx = await contractSigner.mint(state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
         return tx
       } catch (e) {
