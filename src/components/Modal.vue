@@ -10,6 +10,7 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import store from '@/store'
 import { BigNumber as bn, constants } from 'ethers'
+import { fromWei } from '@/utils'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -17,12 +18,7 @@ const props = defineProps({
   nftType: Object
 })
 
-const fromWEI = (wei) => {
-  wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
-  return wei.div(constants.WeiPerEther)
-}
-
-const minDAIPerSec = fromWEI(props.nftType.minAmtPerSec) // bn
+const minDAIPerSec = fromWei(props.nftType.minAmtPerSec) // bn
 const minDAIPerMonth = minDAIPerSec.mul(30 * 24 * 60 * 60) // bn
 
 const rate = ref(Math.max(1, minDAIPerMonth.toNumber())) // min at least 1...

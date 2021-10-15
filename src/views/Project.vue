@@ -3,6 +3,7 @@ import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import InputBody from '@/components/InputBody'
 import Modal from '@/components/Modal'
+import { fromWei } from '@/utils'
 let meta
 
 export default {
@@ -18,6 +19,9 @@ export default {
   computed: {
     projectAddress () {
       return this.$route.params.address
+    },
+    minDAI () {
+      return fromWei(this.nftType.minAmtPerSec).toString()
     }
   },
   async beforeRouteEnter (to, from, next) {
@@ -58,7 +62,7 @@ article.profile
       .mt-44
         button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Fund 🌈
 
-        .mt-16.text-violet-600(v-if="nftType") Min. {{ nftType.minAmtPerSec.toString() }} DAI-WEI/sec
+        .mt-16.text-violet-600(v-if="nftType") Min. {{ minDAI }} DAI/mo
       //- p
         a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 

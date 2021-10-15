@@ -1,16 +1,20 @@
 <script setup>
-import { reactive } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import store from '@/store'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
+import { toWei } from '@/utils'
 
 const props = defineProps({
   projectAddress: String
 })
 
+const minDAIPerMonth = ref(1)
+const minWeiPerSec = computed(() => toWei(minDAIPerMonth.value).div(30 * 24 * 60 * 60))
+
 const state = reactive({
-  typeId: 0,
-  minimum: 1,
+  // typeId: route.query.typeId || 0,
+  // minimum: 1,
   tx: null,
   txReceipt: null
 })
@@ -19,7 +23,11 @@ const emit = defineEmits(['addedNFTType'])
 
 const submit = async () => {
   try {
-    state.tx = await store.dispatch('addProjectNFTType', { projectAddress: props.projectAddress, minAmtPerSec: state.minimum })
+    state.tx = await store.dispatch('addProjectNFTType', {
+      projectAddress: props.projectAddress,
+      // typeId: state.typeId,
+      minAmtPerSec: minWeiPerSec.value
+    })
     state.txReceipt = await state.tx.wait()
     emit('addedNFTType')
   } catch (e) {
@@ -59,8 +67,9 @@ panel.mx-auto(icon="🌈")
           .bg-violet-700.rounded-full.w-full
 
   form.mt-40(@submit.prevent="submit", validate)
-    input-body(label="Minimum (DAI-WEI/sec)", :isFilled="typeof state.minimum === 'number'")
-      input(v-model="state.minimum", type="number", placeholder="Minimum (DAI-WEI/sec)", required)
+    //- input min rate
+    input-body(label="Minimum Monthly Rate (DAI)", :isFilled="typeof minDAIPerMonth === 'number'")
+      input(v-model="minDAIPerMonth", type="number", placeholder="Minimum Monthly Rate (DAI)", required)
 
     .mt-40
       //- submit btn
