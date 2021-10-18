@@ -8,7 +8,7 @@
       },
       {
         "internalType": "contract IDai",
-        "name": "dai",
+        "name": "_dai",
         "type": "address"
       }
     ],
@@ -85,6 +85,12 @@
         "internalType": "uint128",
         "name": "amtPerSec",
         "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "dripsFraction",
+        "type": "uint32"
       }
     ],
     "name": "SenderUpdated",
@@ -173,6 +179,19 @@
   },
   {
     "inputs": [],
+    "name": "DRIPS_FRACTION_MAX",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "SENDER_WEIGHTS_COUNT_MAX",
     "outputs": [
       {
@@ -250,6 +269,19 @@
         "internalType": "uint64",
         "name": "",
         "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dai",
+    "outputs": [
+      {
+        "internalType": "contract IDai",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -381,6 +413,25 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "userAddr",
+        "type": "address"
+      }
+    ],
+    "name": "getDripsFraction",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "dripsFraction",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint128",
         "name": "topUpAmt",
         "type": "uint128"
@@ -394,6 +445,11 @@
         "internalType": "uint128",
         "name": "amtPerSec",
         "type": "uint128"
+      },
+      {
+        "internalType": "uint32",
+        "name": "dripsFraction",
+        "type": "uint32"
       },
       {
         "components": [
@@ -440,6 +496,11 @@
         "internalType": "uint128",
         "name": "amtPerSec",
         "type": "uint128"
+      },
+      {
+        "internalType": "uint32",
+        "name": "dripsFraction",
+        "type": "uint32"
       },
       {
         "components": [

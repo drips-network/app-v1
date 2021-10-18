@@ -1,53 +1,24 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { ref, toRaw, computed, reactive } from 'vue'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
-// import { useRouter } from 'vue-router'
 import store from '@/store'
-
-const state = reactive({
-  // status: null,
-  tx: null,
-  projectAddress: null,
-  projectIpfsHash: null
-})
 
 const owner = computed(() => store.state.address)
 
-// on-chain project
 const project = reactive({
   name: '',
-  // owner added in dispatch action
+  // owner - added in save
   symbol: '',
-  ipfsHash: ''
-})
-
-// meta to save to ipfs/pinata
-const projectMeta = reactive({
   descrip: ''
-  // website: '',
-  // twitter: '',
-  // discord: ''
 })
 
-const emit = defineEmits(['projectCreated'])
+const emit = defineEmits(['projectMetaUpdated'])
 
-async function submit () {
-  try {
-    project.owner = owner.value
-
-    // send!
-    const resp = await store.dispatch('createProject', { project, projectMeta })
-    console.log(resp)
-    state.tx = resp.tx
-    state.projectIpfsHash = resp.ipfsHash
-
-    // confirmation...
-    state.projectAddress = await store.dispatch('waitForProjectCreate', { txFrom: state.tx.from })
-    emit('projectCreated', state.projectAddress)
-  } catch (e) {
-    state.tx = null
-  }
+async function save () {
+  let body = toRaw(project)
+  body = { owner: owner.value, ...body }
+  emit('projectMetaUpdated', body)
 }
 </script>
 
@@ -62,7 +33,7 @@ panel.mx-auto(icon="✨")
 
     //- (create form)
     template(v-else)
-      form(@submit.prevent="submit", validate)
+      form(@submit.prevent="save", validate)
         //- .my-10
           input-body(label="Owner", :isFilled="owner.length", format="code")
             input(v-model="owner", placeholder="owner", disabled)
@@ -73,18 +44,19 @@ panel.mx-auto(icon="✨")
           input-body(label="Symbol*", :isFilled="project.name.length")
             input(v-model="project.symbol", placeholder="Symbol*", required)
         .my-10
-          input-body(label="Description", :isFilled="projectMeta.descrip.length")
-            input(v-model="projectMeta.descrip", placeholder="Description")
+          input-body(label="Description", :isFilled="project.descrip.length")
+            input(v-model="project.descrip", placeholder="Description")
 
         div.mt-40
           //- create btn
-          button.btn.btn-lg.btn-white.mx-auto.min-w-sm(type="submit", :disabled="state.tx !== null")
-            template(v-if="state.projectAddress") Created!
-            template(v-else-if="state.tx") Creating...
-            template(v-else) Create
+          button.btn.btn-lg.btn-indigo.mx-auto.min-w-sm(type="submit")
+            | Next
+            //- template(v-if="state.projectAddress") Saved!
+            //- template(v-else-if="state.tx") Saving...
+            //- template(v-else) Save
 
           //- (tx link)
-          .mt-16.text-violet-600(v-if="state.tx")
+          //- .mt-16.text-violet-600(v-if="state.tx")
             a(:href="`https://rinkeby.etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
 //- .mt-4(v-if="state.projectAddress")

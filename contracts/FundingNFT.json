@@ -5,26 +5,6 @@
         "internalType": "contract DaiPool",
         "name": "pool_",
         "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "name_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "symbol_",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "owner_",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "ipfsHash",
-        "type": "string"
       }
     ],
     "stateMutability": "nonpayable",
@@ -78,6 +58,19 @@
       }
     ],
     "name": "ApprovalForAll",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "contractURI",
+        "type": "string"
+      }
+    ],
+    "name": "NewContractURI",
     "type": "event"
   },
   {
@@ -421,7 +414,20 @@
     "name": "dai",
     "outputs": [
       {
-        "internalType": "contract IERC20",
+        "internalType": "contract IDai",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deployer",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -470,6 +476,56 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "name_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol_",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint128",
+            "name": "nftTypeId",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint64",
+            "name": "limit",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint128",
+            "name": "minAmtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct InputNFTType[]",
+        "name": "inputNFTTypes",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "owner",
         "type": "address"
@@ -512,6 +568,65 @@
         "internalType": "uint128",
         "name": "amtPerSec",
         "type": "uint128"
+      }
+    ],
+    "name": "mint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint128",
+        "name": "typeId",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "topUpAmt",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "amtPerSec",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expiry",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
       }
     ],
     "name": "mint",
@@ -774,7 +889,7 @@
         "type": "string"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -788,6 +903,49 @@
         "internalType": "uint128",
         "name": "topUpAmt",
         "type": "uint128"
+      }
+    ],
+    "name": "topUp",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "topUpAmt",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expiry",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
       }
     ],
     "name": "topUp",

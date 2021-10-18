@@ -31,6 +31,9 @@ html {
 .btn-xl{
   @apply h-112 max-w-lg text-2xl font-semibold transform transition duration-150 notouch_hover_scale-102;
 }
+.btn-indigo{
+  @apply bg-indigo-700
+}
 .btn-dark{
   @apply bg-indigo-700;
 }
@@ -39,6 +42,9 @@ html {
 }
 .btn-white{
   @apply bg-white text-blue-900;
+}
+.btn-outline {
+  @apply border border-violet-700;
 }
 .btn-active-white {
   &.router-link-exact-active { @apply btn-white }

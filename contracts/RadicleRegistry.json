@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "contract DaiPool",
-        "name": "pool_",
+        "name": "pool",
         "type": "address"
       }
     ],
@@ -15,8 +15,8 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "nftRegistry",
+        "internalType": "contract FundingNFT",
+        "name": "fundingNFT",
         "type": "address"
       },
       {
@@ -31,12 +31,12 @@
   },
   {
     "inputs": [],
-    "name": "counter",
+    "name": "fundingNFTTemplate",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "contract FundingNFT",
         "name": "",
-        "type": "uint256"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -63,12 +63,34 @@
         "internalType": "string",
         "name": "ipfsHash",
         "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint128",
+            "name": "nftTypeId",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint64",
+            "name": "limit",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint128",
+            "name": "minAmtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct InputNFTType[]",
+        "name": "inputNFTTypes",
+        "type": "tuple[]"
       }
     ],
     "name": "newProject",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract FundingNFT",
         "name": "",
         "type": "address"
       }
@@ -78,12 +100,12 @@
   },
   {
     "inputs": [],
-    "name": "pool",
+    "name": "nextId",
     "outputs": [
       {
-        "internalType": "contract DaiPool",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -93,14 +115,14 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "id",
         "type": "uint256"
       }
     ],
-    "name": "projects",
+    "name": "projectAddr",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract FundingNFT",
         "name": "",
         "type": "address"
       }

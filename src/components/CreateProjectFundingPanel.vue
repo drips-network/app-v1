@@ -19,21 +19,33 @@ const state = reactive({
   txReceipt: null
 })
 
-const emit = defineEmits(['addedNFTType'])
+const nftType = computed(() => {
+  return [
+    0, // typeId: preset first type as 0
+    999, // limit: preset for now...
+    minWeiPerSec.value.toString() // minAmtPerSec
+  ]
+})
 
-const submit = async () => {
-  try {
-    state.tx = await store.dispatch('addProjectNFTType', {
-      projectAddress: props.projectAddress,
-      // typeId: state.typeId,
-      minAmtPerSec: minWeiPerSec.value
-    })
-    state.txReceipt = await state.tx.wait()
-    emit('addedNFTType')
-  } catch (e) {
-    console.error(e)
-    state.tx = null
-  }
+const emit = defineEmits(['addNFTType'])
+
+// const submit = async () => {
+//   try {
+//     state.tx = await store.dispatch('addProjectNFTType', {
+//       projectAddress: props.projectAddress,
+//       // typeId: state.typeId,
+//       minAmtPerSec: minWeiPerSec.value
+//     })
+//     state.txReceipt = await state.tx.wait()
+//     emit('addedNFTType')
+//   } catch (e) {
+//     console.error(e)
+//     state.tx = null
+//   }
+// }
+
+const submit = () => {
+  emit('addNFTType', nftType.value)
 }
 </script>
 
@@ -73,13 +85,14 @@ panel.mx-auto(icon="🌈")
 
     .mt-40
       //- submit btn
-      button.btn.btn-lg.btn-white.mx-auto.min-w-sm(type="submit", :disabled="state.tx !== null")
-        template(v-if="state.txReceipt") Added!
-        template(v-else-if="state.tx") Adding...
-        template(v-else) Confirm
+      button.btn.btn-lg.btn-indigo.mx-auto.min-w-sm(type="submit", :disabled="state.tx !== null")
+        | Next
+        //- template(v-if="state.txReceipt") Saved!
+        //- template(v-else-if="state.tx") Saving...
+        //- template(v-else) Save
 
       //- (tx link)
-      .mt-16.text-violet-600(v-if="state.tx")
+      //- .mt-16.text-violet-600(v-if="state.tx")
         a(:href="`https://rinkeby.etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
 </template>

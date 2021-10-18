@@ -157,17 +157,10 @@ export default createStore({
     //   return signer
     // },
 
-    async createProject ({ state, dispatch }, { project, projectMeta }) {
-      // let ipfsHash
+    async createProject ({ state, dispatch }, project) {
       try {
-        // ensure wallet connected
-        if (!state.address) {
-          await dispatch('connect')
-        }
-
         // save full data to IPFS/pinata...
-        const projectFull = { ...project, ...projectMeta }
-        const ipfsHash = await pinJSONToIPFS(projectFull)
+        const ipfsHash = await pinJSONToIPFS(project)
         console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         project.ipfsHash = ipfsHash
 
@@ -175,22 +168,25 @@ export default createStore({
         const tx = await newProject(project)
         console.log('new project tx:', tx)
 
-        return { tx, ipfsHash }
+        return tx
       } catch (e) {
         console.error('@createProject', e)
         throw e
       }
     },
 
-    waitForProjectCreate (_, { txFrom }) {
+    waitForProjectCreate (_, tx) {
       const contract = getRadicleRegistryContract()
+
+      // listen for project created by owner and return prj address
       return new Promise((resolve) => {
         // listener
         const onNewProject = async (projectAddress, projectOwner) => {
           console.log('@NewProject', projectAddress, projectOwner)
 
           // if owner matches tx sender...
-          if (projectOwner.toLowerCase() === txFrom.toLowerCase()) {
+          if (projectOwner.toLowerCase() === tx.from.toLowerCase()) {
+            // unlisten and return address
             contract.off('NewProject', onNewProject)
             return resolve(projectAddress)
           }
@@ -260,7 +256,7 @@ export default createStore({
         const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
         const contractSigner = contract.connect(signer)
 
-        const tx = await contractSigner.mint(state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
+        const tx = await contractSigner['mint(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
         return tx
       } catch (e) {
         console.error('@mintProjectNFT', e)
@@ -336,14 +332,14 @@ function getProjectContract (address) {
   return new Ethers.Contract(address, FundingNFT.abi, provider)
 }
 
-function newProject ({ name, owner, symbol, ipfsHash }) {
+function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes }) {
   let contract = getRadicleRegistryContract()
   contract = contract.connect(signer)
   console.log('new project...', arguments)
-  return contract.newProject(name, symbol, owner, ipfsHash)
+  return contract.newProject(name, symbol, owner, ipfsHash, inputNFTTypes)
 }
 
-async function pinJSONToIPFS (json) {
+export async function pinJSONToIPFS (json) {
   let resp = await fetch('/.netlify/functions/pin', {
     method: 'POST',
     body: JSON.stringify(json)
