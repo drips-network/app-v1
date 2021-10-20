@@ -44,7 +44,7 @@ html {
   @apply bg-white text-blue-900;
 }
 .btn-outline {
-  @apply border border-violet-700;
+  @apply border border-violet-700 notouch_hover_border-violet-600 focus_border-violet-600;
 }
 .btn-active-white {
   &.router-link-exact-active { @apply btn-white }
@@ -63,6 +63,7 @@ input, textarea {
   font-weight: inherit;
   text-align: inherit;
   resize:none;
+  min-width:0;
   &::placeholder{
     opacity:0.5;
     @apply text-violet-600;

@@ -323,6 +323,16 @@ export default createStore({
         console.error('@getNFTType', e)
         throw e
       }
+    },
+
+    async getNFTBalance (_, { projectAddress, tokenId }) {
+      try {
+        console.log('getNFTBalance', projectAddress, tokenId)
+        const contract = getProjectContract(projectAddress)
+        return await contract.withdrawable(tokenId)
+      } catch (e) {
+        console.error('@getNFTBalance', e, arguments)
+      }
     }
   }
 })
