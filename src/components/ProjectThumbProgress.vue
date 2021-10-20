@@ -10,7 +10,7 @@ const props = defineProps({
 const meta = ref()
 
 onBeforeMount(async () => {
-  meta.value = await store.dispatch('getProjectMeta', props.project.id)
+  meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })
 })
 
 </script>

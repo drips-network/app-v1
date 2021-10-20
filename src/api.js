@@ -13,3 +13,28 @@ export default async function ({ query, variables }) {
     throw e
   }
 }
+
+export const queryProject = `
+  query ($id: ID!) {
+    fundingProject (id: $id) {
+      id
+      projectOwner
+      # daiCollected
+      ipfsHash
+      nftTypes {
+        # id
+        nftTypeId
+        limit
+        minAmtPerSec
+      }
+    }
+  }
+`
+
+export const queryProjectMeta = `
+  query ($id: ID!) {
+    fundingProject (id: $id) {
+      ipfsHash
+    }
+  }
+`

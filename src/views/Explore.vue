@@ -34,6 +34,6 @@ article.explore.pb-144
       li(v-for="project in projects")
         project-thumb-progress.-mb-px(:project="project")
 
-  tempalte(v-else)
+  template(v-else)
     p.px-40 Loading...
 </template>

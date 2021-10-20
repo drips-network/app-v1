@@ -6,6 +6,8 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 // contracts
 import { RadicleRegistry, DAI, FundingNFT } from '../../contracts'
 
+import api, { queryProjectMeta, queryProject } from '@/api'
+
 let provider, signer, walletProvider
 
 const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
@@ -147,16 +149,6 @@ export default createStore({
       })
     },
 
-    // async getProvider () {
-    //   if (!provider) await dispatch('setupFallbackProvider')
-    //   return provider
-    // },
-
-    // async getSigner ({ dispatch }) {
-    //   if (!signer) await dispatch('connect')
-    //   return signer
-    // },
-
     async createProject ({ state, dispatch }, project) {
       try {
         // save full data to IPFS/pinata...
@@ -210,18 +202,31 @@ export default createStore({
       console.log('new project events:', events)
     },
 
-    async getProjectMeta ({ dispatch }, projectAddress) {
-      if (!provider) {
-        await dispatch('init')
-      }
+    async getProject (_, projectAddress) {
       try {
-        // get hash...
-        const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
-        const ipfsHash = await contract.contractURI()
-        // fetch...
-        const resp = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
-        const meta = resp.json()
-        return meta
+        const resp = await api({ query: queryProject, variables: { id: projectAddress } })
+        return resp.data.fundingProject
+      } catch (e) {
+        console.error('@getProject', e)
+      }
+    },
+
+    async getProjectMeta ({ dispatch }, { projectAddress, ipfsHash }) {
+      try {
+        if (!ipfsHash) {
+          // fetch project...
+          const resp = await api({ query: queryProjectMeta, variables: { id: projectAddress } })
+          ipfsHash = resp.data.fundingProject.ipfsHash
+        }
+
+        if (!ipfsHash || ipfsHash.length !== 46) {
+          console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
+          return null
+        }
+
+        // fetch meta from ipfs...
+        const meta = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+        return meta.json()
       } catch (e) {
         console.error('@getProjectMeta', e)
         throw e

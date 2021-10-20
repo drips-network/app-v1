@@ -3,17 +3,18 @@ import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import InputBody from '@/components/InputBody'
 import Modal from '@/components/Modal'
-import { fromWei } from '@/utils'
-let meta
+import { fromWei, toDAIPerMo } from '@/utils'
+let project, meta
 
 export default {
   name: 'Project',
   components: { AvatarBlockie, InputBody, Modal },
   data () {
     return {
+      project,
       meta,
-      mintModal: false,
-      nftType: null
+      mintModal: false
+      // nftType: null
     }
   },
   computed: {
@@ -21,12 +22,15 @@ export default {
       return this.$route.params.address
     },
     minDAI () {
-      return fromWei(this.nftType.minAmtPerSec).toNumber() || 1
+      return toDAIPerMo(this.nftType.minAmtPerSec) || 1
+    },
+    nftType () {
+      return this.project.nftTypes[0]
     }
   },
   async beforeRouteEnter (to, from, next) {
     try {
-      meta = await getMeta(to.params.address)
+      await getProject(to.params.address)
       next()
     } catch (e) {
       console.error(e)
@@ -34,13 +38,19 @@ export default {
     }
   },
   async created () {
-    meta = meta || await getMeta(this.$route.params.address)
-    this.nftType = await this.$store.dispatch('getNFTType', { projectAddress: this.projectAddress })
+    if (!project) await getProject(this.$route.params.address)
+    // meta = meta || await getMeta(this.$route.params.address)
+    // this.nftType = await this.$store.dispatch('getNFTType', { projectAddress: this.projectAddress })
   }
 }
 
-const getMeta = async (address) => {
-  return await store.dispatch('getProjectMeta', address)
+const getProject = async (address) => {
+  try {
+    project = await store.dispatch('getProject', address)
+    meta = await store.dispatch('getProjectMeta', { ipfsHash: project.ipfsHash })
+  } catch (e) {
+    console.error('failed to get project or meta', e)
+  }
 }
 </script>
 
@@ -53,9 +63,9 @@ article.profile
     header.text-center.relative.pt-44
       //- owner
       .absolute.top-0.left-0.p-18
-        router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full.-m-8(:to="{name: 'user', params: {address: meta.owner}}")
-          avatar-blockie.w-36.mr-12(:address="meta.owner", width="36")
-          .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(meta.owner) }}
+        router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full.-m-8(:to="{name: 'user', params: {address: project.projectOwner}}")
+          avatar-blockie.w-36.mr-12(:address="project.projectOwner", width="36")
+          .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(project.projectOwner) }}
 
       figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto
       //- title

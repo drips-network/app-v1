@@ -15,7 +15,7 @@ const projectAddress = readonly(props.nft.nftRegistryAddress)
 const projectMeta = ref({})
 
 onBeforeMount(async () => {
-  projectMeta.value = await store.dispatch('getProjectMeta', projectAddress)
+  projectMeta.value = await store.dispatch('getProjectMeta', { projectAddress })
 })
 </script>
 
