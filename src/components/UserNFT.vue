@@ -24,6 +24,22 @@ const toggleAdjust = () => {
   adjust.value = adjust.value ? null : 'edit'
 }
 
+const topUpAmt = ref(0)
+const topUpAmtWei = computed(() => utils.parseUnits(topUpAmt.value.toString()))
+const topUpTx = ref(null)
+
+const topUp = async () => {
+  try {
+    topUpTx.value = await store.dispatch('nftTopUp', {
+      projectAddress: nft.nftRegistryAddress,
+      tokenId: nft.id.split('x').pop(1),
+      amountWei: topUpAmtWei.value.toString()
+    })
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 onBeforeMount(() => {
   // get project meta
   store.dispatch('getProjectMeta', { projectAddress })
@@ -71,13 +87,13 @@ onBeforeMount(() => {
       button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'withdraw'") Withdraw
 
     //- adjust: add
-    .my-10(v-if="adjust === 'add'")
+    form.my-10(v-if="adjust === 'add'", validate, @submit.prevent="topUp")
       .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
         .flex.items-center.w-112
           svg-dai.w-32.h-32.ml-16.mr-6
-        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(size="0")
+        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", required)
         .flex.items-center
-          button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32 Add
+          button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32(type="submit") Add
 
   footer.mt-32.flex.justify-end
     a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${nft.id}`", target="_blank", rel="noopener noreferrer") OpenSea ↗

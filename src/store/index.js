@@ -327,11 +327,25 @@ export default createStore({
 
     async getNFTBalance (_, { projectAddress, tokenId }) {
       try {
-        console.log('getNFTBalance', projectAddress, tokenId)
         const contract = getProjectContract(projectAddress)
         return await contract.withdrawable(tokenId)
       } catch (e) {
         console.error('@getNFTBalance', e, arguments)
+      }
+    },
+
+    async nftTopUp ({ dispatch }, { projectAddress, tokenId, amountWei }) {
+      try {
+        if (!signer) await dispatch('connect')
+        const contract = getProjectContract(projectAddress)
+        const contractSigner = contract.connect(signer)
+        console.log('top up', projectAddress, tokenId, amountWei)
+        // go
+        const tx = await contractSigner['topUp(uint256,uint128)'](tokenId, amountWei)
+        return tx
+      } catch (e) {
+        console.error('@nftTopUp', e)
+        return null
       }
     }
   }
