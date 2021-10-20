@@ -1,12 +1,16 @@
 <script setup>
-import { ref, readonly, onBeforeMount } from 'vue'
+import { ref, readonly, onBeforeMount, computed } from 'vue'
 import store from '@/store'
+import { utils } from 'ethers'
+import { toDAIPerMo } from '@/utils'
 
 const props = defineProps({
   nft: Object
 })
 
 const nft = readonly(props.nft)
+const nftRate = toDAIPerMo(nft.amtPerSec)
+
 const projectAddress = readonly(props.nft.nftRegistryAddress)
 const projectMeta = ref({})
 
@@ -27,7 +31,7 @@ onBeforeMount(async () => {
       .absolute.overlay.flex.items-center.justify-center.text-center
         | NFT {{ '#' + nft.id }}<br>
         | Type {{ nft.nftTypeId.toString() }}<br>
-        | {{ nft.amtPerSec }} DAI-WEI/sec
+        | {{ nftRate }} DAI/mo
 
   footer.flex.justify-end
     a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${nft.id}`", target="_blank", rel="noopener noreferrer") OpenSea ↗

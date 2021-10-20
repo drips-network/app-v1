@@ -3,14 +3,13 @@ import { ref, computed, reactive } from 'vue'
 import store from '@/store'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
-import { toWei } from '@/utils'
+import { toWeiPerSec } from '@/utils'
 
 const props = defineProps({
   projectAddress: String
 })
 
 const minDAIPerMonth = ref(1)
-const minWeiPerSec = computed(() => toWei(minDAIPerMonth.value).div(30 * 24 * 60 * 60))
 
 const state = reactive({
   // typeId: route.query.typeId || 0,
@@ -23,7 +22,7 @@ const nftType = computed(() => {
   return [
     0, // typeId: preset first type as 0
     999, // limit: preset for now...
-    minWeiPerSec.value.toString() // minAmtPerSec
+    toWeiPerSec(minDAIPerMonth.value).toString() // minAmtPerSec
   ]
 })
 
