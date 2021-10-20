@@ -1,12 +1,12 @@
 import { createStore } from 'vuex'
+import api, { queryProjectMeta, queryProject } from '@/api'
+// contracts
+import { RadicleRegistry, DAI, FundingNFT } from '../../contracts'
 //
 import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-// contracts
-import { RadicleRegistry, DAI, FundingNFT } from '../../contracts'
-
-import api, { queryProjectMeta, queryProject } from '@/api'
+import { signDaiPermit, signERC2612Permit } from 'eth-permit'
 
 let provider, signer, walletProvider
 
@@ -346,6 +346,32 @@ export default createStore({
       } catch (e) {
         console.error('@nftTopUp', e)
         return null
+      }
+    },
+
+    async mintProjectNFTWithPermit ({ state }, { projectAddress, topUpAmt }) {
+      try {
+        const tokenAddress = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea' // DAI.address
+        const senderAddress = state.address // user
+        const spender = projectAddress
+        const value = topUpAmt
+
+        console.log(window.ethereum, tokenAddress, senderAddress, spender, value)
+
+        // Sign message using injected provider (ie Metamask).
+        // You can replace window.ethereum with any other web3 provider.
+
+        // DAI method:
+        const result = await signDaiPermit(window.ethereum, tokenAddress, senderAddress, spender)
+
+        // ERC2612 method:
+        // const result = await signERC2612Permit(window.ethereum, tokenAddress, senderAddress, spender, value)
+
+        console.log(result)
+
+        // ...then mint with result...
+      } catch (e) {
+        console.error('@mintProjectNFT', e.message)
       }
     }
   }

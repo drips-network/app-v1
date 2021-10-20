@@ -69,17 +69,18 @@ const approve = async () => {
 const mint = async () => {
   try {
     // mint...
-    state.mintTx = await store.dispatch('mintProjectNFT', {
+    // state.mintTx = await store.dispatch('mintProjectNFT', {
+    state.mintTx = await store.dispatch('mintProjectNFTWithPermit', {
       projectAddress: props.projectAddress,
-      topUpAmt: topUpWei.value,
-      amtPerSec: weiPerSec.value
+      topUpAmt: topUpWei.value.toString(),
+      amtPerSec: weiPerSec.value.toString()
     })
     console.log('mint tx', state.mintTx)
 
     // console.log(await tx.wait()) // receipt
 
     // on confirmation...
-    state.nft = await store.dispatch('waitForNFTMint', { projectAddress: props.projectAddress })
+    // state.nft = await store.dispatch('waitForNFTMint', { projectAddress: props.projectAddress })
   } catch (e) {
     console.error(e)
   }
@@ -129,19 +130,19 @@ const mint = async () => {
             <router-link :to="{name: 'user-funds', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
           </template>
 
-          <template v-else-if="!state.approved">
+          <!-- <template v-else-if="!state.approved">
             <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="approve">
               <template v-if="state.approveTx">Approving...</template>
               <template v-else>Approve</template>
             </button>
-          </template>
+          </template> -->
 
-          <template v-else>
-            <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="mint">
-              <template v-if="state.mintTx">Subscribing...</template>
-              <template v-else>Subscribe</template>
-            </button>
-          </template>
+          <!-- <template v-else> -->
+          <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="mint">
+            <template v-if="state.mintTx">Subscribing...</template>
+            <template v-else>Subscribe</template>
+          </button>
+          <!-- </template> -->
         </div>
       </form>
 

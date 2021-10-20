@@ -15,6 +15,7 @@
     "@tailwindcss/aspect-ratio": "^0.3.0",
     "@walletconnect/web3-provider": "^1.6.5",
     "core-js": "^3.6.5",
+    "eth-permit": "^0.1.10",
     "ethereum-blockies": "^0.1.1",
     "ethers": "^5.4.7",
     "global": "^4.4.0",
