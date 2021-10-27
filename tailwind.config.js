@@ -56,8 +56,13 @@ module.exports = {
       transparent: 'transparent',
       black: 'black',
 
+      gray: {
+        300: '#90A0AF'
+      },
+
       violet: {
         // 400: '#382099', // nft thumb title
+        500: '#212064',
         600: '#4949DD',
         700: '#28258E' // bright borders
       },

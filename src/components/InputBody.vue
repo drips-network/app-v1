@@ -6,13 +6,22 @@ const props = defineProps({
   label: String,
   isFilled: [Number, Boolean], // input has content
   format: String,
-  symbol: String
+  symbol: String,
+  theme: { type: String, default: 'outline' }
 })
 
 const styling = computed(() => {
   switch (props.format) {
     case 'code': return 'font-mono text-lg'
     default: return 'text-xl'
+  }
+})
+
+const themeing = computed(() => {
+  switch (props.theme) {
+    case 'outline': return 'border border-violet-700 focus-within_border-violet-600'
+    case 'dark': return 'bg-indigo-900'
+    default: return ''
   }
 })
 
@@ -24,7 +33,7 @@ const slots = useSlots()
   label.absolute.top-0.left-0.w-full.text-center.text-sm.text-violet-600.pt-4(:class="{'opacity-0': !isFilled}") {{ props.label }}
 
   //- field (input, textarea)
-  .min-h-80.flex.items-center.font-semibold.border.border-violet-700.rounded-2xl.focus-within_border-violet-600.text-center(:class="[styling]")
+  .min-h-80.flex.items-center.font-semibold.rounded-2xl.text-center(:class="[styling, themeing]")
     slot
 
     //- (symbol: daipermo)

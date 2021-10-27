@@ -1,10 +1,14 @@
 <script setup>
 // TODO - consider making this one reactive body rather than break into components with emits...
 // manage open/close panels here and wrap the form inputs of this component...
+
+// TODO - auto-update when re-editing areas? Or change button to "SAVE" in each panel??
+
 import { ref, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CreateProjectPanel from '@/components/CreateProjectPanel'
 import CreateProjectFundingPanel from '@/components/CreateProjectFundingPanel'
+import CreateMembershipsPanel from '@/components/CreateMembershipsPanel'
 import store from '@/store'
 
 const route = useRoute()
@@ -25,10 +29,15 @@ const onFundingUpdated = ({ goal, nftType }) => {
   console.log('project funding updated', toRaw(project.value))
 }
 
+const onMembershipsUpdated = (memberships) => {
+  project.value.memberships = memberships
+  console.log('memberships updated', toRaw(project.value))
+}
+
 async function submitProject () {
   try {
     tx.value = await store.dispatch('createProject', project.value)
-    console.log('tx', tx)
+    console.log('tx', tx.value)
 
     // on project created...
     const address = await store.dispatch('waitForProjectCreate', tx.value)
@@ -55,7 +64,9 @@ article.create.py-80.relative
 
   create-project-funding-panel.my-24(v-if="project", @fundingUpdated="onFundingUpdated")
 
-  .mt-40.flex.justify-center.w-full(v-if="project && project.inputNFTTypes")
+  create-memberships-panel.my-24(v-if="project && project.inputNFTTypes", @updated="onMembershipsUpdated")
+
+  .mt-40.flex.justify-center.w-full(v-if="project && project.memberships")
     .text-center
       button.btn.btn-xl.btn-white.min-w-md(@click="submitProject")
         template(v-if="tx") Creating...
