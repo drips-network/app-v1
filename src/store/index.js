@@ -233,7 +233,7 @@ export default createStore({
       }
     },
 
-    async approveDAIContract ({ state, dispatch }, { projectAddress, amount }) {
+    async approveDAIContract ({ state, dispatch }, { projectAddress }) {
       // TODO: check existing DAI allowance
       // const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
       // await contract.allowance(state.address, projectAddress)
@@ -245,7 +245,9 @@ export default createStore({
 
         const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
         const contractSigner = contract.connect(signer)
-        const tx = await contractSigner.approve(projectAddress, amount.toString())
+
+        const amount = Ethers.constants.MaxUint256
+        const tx = await contractSigner.approve(projectAddress, amount)
         return tx
       } catch (e) {
         console.error('@approveDAIContract', e)
@@ -334,18 +336,28 @@ export default createStore({
       }
     },
 
-    async nftTopUp ({ dispatch }, { projectAddress, tokenId, amountWei }) {
+    async nftTopUp ({ state, dispatch }, { projectAddress, tokenId, amountWei }) {
       try {
         if (!signer) await dispatch('connect')
+
+        // determine allowance
+        const daiContract = getDAIContract()
+        const allowance = await daiContract.allowance(state.address, projectAddress)
+
+        if (allowance.lt(amountWei)) {
+          alert("Your top-up amount is greater than what you've allowed the project to spend.")
+          throw new Error('topup amount < allowance')
+        }
+
         const contract = getProjectContract(projectAddress)
         const contractSigner = contract.connect(signer)
-        console.log('top up', projectAddress, tokenId, amountWei)
+        // console.log('top up', projectAddress, tokenId, amountWei)
         // go
         const tx = await contractSigner['topUp(uint256,uint128)'](tokenId, amountWei)
         return tx
       } catch (e) {
         console.error('@nftTopUp', e)
-        return null
+        throw e
       }
     },
 
@@ -370,6 +382,10 @@ function getRadicleRegistryContract () {
 
 function getProjectContract (address) {
   return new Ethers.Contract(address, FundingNFT.abi, provider)
+}
+
+function getDAIContract () {
+  return new Ethers.Contract(DAI.address, DAI.abi, provider)
 }
 
 function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes }) {

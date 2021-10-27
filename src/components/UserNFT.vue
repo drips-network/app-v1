@@ -35,20 +35,28 @@ const topUp = async () => {
     topUpTx.value = await store.dispatch('nftTopUp', {
       projectAddress: nft.nftRegistryAddress,
       tokenId: nft.id.split('x').pop(1),
-      amountWei: topUpAmtWei.value.toString()
+      amountWei: topUpAmtWei.value
     })
+
+    await topUpTx.value.wait()
+    // update balance
+    getBalance()
   } catch (e) {
     console.error(e)
   }
+}
+
+const getBalance = () => {
+  // get nft balance
+  store.dispatch('getNFTBalance', { projectAddress, tokenId })
+    .then(wei => { balance.value = wei })
 }
 
 onBeforeMount(() => {
   // get project meta
   store.dispatch('getProjectMeta', { projectAddress })
     .then(meta => { projectMeta.value = meta })
-  // get nft balance
-  store.dispatch('getNFTBalance', { projectAddress, tokenId })
-    .then(wei => { balance.value = wei })
+  getBalance()
   // get nft meta
   store.dispatch('getNFTMetadata', { projectAddress, tokenId })
     .then(meta => { nftMeta.value = meta })
@@ -100,7 +108,7 @@ onBeforeMount(() => {
       .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
         .flex.items-center.w-112
           svg-dai.w-32.h-32.ml-16.mr-6
-        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", required)
+        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", step="0.01", required)
         .flex.items-center
           button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32(type="submit") Add
 
