@@ -1,16 +1,18 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
+import store from '@/store'
+import { BigNumber as bn, constants } from 'ethers'
+import { fromWei } from '@/utils'
+// components:
 import {
-  Dialog,
+  Dialog as DialogBody,
   DialogOverlay,
   DialogTitle,
   DialogDescription
 } from '@headlessui/vue'
+import SvgDai from '@/components/SvgDai'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
-import store from '@/store'
-import { BigNumber as bn, constants } from 'ethers'
-import { fromWei } from '@/utils'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -29,7 +31,7 @@ const state = reactive({
   // rate: 2, // DAI
   // prePayMonths: 1,
   // topUp: 5184000,
-  approved: false,
+  approved: true, // check allowance on mint...
   nft: null,
   approveTx: null,
   mintTx: null
@@ -47,27 +49,17 @@ const weiPerSec = computed(() => {
 const emit = defineEmits(['close'])
 const close = () => emit('close')
 
-const approve = async () => {
-  try {
-    // send...
-    state.approveTx = await store.dispatch('approveDAIContract', {
-      projectAddress: props.projectAddress,
-      amount: topUpWei.value
-    })
-    console.log('approve tx', state.approveTx)
-
-    // wait for confirmation...
-    await state.approveTx.wait() // receipt
-
-    state.approved = topUpWei.value.toString()
-  } catch (e) {
-    console.error(e)
-    state.approved = false
-  }
-}
-
 const mint = async () => {
   try {
+    // check allowance
+    const allowance = await store.dispatch('getProjectAllowance', props.projectAddress)
+
+    if (allowance.lt(topUpWei.value)) {
+      alert('You must first approve the contract to withdraw your DAI periodically.')
+      state.approved = false
+      throw new Error('Exceeds project allowance')
+    }
+
     // mint...
     state.mintTx = await store.dispatch('mintProjectNFT', {
       projectAddress: props.projectAddress,
@@ -84,68 +76,66 @@ const mint = async () => {
     console.error(e)
   }
 }
+
+const approve = async () => {
+  try {
+    // send...
+    state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
+    console.log('approve tx', state.approveTx)
+
+    // wait for confirmation...
+    await state.approveTx.wait() // receipt
+
+    state.approved = topUpWei.value.toString()
+  } catch (e) {
+    console.error(e)
+    state.approved = false
+  }
+}
 </script>
 
-<template>
-  <Dialog :open="isOpen" @close="close" class="fixed inset-0 z-10 overflow-y-auto flex py-60 px-30">
-    <DialogOverlay class="fixed overlay bg-indigo-900 opacity-75" />
+<template lang="pug">
+dialog-body.fixed.inset-0.z-10.overflow-y-auto.flex.py-60.px-30(:open="isOpen", @close="close")
 
-    <Panel icon="🌈" class="z-10 m-auto">
-      <template v-slot:header>
-        <DialogTitle>Fund</DialogTitle>
-      </template>
+  dialog-overlay.fixed.overlay.bg-indigo-900.opacity-75
 
-      <template v-slot:description>
-        <DialogDescription class="text-base mx-auto" style="max-width:23em">
-          Fund this project and receive a unique NFT to show your support and vote on proposals.
-        </DialogDescription>
-      </template>
+  panel.z-10.m-auto(icon="🌈")
 
-      <form @submit.prevent validate>
-        <!-- input rate -->
-        <input-body class="my-10" label="Monthly Rate (DAI)" :isFilled="typeof rate === 'number'">
-          <input v-model="rate" type="number" placeholder="Monthly Rate (DAI)" :min="minDAIPerMonth.toString()" step="1" required>
-        </input-body>
+    template(v-slot:header)
+      dialog-title Fund
 
-        <!-- input months -->
-        <input-body class="my-10" label="Pre-pay (Months)" :isFilled="typeof prePayMonths === 'number'">
-          <input v-model="prePayMonths" type="number" placeholder="Pre-pay (Months)" min="1" step="1" required>
-        </input-body>
+    template(v-slot:description)
+      dialog-description.text-base.mx-auto(style="max-width:23em")
+        | Fund this project and receive a unique NFT to show your support and vote on proposals.
 
-        <!-- total due -->
-        <div class="rounded-full px-24 h-80 bg-indigo-700 flex justify-between items-center font-semibold">
-          <div class="text-lg">TOTAL</div>
-          <div class="text-2xl"> {{ payTotalDAI }} DAI</div>
-        </div>
+    form(@submit.prevent, validate)
+      //- input rate
+      input-body.my-10(label="Monthly Rate (DAI)", :isFilled="typeof rate === 'number'")
+        input(v-model="rate", type="number", placeholder="Monthly Rate (DAI)", :min="minDAIPerMonth.toString()", step="1", required)
 
-        <!-- <p> {{ topUpWei.value.toString() }} WEI</p> -->
+      //- input months prepay
+      input-body.my-10(label="Pre-pay (Months)", :isFilled="typeof prePayMonths === 'number'")
+        input(v-model="prePayMonths", type="number", placeholder="Pre-pay (Months)", min="1", step="1", required)
 
-        <!-- <input-body class="my-10 mb-36" label="Pay 30 days (DAI-WEI)" :isFilled="typeof topUp === 'number'">
-          <input class="opacity-50" v-model="topUp" type="number" placeholder="Pay 30 days (DAI-WEI)" disabled required>
-        </input-body> -->
+      //- total due
+      .rounded-full.px-24.h-80.bg-indigo-700.flex.justify-between.items-center.font-semibold
+        .text-lg TOTAL
+        .text-2xl.flex
+          | {{ payTotalDAI }}
+          svg-dai.w-32.h-32.ml-16
 
-        <div class="flex justify-center mt-40">
-          <template v-if="state.nft">
-            <router-link :to="{name: 'user-funds', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
-          </template>
+      .flex.justify-center.mt-40
+        template(v-if="state.nft")
+          <router-link :to="{name: 'user-funds', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
 
-          <template v-else-if="!state.approved">
-            <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="approve">
-              <template v-if="state.approveTx">Approving...</template>
-              <template v-else>Approve</template>
-            </button>
-          </template>
+        template(v-else-if="!state.approved")
+          button.btn.btn-lg.btn-white.min-w-sm.mx-auto(@click="approve")
+            template(v-if="state.approveTx") Approving...
+            template(v-else) Approve
 
-          <template v-else>
-            <button class="btn btn-lg btn-white min-w-sm mx-auto" @click="mint">
-              <template v-if="state.mintTx">Subscribing...</template>
-              <template v-else>Subscribe</template>
-            </button>
-          </template>
-        </div>
-      </form>
+        template(v-else)
+          button.btn.btn-lg.btn-white.min-w-sm.mx-auto(@click="mint")
+            template(v-if="state.mintTx") Subscribing...
+            template(v-else) Subscribe
 
-    </Panel>
-
-  </Dialog>
 </template>

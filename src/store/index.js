@@ -233,11 +233,7 @@ export default createStore({
       }
     },
 
-    async approveDAIContract ({ state, dispatch }, { projectAddress }) {
-      // TODO: check existing DAI allowance
-      // const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
-      // await contract.allowance(state.address, projectAddress)
-
+    async approveDAIContract ({ state, dispatch }, projectAddress) {
       try {
         if (!state.address) {
           await dispatch('connect')
@@ -245,13 +241,19 @@ export default createStore({
 
         const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
         const contractSigner = contract.connect(signer)
-
+        // approve max amount
         const amount = Ethers.constants.MaxUint256
         const tx = await contractSigner.approve(projectAddress, amount)
         return tx
       } catch (e) {
         console.error('@approveDAIContract', e)
       }
+    },
+
+    async getProjectAllowance ({ state, dispatch }, projectAddress) {
+      if (!state.address) await dispatch('connect')
+      const daiContract = getDAIContract()
+      return daiContract.allowance(state.address, projectAddress)
     },
 
     async mintProjectNFT ({ state, dispatch }, { projectAddress, typeId = 0, topUpAmt, amtPerSec }) {
