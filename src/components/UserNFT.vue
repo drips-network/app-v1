@@ -5,6 +5,7 @@ import { utils } from 'ethers'
 import { toDAIPerMo } from '@/utils'
 import SvgPlusMinus from '@/components/SvgPlusMinus'
 import SvgDai from '@/components/SvgDai'
+import TxLink from '@/components/TxLink'
 
 const props = defineProps({
   nft: Object
@@ -30,6 +31,10 @@ const topUpAmt = ref(0)
 const topUpAmtWei = computed(() => utils.parseUnits(topUpAmt.value.toString()))
 const topUpTx = ref(null)
 
+const withdrawAmt = ref(0)
+const withdrawAmtWei = computed(() => utils.parseUnits(withdrawAmt.value.toString()))
+const withdrawTx = ref(null)
+
 const topUp = async () => {
   try {
     topUpTx.value = await store.dispatch('nftTopUp', {
@@ -41,6 +46,26 @@ const topUp = async () => {
     await topUpTx.value.wait()
     // update balance
     getBalance()
+    toggleAdjust()
+    topUpTx.value = null
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const withdraw = async () => {
+  try {
+    withdrawTx.value = await store.dispatch('nftWithdraw', {
+      projectAddress: nft.nftRegistryAddress,
+      tokenId: nft.id.split('x').pop(1),
+      amountWei: withdrawAmtWei.value
+    })
+
+    await withdrawTx.value.wait()
+    // update balance
+    getBalance()
+    toggleAdjust()
+    withdrawTx.value = null
   } catch (e) {
     console.error(e)
   }
@@ -103,7 +128,7 @@ onBeforeMount(() => {
       button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'add'") Add
       button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'withdraw'") Withdraw
 
-    //- adjust: add
+    //- (step 2 as add)
     form.my-10(v-if="adjust === 'add'", validate, @submit.prevent="topUp")
       .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
         .flex.items-center.w-112
@@ -111,6 +136,17 @@ onBeforeMount(() => {
         input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", step="0.01", required)
         .flex.items-center
           button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32(type="submit") Add
+      tx-link(v-if="topUpTx", :tx="topUpTx")
+
+    //- (step 2 as withdraw)
+    form.my-10(v-if="adjust === 'withdraw'", validate, @submit.prevent="withdraw")
+      .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
+        .flex.items-center.w-144
+          svg-dai.w-32.h-32.ml-16.mr-6
+        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="withdrawAmt", type="number", step="0.01", required)
+        .flex.items-center
+          button.ml-6.mr-12.h-54.w-144.rounded-full.bg-indigo-800.text-lg.font-semibold(type="submit") Withdraw
+      tx-link(v-if="withdrawTx", :tx="withdrawTx")
 
   footer.mt-32.flex.justify-end
     a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${nft.id}`", target="_blank", rel="noopener noreferrer") OpenSea ↗

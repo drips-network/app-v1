@@ -361,6 +361,28 @@ export default createStore({
       }
     },
 
+    async nftWithdraw (_, { projectAddress, tokenId, amountWei }) {
+      try {
+        // determine amount withdrawable
+        const contract = getProjectContract(projectAddress)
+        const withdrawable = await contract.withdrawable(tokenId)
+
+        if (withdrawable.lt(amountWei)) {
+          alert(`You can only withdraw ${Ethers.utils.formatEther(withdrawable)}.`)
+          throw new Error('withdraw amount > withdrawable')
+        }
+
+        if (!signer) await dispatch('connect')
+        const contractSigner = contract.connect(signer)
+        // go!
+        const tx = await contractSigner.withdraw(tokenId, amountWei)
+        return tx
+      } catch (e) {
+        console.error('@nftTopUp', e)
+        throw e
+      }
+    },
+
     async getNFTMetadata (_, { projectAddress, tokenId }) {
       try {
         const contract = getProjectContract(projectAddress)
