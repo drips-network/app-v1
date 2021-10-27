@@ -30,9 +30,16 @@ const slots = useSlots()
   .input-body{
     & input {
       @apply w-full h-80 flex items-center;
+      &::placeholder{
+        /* TODO: maybe font style <label> instead of placeholder... */
+        @apply font-sans text-xl;
+      }
     }
     & textarea {
       @apply w-full min-h-80 flex items-center;
+      &::placeholder{
+        @apply font-sans text-xl;
+      }
     }
   }
 </style>

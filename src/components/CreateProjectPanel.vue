@@ -10,7 +10,12 @@ const project = reactive({
   name: '',
   // owner - added in save
   symbol: '',
-  descrip: ''
+  descrip: '',
+  website: '',
+  twitter: '',
+  discord: '',
+  radicleProjectId: '',
+  githubProject: ''
 })
 
 const emit = defineEmits(['projectMetaUpdated'])
@@ -41,11 +46,30 @@ panel.mx-auto(icon="✨")
           input-body(label="Name*", :isFilled="project.name.length")
             input(v-model="project.name", placeholder="Name*", required)
         .my-10
-          input-body(label="Symbol*", :isFilled="project.name.length")
+          input-body(label="Symbol*", :isFilled="project.symbol.length")
             input(v-model="project.symbol", placeholder="Symbol*", required)
         .my-10
           input-body(label="Description", :isFilled="project.descrip.length")
             input(v-model="project.descrip", placeholder="Description")
+        .my-10
+          input-body(label="Website", :isFilled="project.website.length", format="code")
+            input(v-model="project.website", placeholder="Website", type="url")
+
+        .my-10.flex.-mx-10
+          .px-5
+            input-body(label="Twitter", :isFilled="project.twitter.length")
+              input(v-model="project.twitter", placeholder="Twitter")
+          .px-5
+            input-body(label="Discord", :isFilled="project.discord.length")
+              input(v-model="project.discord", placeholder="Discord")
+
+        .my-10
+          input-body(label="Radicle Project ID", :isFilled="project.radicleProjectId.length", format="code")
+            input(v-model="project.radicleProjectId", placeholder="Radicle Project ID")
+
+        .my-10
+          input-body(label="Github Project URL", :isFilled="project.githubProject.length", format="code")
+            input(v-model="project.githubProject", placeholder="Github Project URL", type="url")
 
         div.mt-40
           //- create btn
