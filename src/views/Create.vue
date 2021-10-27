@@ -1,7 +1,7 @@
 <script setup>
 // TODO - consider making this one reactive body rather than break into components with emits...
 // manage open/close panels here and wrap the form inputs of this component...
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CreateProjectPanel from '@/components/CreateProjectPanel'
 import CreateProjectFundingPanel from '@/components/CreateProjectFundingPanel'
@@ -15,13 +15,14 @@ const tx = ref()
 
 const onProjectMetaUpdated = (body) => {
   project.value = body
-  console.log('project updated', project.value)
+  console.log('project updated', toRaw(project.value))
 }
 
-const onAddNFTType = (type) => {
+const onFundingUpdated = ({ goal, nftType }) => {
+  project.value.goal = goal // DAI
   project.value.inputNFTTypes = []
-  project.value.inputNFTTypes.push(type)
-  console.log('project nft updated', project.value)
+  project.value.inputNFTTypes.push(nftType)
+  console.log('project funding updated', toRaw(project.value))
 }
 
 async function submitProject () {
@@ -52,7 +53,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 article.create.py-80.relative
   create-project-panel(@projectMetaUpdated="onProjectMetaUpdated")
 
-  create-project-funding-panel.my-24(v-if="project", @addNFTType="onAddNFTType")
+  create-project-funding-panel.my-24(v-if="project", @fundingUpdated="onFundingUpdated")
 
   .mt-40.flex.justify-center.w-full(v-if="project && project.inputNFTTypes")
     .text-center

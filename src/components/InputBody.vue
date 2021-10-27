@@ -1,10 +1,12 @@
 <script setup>
 import { useSlots, computed } from 'vue'
+import SvgDai from '@/components/SvgDai'
 
 const props = defineProps({
   label: String,
   isFilled: [Number, Boolean], // input has content
-  format: String
+  format: String,
+  symbol: String
 })
 
 const styling = computed(() => {
@@ -24,6 +26,13 @@ const slots = useSlots()
   //- field (input, textarea)
   .min-h-80.flex.items-center.font-semibold.border.border-violet-700.rounded-2xl.focus-within_border-violet-600.text-center(:class="[styling]")
     slot
+
+    //- (symbol: daipermo)
+    template(v-if="props.symbol === 'daipermo'")
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+        .flex.items-center
+          svg-dai(size="lg")
+          .text-lg.ml-4.tracking-tight / MO
 </template>
 
 <style lang="postcss">

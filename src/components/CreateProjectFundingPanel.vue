@@ -9,7 +9,8 @@ const props = defineProps({
   projectAddress: String
 })
 
-const minDAIPerMonth = ref(1)
+const projectGoal = ref()
+const minDAIPerMonth = ref()
 
 const state = reactive({
   // typeId: route.query.typeId || 0,
@@ -26,7 +27,7 @@ const nftType = computed(() => {
   ]
 })
 
-const emit = defineEmits(['addNFTType'])
+const emit = defineEmits(['fundingUpdated'])
 
 // const submit = async () => {
 //   try {
@@ -44,7 +45,10 @@ const emit = defineEmits(['addNFTType'])
 // }
 
 const submit = () => {
-  emit('addNFTType', nftType.value)
+  emit('fundingUpdated', {
+    goal: projectGoal.value,
+    nftType: nftType.value
+  })
 }
 </script>
 
@@ -78,9 +82,13 @@ panel.mx-auto(icon="🌈")
           .bg-violet-700.rounded-full.w-full
 
   form.mt-40(@submit.prevent="submit", validate)
+    //- input monthly goal
+    input-body.my-10(label="Monthly Goal", :isFilled="typeof projectGoal === 'number'", symbol="daipermo")
+      input(v-model="projectGoal", type="number", placeholder="Monthly Goal", required)
+
     //- input min rate
-    input-body(label="Minimum Monthly Rate (DAI)", :isFilled="typeof minDAIPerMonth === 'number'")
-      input(v-model="minDAIPerMonth", type="number", placeholder="Minimum Monthly Rate (DAI)", required)
+    input-body(label="Minimum Subscription", :isFilled="typeof minDAIPerMonth === 'number'", symbol="daipermo")
+      input(v-model="minDAIPerMonth", type="number", placeholder="Minimum Subscription", required)
 
     .mt-40
       //- submit btn
