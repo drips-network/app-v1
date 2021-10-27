@@ -1,5 +1,5 @@
 <script setup>
-import { ref, readonly, onBeforeMount, computed } from 'vue'
+import { ref, markRaw, onBeforeMount, computed } from 'vue'
 import store from '@/store'
 import { utils } from 'ethers'
 import { toDAIPerMo } from '@/utils'
@@ -11,12 +11,12 @@ const props = defineProps({
   nft: Object
 })
 
-const nft = readonly(props.nft)
+const nft = markRaw(props.nft)
 const nftRate = toDAIPerMo(nft.amtPerSec)
-const tokenId = props.nft.id.split('x').pop(1)
+const tokenId = nft.tokenId
 const nftMeta = ref({})
 
-const projectAddress = readonly(props.nft.nftRegistryAddress)
+const projectAddress = nft.projectAddress
 const projectMeta = ref({})
 
 const balance = ref(0)
@@ -38,8 +38,8 @@ const withdrawTx = ref(null)
 const topUp = async () => {
   try {
     topUpTx.value = await store.dispatch('nftTopUp', {
-      projectAddress: nft.nftRegistryAddress,
-      tokenId: nft.id.split('x').pop(1),
+      projectAddress,
+      tokenId,
       amountWei: topUpAmtWei.value
     })
 
@@ -56,8 +56,8 @@ const topUp = async () => {
 const withdraw = async () => {
   try {
     withdrawTx.value = await store.dispatch('nftWithdraw', {
-      projectAddress: nft.nftRegistryAddress,
-      tokenId: nft.id.split('x').pop(1),
+      projectAddress,
+      tokenId,
       amountWei: withdrawAmtWei.value
     })
 
@@ -102,12 +102,12 @@ onBeforeMount(() => {
 
       //- temp img
       .absolute.overlay.flex.items-center.justify-center.text-center
-        | NFT {{ '#' + nft.id }}<br>
-        | Type {{ nft.nftTypeId.toString() }}<br>
+        | {{ '#' + nft.tokenId }}<br>
+        | Type {{ nft.typeId }}<br>
         | {{ nftRate }} DAI/mo
 
   //- (owner actions)
-  template(v-if="nft.nftReceiver === $store.state.address")
+  template(v-if="nft.owner === $store.state.address")
     //- balance/valid
     .flex.my-10.-mx-5
       .flex-1.px-5

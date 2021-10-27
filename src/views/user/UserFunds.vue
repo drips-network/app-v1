@@ -15,9 +15,10 @@ const fetchUserNFTs = (nftReceiver) => {
       query ($nftReceiver: Bytes!) {
         nfts (where: {nftReceiver: $nftReceiver}) {
           id
-          nftReceiver
-          nftRegistryAddress
-          nftTypeId
+          tokenId
+          owner: nftReceiver
+          projectAddress: nftRegistryAddress
+          typeId: nftTypeId
           amtPerSec
         }
       }
