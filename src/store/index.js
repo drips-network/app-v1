@@ -180,7 +180,7 @@ export default createStore({
           if (projectOwner.toLowerCase() === tx.from.toLowerCase()) {
             // unlisten and return address
             contract.off('NewProject', onNewProject)
-            return resolve(projectAddress)
+            return resolve(projectAddress.toLowerCase())
           }
         }
 
