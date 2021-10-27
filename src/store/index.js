@@ -347,6 +347,17 @@ export default createStore({
         console.error('@nftTopUp', e)
         return null
       }
+    },
+
+    async getNFTMetadata (_, { projectAddress, tokenId }) {
+      try {
+        const contract = getProjectContract(projectAddress)
+        const hash = await contract.tokenURI(tokenId)
+        const meta = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${hash}`)
+        return meta.json()
+      } catch (e) {
+        console.error('@getNFTMetadata', e)
+      }
     }
   }
 })

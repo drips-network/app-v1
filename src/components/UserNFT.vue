@@ -12,6 +12,8 @@ const props = defineProps({
 
 const nft = readonly(props.nft)
 const nftRate = toDAIPerMo(nft.amtPerSec)
+const tokenId = props.nft.id.split('x').pop(1)
+const nftMeta = ref({})
 
 const projectAddress = readonly(props.nft.nftRegistryAddress)
 const projectMeta = ref({})
@@ -45,8 +47,11 @@ onBeforeMount(() => {
   store.dispatch('getProjectMeta', { projectAddress })
     .then(meta => { projectMeta.value = meta })
   // get nft balance
-  store.dispatch('getNFTBalance', { projectAddress, tokenId: props.nft.id.split('x').pop(1) })
+  store.dispatch('getNFTBalance', { projectAddress, tokenId })
     .then(wei => { balance.value = wei })
+  // get nft meta
+  store.dispatch('getNFTMetadata', { projectAddress, tokenId })
+    .then(meta => { nftMeta.value = meta })
 })
 </script>
 
@@ -59,6 +64,10 @@ onBeforeMount(() => {
   figure.my-40
     //- filler graphic
     .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative
+      //- nft meta img
+      //- img.absolute.overlay.object-contain.object-center(:src="nftMeta.image")
+
+      //- temp img
       .absolute.overlay.flex.items-center.justify-center.text-center
         | NFT {{ '#' + nft.id }}<br>
         | Type {{ nft.nftTypeId.toString() }}<br>
