@@ -103,7 +103,7 @@ article.project
                       svg-dai.mr-3(size="lgg")
                       .flex.items-end.leading-none
                         | {{ membership.minDAI }}
-                        span.tracking-tight.text-sm.ml-2.font-semibold /MO
+                        span.text-sm.ml-2.font-semibold /MO
                   ul.mt-32.list-disc.pl-18
                     li(v-for="perk in membership.perks") {{ perk }}
                 .flex.justify-center
