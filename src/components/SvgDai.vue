@@ -4,12 +4,9 @@ const props = defineProps({
 })
 let clss
 switch (props.size) {
-  case 'lg':
-    clss = 'h-20 w-20'
-    break
-  case '2xl':
-    clss = 'h-32 w-32'
-    break
+  case 'lg': clss = 'h-20 w-20'; break
+  case 'lgg': clss = 'h-22 w-22'; break
+  case '2xl': clss = 'h-32 w-32'; break
 }
 </script>
 

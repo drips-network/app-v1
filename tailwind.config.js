@@ -31,6 +31,7 @@ module.exports = {
       16: '1.6rem',
       18: '1.8rem',
       20: '2.0rem',
+      22: '2.2rem',
       24: '2.4rem',
       28: '2.8rem',
       32: '3.2rem',
@@ -48,6 +49,7 @@ module.exports = {
       96: '9.6rem',
       112: '11.2rem',
       120: '12rem',
+      132: '13.2rem',
       144: '14.4rem',
       160: '16rem',
       180: '18rem'
@@ -64,7 +66,8 @@ module.exports = {
         // 400: '#382099', // nft thumb title
         500: '#212064',
         600: '#4949DD',
-        700: '#28258E' // bright borders
+        700: '#28258E', // bright borders
+        800: '#4949DD' // memberships bg
       },
       indigo: {
         700: '#17164B',
@@ -176,6 +179,7 @@ module.exports = {
       // md: '0.375rem',
       // lg: '0.5rem',
       // xl: '0.75rem',
+      xl: '3.3rem',
       '2xl': '4rem',
       '2xlb': '4.5rem',
       // '3xl': '1.5rem',
