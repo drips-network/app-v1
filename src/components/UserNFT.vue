@@ -149,5 +149,5 @@ onBeforeMount(() => {
       tx-link(v-if="withdrawTx", :tx="withdrawTx")
 
   footer.mt-32.flex.justify-end
-    a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${nft.id}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
+    a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${tokenId}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
 </template>
