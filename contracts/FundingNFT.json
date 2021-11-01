@@ -64,6 +64,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "Builder",
+        "type": "address"
+      }
+    ],
+    "name": "NewBuilder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "string",
         "name": "contractURI",
@@ -340,6 +353,32 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "builder",
+    "outputs": [
+      {
+        "internalType": "contract IBuilder",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newBuilder",
+        "type": "address"
+      }
+    ],
+    "name": "changeBuilder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -355,8 +394,37 @@
   {
     "inputs": [],
     "name": "collect",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "collected",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "dripped",
+        "type": "uint128"
+      }
+    ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "collectable",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "toCollect",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "toDrip",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -433,6 +501,36 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "dripFraction",
+        "type": "uint32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct ReceiverWeight[]",
+        "name": "receiverWeights",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "drip",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -516,6 +614,11 @@
         "internalType": "struct InputNFTType[]",
         "name": "inputNFTTypes",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "builder_",
+        "type": "address"
       }
     ],
     "name": "init",
@@ -877,7 +980,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "tokenId",
         "type": "uint256"
       }
     ],
@@ -889,7 +992,7 @@
         "type": "string"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {

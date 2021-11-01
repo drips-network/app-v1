@@ -3,7 +3,17 @@
     "inputs": [
       {
         "internalType": "contract DaiPool",
-        "name": "pool",
+        "name": "pool_",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "builder_",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "governance_",
         "type": "address"
       }
     ],
@@ -15,8 +25,21 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "contract FundingNFT",
-        "name": "fundingNFT",
+        "internalType": "address",
+        "name": "builder",
+        "type": "address"
+      }
+    ],
+    "name": "NewBuilder",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "nftRegistry",
         "type": "address"
       },
       {
@@ -31,10 +54,49 @@
   },
   {
     "inputs": [],
+    "name": "builder",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newBuilder",
+        "type": "address"
+      }
+    ],
+    "name": "changeBuilder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "fundingNFTTemplate",
     "outputs": [
       {
         "internalType": "contract FundingNFT",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "governance",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }

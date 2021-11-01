@@ -27,11 +27,42 @@
       {
         "indexed": false,
         "internalType": "uint128",
-        "name": "amt",
+        "name": "collectedAmt",
+        "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "drippedAmt",
         "type": "uint128"
       }
     ],
     "name": "Collected",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "amt",
+        "type": "uint128"
+      }
+    ],
+    "name": "Dripped",
     "type": "event"
   },
   {
@@ -238,7 +269,18 @@
       }
     ],
     "name": "collect",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "collected",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "dripped",
+        "type": "uint128"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -254,7 +296,12 @@
     "outputs": [
       {
         "internalType": "uint128",
-        "name": "",
+        "name": "collected",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "dripped",
         "type": "uint128"
       }
     ],
@@ -295,6 +342,49 @@
         "internalType": "contract IERC20",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiverAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "maxCycles",
+        "type": "uint64"
+      }
+    ],
+    "name": "flushCycles",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "flushable",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiverAddr",
+        "type": "address"
+      }
+    ],
+    "name": "flushableCycles",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "flushable",
+        "type": "uint64"
       }
     ],
     "stateMutability": "view",
@@ -475,6 +565,16 @@
         "internalType": "uint128",
         "name": "withdrawn",
         "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "collected",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "dripped",
+        "type": "uint128"
       }
     ],
     "stateMutability": "nonpayable",
@@ -550,6 +650,16 @@
       {
         "internalType": "uint128",
         "name": "withdrawn",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "collected",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "dripped",
         "type": "uint128"
       }
     ],
