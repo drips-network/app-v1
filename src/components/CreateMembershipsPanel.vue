@@ -48,7 +48,7 @@ panel.mx-auto(icon="🏅")
   form.mt-60(@submit.prevent="submit")
     //- memberships...
     template(v-for="(membership, i) in memberships")
-      section.my-10.rounded-2xl.bg-indigo-800.p-12
+      section.my-10.input-group
         .flex.-mx-5
           .w-1x2.px-5
             input-body(label="Name", :isFilled="memberships[i].name.length", theme="dark")

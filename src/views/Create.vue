@@ -9,12 +9,14 @@ import { useRoute, useRouter } from 'vue-router'
 import CreateProjectPanel from '@/components/CreateProjectPanel'
 import CreateProjectFundingPanel from '@/components/CreateProjectFundingPanel'
 import CreateMembershipsPanel from '@/components/CreateMembershipsPanel'
+import CreateDripsPanel from '@/components/CreateDripsPanel'
 import store from '@/store'
 
 const route = useRoute()
 const router = useRouter()
 
 const project = ref(null)
+const projectAddress = ref(null)
 const tx = ref()
 
 const onProjectMetaUpdated = (body) => {
@@ -40,9 +42,10 @@ async function submitProject () {
     console.log('tx', tx.value)
 
     // on project created...
-    const address = await store.dispatch('waitForProjectCreate', tx.value)
+    projectAddress.value = await store.dispatch('waitForProjectCreate', tx.value)
 
-    router.push({ name: 'project', params: { address } })
+    // go to project
+    // router.push({ name: 'project', params: { address } })
   } catch (e) {
     console.error(e)
   }
@@ -75,6 +78,9 @@ article.create.py-80.relative
       //- (tx link)
       .mt-16.text-violet-600(v-if="tx")
         a(:href="`https://rinkeby.etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+
+  //- (add drips after project creation)
+  create-drips-panel.my-24
 
   button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
