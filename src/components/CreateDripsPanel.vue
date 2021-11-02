@@ -29,7 +29,7 @@ panel.mx-auto(icon="💧")
   p Optionally share your revenue with others.<br>Add collaborators or project dependencies.
 
   //- drips list
-  form.mt-60(@submit.prevent="submit")
+  form.mt-60(@submit.prevent="submit", autocomplete="off")
     //- drips...
     template(v-for="(drip, i) in drips")
       section.my-10.input-group
@@ -39,7 +39,7 @@ panel.mx-auto(icon="💧")
               input(v-model="drips[i].name", placeholder="Name")
           .flex-1.px-5
             input-body(label="Share %", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
-              input(v-model="drips[i].percent", type="number", min="0", placeholder="%")
+              input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="%")
 
         .mt-10
           input-body(label="ETH Address", :isFilled="drips[i].address === 'length'", theme="dark")
