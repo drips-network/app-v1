@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Panel from '@/components/Panel'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import InputBody from '@/components/InputBody'
@@ -13,6 +13,25 @@ const newDrip = () => ({
 const drips = ref([
   newDrip()
 ])
+
+const dripsFormatted = computed(() => {
+  const dripFractionMax = 1_000_000
+  const totalPercent = drips.value.reduce((acc, cur) => acc + (cur.percent || 0), 0)
+  const dripFraction = parseInt(totalPercent / 100 * dripFractionMax)
+
+  const receiverWeights = drips.value.map(drip => {
+    return {
+      receiver: drip.address,
+      // weight of this receiver against the total dripFraction amount, as integer (max 10K)
+      weight: parseInt((drip.percent / 100 * dripFractionMax) / dripFraction * 10000)
+    }
+  })
+
+  return {
+    dripFraction,
+    receiverWeights
+  }
+})
 
 const addDrip = () => drips.value.push(newDrip())
 
