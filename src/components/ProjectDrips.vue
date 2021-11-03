@@ -42,6 +42,7 @@ section.project-drips.relative
 
   .flex.justify-end
     ul
+      h6 dripFraction: {{ dripsFraction }} of {{ dripsFractionMax }} ({{ (dripsFraction / dripsFractionMax).toFixed(3) }}%)
       li(v-for="item in dripsList")
         pre.p-10.border.white.font-sans
           | {{ item.receiver }}

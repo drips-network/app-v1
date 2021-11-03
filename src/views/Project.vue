@@ -26,12 +26,13 @@ const mintModal = ref(false)
 onBeforeMount(async () => {
   try {
     // get project...
-    project.value = await store.dispatch('getProject', projectAddress)
+    project.value = (await store.dispatch('getProject', projectAddress))?.data?.fundingProject
 
     if (!project.value) {
       status.value = 'Not Found :('
       return false
     }
+
     // get meta...
     meta.value = await store.dispatch('getProjectMeta', { ipfsHash: project.value.ipfsHash })
     // finish setup
@@ -39,7 +40,7 @@ onBeforeMount(async () => {
     minDAI.value = toDAIPerMo(nftType.value.minAmtPerSec)
   } catch (e) {
     console.error(e)
-    status.value = 'Error :/'
+    status.value = e.message ? 'Error: ' + e.message : 'Error'
   }
 })
 </script>

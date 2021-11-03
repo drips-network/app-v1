@@ -203,12 +203,7 @@ export default createStore({
     },
 
     async getProject (_, projectAddress) {
-      try {
-        const resp = await api({ query: queryProject, variables: { id: projectAddress } })
-        return resp.data.fundingProject
-      } catch (e) {
-        console.error('@getProject', e)
-      }
+      return api({ query: queryProject, variables: { id: projectAddress } })
     },
 
     async getProjectMeta ({ dispatch }, { projectAddress, ipfsHash }) {
