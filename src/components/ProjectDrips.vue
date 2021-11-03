@@ -42,10 +42,10 @@ section.project-drips.relative
 
   .flex.justify-end
     ul
-      h6 dripFraction: {{ dripsFraction }} of {{ dripsFractionMax }} ({{ (dripsFraction / dripsFractionMax).toFixed(3) }}%)
+      h6 dripsFraction: {{ dripsFraction }} of {{ dripsFractionMax }} ({{ (dripsFraction / dripsFractionMax * 100).toFixed(3) }}%)
       li(v-for="item in dripsList")
         pre.p-10.border.white.font-sans
           | {{ item.receiver }}
           | weight: {{ item.weight }}
-          | percent: {{ item.percent }}%
+          | percent of total revenue: {{ item.percent }}%
 </template>

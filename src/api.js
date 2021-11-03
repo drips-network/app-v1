@@ -8,10 +8,10 @@ export default async function ({ query, variables }) {
       body: JSON.stringify({ query, variables })
     })
 
-    if (response.status >= 200 && response.status <= 299) {
-      return await response.json()
+    if (resp.status >= 200 && resp.status <= 299) {
+      return await resp.json()
     } else {
-      throw Error(response.statusText)
+      throw Error(resp.statusText)
     }
   } catch (e) {
     console.log('api err', e, e.message, e.status)
