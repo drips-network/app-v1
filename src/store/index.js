@@ -394,6 +394,13 @@ export default createStore({
       } catch (e) {
         console.error('@getNFTMetadata', e)
       }
+    },
+
+    async addDripToProject ({ dispatch }, { projectAddress, dripFraction, receiverWeights }) {
+      if (!signer) await dispatch('connect')
+      const contract = getProjectContract(projectAddress)
+      const contractSigner = contract.connect(signer)
+      return contractSigner.drip(dripFraction, receiverWeights) // tx
     }
   }
 })

@@ -51,6 +51,9 @@ async function submitProject () {
   }
 }
 
+const viewBtnVisible = ref(false)
+const showViewBtn = () => { viewBtnVisible.value = true }
+
 // preloaded address? (dev)
 // const projectAddress = ref(route.query.project)
 
@@ -59,28 +62,37 @@ async function submitProject () {
 // }
 
 const isDev = process.env.NODE_ENV !== 'production'
+projectAddress.value = isDev ? route.query.project : null
 </script>
 
 <template lang="pug">
 article.create.py-80.relative
-  create-project-panel(@projectMetaUpdated="onProjectMetaUpdated")
+  //- create project sections
+  section(:class="{'opacity-50': projectAddress}")
+    create-project-panel(@projectMetaUpdated="onProjectMetaUpdated")
 
-  create-project-funding-panel.my-24(v-if="project", @fundingUpdated="onFundingUpdated")
+    create-project-funding-panel.my-24(v-if="project", @fundingUpdated="onFundingUpdated")
 
-  create-memberships-panel.my-24(v-if="project && project.inputNFTTypes", @updated="onMembershipsUpdated")
+    create-memberships-panel.my-24(v-if="project && project.inputNFTTypes", @updated="onMembershipsUpdated")
 
-  .mt-40.flex.justify-center.w-full(v-if="project && project.memberships")
-    .text-center
-      button.btn.btn-xl.btn-white.min-w-md(@click="submitProject")
-        template(v-if="tx") Creating...
-        template(v-else) Create ✨
+    .mt-40.flex.justify-center.w-full(v-if="project && project.memberships && !projectAddress")
+      .text-center
+        button.btn.btn-xl.btn-white.min-w-md(@click="submitProject")
+          template(v-if="tx") Creating...
+          template(v-else) Create ✨
 
-      //- (tx link)
-      .mt-16.text-violet-600(v-if="tx")
-        a(:href="`https://rinkeby.etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+        //- (tx link)
+        .mt-16.text-violet-600(v-if="tx")
+          a(:href="`https://rinkeby.etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
-  //- (add drips after project creation)
-  create-drips-panel.my-24
+  //- post-create
+  section(v-if="projectAddress")
+    //- (add drips after project creation)
+    create-drips-panel.my-24(:projectAddress="projectAddress", @skip="showViewBtn", @dripsAdded="showViewBtn")
+
+    //- (view link)
+    .mt-40.flex.justify-center(v-show="viewBtnVisible")
+      router-link.btn.btn-lg.btn-white.min-w-sm(:to="{name: 'project', params: { address: projectAddress }}") View Project
 
   button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
