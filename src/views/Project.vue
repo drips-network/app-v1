@@ -9,6 +9,7 @@ import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
 import SvgDai from '@/components/SvgDai'
+import ProjectDrips from '@/components/ProjectDrips'
 import { fromWei, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
@@ -54,7 +55,8 @@ article.project
       .h-160
 
   template(v-else)
-    section.panel-indigo.my-10.py-12.pb-48
+    //- main project panel
+    section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
       .h-80.rounded-full.bg-indigo-800.mx-10
 
@@ -110,5 +112,8 @@ article.project
                   //- TODO: join click
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
-      modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+    //- drips list
+    project-drips
+
+    modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 </template>
