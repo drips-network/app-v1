@@ -15,17 +15,21 @@ const nft = markRaw(props.nft)
 const nftRate = toDAIPerMo(nft.amtPerSec)
 const tokenId = nft.tokenId
 const nftMeta = ref({})
+const nftExpiryDate = ref()
+const nftActiveForDays = computed(() => {
+  if (!nftExpiryDate.value) return null
+  const days = (nftExpiryDate.value - new Date()) / 1000 / 60 / 60 / 24
+  return days // decimal
+})
 
 const projectAddress = nft.projectAddress
 const projectMeta = ref({})
 
-const balance = ref(0)
-const balanceDAI = computed(() => Math.round(utils.formatEther(balance.value) * 1000) / 1000)
+const precision = 100
+const round = ether => Math.floor(ether * precision) / precision
 
-const adjust = ref(null)
-const toggleAdjust = () => {
-  adjust.value = adjust.value ? null : 'edit'
-}
+const balance = ref(0)
+const balanceDAI = computed(() => round(utils.formatEther(balance.value)))
 
 const topUpAmt = ref(0)
 const topUpAmtWei = computed(() => utils.parseUnits(topUpAmt.value.toString()))
@@ -33,7 +37,14 @@ const topUpTx = ref(null)
 
 const withdrawAmt = ref(0)
 const withdrawAmtWei = computed(() => utils.parseUnits(withdrawAmt.value.toString()))
+const withdrawMaxWei = ref(0)
+const withdrawMax = computed(() => round(utils.formatEther(withdrawMaxWei.value)))
 const withdrawTx = ref(null)
+
+const adjust = ref(null)
+const toggleAdjust = () => {
+  adjust.value = adjust.value ? null : 'edit'
+}
 
 const topUp = async () => {
   try {
@@ -44,13 +55,23 @@ const topUp = async () => {
     })
 
     await topUpTx.value.wait()
-    // update balance
+    // update ui
     getBalance()
+    getActiveUntil()
     toggleAdjust()
     topUpTx.value = null
   } catch (e) {
     console.error(e)
   }
+}
+
+const showWithdrawForm = async () => {
+  adjust.value = 'withdraw'
+  withdrawMaxWei.value = await store.dispatch('getNFTWithdrawable', { projectAddress, tokenId })
+}
+
+const setWithdrawToMax = () => {
+  withdrawAmt.value = round(utils.formatEther(withdrawMaxWei.value))
 }
 
 const withdraw = async () => {
@@ -62,8 +83,9 @@ const withdraw = async () => {
     })
 
     await withdrawTx.value.wait()
-    // update balance
+    // update ui
     getBalance()
+    getActiveUntil()
     toggleAdjust()
     withdrawTx.value = null
   } catch (e) {
@@ -77,14 +99,26 @@ const getBalance = () => {
     .then(wei => { balance.value = wei })
 }
 
+const getActiveUntil = () => {
+  store.dispatch('getNFTActiveUntil', { projectAddress, tokenId })
+    .then(timeSec => {
+      nftExpiryDate.value = new Date(timeSec * 1000)
+    })
+    .catch(console.error)
+}
+
 onBeforeMount(() => {
   // get project meta
   store.dispatch('getProjectMeta', { projectAddress })
     .then(meta => { projectMeta.value = meta })
   getBalance()
+
   // get nft meta
-  store.dispatch('getNFTMetadata', { projectAddress, tokenId })
-    .then(meta => { nftMeta.value = meta })
+  // store.dispatch('getNFTMetadata', { projectAddress, tokenId })
+  //   .then(meta => { nftMeta.value = meta })
+
+  // get nft active until
+  getActiveUntil()
 })
 </script>
 
@@ -110,42 +144,63 @@ onBeforeMount(() => {
   template(v-if="nft.owner === $store.state.address")
     //- balance/valid
     .flex.my-10.-mx-5
+      //- balance
       .flex-1.px-5
         .font-medium.text-center.mb-12 Balance
         .h-80.rounded-full.bg-indigo-700.flex.items-center
           svg-dai.w-32.h-32.ml-16.mr-6
           .flex-1
             .text-2xl.w-full.text-center.font-semibold {{ balanceDAI }}
-          button.flex-shrink-0.h-54.w-54.bg-indigo-900.flex.items-center.justify-center.rounded-full.mr-12.ml-2.transform.duration-150(@click="toggleAdjust", :class="{'rotate-45': adjust}")
+          button.flex-shrink-0.h-54.w-54.bg-indigo-900.flex.items-center.justify-center.rounded-full.mr-12.ml-2.transform.duration-150off(@click="toggleAdjust", :class="{'rotate-45': adjust}")
             svg-plus-minus
-      //- .w-1x2.px-5
-        .font-medium.text-center.mb-12 Valid For
+      //- valid for
+      .w-1x2.px-5(v-show="!adjust")
+        .font-medium.text-center.mb-12 Valid for
         .h-80.rounded-full.bg-indigo-700.flex.items-center
-          .text-2xl.w-full.text-center.font-semibold -
+          .text-2xl.w-full.text-center.font-semibold(:title="nftExpiryDate")
+            template(v-if="nftActiveForDays === null") -
+            span.text-red-500(v-else-if="nftActiveForDays < 0") INACTIVE
+            span.text-red-500(v-else-if="nftActiveForDays < 1") &lt;1 day
+            //- template(v-else-if="nftActiveForDays < 2") 1 day
+            span(v-else, :class="{'text-red-500': nftActiveForDays < 10}")
+              | {{ Math.ceil(nftActiveForDays) }} days
 
-    //- step 1: action option
+    //- (edit balance buttons)
     .flex.my-10.-mx-5(v-show="adjust === 'edit'")
       button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'add'") Add
-      button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'withdraw'") Withdraw
+      button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="showWithdrawForm") Withdraw
 
-    //- (step 2 as add)
+    //- (add balance)
     form.my-10(v-if="adjust === 'add'", validate, @submit.prevent="topUp")
       .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
-        .flex.items-center.w-112
-          svg-dai.w-32.h-32.ml-16.mr-6
-        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", step="0.01", required)
         .flex.items-center
+          svg-dai.w-32.h-32.ml-16.mr-6
+
+        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", step="0.01", required, v-autofocus)
+
+        .w-32.mr-16.ml-6
+        //- .flex.items-center
           button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32(type="submit") Add
+      button.mt-10.btn.btn-lg.bg-violet-600.w-full.mx-auto.font-semibold.text-xl(type="submit")
+        | Add
+
       tx-link(v-if="topUpTx", :tx="topUpTx")
 
-    //- (step 2 as withdraw)
+    //- (withdraw balance)
     form.my-10(v-if="adjust === 'withdraw'", validate, @submit.prevent="withdraw")
-      .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
-        .flex.items-center.w-144
-          svg-dai.w-32.h-32.ml-16.mr-6
-        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="withdrawAmt", type="number", step="0.01", required)
+      .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex.items-center
         .flex.items-center
-          button.ml-6.mr-12.h-54.w-144.rounded-full.bg-indigo-800.text-lg.font-semibold(type="submit") Withdraw
+          svg-dai.w-32.h-32.ml-16.mr-18
+
+        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="withdrawAmt", type="number", :min="1 / precision", :max="withdrawMax", :step="1 / precision", required, v-autofocus)
+
+        .mr-24.text-violet-600.text-base.ml-12
+          //- TODO: add max click
+          button.py-6(@click.prevent="setWithdrawToMax") MAX
+
+      button.mt-10.btn.btn-lg.bg-violet-600.w-full.mx-auto.font-semibold.text-xl(type="submit")
+        | Withdraw
+
       tx-link(v-if="withdrawTx", :tx="withdrawTx")
 
   footer.mt-32.flex.justify-end

@@ -394,6 +394,16 @@ export default createStore({
       } catch (e) {
         console.error('@getNFTMetadata', e)
       }
+    },
+
+    getNFTActiveUntil (_, { projectAddress, tokenId }) {
+      const contract = getProjectContract(projectAddress)
+      return contract.activeUntil(tokenId)
+    },
+
+    getNFTWithdrawable (_, { projectAddress, tokenId }) {
+      const contract = getProjectContract(projectAddress)
+      return contract.withdrawable(tokenId)
     }
   }
 })
