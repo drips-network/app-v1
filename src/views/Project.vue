@@ -57,7 +57,11 @@ article.project
   template(v-else)
     section.panel-indigo.my-10.py-12.pb-48
       //- progress bar
-      .h-80.rounded-full.bg-indigo-800.mx-10
+      .h-80.rounded-full.bg-indigo-800.mx-10.relative
+        .absolute.top-0.right-0.h-full.flex.items-center.pr-32.text-lg(v-if="meta.goal && meta.goal > 0")
+          svg-dai.mr-4(size="sm")
+          //- TODO: adapt goal
+          | {{ meta.goal.toLocaleString() }}/mo
 
       header.text-center.relative.pt-44
         //- owner
