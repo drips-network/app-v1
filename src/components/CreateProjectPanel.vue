@@ -2,6 +2,7 @@
 import { ref, toRaw, computed, reactive } from 'vue'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import store from '@/store'
 
 const owner = computed(() => store.state.address)
@@ -25,6 +26,18 @@ async function save () {
   body = { owner: owner.value, ...body }
   emit('projectMetaUpdated', body)
 }
+
+const imgSrc = ref('')
+const onImgFileChange = (e) => {
+  const input = e.target
+  if (input.files && input.files[0]) {
+    var reader = new FileReader()
+    reader.onload = function (event) {
+      imgSrc.value = event.target.result
+    }
+    reader.readAsDataURL(input.files[0])
+  }
+}
 </script>
 
 <template lang="pug">
@@ -38,6 +51,15 @@ panel.mx-auto(icon="✨")
 
     //- (create form)
     template(v-else)
+      //- avatar image upload
+      .h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-700.mb-36
+        label.absolute.overlay.flex.items-center.justify-center.cursor-pointer(title="Project Image")
+          span.sr-only Project Image
+          input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
+          svg-plus-minus-radicle
+        //- (image)
+        img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
+
       form(@submit.prevent="save", validate)
         //- .my-10
           input-body(label="Owner", :isFilled="owner.length", format="code")
