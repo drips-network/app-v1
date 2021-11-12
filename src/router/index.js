@@ -32,7 +32,7 @@ const routes = [
       {
         path: 'drips',
         name: 'user-drips',
-        component: () => import(/* webpackChunkName: "user-drips" */ '../views/user/UserFunds.vue')
+        component: () => import(/* webpackChunkName: "user-drips" */ '../views/user/UserDrips.vue')
       }
     ]
   }

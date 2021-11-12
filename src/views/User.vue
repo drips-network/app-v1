@@ -12,7 +12,7 @@ article.profile.pb-80
 
     nav.my-40.flex
       router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user', params: $route.params }") Projects
-      router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user-funds', params: $route.params }") Drips
+      router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user-drips', params: $route.params }") Drips
 
   main#main
     router-view
