@@ -437,3 +437,10 @@ export async function pinJSONToIPFS (json) {
   resp = await resp.json()
   return resp.IpfsHash
 }
+
+export function pinImageToIPFS (imgString) {
+  return fetch('/.netlify/functions/pinImage', {
+    method: 'POST',
+    body: JSON.stringify(imgString)
+  })
+}

@@ -3,7 +3,7 @@ import { ref, toRaw, computed, reactive } from 'vue'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import store from '@/store'
+import store, { pinImageToIPFS } from '@/store'
 
 const owner = computed(() => store.state.address)
 
@@ -12,6 +12,7 @@ const project = reactive({
   // owner - added in save
   symbol: '',
   descrip: '',
+  image: null,
   website: '',
   twitter: '',
   discord: '',
@@ -32,8 +33,25 @@ const onImgFileChange = (e) => {
   const input = e.target
   if (input.files && input.files[0]) {
     var reader = new FileReader()
-    reader.onload = function (event) {
+    reader.onload = async function (event) {
       imgSrc.value = event.target.result
+
+      // upload to ipfs
+      // TODO: upload only on create() to save ipfs uploads
+      try {
+        let resp = await pinImageToIPFS(imgSrc.value)
+        resp = await resp.json()
+        // oops
+        if (resp.error) {
+          throw new Error(resp.message)
+        }
+        // save
+        project.image = resp.IpfsHash
+      } catch (e) {
+        console.error(e)
+        alert('An error occured. Perhaps the image is too large (200kb max)')
+        imgSrc.value = null
+      }
     }
     reader.readAsDataURL(input.files[0])
   }
