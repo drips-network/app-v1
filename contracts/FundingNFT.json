@@ -64,9 +64,40 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "Builder",
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "dripFraction",
+        "type": "uint32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Receiver[]",
+        "name": "drips",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "DripsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "contract IBuilder",
+        "name": "builder",
         "type": "address"
       }
     ],
@@ -259,6 +290,11 @@
         "internalType": "uint128",
         "name": "minAmtPerSec",
         "type": "uint128"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
       }
     ],
     "name": "addType",
@@ -284,6 +320,11 @@
             "internalType": "uint128",
             "name": "minAmtPerSec",
             "type": "uint128"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
           }
         ],
         "internalType": "struct InputNFTType[]",
@@ -294,25 +335,6 @@
     "name": "addTypes",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "amtPerSecond",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -368,7 +390,7 @@
   {
     "inputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IBuilder",
         "name": "newBuilder",
         "type": "address"
       }
@@ -382,17 +404,82 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "ipfsHash",
+        "name": "contractURI_",
         "type": "string"
       }
     ],
-    "name": "changeIPFSHash",
+    "name": "changeContractURI",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "dripFraction",
+        "type": "uint32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currDrips",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "newDrips",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "changeDripReceiver",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currDrips",
+        "type": "tuple[]"
+      }
+    ],
     "name": "collect",
     "outputs": [
       {
@@ -410,7 +497,25 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currDrips",
+        "type": "tuple[]"
+      }
+    ],
     "name": "collectable",
     "outputs": [
       {
@@ -506,36 +611,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "dripFraction",
-        "type": "uint32"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "receiver",
-            "type": "address"
-          },
-          {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
-          }
-        ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "receiverWeights",
-        "type": "tuple[]"
-      }
-    ],
-    "name": "drip",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -590,7 +665,7 @@
       },
       {
         "internalType": "string",
-        "name": "ipfsHash",
+        "name": "contractURI_",
         "type": "string"
       },
       {
@@ -609,6 +684,11 @@
             "internalType": "uint128",
             "name": "minAmtPerSec",
             "type": "uint128"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
           }
         ],
         "internalType": "struct InputNFTType[]",
@@ -616,14 +696,56 @@
         "type": "tuple[]"
       },
       {
-        "internalType": "address",
+        "internalType": "contract IBuilder",
         "name": "builder_",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "dripFraction",
+            "type": "uint32"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+              },
+              {
+                "internalType": "uint128",
+                "name": "amtPerSec",
+                "type": "uint128"
+              }
+            ],
+            "internalType": "struct Receiver[]",
+            "name": "dripReceiver",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct DripInput",
+        "name": "drips",
+        "type": "tuple"
       }
     ],
     "name": "init",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "initialized",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -744,25 +866,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "minted",
-    "outputs": [
-      {
-        "internalType": "uint64",
-        "name": "",
-        "type": "uint64"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -798,6 +901,35 @@
       {
         "internalType": "uint128",
         "name": "minAmtPerSec",
+        "type": "uint128"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "nfts",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "minted",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint128",
+        "name": "amtPerSecond",
         "type": "uint128"
       }
     ],

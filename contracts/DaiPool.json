@@ -113,15 +113,27 @@
       },
       {
         "indexed": false,
-        "internalType": "uint128",
-        "name": "amtPerSec",
-        "type": "uint128"
-      },
-      {
-        "indexed": false,
         "internalType": "uint32",
         "name": "dripsFraction",
         "type": "uint32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Receiver[]",
+        "name": "receivers",
+        "type": "tuple[]"
       }
     ],
     "name": "SenderUpdated",
@@ -186,10 +198,22 @@
         "type": "uint128"
       },
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint128",
-        "name": "amtPerSec",
-        "type": "uint128"
+        "internalType": "struct Receiver[]",
+        "name": "receivers",
+        "type": "tuple[]"
       }
     ],
     "name": "SubSenderUpdated",
@@ -197,20 +221,7 @@
   },
   {
     "inputs": [],
-    "name": "AMT_PER_SEC_UNCHANGED",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "DRIPS_FRACTION_MAX",
+    "name": "MAX_DRIPS_FRACTION",
     "outputs": [
       {
         "internalType": "uint32",
@@ -223,20 +234,7 @@
   },
   {
     "inputs": [],
-    "name": "SENDER_WEIGHTS_COUNT_MAX",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SENDER_WEIGHTS_SUM_MAX",
+    "name": "MAX_RECEIVERS",
     "outputs": [
       {
         "internalType": "uint32",
@@ -266,6 +264,23 @@
         "internalType": "address",
         "name": "receiverAddr",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
       }
     ],
     "name": "collect",
@@ -290,6 +305,23 @@
         "internalType": "address",
         "name": "receiverAddr",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
       }
     ],
     "name": "collectable",
@@ -394,116 +426,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "senderAddr",
-        "type": "address"
-      }
-    ],
-    "name": "getAllReceivers",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "receiver",
-            "type": "address"
-          },
-          {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
-          }
-        ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "weights",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "senderAddr",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subSenderId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getAllReceiversSubSender",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "receiver",
-            "type": "address"
-          },
-          {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
-          }
-        ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "weights",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "senderAddr",
-        "type": "address"
-      }
-    ],
-    "name": "getAmtPerSec",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "amt",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "senderAddr",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subSenderId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getAmtPerSecSubSender",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "amt",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "userAddr",
         "type": "address"
       }
@@ -522,6 +444,80 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "senderAddr",
+        "type": "address"
+      }
+    ],
+    "name": "getReceiversHash",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "receiversHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "senderAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subSenderId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSubSenderReceiversHash",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "receiversHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "receivers",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "hashReceivers",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "receiversHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint128",
         "name": "topUpAmt",
         "type": "uint128"
@@ -529,11 +525,6 @@
       {
         "internalType": "uint128",
         "name": "withdraw",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint128",
-        "name": "amtPerSec",
         "type": "uint128"
       },
       {
@@ -549,13 +540,30 @@
             "type": "address"
           },
           {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
           }
         ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "updatedReceivers",
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "newReceivers",
         "type": "tuple[]"
       }
     ],
@@ -593,11 +601,6 @@
         "type": "uint128"
       },
       {
-        "internalType": "uint128",
-        "name": "amtPerSec",
-        "type": "uint128"
-      },
-      {
         "internalType": "uint32",
         "name": "dripsFraction",
         "type": "uint32"
@@ -610,39 +613,63 @@
             "type": "address"
           },
           {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
           }
         ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "updatedReceivers",
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
         "type": "tuple[]"
       },
       {
-        "internalType": "uint256",
-        "name": "nonce",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "newReceivers",
+        "type": "tuple[]"
       },
       {
-        "internalType": "uint256",
-        "name": "expiry",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "v",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "r",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "s",
-        "type": "bytes32"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "nonce",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiry",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "v",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "r",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct PermitArgs",
+        "name": "permitArgs",
+        "type": "tuple"
       }
     ],
     "name": "updateSenderAndPermit",
@@ -684,9 +711,21 @@
         "type": "uint128"
       },
       {
-        "internalType": "uint128",
-        "name": "amtPerSec",
-        "type": "uint128"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
       },
       {
         "components": [
@@ -696,13 +735,13 @@
             "type": "address"
           },
           {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
           }
         ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "updatedReceivers",
+        "internalType": "struct Receiver[]",
+        "name": "newReceivers",
         "type": "tuple[]"
       }
     ],
@@ -735,9 +774,21 @@
         "type": "uint128"
       },
       {
-        "internalType": "uint128",
-        "name": "amtPerSec",
-        "type": "uint128"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
       },
       {
         "components": [
@@ -747,39 +798,46 @@
             "type": "address"
           },
           {
-            "internalType": "uint32",
-            "name": "weight",
-            "type": "uint32"
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
           }
         ],
-        "internalType": "struct ReceiverWeight[]",
-        "name": "updatedReceivers",
+        "internalType": "struct Receiver[]",
+        "name": "newReceivers",
         "type": "tuple[]"
       },
       {
-        "internalType": "uint256",
-        "name": "nonce",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "expiry",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint8",
-        "name": "v",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "r",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "s",
-        "type": "bytes32"
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "nonce",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiry",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "v",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "r",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct PermitArgs",
+        "name": "permitArgs",
+        "type": "tuple"
       }
     ],
     "name": "updateSubSenderAndPermit",
@@ -799,6 +857,23 @@
         "internalType": "address",
         "name": "senderAddr",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
       }
     ],
     "name": "withdrawable",
@@ -823,6 +898,23 @@
         "internalType": "uint256",
         "name": "subSenderId",
         "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint128",
+            "name": "amtPerSec",
+            "type": "uint128"
+          }
+        ],
+        "internalType": "struct Receiver[]",
+        "name": "currReceivers",
+        "type": "tuple[]"
       }
     ],
     "name": "withdrawableSubSender",
