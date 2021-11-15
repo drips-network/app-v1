@@ -20,15 +20,17 @@ const drips = ref([
 ])
 
 const dripsFormatted = computed(() => {
+  // figure out drip fraction from sum of drips' weights
   const dripFractionMax = 1_000_000
-  const totalPercent = drips.value.reduce((acc, cur) => acc + (cur.percent || 0), 0)
-  const dripFraction = parseInt(totalPercent / 100 * dripFractionMax)
+  const dripsPercentSum = drips.value.reduce((acc, cur) => acc + (cur.percent || 0), 0)
+  const dripFraction = parseInt(dripsPercentSum / 100 * dripFractionMax)
 
+  // format
   const receiverWeights = drips.value.map(drip => {
     return {
       receiver: drip.address,
       // weight of this receiver against the total dripFraction amount, as integer (max 10K)
-      weight: parseInt((drip.percent / 100 * dripFractionMax) / dripFraction * 1000)
+      amtPerSec: parseInt((drip.percent / 100 * dripFractionMax) / dripFraction * 1000)
     }
   })
 
@@ -42,24 +44,25 @@ const addDrip = () => drips.value.push(newDrip())
 
 const emit = defineEmits(['dripsAdded', 'skip'])
 
-const tx = ref(null)
+// const tx = ref(null)
 
-const submit = async () => {
-  try {
-    tx.value = await store.dispatch('addDripToProject', {
-      projectAddress: props.projectAddress,
-      dripFraction: dripsFormatted.value.dripFraction,
-      receiverWeights: dripsFormatted.value.receiverWeights
-    })
-    // wait for tx...
-    await tx.value.wait()
-    // finish
-    emit('dripsAdded')
-    tx.value = null
-  } catch (e) {
-    console.error(e)
-    tx.value = null
-  }
+const submit = () => {
+  emit('dripsUpdated')
+  // try {
+  //   tx.value = await store.dispatch('addDripToProject', {
+  //     projectAddress: props.projectAddress,
+  //     dripFraction: dripsFormatted.value.dripFraction,
+  //     receiverWeights: dripsFormatted.value.receiverWeights
+  //   })
+  //   // wait for tx...
+  //   await tx.value.wait()
+  //   // finish
+  //   emit('dripsAdded')
+  //   tx.value = null
+  // } catch (e) {
+  //   console.error(e)
+  //   tx.value = null
+  // }
 }
 </script>
 
@@ -92,11 +95,10 @@ panel.mx-auto(icon="💧")
       svg-plus-minus-radicle
 
     .mt-40.flex.justify-center
-      .mx-5
+      //- .mx-5
         button.btn.btn-lg.btn-outline.mx-auto.min-w-xs(@click.prevent="emit('skip')") Skip
-      .mx-5
-        button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(type="submit", :disabled="tx")
-          template(v-if="tx") Adding...
-          template(v-else) Add
+      //- .mx-5
+
+      button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(type="submit") Next
 
 </template>

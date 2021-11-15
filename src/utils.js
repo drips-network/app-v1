@@ -15,7 +15,7 @@ export const toDAIPerMo = (weiBN) => {
   return Math.round(dai * 100) / 100
 }
 
-export const toWeiPerSec = (dai) => {
+export const toWeiPerSec = (dai = 0) => {
   // warning! BN will clip off the decimal...
   // (but maybe good for when setting minAmtPerSec)
   return utils.parseUnits(dai.toString()).div(30 * 24 * 60 * 60)
