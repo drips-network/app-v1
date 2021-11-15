@@ -37,7 +37,7 @@ onBeforeMount(async () => {
 </script>
 
 <template lang="pug">
-section.user-funds
+section.user-drips
   template(v-if="nfts")
     ul.flex.flex-wrap.px-20.w-full
       //- nfts...

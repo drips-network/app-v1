@@ -126,7 +126,7 @@ dialog-body.fixed.inset-0.z-10.overflow-y-auto.flex.py-60.px-30(:open="isOpen", 
 
       .flex.justify-center.mt-40
         template(v-if="state.nft")
-          <router-link :to="{name: 'user-funds', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
+          <router-link :to="{name: 'user-drips', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
 
         template(v-else-if="!state.approved")
           button.btn.btn-lg.btn-white.min-w-sm.mx-auto(@click="approve")

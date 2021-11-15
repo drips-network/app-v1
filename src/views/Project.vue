@@ -8,6 +8,7 @@ import Modal from '@/components/Modal'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
+import SvgDiscord from '@/components/SvgDiscord'
 import SvgDai from '@/components/SvgDai'
 import ProjectDrips from '@/components/ProjectDrips'
 import { fromWei, toDAIPerMo } from '@/utils'
@@ -59,7 +60,11 @@ article.project
     //- main project panel
     section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
-      .h-80.rounded-full.bg-indigo-800.mx-10
+      .h-80.rounded-full.bg-indigo-800.mx-10.relative
+        .absolute.top-0.right-0.h-full.flex.items-center.pr-32.text-lg(v-if="meta.goal && meta.goal > 0")
+          svg-dai.mr-4(size="sm")
+          //- TODO: adapt goal
+          | {{ typeof meta.goal === 'number' ? meta.goal.toLocaleString() : '?' }}/mo
 
       header.text-center.relative.pt-44
         //- owner
@@ -74,16 +79,19 @@ article.project
         //- descrip
         p.text-lg {{ meta.descrip }}
         //- links
-        ul.flex.justify-center
-          li.mt-32.mx-8(v-if="meta.website")
+        ul.flex.items-center.justify-center.mt-32
+          li.m-8(v-if="meta.website")
             a(:href="meta.website", target="_blank", rel="noopener noreferrer")
               svg-globe.block
-          li.mt-32.mx-8(v-if="meta.githubProject")
+          li.m-8(v-if="meta.githubProject")
             a(:href="meta.githubProject", target="_blank", rel="noopener noreferrer")
               svg-github.block
-          li.mt-32.mx-8(v-if="meta.twitter")
+          li.m-8(v-if="meta.twitter")
             a(:href="`https://twitter.com/${meta.twitter}`", target="_blank", rel="noopener noreferrer")
               svg-twitter.block
+          li.m-8(v-if="meta.discord")
+            a(:href="meta.discord", target="_blank", rel="noopener noreferrer")
+              svg-discord.block
 
         .mt-44
           button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Fund 🌈

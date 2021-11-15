@@ -406,6 +406,16 @@ export default createStore({
     getProjectDripFraction (_, projectAddress) {
       const contract = getPoolContract()
       return contract.getDripsFraction(projectAddress)
+    },
+
+    getNFTActiveUntil (_, { projectAddress, tokenId }) {
+      const contract = getProjectContract(projectAddress)
+      return contract.activeUntil(tokenId)
+    },
+
+    getNFTWithdrawable (_, { projectAddress, tokenId }) {
+      const contract = getProjectContract(projectAddress)
+      return contract.withdrawable(tokenId)
     }
   }
 })
@@ -442,4 +452,11 @@ export async function pinJSONToIPFS (json) {
   })
   resp = await resp.json()
   return resp.IpfsHash
+}
+
+export function pinImageToIPFS (imgString) {
+  return fetch('/.netlify/functions/pinImage', {
+    method: 'POST',
+    body: JSON.stringify(imgString)
+  })
 }

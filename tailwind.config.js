@@ -77,6 +77,9 @@ module.exports = {
       blue: {
         900: '#101828'
       },
+      red: {
+        500: '#F52727'
+      },
 
       white: 'white'
     },
