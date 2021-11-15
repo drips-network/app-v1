@@ -7,8 +7,14 @@ export default async function ({ query, variables }) {
       },
       body: JSON.stringify({ query, variables })
     })
-    return await resp.json()
+
+    if (resp.status >= 200 && resp.status <= 299) {
+      return await resp.json()
+    } else {
+      throw Error(resp.statusText)
+    }
   } catch (e) {
+    console.log('api err', e, e.message, e.status)
     console.error('@graphAPI', e)
     throw e
   }

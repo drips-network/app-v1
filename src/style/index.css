@@ -87,3 +87,7 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.input-group {
+  @apply  rounded-2xlb bg-indigo-800 p-12;
+}

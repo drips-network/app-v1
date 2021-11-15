@@ -4,7 +4,7 @@ import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 // contracts
-import { RadicleRegistry, DAI, FundingNFT } from '../../contracts'
+import { RadicleRegistry, DAI, FundingNFT, DAIPool } from '../../contracts'
 
 import api, { queryProjectMeta, queryProject } from '@/api'
 
@@ -37,7 +37,7 @@ export default createStore({
     return {
       address: null,
 
-      RadicleRegistryContract: null
+      dripsFractionMax: 1000000
     }
   },
   getters: {
@@ -203,12 +203,7 @@ export default createStore({
     },
 
     async getProject (_, projectAddress) {
-      try {
-        const resp = await api({ query: queryProject, variables: { id: projectAddress } })
-        return resp.data.fundingProject
-      } catch (e) {
-        console.error('@getProject', e)
-      }
+      return api({ query: queryProject, variables: { id: projectAddress } })
     },
 
     async getProjectMeta ({ dispatch }, { projectAddress, ipfsHash }) {
@@ -396,6 +391,23 @@ export default createStore({
       }
     },
 
+    async addDripToProject ({ dispatch }, { projectAddress, dripFraction, receiverWeights }) {
+      if (!signer) await dispatch('connect')
+      const contract = getProjectContract(projectAddress)
+      const contractSigner = contract.connect(signer)
+      return contractSigner.drip(dripFraction, receiverWeights) // tx
+    },
+
+    getProjectDripReceivers (_, projectAddress) {
+      const contract = getPoolContract()
+      return contract.getAllReceivers(projectAddress)
+    },
+
+    getProjectDripFraction (_, projectAddress) {
+      const contract = getPoolContract()
+      return contract.getDripsFraction(projectAddress)
+    },
+
     getNFTActiveUntil (_, { projectAddress, tokenId }) {
       const contract = getProjectContract(projectAddress)
       return contract.activeUntil(tokenId)
@@ -420,6 +432,10 @@ function getProjectContract (address) {
 
 function getDAIContract () {
   return new Ethers.Contract(DAI.address, DAI.abi, provider)
+}
+
+function getPoolContract () {
+  return new Ethers.Contract(DAIPool.address, DAIPool.abi, provider)
 }
 
 function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes }) {

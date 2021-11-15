@@ -10,6 +10,7 @@ import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
 import SvgDiscord from '@/components/SvgDiscord'
 import SvgDai from '@/components/SvgDai'
+import ProjectDrips from '@/components/ProjectDrips'
 import { fromWei, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
@@ -26,12 +27,13 @@ const mintModal = ref(false)
 onBeforeMount(async () => {
   try {
     // get project...
-    project.value = await store.dispatch('getProject', projectAddress)
+    project.value = (await store.dispatch('getProject', projectAddress))?.data?.fundingProject
 
     if (!project.value) {
       status.value = 'Not Found :('
       return false
     }
+
     // get meta...
     meta.value = await store.dispatch('getProjectMeta', { ipfsHash: project.value.ipfsHash })
     // finish setup
@@ -39,7 +41,7 @@ onBeforeMount(async () => {
     minDAI.value = toDAIPerMo(nftType.value.minAmtPerSec)
   } catch (e) {
     console.error(e)
-    status.value = 'Error :/'
+    status.value = e.message ? 'Error: ' + e.message : 'Error'
   }
 })
 </script>
@@ -55,7 +57,8 @@ article.project
       .h-160
 
   template(v-else)
-    section.panel-indigo.my-10.py-12.pb-48
+    //- main project panel
+    section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
       .h-80.rounded-full.bg-indigo-800.mx-10.relative
         .absolute.top-0.right-0.h-full.flex.items-center.pr-32.text-lg(v-if="meta.goal && meta.goal > 0")
@@ -118,5 +121,9 @@ article.project
                   //- TODO: join click
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
-      modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+    //- drips list
+    project-drips(:projectAddress="projectAddress")
+
+    modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+
 </template>
