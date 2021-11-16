@@ -23,6 +23,7 @@ defineExpose({ open, close })
 section.panel.panel-dark.w-full.max-w-screen-sm.text-center
   //- collapsed bar
   button.h-80.w-full.flex.items-center.justify-center.relative.text-2xl.font-semibold.group(v-show="isCollapsed", @click.prevent="open")
+    .absolute.top-0.left-24.h-full.flex.items-center.text-xl {{ icon }}
     | {{ label }}
     .absolute.top-0.right-20.h-full.flex.items-center
       svg-pen.h-28.text-white.opacity-30.notouch_group-hover_opacity-100

@@ -9,10 +9,6 @@ import { useRoute, useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-// import CreateProjectPanel from '@/components/CreateProjectPanel'
-// import CreateProjectFundingPanel from '@/components/CreateProjectFundingPanel'
-// import CreateMembershipsPanel from '@/components/CreateMembershipsPanel'
-// import CreateDripsPanel from '@/components/CreateDripsPanel'
 import store, { pinImageToIPFS } from '@/store'
 import { toWeiPerSec } from '@/utils'
 
@@ -41,6 +37,38 @@ const newMembershipTempl = () => ({
   perks: ['']
 })
 
+// drips
+const newDrip = () => ({
+  // name: '',
+  address: '',
+  percent: null
+})
+
+const drips = ref([
+  newDrip()
+])
+
+const dripsFormatted = computed(() => {
+  // figure out drip fraction from sum of drips' weights
+  const dripFractionMax = 1000000
+  const dripsPercentSum = drips.value.reduce((acc, cur) => acc + (cur.percent || 0), 0)
+  const dripFraction = parseInt(dripsPercentSum / 100 * dripFractionMax)
+
+  // format
+  const receiverWeights = drips.value.map(drip => {
+    return {
+      receiver: drip.address,
+      // weight of this receiver against the total dripFraction amount, as integer (max 10K)
+      amtPerSec: parseInt((drip.percent / 100 * dripFractionMax) / dripFraction * 1000)
+    }
+  })
+
+  return {
+    dripFraction,
+    receiverWeights
+  }
+})
+
 // project meta
 const meta = ref({
   name: '',
@@ -62,12 +90,14 @@ const meta = ref({
 const project = computed(() => {
   return {
     ...meta,
-    inputNFTTypes: [nftType.value]
+    inputNFTTypes: [nftType.value],
+    drips: dripsFormatted.value
   }
 })
 
-const addMembership = () => meta.value.memberships.value.push(newTempl())
-const addPerk = (index) => meta.value.memberships.value[index].perks.push('')
+const addMembership = () => meta.value.memberships.push(newMembershipTempl())
+const addPerk = (index) => meta.value.memberships[index].perks.push('')
+const addDrip = () => drips.value.push(newDrip())
 
 // panels
 const projectPanel = ref()
@@ -90,30 +120,21 @@ const openMembershipsPanel = () => {
 const openDripsPanel = () => {
   projectPanel.value.close()
   fundingPanel.value.close()
+  membershipsPanel.value.close()
   window.scroll({ top: 0, behavior: 'smooth' })
   step.value++
 }
-// const openFundingPanel = () => {
-//   projectPanel.close()
-//   step++
-// }
 
-// const onProjectMetaUpdated = (body) => {
-//   project.value = body
-//   console.log('project updated', toRaw(project.value))
-// }
-
-// const onFundingUpdated = ({ goal, nftType }) => {
-//   project.value.goal = goal // DAI
-//   project.value.inputNFTTypes = []
-//   project.value.inputNFTTypes.push(nftType)
-//   console.log('project funding updated', toRaw(project.value))
-// }
-
-// const onMembershipsUpdated = (memberships) => {
-//   project.value.memberships = memberships || []
-//   console.log('memberships updated', toRaw(project.value))
-// }
+const openPanelsForReview = () => {
+  // validate drips (remove empty)
+  drips.value = drips.value.filter(drip => drip.address.length && drip.percent > 0)
+  //
+  projectPanel.value.open()
+  fundingPanel.value.open()
+  membershipsPanel.value.open()
+  window.scroll({ top: 0, behavior: 'smooth' })
+  step.value++
+}
 
 async function submitProject () {
   try {
@@ -130,29 +151,36 @@ async function submitProject () {
   }
 }
 
-const viewBtnVisible = ref(false)
-const showViewBtn = () => { viewBtnVisible.value = true }
+// const viewBtnVisible = ref(false)
+// const showViewBtn = () => { viewBtnVisible.value = true }
 
-// preloaded address? (dev)
-// const projectAddress = ref(route.query.project)
+function onPerkInputKeydown (e, i, ii) {
+  const perks = meta.value.memberships[i].perks
+  // delete perk row?
+  if (e.code === 'Backspace' && !perks[ii].length && perks.length > 1) {
+    perks.splice(ii, 1)
+    // TODO: focus previous input
+  }
+}
 
-// const onProjectCreated = (address) => {
-//   projectAddress = address
-// }
+function onDripInputKeydown (e, i) {
+  if (e.code === 'Backspace' && !drips.value[i].address.length) {
+    drips.value.splice(i, 1)
+  }
+}
 
 // project image
-const imgSrc = ref('')
 const onImgFileChange = (e) => {
   const input = e.target
   if (input.files && input.files[0]) {
     var reader = new FileReader()
     reader.onload = async function (event) {
-      imgSrc.value = event.target.result
+      meta.value.image = event.target.result
 
       // upload to ipfs
-      // TODO: upload only on create() to save ipfs uploads
+      // TODO: upload only on create() to save ipfs uploads...
       try {
-        let resp = await pinImageToIPFS(imgSrc.value)
+        let resp = await pinImageToIPFS(meta.value.image)
         resp = await resp.json()
         // oops
         if (resp.error) {
@@ -163,16 +191,12 @@ const onImgFileChange = (e) => {
       } catch (e) {
         console.error(e)
         alert('An error occured. Perhaps the image is too large (200kb max)')
-        imgSrc.value = null
+        meta.value.image = null
       }
     }
     reader.readAsDataURL(input.files[0])
   }
 }
-
-onMounted(() => {
-  console.log(projectPanel.value)
-})
 
 const isDev = process.env.NODE_ENV !== 'production'
 projectAddress.value = isDev ? route.query.project : null
@@ -181,7 +205,7 @@ projectAddress.value = isDev ? route.query.project : null
 <template lang="pug">
 article.create.py-80.relative
   //- create project sections
-  form(@submit.prevent)
+  form(@submit.prevent="submitProject")
 
     //- 1. PROJECT
 
@@ -197,12 +221,12 @@ article.create.py-80.relative
         template(v-else)
           //- avatar image upload
           .h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-700.mb-36
-            label.absolute.overlay.flex.items-center.justify-center.cursor-pointer(title="Project Image")
+            label.absolute.overlay.flex.items-center.justify-center.cursor-pointer(tabindex="0", title="Project Image")
               span.sr-only Project Image
               input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
               svg-plus-minus-radicle
             //- (image)
-            img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
+            img.absolute.overlay.object-cover.pointer-events-none(v-if="meta.image", :src="meta.image", alt="your project image")
 
           //- form(@submit.prevent="save", validate)
           section
@@ -211,7 +235,7 @@ article.create.py-80.relative
                 input(v-model="owner", placeholder="owner", disabled)
             .my-10
               input-body(label="Name*", :isFilled="meta.name.length")
-                input(v-model="meta.name", placeholder="Name*", required)
+                input(v-model="meta.name", placeholder="Name*", required, autocomplete="new-password")
             .my-10
               input-body(label="Symbol*", :isFilled="meta.symbol.length")
                 input(v-model="meta.symbol", placeholder="Symbol*", required)
@@ -224,7 +248,7 @@ article.create.py-80.relative
 
             .my-10.flex.-mx-10
               .px-5
-                input-body(label="Twitter", :isFilled="meta.twitter.length")
+                input-body(label="Twitter Handle", :isFilled="meta.twitter.length")
                   input(v-model="meta.twitter", placeholder="Twitter")
               .px-5
                 input-body(label="Discord", :isFilled="meta.discord.length")
@@ -240,7 +264,7 @@ article.create.py-80.relative
 
             div.mt-40(v-show="step === 0")
               //- create btn
-              button.btn.btn-lg.btn-indigo.mx-auto.min-w-sm(@click.prevent="openFundingPanel")
+              button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openFundingPanel")
                 | Next
 
     //- 2. FUNDING
@@ -285,7 +309,7 @@ article.create.py-80.relative
 
         .mt-40(v-show="step === 1")
           //- submit btn
-          button.btn.btn-lg.btn-indigo.mx-auto.min-w-sm(@click.prevent="step++")
+          button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openMembershipsPanel")
             | Next
 
     //- 3. MEMBERSHIPS
@@ -296,7 +320,6 @@ article.create.py-80.relative
 
       p Optionally, set membership levels with different benefits you will provide.
 
-      //- memberships list
       //- form.mt-60(@submit.prevent="submit")
       section.mt-60
         //- memberships...
@@ -305,7 +328,7 @@ article.create.py-80.relative
             .flex.-mx-5
               .w-1x2.px-5
                 input-body(label="Name", :isFilled="meta.memberships[i].name.length", theme="dark")
-                  input(v-model="meta.memberships[i].name", placeholder="Name")
+                  input(v-model="meta.memberships[i].name", placeholder="Name", autocomplete="new-password")
               .w-1x2.px-5
                 input-body(label="Min DAI", :isFilled="typeof meta.memberships[i].minDAI === 'number'", theme="dark")
                   input(v-model="meta.memberships[i].minDAI", type="number", min="0", placeholder="Min DAI")
@@ -324,16 +347,49 @@ article.create.py-80.relative
         button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addMembership", style="border-style:dashed")
           svg-plus-minus-radicle
 
-        .mt-40(v-show="step < 2")
-          button.btn.btn-lg.btn-indigo.mx-auto.min-w-sm(@click.prevent="step++") Next
+        .mt-40(v-show="step === 2")
+          button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openDripsPanel") Next
 
-    //- create-memberships-panel.my-24(v-if="project && project.inputNFTTypes", @updated="onMembershipsUpdated")
+    //- 4. DRIPS
 
-    //- create-drips-panel.my-24(v-if="project && project.memberships", @skip="showViewBtn", @dripsAdded="showViewBtn")
+    panel.mx-auto(v-show="step > 2", ref="dripsPanel", title="Drips", icon="💧")
+      template(v-slot:header)
+        h2 Drips
 
-    .mt-40.flex.justify-center.w-full(v-if="project && project.memberships && !projectAddress")
+      p Share revenue with others with drips.<br>Add anything with an Ethereum address.
+
+      //- drips list
+      //- form.mt-60(@submit.prevent="submit", autocomplete="off")
+      section.mt-60
+        //- drips...
+        template(v-for="(drip, i) in drips")
+          section.my-10.input-group
+            //- input address
+            .mb-10
+              input-body(label="ETH/ENS Address", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
+                input(v-model="drips[i].address", placeholder="ETH Address", autocomplete="new-password", @keydown="e => onDripInputKeydown(e, i)")
+            //- input percent
+            .flex.-mx-5
+              //- .w-3x4.px-5
+                input-body(label="Name", :isFilled="drips[i].name.length", theme="dark")
+                  input(v-model="drips[i].name", placeholder="Name")
+              .flex-1
+                input-body(label="Drip Amount (%)", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
+                  input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="%")
+
+        button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
+          svg-plus-minus-radicle
+
+        .mt-40.flex.justify-center(v-show="step === 3")
+          //- .mx-5
+            button.btn.btn-lg.btn-outline.mx-auto.min-w-xs(@click.prevent="emit('skip')") Skip
+          //- .mx-5
+
+          button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
+
+    .mt-40.flex.justify-center.w-full(v-show="step > 3")
       .text-center
-        button.btn.btn-xl.btn-white.min-w-md(@click="submitProject")
+        button.btn.btn-xl.btn-white.min-w-md(type="submit")
           template(v-if="tx") Creating...
           template(v-else) Create ✨
 
@@ -345,7 +401,7 @@ article.create.py-80.relative
   //- section
     //- (view link)
     .mt-40.flex.justify-center(v-show="viewBtnVisible")
-      router-link.btn.btn-lg.btn-white.min-w-sm(:to="{name: 'project', params: { address: projectAddress }}") View Project
+      router-link.btn.btn-lg.btn-white.min-w-xs(:to="{name: 'project', params: { address: projectAddress }}") View Project
 
   button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
