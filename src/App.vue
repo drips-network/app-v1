@@ -12,7 +12,7 @@ store.dispatch('init')
 <template lang="pug">
 #app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans
   header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
-    router-link.ml-24.mb-px(to="/")
+    router-link.pl-24.-ml-px.mb-px(to="/")
       svg-logo.text-white
     .flex.items-center.mr-24
       router-link.mr-28(:to="{name: 'create'}") Create
