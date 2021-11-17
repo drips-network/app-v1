@@ -12,7 +12,7 @@ store.dispatch('init')
 <template lang="pug">
 #app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans
   header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
-    router-link.ml-14(to="/")
+    router-link.ml-24.mb-px(to="/")
       svg-logo.text-white
     .flex.items-center.mr-24
       router-link.mr-28(:to="{name: 'create'}") Create
@@ -25,7 +25,7 @@ store.dispatch('init')
           button.notouch_hidden.notouch_group-hover_block.ml-12.ml-10(@click="$store.dispatch('disconnect')", title="Disconnect")
             svg-x.h-12.w-12(strokeWidth="1.5")
       template(v-else)
-        button.ml-16(@click="$store.dispatch('connect')") Connect
+        button.btn.btn-md.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
 
   main#main
     router-view

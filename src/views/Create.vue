@@ -25,7 +25,7 @@ const minDAIPerMonth = ref()
 const nftType = computed(() => {
   return [
     0, // typeId: preset first type as 0
-    999, // limit: preset to 1 billion for now...
+    1000000000, // limit: preset to 1 billion for now...
     toWeiPerSec(minDAIPerMonth.value).toString(), // minAmtPerSec
     '' // ipfsHash for custom nft image
   ]
