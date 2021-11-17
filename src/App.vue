@@ -11,10 +11,10 @@ store.dispatch('init')
 
 <template lang="pug">
 #app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans
-  header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between.px-36
-    router-link(to="/")
-      //- svg-logo.h-18.text-white
-    .flex.items-center
+  header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
+    router-link.ml-14(to="/")
+      svg-logo.text-white
+    .flex.items-center.mr-24
       router-link.mr-28(:to="{name: 'create'}") Create
       router-link.mr-28(:to="{name: 'home'}") Explore
       template(v-if="$store.state.address")
