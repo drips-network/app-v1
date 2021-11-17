@@ -149,15 +149,15 @@ export default createStore({
       })
     },
 
-    async createProject ({ state, dispatch }, project) {
+    async createProject ({ state, dispatch }, { project, meta }) {
       try {
         // save full data to IPFS/pinata...
-        const ipfsHash = await pinJSONToIPFS(project)
+        const ipfsHash = await pinJSONToIPFS(meta)
         console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         project.ipfsHash = ipfsHash
 
         // create project on chain
-        const tx = await newProject(project)
+        const tx = await newProject({ owner: state.address, ...project })
         console.log('new project tx:', tx)
 
         return tx
@@ -438,11 +438,11 @@ function getPoolContract () {
   return new Ethers.Contract(DAIPool.address, DAIPool.abi, provider)
 }
 
-function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes }) {
+function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes, drips }) {
   let contract = getRadicleRegistryContract()
   contract = contract.connect(signer)
   console.log('new project...', arguments)
-  return contract.newProject(name, symbol, owner, ipfsHash, inputNFTTypes)
+  return contract.newProject(name, symbol, owner, ipfsHash, inputNFTTypes, drips)
 }
 
 export async function pinJSONToIPFS (json) {

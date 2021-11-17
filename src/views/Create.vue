@@ -10,7 +10,7 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import store, { pinImageToIPFS } from '@/store'
-import { toWeiPerSec } from '@/utils'
+import { toWeiPerSec, formatDrips } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -25,8 +25,9 @@ const minDAIPerMonth = ref()
 const nftType = computed(() => {
   return [
     0, // typeId: preset first type as 0
-    1000000000, // limit: preset to 1 billion for now...
-    toWeiPerSec(minDAIPerMonth.value).toString() // minAmtPerSec
+    999, // limit: preset to 1 billion for now...
+    toWeiPerSec(minDAIPerMonth.value).toString(), // minAmtPerSec
+    '' // ipfsHash for custom nft image
   ]
 })
 
@@ -44,30 +45,8 @@ const newDrip = () => ({
   percent: null
 })
 
-const drips = ref([
-  newDrip()
-])
-
-const dripsFormatted = computed(() => {
-  // figure out drip fraction from sum of drips' weights
-  const dripFractionMax = 1000000
-  const dripsPercentSum = drips.value.reduce((acc, cur) => acc + (cur.percent || 0), 0)
-  const dripFraction = parseInt(dripsPercentSum / 100 * dripFractionMax)
-
-  // format
-  const receiverWeights = drips.value.map(drip => {
-    return {
-      receiver: drip.address,
-      // weight of this receiver against the total dripFraction amount, as integer (max 10K)
-      amtPerSec: parseInt((drip.percent / 100 * dripFractionMax) / dripFraction * 1000)
-    }
-  })
-
-  return {
-    dripFraction,
-    receiverWeights
-  }
-})
+const drips = ref([newDrip()])
+const dripsFormatted = computed(() => formatDrips(drips.value))
 
 // project meta
 const meta = ref({
@@ -89,7 +68,8 @@ const meta = ref({
 // compiled project
 const project = computed(() => {
   return {
-    ...meta,
+    name: meta.value.name,
+    symbol: meta.value.symbol,
     inputNFTTypes: [nftType.value],
     drips: dripsFormatted.value
   }
@@ -118,6 +98,9 @@ const openMembershipsPanel = () => {
 }
 
 const openDripsPanel = () => {
+  // validate memberships
+  meta.value.memberships = meta.value.memberships.filter(m => m.name.length && m.minDAI > 0)
+  //
   projectPanel.value.close()
   fundingPanel.value.close()
   membershipsPanel.value.close()
@@ -138,7 +121,11 @@ const openPanelsForReview = () => {
 
 async function submitProject () {
   try {
-    tx.value = await store.dispatch('createProject', project.value)
+    // TODO - better UX to break ipfs and create into separate actions with error handling inside this component
+    tx.value = await store.dispatch('createProject', {
+      project: toRaw(project.value),
+      meta: toRaw(meta.value)
+    })
     console.log('tx', tx.value)
 
     // on project created...
@@ -170,28 +157,29 @@ function onDripInputKeydown (e, i) {
 }
 
 // project image
+const imgSrc = ref()
 const onImgFileChange = (e) => {
   const input = e.target
   if (input.files && input.files[0]) {
     var reader = new FileReader()
     reader.onload = async function (event) {
-      meta.value.image = event.target.result
+      imgSrc.value = event.target.result
 
       // upload to ipfs
       // TODO: upload only on create() to save ipfs uploads...
       try {
-        let resp = await pinImageToIPFS(meta.value.image)
+        let resp = await pinImageToIPFS(imgSrc.value)
         resp = await resp.json()
         // oops
         if (resp.error) {
           throw new Error(resp.message)
         }
         // save
-        project.value.image = resp.IpfsHash
+        meta.value.image = resp.IpfsHash
       } catch (e) {
         console.error(e)
         alert('An error occured. Perhaps the image is too large (200kb max)')
-        meta.value.image = null
+        imgSrc.value = null
       }
     }
     reader.readAsDataURL(input.files[0])
@@ -226,7 +214,7 @@ article.create.py-80.relative
               input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
               svg-plus-minus-radicle
             //- (image)
-            img.absolute.overlay.object-cover.pointer-events-none(v-if="meta.image", :src="meta.image", alt="your project image")
+            img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
 
           //- form(@submit.prevent="save", validate)
           section
@@ -237,27 +225,25 @@ article.create.py-80.relative
               input-body(label="Name*", :isFilled="meta.name.length")
                 input(v-model="meta.name", placeholder="Name*", required, autocomplete="new-password")
             .my-10
+              //- TODO: format/validate symbol text?
               input-body(label="Symbol*", :isFilled="meta.symbol.length")
                 input(v-model="meta.symbol", placeholder="Symbol*", required)
             .my-10
+              //- TODO: use textarea
               input-body(label="Description", :isFilled="meta.descrip.length")
                 input(v-model="meta.descrip", placeholder="Description")
             .my-10
               input-body(label="Website", :isFilled="meta.website.length", format="code")
                 input(v-model="meta.website", placeholder="Website", type="url")
-
-            .my-10.flex.-mx-10
-              .px-5
-                input-body(label="Twitter Handle", :isFilled="meta.twitter.length")
-                  input(v-model="meta.twitter", placeholder="Twitter")
-              .px-5
-                input-body(label="Discord", :isFilled="meta.discord.length")
-                  input(v-model="meta.discord", placeholder="Discord")
-
+            .my-10
+              input-body(label="Twitter Handle", :isFilled="meta.twitter.length")
+                input(v-model="meta.twitter", placeholder="Twitter")
+            .my-10
+              input-body(label="Discord Invite Link", :isFilled="meta.discord.length")
+                input(v-model="meta.discord", placeholder="Discord")
             .my-10
               input-body(label="Radicle Project ID", :isFilled="meta.radicleProjectId.length", format="code")
                 input(v-model="meta.radicleProjectId", placeholder="Radicle Project ID")
-
             .my-10
               input-body(label="Github Project URL", :isFilled="meta.githubProject.length", format="code")
                 input(v-model="meta.githubProject", placeholder="Github Project URL", type="url")
@@ -387,6 +373,7 @@ article.create.py-80.relative
 
           button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
 
+    //- (create btn)
     .mt-40.flex.justify-center.w-full(v-show="step > 3")
       .text-center
         button.btn.btn-xl.btn-white.min-w-md(type="submit")

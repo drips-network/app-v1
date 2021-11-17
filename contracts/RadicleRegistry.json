@@ -38,25 +38,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "nftRegistry",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "projectOwner",
-        "type": "address"
-      }
-    ],
-    "name": "NewProject",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "contract FundingNFT",
         "name": "fundingNFT",
         "type": "address"

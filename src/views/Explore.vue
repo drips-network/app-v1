@@ -11,6 +11,7 @@ const getProjects = () => {
       query {
         fundingProjects {
           id
+          name: projectName
           projectOwner
         }
       }
