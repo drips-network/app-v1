@@ -45,7 +45,9 @@ store.dispatch('init')
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* purgecss start ignore */
 .web3modal-modal-lightbox{
-  @apply z-50;
+  z-index: 50 !important;
 }
+/* purgecss end ignore */
 </style>
