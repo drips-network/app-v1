@@ -12,6 +12,7 @@ import SvgDiscord from '@/components/SvgDiscord'
 import SvgDai from '@/components/SvgDai'
 import ProjectDrips from '@/components/ProjectDrips'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
+import ProjectStats from '@/components/ProjectStats'
 import { fromWei, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
@@ -65,8 +66,10 @@ article.project
 
       header.text-center.relative.pt-44
         //- owner
-        .absolute.top-0.left-0.p-18
-          router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full.-m-8(:to="{name: 'user', params: {address: project.projectOwner}}")
+        .absolute.top-0.left-0.pt-10.pl-12
+          //- profile link
+          router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full(:to="{name: 'user', params: {address: project.projectOwner}}")
+            //- avatar
             avatar-blockie.w-36.mr-12(:address="project.projectOwner", width="36")
             .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(project.projectOwner) }}
 
@@ -97,7 +100,11 @@ article.project
         //- p
           a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 
-      //- memberships
+      //- (stats)
+      .mt-96.mb-120.px-20
+        project-stats(v-if="project", :project="project", :meta="meta")
+
+      //- (memberships)
       section.mt-112(v-if="meta.memberships && meta.memberships.length")
         ul.flex.justify-center
           //- memberships...

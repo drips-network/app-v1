@@ -25,7 +25,7 @@ export const queryProject = `
     fundingProject (id: $id) {
       id
       projectOwner
-      # daiCollected
+      daiCollected
       ipfsHash
       nftTypes {
         # id

@@ -1,6 +1,6 @@
 <script setup>
 const props = defineProps({
-  size: { type: String, default: '2xl' }
+  size: { type: String, default: undefined }
 })
 let clss
 switch (props.size) {

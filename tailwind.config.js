@@ -52,7 +52,8 @@ module.exports = {
       132: '13.2rem',
       144: '14.4rem',
       160: '16rem',
-      180: '18rem'
+      180: '18rem',
+      196: '19.6rem'
     },
     colors: {
       transparent: 'transparent',
@@ -94,12 +95,15 @@ module.exports = {
       xl: ['2.4rem', { lineHeight: '2.8rem' }],
       '2xl': ['3.2rem', { lineHeight: '1' }],
       '3xl': ['3.6rem', { lineHeight: '1' }],
+      '3xlb': ['4.0rem', { lineHeight: '1' }],
       '4xl': ['4.8rem', { lineHeight: '1' }],
-      '5xl': ['6.4rem', { lineHeight: '1' }]
+      '5xl': ['6.4rem', { lineHeight: '1' }],
+      '6xl': ['7.2rem', { lineHeight: '1' }]
     },
     fontFamily: {
       sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-      mono: ['Source Code Pro', 'monospace']
+      mono: ['Source Code Pro', 'monospace'],
+      kaeru: ['kaeru-kaeru', 'Inter', 'system-ui', '-apple-system', 'sans-serif']
     },
     animation: {
       none: 'none',
@@ -801,6 +805,7 @@ module.exports = {
       '10x12': '83.333333%',
       '11x12': '91.666667%',
       full: '100%',
+      full_10: 'calc(100% + 1rem)',
       screen: '100vw',
       min: 'min-content',
       max: 'max-content'
