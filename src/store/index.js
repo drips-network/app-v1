@@ -4,13 +4,13 @@ import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 // contracts
-import { RadicleRegistry, DAI, FundingNFT, DAIPool } from '../../contracts'
+import { deploy, RadicleRegistry, DAI, FundingNFT, DAIPool } from '../../contracts'
 
 import api, { queryProjectMeta, queryProject } from '@/api'
 
 let provider, signer, walletProvider
 
-const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const network = deploy.NETWORK // JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
   rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }

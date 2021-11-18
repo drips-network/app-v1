@@ -1,6 +1,8 @@
+const apiUrl = 'https://api.studio.thegraph.com/query/9578/funding-subgraph-v6/v0.0.2'
+
 export default async function ({ query, variables }) {
   try {
-    const resp = await fetch(`${process.env.VUE_APP_GRAPH_API}`, {
+    const resp = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
