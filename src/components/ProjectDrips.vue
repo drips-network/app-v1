@@ -22,7 +22,10 @@ const dripsList = computed(() => {
 onBeforeMount(() => {
   // get drips
   store.dispatch('getProjectDripReceivers', props.projectAddress)
-    .then(arr => { drips.value = arr })
+    .then(arr => {
+      console.log('hash?', arr)
+      // drips.value = arr
+    })
   // get drip fraction (INT out of 1_000_000)
   store.dispatch('getProjectDripFraction', props.projectAddress)
     .then(int => { dripsFraction.value = int })

@@ -400,7 +400,7 @@ export default createStore({
 
     getProjectDripReceivers (_, projectAddress) {
       const contract = getPoolContract()
-      return contract.getAllReceivers(projectAddress)
+      return contract.getReceiversHash(projectAddress)
     },
 
     getProjectDripFraction (_, projectAddress) {

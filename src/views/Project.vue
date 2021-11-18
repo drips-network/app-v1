@@ -127,7 +127,7 @@ article.project
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
     //- drips list
-    //- project-drips(:projectAddress="projectAddress")
+    project-drips(:projectAddress="projectAddress")
 
     modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 

@@ -4,6 +4,7 @@ import store from '@/store'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import ProjectStats from '@/components/ProjectStats'
 import SvgDai from '@/components/SvgDai'
+import { ipfsUrl } from '@/utils'
 
 const props = defineProps({
   project: Object
@@ -29,7 +30,8 @@ onBeforeMount(async () => {
   header.flex.justify-between.items-center.mb-32
     .flex.items-center
       //- avatar
-      router-link.h-80.w-80.bg-indigo-800.rounded-full.mr-24(:to="projectRt")
+      router-link.relative.h-80.w-80.bg-indigo-800.rounded-full.mr-24.overflow-hidden(:to="projectRt")
+        img.absolute.overlay.object-cover.object-center(:v-if="meta.image", :src="ipfsUrl(meta.image)")
       //- title
       h3.text-2xl.font-semibold.text-violet-650
         router-link(:to="projectRt") {{ meta.name || $store.getters.addrShort(props.project.id) }}
