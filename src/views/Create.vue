@@ -203,7 +203,7 @@ article.create.py-80.relative
       section
         //- (connect bt)
         template(v-if="!owner")
-          button.btn.btn-lg.btn-white.mx-auto(@click="$store.dispatch('connect')") Connect Wallet
+          button.btn.btn-lg.btn-violet.mx-auto(@click="$store.dispatch('connect')") Connect Wallet
 
         //- (create form)
         template(v-else)

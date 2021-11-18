@@ -64,10 +64,10 @@ module.exports = {
 
       violet: {
         // 400: '#382099', // nft thumb title
-        500: '#212064',
-        600: '#4949DD',
-        700: '#28258E', // bright borders
-        800: '#4949DD' // memberships bg
+        500: '#212064', // subtle borders
+        600: '#4949DD', // bright bg's
+        650: '#5151ff', // brighter for text
+        700: '#28258E' // bright borders
       },
       indigo: {
         700: '#17164B',

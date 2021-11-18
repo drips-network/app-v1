@@ -14,7 +14,7 @@ store.dispatch('init')
   header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
     router-link.pl-24.-ml-px.mb-px(to="/")
       svg-logo.text-white
-    .flex.items-center.mr-24
+    .flex.items-center.mr-24.text-violet-650
       router-link.mr-28(:to="{name: 'create'}") Create
       router-link.mr-28(:to="{name: 'home'}") Explore
       template(v-if="$store.state.address")
@@ -23,7 +23,7 @@ store.dispatch('init')
             avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28")
             | {{ $store.getters.addrShort($store.state.address) }}
           button.notouch_hidden.notouch_group-hover_block.ml-12.ml-10(@click="$store.dispatch('disconnect')", title="Disconnect")
-            svg-x.h-12.w-12(strokeWidth="1.5")
+            svg-x.h-12.w-12.text-white.mr-6(strokeWidth="1.5")
       template(v-else)
         button.btn.btn-md.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
 

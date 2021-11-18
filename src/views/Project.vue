@@ -11,6 +11,7 @@ import SvgGithub from '@/components/SvgGithub'
 import SvgDiscord from '@/components/SvgDiscord'
 import SvgDai from '@/components/SvgDai'
 import ProjectDrips from '@/components/ProjectDrips'
+import ProjectProgressBar from '@/components/ProjectProgressBar'
 import { fromWei, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
@@ -60,11 +61,7 @@ article.project
     //- main project panel
     section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
-      .h-80.rounded-full.bg-indigo-800.mx-10.relative
-        .absolute.top-0.right-0.h-full.flex.items-center.pr-32.text-lg(v-if="meta.goal && meta.goal > 0")
-          svg-dai.mr-4(size="sm")
-          //- TODO: adapt goal
-          | {{ typeof meta.goal === 'number' ? meta.goal.toLocaleString() : '?' }}/mo
+      project-progress-bar.mx-10(:meta="meta")
 
       header.text-center.relative.pt-44
         //- owner
@@ -105,7 +102,7 @@ article.project
         ul.flex.justify-center
           //- memberships...
           li.w-1x4.mx-5(v-for="membership in meta.memberships")
-            .aspect-w-3.aspect-h-4.rounded-xl.relative.bg-violet-800
+            .aspect-w-3.aspect-h-4.rounded-xl.relative.bg-violet-600
               .absolute.overlay.px-32.pt-36.pb-24.flex.flex-col.justify-between
                 header
                   .flex.justify-between.text-xl.font-semibold
@@ -122,7 +119,7 @@ article.project
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
     //- drips list
-    project-drips(:projectAddress="projectAddress")
+    //- project-drips(:projectAddress="projectAddress")
 
     modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 
