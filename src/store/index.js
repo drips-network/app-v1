@@ -384,8 +384,8 @@ export default createStore({
       try {
         const contract = getProjectContract(projectAddress)
         const hash = await contract.tokenURI(tokenId)
-        const meta = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${hash}`)
-        return meta.json()
+        const meta = await fetch(hash)
+        return await meta.json()
       } catch (e) {
         console.error('@getNFTMetadata', e)
       }
