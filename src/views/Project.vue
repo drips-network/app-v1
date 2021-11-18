@@ -13,7 +13,7 @@ import SvgDai from '@/components/SvgDai'
 import ProjectDrips from '@/components/ProjectDrips'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import ProjectStats from '@/components/ProjectStats'
-import { fromWei, toDAIPerMo } from '@/utils'
+import { fromWei, toDAIPerMo, ipfsUrl } from '@/utils'
 
 const route = useRoute()
 
@@ -73,7 +73,8 @@ article.project
             avatar-blockie.w-36.mr-12(:address="project.projectOwner", width="36")
             .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(project.projectOwner) }}
 
-        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto
+        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative
+          img.absolute.overlay.object-cover.object-center(:src="ipfsUrl(meta.image)")
         //- title
         h1.text-3xl.mb-36.font-semibold {{ meta.name }}
         //- descrip

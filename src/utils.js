@@ -1,5 +1,7 @@
 import { BigNumber as bn, constants, utils } from 'ethers'
 
+export const ipfsUrl = hash => process.env.VUE_APP_IPFS_GATEWAY + '/ipfs/' + hash
+
 export const fromWei = (wei) => {
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
   return wei.div(constants.WeiPerEther)
