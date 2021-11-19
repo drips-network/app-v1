@@ -1,4 +1,5 @@
 <script setup>
+// TODO - beforeRouteEnter() redirect if address is a project!
 import AvatarBlockie from '@/components/AvatarBlockie'
 </script>
 
@@ -11,8 +12,8 @@ article.profile.pb-80
         h1.text-2xl.font-semibold.pr-60 {{ $store.getters.addrShort($route.params.address) }}
 
     nav.my-40.flex
-      router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user', params: $route.params }") Projects
-      router-link.btn.btn-dark.btn-active-white.btn-lg.w-180(:to="{ name: 'user-funds', params: $route.params }") Funds
+      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40(:to="{ name: 'user', params: $route.params }") Projects
+      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-44(:to="{ name: 'user-drips', params: $route.params }") Drips
 
   main#main
     router-view

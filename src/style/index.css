@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* fonts */
+@font-face {
+  font-family: 'kaeru-kaeru';
+  src: url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff2') format('woff2'),
+       url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff') format('woff');
+  font-style: normal;
+}
+
 html {
   font-size: 10px; /* 1rem / Tailwind default */
 }
@@ -22,11 +30,14 @@ html {
 .btn {
   @apply rounded-full flex items-center justify-center;
 }
+.btn-sm {
+  @apply h-40
+}
 .btn-md {
-  @apply h-40;
+  @apply h-54;
 }
 .btn-lg {
-  @apply h-80 px-32 text-xl font-semibold;
+  @apply h-80 text-xl font-semibold;
 }
 .btn-xl{
   @apply h-112 max-w-lg text-2xl font-semibold transform transition duration-150 notouch_hover_scale-102;
@@ -38,16 +49,23 @@ html {
   @apply bg-indigo-700;
 }
 .btn-darker{
-  @apply bg-indigo-800;
+  @apply bg-indigo-900 notouch_hover_text-white transition duration-150;
 }
 .btn-white{
   @apply bg-white text-blue-900;
 }
 .btn-outline {
-  @apply border border-violet-700 notouch_hover_border-violet-600 focus_border-violet-600;
+  @apply border border-violet-700 notouch_hover_border-violet-600 focus_border-violet-600 notouch_hover_bg-violet-600;
+}
+.btn-violet{
+  @apply bg-violet-600 border-2 border-transparent notouch_hover_border-white
 }
 .btn-active-white {
   &.router-link-exact-active { @apply btn-white }
+}
+.btn-active-violet {
+  &.router-link-exact-active { @apply bg-violet-600 }
+  @apply border-2 border-transparent notouch_hover_border-violet-600;
 }
 
 button{
@@ -86,4 +104,8 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.input-group {
+  @apply  rounded-2xlb bg-indigo-800 p-12;
 }

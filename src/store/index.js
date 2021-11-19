@@ -4,13 +4,13 @@ import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 // contracts
-import { RadicleRegistry, DAI, FundingNFT } from '../../contracts'
+import { deploy, RadicleRegistry, DAI, FundingNFT, DAIPool } from '../../contracts'
 
 import api, { queryProjectMeta, queryProject } from '@/api'
 
 let provider, signer, walletProvider
 
-const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const network = deploy.NETWORK // JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
   rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }
@@ -37,7 +37,8 @@ export default createStore({
     return {
       address: null,
 
-      RadicleRegistryContract: null
+      // TODO - get this from the contract?
+      dripsFractionMax: 1000000
     }
   },
   getters: {
@@ -149,15 +150,15 @@ export default createStore({
       })
     },
 
-    async createProject ({ state, dispatch }, project) {
+    async createProject ({ state, dispatch }, { project, meta }) {
       try {
         // save full data to IPFS/pinata...
-        const ipfsHash = await pinJSONToIPFS(project)
+        const ipfsHash = await pinJSONToIPFS(meta)
         console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         project.ipfsHash = ipfsHash
 
         // create project on chain
-        const tx = await newProject(project)
+        const tx = await newProject({ owner: state.address, ...project })
         console.log('new project tx:', tx)
 
         return tx
@@ -203,12 +204,7 @@ export default createStore({
     },
 
     async getProject (_, projectAddress) {
-      try {
-        const resp = await api({ query: queryProject, variables: { id: projectAddress } })
-        return resp.data.fundingProject
-      } catch (e) {
-        console.error('@getProject', e)
-      }
+      return api({ query: queryProject, variables: { id: projectAddress } })
     },
 
     async getProjectMeta ({ dispatch }, { projectAddress, ipfsHash }) {
@@ -389,10 +385,84 @@ export default createStore({
       try {
         const contract = getProjectContract(projectAddress)
         const hash = await contract.tokenURI(tokenId)
-        const meta = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${hash}`)
-        return meta.json()
+        const meta = await fetch(hash)
+        return await meta.json()
       } catch (e) {
         console.error('@getNFTMetadata', e)
+      }
+    },
+
+    async addDripToProject ({ dispatch }, { projectAddress, dripFraction, receiverWeights }) {
+      if (!signer) await dispatch('connect')
+      const contract = getProjectContract(projectAddress)
+      const contractSigner = contract.connect(signer)
+      return contractSigner.drip(dripFraction, receiverWeights) // tx
+    },
+
+    async getProjectDrips ({ state }, projectAddress) {
+      try {
+        let drips = []
+        const contract = getProjectContract(projectAddress)
+        const events = await contract.queryFilter('DripsUpdated')
+
+        // reformat to array of receivers and percents...
+        if (events?.length) {
+          const current = events.pop().args // last event
+          const fraction = current[0] // number ~ 150000 (max 1M)
+          const receivers = current[1] // array ~ ['0x...', BigNum]
+
+          // add the weights/amtPerSec up — (dangerous to convert to number from BigNumber?)
+          const weightsTotal = receivers.reduce((acc, itm) => acc + itm[1].toNumber(), 0)
+
+          drips = receivers.map(item => {
+            const address = item[0]
+            const weight = item[1].toNumber()
+            let percent = (weight / weightsTotal) * fraction / state.dripsFractionMax * 100
+            percent = percent.toFixed(3)
+            return {
+              address,
+              percent
+            }
+          })
+          // sort by percent descending
+          drips = drips.sort((a, b) => a.percent < b.percent ? -1 : a.percent > b.percent ? 1 : 0)
+        }
+        return drips
+      } catch (e) {
+        console.error(e)
+        return []
+      }
+    },
+
+    getProjectDripReceivers (_, projectAddress) {
+      const contract = getPoolContract()
+      return contract.getReceiversHash(projectAddress)
+    },
+
+    getProjectDripFraction (_, projectAddress) {
+      const contract = getPoolContract()
+      return contract.getDripsFraction(projectAddress)
+    },
+
+    getNFTActiveUntil (_, { projectAddress, tokenId }) {
+      const contract = getProjectContract(projectAddress)
+      return contract.activeUntil(tokenId)
+    },
+
+    getNFTWithdrawable (_, { projectAddress, tokenId }) {
+      const contract = getProjectContract(projectAddress)
+      return contract.withdrawable(tokenId)
+    },
+
+    async resolveAddr ({ getters, dispatch }, { address, short = true }) {
+      const fallback = short ? getters.addrShort(address) : address
+      try {
+        if (!provider) await dispatch('init')
+        const ens = await provider.lookupAddress(address)
+        return ens || fallback
+      } catch (e) {
+        console.error(e)
+        return fallback
       }
     }
   }
@@ -412,11 +482,15 @@ function getDAIContract () {
   return new Ethers.Contract(DAI.address, DAI.abi, provider)
 }
 
-function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes }) {
+function getPoolContract () {
+  return new Ethers.Contract(DAIPool.address, DAIPool.abi, provider)
+}
+
+function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes, drips }) {
   let contract = getRadicleRegistryContract()
   contract = contract.connect(signer)
   console.log('new project...', arguments)
-  return contract.newProject(name, symbol, owner, ipfsHash, inputNFTTypes)
+  return contract.newProject(name, symbol, owner, ipfsHash, inputNFTTypes, drips)
 }
 
 export async function pinJSONToIPFS (json) {
@@ -426,4 +500,11 @@ export async function pinJSONToIPFS (json) {
   })
   resp = await resp.json()
   return resp.IpfsHash
+}
+
+export function pinImageToIPFS (imgString) {
+  return fetch('/.netlify/functions/pinImage', {
+    method: 'POST',
+    body: JSON.stringify(imgString)
+  })
 }

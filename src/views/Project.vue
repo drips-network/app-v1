@@ -8,8 +8,12 @@ import Modal from '@/components/Modal'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
+import SvgDiscord from '@/components/SvgDiscord'
 import SvgDai from '@/components/SvgDai'
-import { fromWei, toDAIPerMo } from '@/utils'
+import ProjectDrips from '@/components/ProjectDrips'
+import ProjectProgressBar from '@/components/ProjectProgressBar'
+import ProjectStats from '@/components/ProjectStats'
+import { fromWei, toDAIPerMo, ipfsUrl } from '@/utils'
 
 const route = useRoute()
 
@@ -18,6 +22,7 @@ const project = ref()
 const meta = ref(null)
 const nftType = ref()
 const minDAI = ref()
+const drips = ref()
 
 const status = ref()
 const mintModal = ref(false)
@@ -25,26 +30,37 @@ const mintModal = ref(false)
 onBeforeMount(async () => {
   try {
     // get project...
-    project.value = await store.dispatch('getProject', projectAddress)
+    project.value = (await store.dispatch('getProject', projectAddress))?.data?.fundingProject
 
     if (!project.value) {
       status.value = 'Not Found :('
       return false
     }
+
     // get meta...
     meta.value = await store.dispatch('getProjectMeta', { ipfsHash: project.value.ipfsHash })
-    // finish setup
+
+    if (!meta.value) {
+      status.value = 'Info Missing :/'
+      return false
+    }
+
+    // set nft
     nftType.value = project.value.nftTypes[0]
     minDAI.value = toDAIPerMo(nftType.value.minAmtPerSec)
+
+    // get drips
+    drips.value = await store.dispatch('getProjectDrips', projectAddress)
+    return true
   } catch (e) {
     console.error(e)
-    status.value = 'Error :/'
+    status.value = e.message ? 'Error: ' + e.message : 'Error'
   }
 })
 </script>
 
 <template lang="pug">
-article.project
+article.project.pb-96
 
   template(v-if="!meta")
     .panel-indigo.my-10.py-12.px-10(:class="{'animate-pulse': !status}")
@@ -54,33 +70,40 @@ article.project
       .h-160
 
   template(v-else)
-    section.panel-indigo.my-10.py-12.pb-48
+    //- main project panel
+    section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
-      .h-80.rounded-full.bg-indigo-800.mx-10
+      project-progress-bar.mx-10(:meta="meta")
 
       header.text-center.relative.pt-44
         //- owner
-        .absolute.top-0.left-0.p-18
-          router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full.-m-8(:to="{name: 'user', params: {address: project.projectOwner}}")
+        .absolute.top-0.left-0.pt-10.pl-12
+          //- profile link
+          router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full(:to="{name: 'user', params: {address: project.projectOwner}}")
+            //- avatar
             avatar-blockie.w-36.mr-12(:address="project.projectOwner", width="36")
             .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(project.projectOwner) }}
 
-        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto
+        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative
+          img.absolute.overlay.object-cover.object-center(:src="ipfsUrl(meta.image)")
         //- title
         h1.text-3xl.mb-36.font-semibold {{ meta.name }}
         //- descrip
         p.text-lg {{ meta.descrip }}
         //- links
-        ul.flex.justify-center
-          li.mt-32.mx-8(v-if="meta.website")
+        ul.flex.items-center.justify-center.mt-32
+          li.m-8(v-if="meta.website")
             a(:href="meta.website", target="_blank", rel="noopener noreferrer")
               svg-globe.block
-          li.mt-32.mx-8(v-if="meta.githubProject")
+          li.m-8(v-if="meta.githubProject")
             a(:href="meta.githubProject", target="_blank", rel="noopener noreferrer")
               svg-github.block
-          li.mt-32.mx-8(v-if="meta.twitter")
+          li.m-8(v-if="meta.twitter")
             a(:href="`https://twitter.com/${meta.twitter}`", target="_blank", rel="noopener noreferrer")
               svg-twitter.block
+          li.m-8(v-if="meta.discord")
+            a(:href="meta.discord", target="_blank", rel="noopener noreferrer")
+              svg-discord.block
 
         .mt-44
           button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Fund 🌈
@@ -89,12 +112,16 @@ article.project
         //- p
           a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 
-      //- memberships
+      //- (stats)
+      .mt-96.mb-120.px-20
+        project-stats(v-if="project", :project="project", :meta="meta", :drips="drips")
+
+      //- (memberships)
       section.mt-112(v-if="meta.memberships && meta.memberships.length")
         ul.flex.justify-center
           //- memberships...
           li.w-1x4.mx-5(v-for="membership in meta.memberships")
-            .aspect-w-3.aspect-h-4.rounded-xl.relative.bg-violet-800
+            .aspect-w-3.aspect-h-4.rounded-xl.relative.bg-violet-600
               .absolute.overlay.px-32.pt-36.pb-24.flex.flex-col.justify-between
                 header
                   .flex.justify-between.text-xl.font-semibold
@@ -110,5 +137,9 @@ article.project
                   //- TODO: join click
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
-      modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+    //- drips list
+    project-drips(v-if="drips", :drips="drips")
+
+    modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+
 </template>

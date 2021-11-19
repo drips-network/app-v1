@@ -7,7 +7,7 @@
         "type": "address"
       },
       {
-        "internalType": "address",
+        "internalType": "contract IBuilder",
         "name": "builder_",
         "type": "address"
       },
@@ -24,8 +24,8 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
+        "indexed": false,
+        "internalType": "contract IBuilder",
         "name": "builder",
         "type": "address"
       }
@@ -38,8 +38,8 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "nftRegistry",
+        "internalType": "contract FundingNFT",
+        "name": "fundingNFT",
         "type": "address"
       },
       {
@@ -47,6 +47,12 @@
         "internalType": "address",
         "name": "projectOwner",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
       }
     ],
     "name": "NewProject",
@@ -57,7 +63,7 @@
     "name": "builder",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IBuilder",
         "name": "",
         "type": "address"
       }
@@ -68,7 +74,7 @@
   {
     "inputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IBuilder",
         "name": "newBuilder",
         "type": "address"
       }
@@ -123,7 +129,7 @@
       },
       {
         "internalType": "string",
-        "name": "ipfsHash",
+        "name": "contractURI",
         "type": "string"
       },
       {
@@ -142,11 +148,45 @@
             "internalType": "uint128",
             "name": "minAmtPerSec",
             "type": "uint128"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
           }
         ],
         "internalType": "struct InputNFTType[]",
         "name": "inputNFTTypes",
         "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "dripFraction",
+            "type": "uint32"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+              },
+              {
+                "internalType": "uint128",
+                "name": "amtPerSec",
+                "type": "uint128"
+              }
+            ],
+            "internalType": "struct Receiver[]",
+            "name": "dripReceiver",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct DripInput",
+        "name": "drips",
+        "type": "tuple"
       }
     ],
     "name": "newProject",
