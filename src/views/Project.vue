@@ -22,6 +22,7 @@ const project = ref()
 const meta = ref(null)
 const nftType = ref()
 const minDAI = ref()
+const drips = ref()
 
 const status = ref()
 const mintModal = ref(false)
@@ -38,9 +39,19 @@ onBeforeMount(async () => {
 
     // get meta...
     meta.value = await store.dispatch('getProjectMeta', { ipfsHash: project.value.ipfsHash })
-    // finish setup
+
+    if (!meta.value) {
+      status.value = 'Info Missing :/'
+      return false
+    }
+
+    // set nft
     nftType.value = project.value.nftTypes[0]
     minDAI.value = toDAIPerMo(nftType.value.minAmtPerSec)
+
+    // get drips
+    drips.value = await store.dispatch('getProjectDrips', projectAddress)
+    return true
   } catch (e) {
     console.error(e)
     status.value = e.message ? 'Error: ' + e.message : 'Error'
@@ -49,7 +60,7 @@ onBeforeMount(async () => {
 </script>
 
 <template lang="pug">
-article.project
+article.project.pb-96
 
   template(v-if="!meta")
     .panel-indigo.my-10.py-12.px-10(:class="{'animate-pulse': !status}")
@@ -103,7 +114,7 @@ article.project
 
       //- (stats)
       .mt-96.mb-120.px-20
-        project-stats(v-if="project", :project="project", :meta="meta")
+        project-stats(v-if="project", :project="project", :meta="meta", :drips="drips")
 
       //- (memberships)
       section.mt-112(v-if="meta.memberships && meta.memberships.length")
@@ -127,7 +138,7 @@ article.project
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
     //- drips list
-    project-drips(:projectAddress="projectAddress")
+    project-drips(v-if="drips", :drips="drips")
 
     modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 

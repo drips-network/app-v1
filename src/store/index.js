@@ -37,6 +37,7 @@ export default createStore({
     return {
       address: null,
 
+      // TODO - get this from the contract?
       dripsFractionMax: 1000000
     }
   },
@@ -398,6 +399,41 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
+    async getProjectDrips ({ state }, projectAddress) {
+      try {
+        let drips = []
+        const contract = getProjectContract(projectAddress)
+        const events = await contract.queryFilter('DripsUpdated')
+
+        // reformat to array of receivers and percents...
+        if (events?.length) {
+          const current = events.pop().args // last event
+          const fraction = current[0] // number ~ 150000 (max 1M)
+          const receivers = current[1] // array ~ ['0x...', BigNum]
+
+          // add the weights/amtPerSec up — (dangerous to convert to number from BigNumber?)
+          const weightsTotal = receivers.reduce((acc, itm) => acc + itm[1].toNumber(), 0)
+
+          drips = receivers.map(item => {
+            const address = item[0]
+            const weight = item[1].toNumber()
+            let percent = (weight / weightsTotal) * fraction / state.dripsFractionMax * 100
+            percent = percent.toFixed(3)
+            return {
+              address,
+              percent
+            }
+          })
+          // sort by percent descending
+          drips = drips.sort((a, b) => a.percent < b.percent ? -1 : a.percent > b.percent ? 1 : 0)
+        }
+        return drips
+      } catch (e) {
+        console.error(e)
+        return []
+      }
+    },
+
     getProjectDripReceivers (_, projectAddress) {
       const contract = getPoolContract()
       return contract.getReceiversHash(projectAddress)
@@ -416,6 +452,18 @@ export default createStore({
     getNFTWithdrawable (_, { projectAddress, tokenId }) {
       const contract = getProjectContract(projectAddress)
       return contract.withdrawable(tokenId)
+    },
+
+    async resolveAddr ({ getters, dispatch }, { address, short = true }) {
+      const fallback = short ? getters.addrShort(address) : address
+      try {
+        if (!provider) await dispatch('init')
+        const ens = await provider.lookupAddress(address)
+        return ens || fallback
+      } catch (e) {
+        console.error(e)
+        return fallback
+      }
     }
   }
 })

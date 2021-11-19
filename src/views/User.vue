@@ -1,4 +1,5 @@
 <script setup>
+// TODO - beforeRouteEnter() redirect if address is a project!
 import AvatarBlockie from '@/components/AvatarBlockie'
 </script>
 

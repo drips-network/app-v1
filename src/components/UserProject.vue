@@ -11,6 +11,7 @@ const props = defineProps({
 })
 
 const meta = ref({})
+const drips = ref()
 const projectRt = { name: 'project', params: { address: props.project.id } }
 
 const isUsersProject = computed(() => props.project.projectOwner === store._state.data.address)
@@ -19,8 +20,13 @@ const collect = () => {
   store.dispatch('collectProjectFunds', { projectAddress: props.project.id })
 }
 
-onBeforeMount(async () => {
-  meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })
+onBeforeMount(() => {
+  // get meta
+  store.dispatch('getProjectMeta', { projectAddress: props.project.id })
+    .then(data => { meta.value = data })
+  // get drips
+  store.dispatch('getProjectDrips', props.project.id)
+    .then(arr => { drips.value = arr })
 })
 </script>
 
@@ -50,6 +56,6 @@ onBeforeMount(async () => {
         button.btn-md.btn-violet.text-md.font-semibold.rounded-full.px-20(@click="collect") WITHDRAW
 
   //- stats
-  project-stats.mt-20(v-if="project", :project="project", :meta="meta")
+  project-stats.mt-20(v-if="project", :project="project", :meta="meta", :drips="drips")
 
 </template>

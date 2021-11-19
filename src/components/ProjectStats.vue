@@ -7,7 +7,8 @@ import { utils } from 'ethers'
 
 const props = defineProps({
   project: Object,
-  meta: Object
+  meta: Object,
+  drips: Array
 })
 
 const query = `
@@ -76,10 +77,11 @@ section.project-stats.flex.w-full_10.-mx-5
     template(v-else) ...
 
   //- total revenue
-  project-stat.flex-1.mx-5
+  project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
     template(v-slot:header)
       h6 💦&nbsp; Drips Out
-    div 0
+    template(v-if="drips") {{ drips.length }}
+    template(v-else) ...
     //- .flex.items-center 0 <span class="hiddenff ml-3" style="font-size:0.65em">💦</span>
 
   //- Goal

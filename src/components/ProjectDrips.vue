@@ -1,35 +1,19 @@
 <script setup>
 import { ref, computed, onBeforeMount } from 'vue'
 import store from '@/store'
+import Addr from '@/components/Addr'
 
 const props = defineProps({
-  projectAddress: String
+  drips: Array
 })
 
-const drips = ref([])
-const dripsFraction = ref(0)
-const dripsFractionMax = store.state.dripsFractionMax
+// TODO remove demo
+const myDrips = ref(props.drips)
 
-const dripsList = computed(() => {
-  const weightsTotal = drips.value.reduce((acc, itm) => acc + itm?.weight, 0)
-  return drips.value.map(item => {
-    let percent = (item.weight / weightsTotal) * dripsFraction.value / dripsFractionMax * 100
-    percent = percent.toFixed(3)
-    return { percent, ...item }
-  })
-})
-
-onBeforeMount(() => {
-  // get drips
-  store.dispatch('getProjectDripReceivers', props.projectAddress)
-    .then(arr => {
-      console.log('hash?', arr)
-      // drips.value = arr
-    })
-  // get drip fraction (INT out of 1_000_000)
-  store.dispatch('getProjectDripFraction', props.projectAddress)
-    .then(int => { dripsFraction.value = int })
-})
+// TODO remove demo
+if (!myDrips.value.length) {
+  myDrips.value = Array(16).fill(0).map(() => ({ address: '0x87f3834fd4fce5781b4c12500de8b90b73342861', percent: 12 }))
+}
 </script>
 
 <template lang="pug">
@@ -43,12 +27,35 @@ section.project-drips.relative
       //- title
       h2.absolute.top-54.left-0.w-full.flex.justify-center.text-3xl.font-semibold Drips
 
-  .flex.justify-end
-    ul
-      h6 dripsFraction: {{ dripsFraction }} of {{ dripsFractionMax }} ({{ (dripsFraction / dripsFractionMax * 100).toFixed(3) }}%)
-      li(v-for="item in dripsList")
-        pre.p-10.border.white.font-sans
-          | {{ item.receiver }}
-          | weight: {{ item.weight }}
-          | percent of total revenue: {{ item.percent }}%
+  section
+    ul.flex.flex-wrap.pl-52.pr-60
+      //- TODO - mobile use :nth-child for m-l/r
+      li.project-drips__drip(v-for="(drip, i) in myDrips", :class="{'ml-auto': i % 6 === 0, 'mr-auto': i % 6 === 5}")
+        //- (drip head)
+        .block.-mt-px.mb-32(v-if="i < 3")
+          img.mx-auto(src="../assets/icons/drip-off-point.svg")
+        //- drip
+        router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20(:to="{name: 'user', params: { address: drip.address }}")
+          //- drip graphic
+          img.w-full.block(src="../assets/icons/drip-big.svg", alt="blue raindrop")
+          //- text
+          .absolute.overlay.flex.items-center.justify-center
+            div.text-center
+              //- percent
+              .font-kaeru.text-6xl.text-violet-650.font-normal(style="margin-top:38%")
+                | {{ parseInt(drip.percent) }}
+                span(style="font-size: 0.75em") %
+              .mt-24.text-violet-650.font-semibold.text-lg
+                addr(:address="drip.address")
+              //- TODO calc amount
+              .mt-8.font-mono.text-ms.text-violet-650 XXX Ð/mo
+
 </template>
+
+<style>
+.project-drips__drip{
+  width: calc((292.4 + 40) / (1128.53 + 40) * 100%);
+  margin-bottom:  calc(40 / (1128.53 + 40) * -100%);
+  padding: 0 calc(20 / (1128.53 + 40) * 100%);
+}
+</style>
