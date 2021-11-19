@@ -108,7 +108,7 @@ dialog-body.fixed.inset-0.z-10.overflow-y-auto.flex.py-60.px-30(:open="isOpen", 
       dialog-description.text-base.mx-auto(style="max-width:23em")
         | Fund this project and receive a unique NFT to show your support and vote on proposals.
 
-    form(@submit.prevent, validate)
+    form(@submit.prevent, validate, :class="{'opacity-25 pointer-events-none': state.nft}")
       //- input rate
       input-body.my-10(label="Monthly Rate (DAI)", :isFilled="typeof rate === 'number'")
         input(v-model="rate", type="number", placeholder="Monthly Rate (DAI)", :min="minDAIPerMonth.toString()", step="1", required)
@@ -124,18 +124,26 @@ dialog-body.fixed.inset-0.z-10.overflow-y-auto.flex.py-60.px-30(:open="isOpen", 
           | {{ payTotalDAI }}
           svg-dai.w-32.h-32.ml-16
 
-      .flex.justify-center.mt-40
-        template(v-if="state.nft")
-          <router-link :to="{name: 'user-drips', params: {address: $store.state.address}}" class="btn btn-lg btn-white min-w-sm mx-auto">View NFT</router-link>
-
-        template(v-else-if="!state.approved")
-          button.btn.btn-lg.btn-white.min-w-sm.mx-auto(@click="approve")
+      //- TODO - show as second button for better UX
+      template(v-if="!state.approved")
+        .mt-40.mb-12.flex.justify-center
+          button.btn.btn-lg.btn-violet.min-w-sm.mx-auto(@click="approve")
             template(v-if="state.approveTx") Approving...
-            template(v-else) Approve
+            template(v-else) 1. Approve
 
-        template(v-else)
-          button.btn.btn-lg.btn-white.min-w-sm.mx-auto(@click="mint")
-            template(v-if="state.mintTx") Subscribing...
-            template(v-else) Subscribe
+      //- (fund button)
+      template(v-if="!state.nft")
+        .mt-40.flex.justify-center
+          button.btn.btn-lg.btn-violet.min-w-sm.mx-auto(@click="mint", :disabled="!state.approved", :class="{'opacity-25': !state.approved}")
+            template(v-if="state.mintTx") Submitting...
+            template(v-else)
+              template(v-if="!state.approved") 2.
+              | Fund
+
+    //- (view nft btn)
+    .mt-40.flex.justify-center
+      //- (view nft link)
+      template(v-if="state.nft")
+        <router-link :to="{name: 'user-drips', params: {address: $store.state.address}}" class="btn btn-lg btn-violet min-w-sm mx-auto">View NFT</router-link>
 
 </template>

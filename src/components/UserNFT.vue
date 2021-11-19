@@ -114,8 +114,8 @@ onBeforeMount(() => {
   getBalance()
 
   // get nft meta
-  // store.dispatch('getNFTMetadata', { projectAddress, tokenId })
-  //   .then(meta => { nftMeta.value = meta })
+  store.dispatch('getNFTMetadata', { projectAddress, tokenId })
+    .then(meta => { nftMeta.value = meta })
 
   // get nft active until
   getActiveUntil()
@@ -130,12 +130,12 @@ onBeforeMount(() => {
 
   figure.my-40
     //- filler graphic
-    .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative
+    .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative.overflow-hidden
       //- nft meta img
-      //- img.absolute.overlay.object-contain.object-center(:src="nftMeta.image")
+      img.absolute.overlay.object-contain.object-center(v-if="nftMeta.image", :src="nftMeta.image")
 
       //- temp img
-      .absolute.overlay.flex.items-center.justify-center.text-center
+      //- .absolute.overlay.flex.items-center.justify-center.text-center
         | {{ '#' + nft.tokenId }}<br>
         | Type {{ nft.typeId }}<br>
         | {{ nftRate }} DAI/mo
@@ -204,5 +204,5 @@ onBeforeMount(() => {
       tx-link(v-if="withdrawTx", :tx="withdrawTx")
 
   footer.mt-32.flex.justify-end
-    a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${nft.id}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
+    a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${tokenId}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
 </template>

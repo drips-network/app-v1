@@ -11,7 +11,8 @@ const getProjects = () => {
       query {
         fundingProjects {
           id
-          projectOwner
+          name: projectName
+          owner: projectOwner
         }
       }
     `
