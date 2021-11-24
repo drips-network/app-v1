@@ -6,6 +6,10 @@ import { toDAIPerMo } from '@/utils'
 import SvgPlusMinus from '@/components/SvgPlusMinus'
 import SvgDai from '@/components/SvgDai'
 import TxLink from '@/components/TxLink'
+// import SvgNftTest2 from '@/components/SvgNFTTest2'
+
+// temp
+const nftArtSvg = ref()
 
 const props = defineProps({
   nft: Object
@@ -119,6 +123,11 @@ onBeforeMount(() => {
 
   // get nft active until
   getActiveUntil()
+
+  // temp
+  fetch('/art/sketching/nft-drop-ripple-shiny-1--gif.svg')
+    .then(resp => resp.text())
+    .then(text => { nftArtSvg.value = text })
 })
 </script>
 
@@ -128,9 +137,15 @@ onBeforeMount(() => {
     router-link(:to="{name: 'project', params: { address: projectAddress }}")
       | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
 
-  figure.my-40
+  figure.mt-32.mb-40
+    //- inline svg (for exteneral ipfs bg/assets)
+    .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
+
+    //- svg-nft-test-2.max-w-full.mx-auto
+    //- img.max-w-full.mx-auto(src="https://cloudflare-ipfs.com/ipfs/QmXmduqpDqS5aY1ZAf5tSig5UWL2P9Wo31QUuVTq9hJY33")
+
     //- filler graphic
-    .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative.overflow-hidden
+    //- .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative.overflow-hidden
       //- nft meta img
       img.absolute.overlay.object-contain.object-center(v-if="nftMeta.image", :src="nftMeta.image")
 

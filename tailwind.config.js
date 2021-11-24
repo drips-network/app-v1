@@ -186,6 +186,8 @@ module.exports = {
       // md: '0.375rem',
       // lg: '0.5rem',
       // xl: '0.75rem',
+      md: '1.6rem',
+      lg: '2rem',
       xl: '3.3rem',
       '2xl': '4rem',
       '2xlb': '4.5rem',
