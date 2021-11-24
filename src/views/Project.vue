@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
@@ -13,6 +13,9 @@ import SvgDai from '@/components/SvgDai'
 import ProjectDrips from '@/components/ProjectDrips'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import ProjectStats from '@/components/ProjectStats'
+import Addr from '@/components/Addr'
+import SvgPen from '@/components/SvgPen'
+import SvgXCircle from '@/components/SvgXCircle'
 import { fromWei, toDAIPerMo, ipfsUrl } from '@/utils'
 
 const route = useRoute()
@@ -26,6 +29,9 @@ const drips = ref()
 
 const status = ref()
 const mintModal = ref(false)
+
+const canEdit = computed(() => project.value?.projectOwner === store.state.address)
+const editMenuOpen = ref(false)
 
 onBeforeMount(async () => {
   try {
@@ -82,8 +88,10 @@ article.project.pb-96
           router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full(:to="{name: 'user', params: {address: project.projectOwner}}")
             //- avatar
             avatar-blockie.w-36.mr-12(:address="project.projectOwner", width="36")
-            .text-violet-600.font-semibold.pr-6 {{ $store.getters.addrShort(project.projectOwner) }}
+            .text-violet-600.font-semibold.pr-6
+              addr(:address="project.projectOwner")
 
+        //- project image
         figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative
           img.absolute.overlay.object-cover.object-center(:src="ipfsUrl(meta.image)")
         //- title
@@ -139,6 +147,26 @@ article.project.pb-96
 
     //- drips list
     project-drips(v-if="drips", :drips="drips")
+
+    //- (owner actions)
+    template(v-if="canEdit")
+      .sticky.mt-144.w-full.bottom-20.left-0.flex.justify-center.px-12
+        .flex.flex-col.items-center
+          //- (options)
+          .flex.flex-wrap.my-5.items-center.justify-center(v-show="editMenuOpen")
+            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide
+              | Edit Info
+              span.transform.-scale-x-100.ml-12 ✏️
+            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide Edit Drips 💧
+          //- toggle menu btn
+          .my-3
+            button.btn.btn-lg.shadow-md.pl-36.pr-28.font-semibold.tracking-wide(:class="{'btn-violet': !editMenuOpen, 'btn-darker': editMenuOpen}", @click="editMenuOpen = !editMenuOpen")
+              .flex.items-center(v-show="!editMenuOpen")
+                | Edit
+                svg-pen.h-28.ml-12.text-white.opacity-30
+              .flex.items-center(v-show="editMenuOpen")
+                | Close
+                svg-x-circle.h-32.ml-12.text-white.opacity-30
 
     modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 

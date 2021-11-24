@@ -1,5 +1,5 @@
 const apiUrl = 'https://api.studio.thegraph.com/query/9578/funding-subgraph-v6/v0.0.2'
-const isDev = process.env.NODE_ENV === 'development'
+const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC
 
 export default async function ({ query, variables }) {
   const id = btoa(JSON.stringify({ query, variables }))
@@ -9,7 +9,7 @@ export default async function ({ query, variables }) {
     if (cached) {
       cached = JSON.parse(cached)
       const secSince = new Date().getTime() - cached.time
-      if (secSince > 60 * 60) {
+      if (secSince > cacheAPISec) {
         // slightly delay response...
         return new Promise((resolve) => setTimeout(() => resolve(cached.data), 200))
       }
@@ -28,7 +28,7 @@ export default async function ({ query, variables }) {
       const data = await resp.json()
 
       // cache resp?
-      if (isDev) {
+      if (cacheAPISec) {
         sessionStorage.setItem(id, JSON.stringify({ data, time: new Date().getTime() }))
       }
 
