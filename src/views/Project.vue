@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import InputBody from '@/components/InputBody'
-import Modal from '@/components/Modal'
+import ModalFund from '@/components/ModalFund'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
@@ -168,6 +168,6 @@ article.project.pb-96
                 | Close
                 svg-x-circle.h-32.ml-12.text-white.opacity-30
 
-    modal(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+    modal-fund(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
 
 </template>
