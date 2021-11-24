@@ -9,8 +9,9 @@ import { useRoute, useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import store, { pinImageToIPFS } from '@/store'
+import store from '@/store'
 import { toWeiPerSec, formatDrips } from '@/utils'
+import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 
 const route = useRoute()
 const router = useRouter()
@@ -156,36 +157,6 @@ function onDripInputKeydown (e, i) {
   }
 }
 
-// project image
-const imgSrc = ref()
-const onImgFileChange = (e) => {
-  const input = e.target
-  if (input.files && input.files[0]) {
-    var reader = new FileReader()
-    reader.onload = async function (event) {
-      imgSrc.value = event.target.result
-
-      // upload to ipfs
-      // TODO: upload only on create() to save ipfs uploads...
-      try {
-        let resp = await pinImageToIPFS(imgSrc.value)
-        resp = await resp.json()
-        // oops
-        if (resp.error) {
-          throw new Error(resp.message)
-        }
-        // save
-        meta.value.image = resp.IpfsHash
-      } catch (e) {
-        console.error(e)
-        alert('An error occured. Perhaps the image is too large (200kb max)')
-        imgSrc.value = null
-      }
-    }
-    reader.readAsDataURL(input.files[0])
-  }
-}
-
 const isDev = process.env.NODE_ENV !== 'production'
 projectAddress.value = isDev ? route.query.project : null
 </script>
@@ -196,62 +167,22 @@ article.create.py-80.relative
   form(@submit.prevent="submitProject")
 
     //- 1. PROJECT
-
     panel.mx-auto(ref="projectPanel", label="Project", icon="✨")
       template(v-slot:header)
         h2 Project
       section
         //- (connect bt)
         template(v-if="!owner")
-          button.btn.btn-lg.btn-violet.mx-auto(@click="$store.dispatch('connect')") Connect Wallet
+          button.btn.btn-lg.btn-violet.mx-auto.px-36(@click="$store.dispatch('connect')") Connect Wallet
 
         //- (create form)
         template(v-else)
-          //- avatar image upload
-          .h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-700.mb-36
-            label.absolute.overlay.flex.items-center.justify-center.cursor-pointer(tabindex="0", title="Project Image")
-              span.sr-only Project Image
-              input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
-              svg-plus-minus-radicle
-            //- (image)
-            img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
+          fields-project-edit(v-model="meta")
 
-          //- form(@submit.prevent="save", validate)
-          section
-            //- .my-10
-              input-body(label="Owner", :isFilled="owner.length", format="code")
-                input(v-model="owner", placeholder="owner", disabled)
-            .my-10
-              input-body(label="Name*", :isFilled="meta.name.length")
-                input(v-model="meta.name", placeholder="Name*", required, autocomplete="new-password")
-            .my-10
-              //- TODO: format/validate symbol text?
-              input-body(label="Symbol*", :isFilled="meta.symbol.length")
-                input(v-model="meta.symbol", placeholder="Symbol*", required)
-            .my-10
-              //- TODO: use textarea
-              input-body(label="Description", :isFilled="meta.descrip.length")
-                input(v-model="meta.descrip", placeholder="Description")
-            .my-10
-              input-body(label="Website", :isFilled="meta.website.length", format="code")
-                input(v-model="meta.website", placeholder="Website", type="url")
-            .my-10
-              input-body(label="Twitter Handle", :isFilled="meta.twitter.length")
-                input(v-model="meta.twitter", placeholder="Twitter")
-            .my-10
-              input-body(label="Discord Invite Link", :isFilled="meta.discord.length")
-                input(v-model="meta.discord", placeholder="Discord")
-            .my-10
-              input-body(label="Radicle Project ID", :isFilled="meta.radicleProjectId.length", format="code")
-                input(v-model="meta.radicleProjectId", placeholder="Radicle Project ID")
-            .my-10
-              input-body(label="Github Project URL", :isFilled="meta.githubProject.length", format="code")
-                input(v-model="meta.githubProject", placeholder="Github Project URL", type="url")
-
-            div.mt-40(v-show="step === 0")
-              //- create btn
-              button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openFundingPanel")
-                | Next
+          div.mt-40(v-show="step === 0")
+            //- create btn
+            button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openFundingPanel")
+              | Next
 
     //- 2. FUNDING
 
