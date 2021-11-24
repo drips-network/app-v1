@@ -1,7 +1,21 @@
 const apiUrl = 'https://api.studio.thegraph.com/query/9578/funding-subgraph-v6/v0.0.2'
+const isDev = process.env.NODE_ENV === 'development'
 
 export default async function ({ query, variables }) {
+  const id = btoa(JSON.stringify({ query, variables }))
   try {
+    // cached ?
+    let cached = sessionStorage.getItem(id)
+    if (cached) {
+      cached = JSON.parse(cached)
+      const secSince = new Date().getTime() - cached.time
+      if (secSince > 60 * 60) {
+        // slightly delay response...
+        return new Promise((resolve) => setTimeout(() => resolve(cached.data), 200))
+      }
+    }
+
+    // fetch new...
     const resp = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -11,13 +25,21 @@ export default async function ({ query, variables }) {
     })
 
     if (resp.status >= 200 && resp.status <= 299) {
-      return await resp.json()
+      const data = await resp.json()
+
+      // cache resp?
+      if (isDev) {
+        sessionStorage.setItem(id, JSON.stringify({ data, time: new Date().getTime() }))
+      }
+
+      return data
     } else {
       throw Error(resp.statusText)
     }
   } catch (e) {
     console.log('api err', e, e.message, e.status)
     console.error('@graphAPI', e)
+    sessionStorage.removeItem(id)
     throw e
   }
 }
