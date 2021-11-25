@@ -177,7 +177,7 @@ article.create.py-80.relative
 
         //- (create form)
         template(v-else)
-          fields-project-edit(v-model="meta")
+          fields-project-edit(v-model="meta", :isNewProject="true")
 
           div.mt-40(v-show="step === 0")
             //- create btn

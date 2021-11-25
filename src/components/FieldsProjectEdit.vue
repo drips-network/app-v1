@@ -5,7 +5,7 @@ import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import { pinImageToIPFS } from '@/store'
 import { ipfsUrl } from '@/utils'
 
-const props = defineProps(['modelValue'])
+const props = defineProps(['modelValue', 'isNewProject'])
 const emit = defineEmits(['update:modelValue'])
 
 // current image ?
@@ -63,10 +63,10 @@ section
   //- .my-10
     input-body(label="Owner", :isFilled="owner.length", format="code")
       input(v-model="owner", placeholder="owner", disabled)
-  .my-10
+  .my-10(v-if="props.isNewProject")
     input-body(label="Name*", :isFilled="modelValue.name.length")
       input(v-model="modelValue.name", placeholder="Name*", required, autocomplete="new-password")
-  .my-10
+  .my-10(v-if="props.isNewProject")
     //- TODO: format/validate symbol text?
     input-body(label="Symbol*", :isFilled="modelValue.symbol.length")
       input(v-model="modelValue.symbol", placeholder="Symbol*", required)

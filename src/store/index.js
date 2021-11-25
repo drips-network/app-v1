@@ -464,6 +464,12 @@ export default createStore({
         console.error(e)
         return fallback
       }
+    },
+
+    updateProjectMeta (_, { address, ipfsHash }) {
+      const contract = getProjectContract(address)
+      const contractSigner = contract.connect(signer)
+      return contractSigner.changeContractURI(ipfsHash)
     }
   }
 })

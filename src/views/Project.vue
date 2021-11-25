@@ -5,6 +5,7 @@ import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import InputBody from '@/components/InputBody'
 import ModalFund from '@/components/ModalFund'
+import ModalEditProjectInfo from '@/components/ModalEditProjectInfo'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
@@ -29,9 +30,15 @@ const drips = ref()
 
 const status = ref()
 const mintModal = ref(false)
+const editProject = ref(false)
 
 const canEdit = computed(() => project.value?.projectOwner === store.state.address)
 const editMenuOpen = ref(false)
+
+const getProjectMeta = async (ipfsHash) => {
+  meta.value = await store.dispatch('getProjectMeta', { ipfsHash })
+  // TODO handle error for updating/editing meta?
+}
 
 onBeforeMount(async () => {
   try {
@@ -44,7 +51,7 @@ onBeforeMount(async () => {
     }
 
     // get meta...
-    meta.value = await store.dispatch('getProjectMeta', { ipfsHash: project.value.ipfsHash })
+    await getProjectMeta(project.value.ipfsHash)
 
     if (!meta.value) {
       status.value = 'Info Missing :/'
@@ -63,6 +70,7 @@ onBeforeMount(async () => {
     status.value = e.message ? 'Error: ' + e.message : 'Error'
   }
 })
+
 </script>
 
 <template lang="pug">
@@ -92,7 +100,7 @@ article.project.pb-96
               addr(:address="project.projectOwner")
 
         //- project image
-        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative
+        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative.overflow-hidden
           img.absolute.overlay.object-cover.object-center(:src="ipfsUrl(meta.image)")
         //- title
         h1.text-3xl.mb-36.font-semibold {{ meta.name }}
@@ -154,7 +162,7 @@ article.project.pb-96
         .flex.flex-col.items-center
           //- (options)
           .flex.flex-wrap.my-5.items-center.justify-center(v-show="editMenuOpen")
-            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide
+            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(@click="editProject = true")
               | Edit Info
               span.transform.-scale-x-100.ml-12 ✏️
             button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide Edit Drips 💧
@@ -169,5 +177,7 @@ article.project.pb-96
                 svg-x-circle.h-32.ml-12.text-white.opacity-30
 
     modal-fund(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+
+    modal-edit-project-info(v-if="editProject", :open="editProject", @updated="getProjectMeta", @close="editProject = editMenuOpen = false", :meta="meta", :projectAddress="projectAddress")
 
 </template>

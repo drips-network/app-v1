@@ -89,7 +89,7 @@ const approve = async () => {
 </script>
 
 <template lang="pug">
-modal(panelIcon="🌈", v-bind="$attrs", v-on="$listeners")
+modal(v-bind="$attrs", v-on="$listeners")
 
   panel.z-10.m-auto(icon="🌈")
 
