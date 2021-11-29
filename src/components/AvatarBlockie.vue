@@ -36,7 +36,7 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-.avatar-blockie.rounded-full.overflow-hidden(ref="el")
+.avatar-blockie.rounded-full.overflow-hidden.relative(ref="el")
 </template>
 
 <style>

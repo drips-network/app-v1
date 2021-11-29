@@ -21,9 +21,9 @@ article.profile.pb-80
         button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32 Fund&nbsp; 🌈
 
     nav.my-40.flex
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-36(:to="{ name: 'user', params: $route.params }") Projects
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40(:to="{ name: 'user-drips', params: $route.params }") Member Of
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40(:to="{ name: 'user-splits', params: $route.params }") Splits
+      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-36.mr-1(:to="{ name: 'user', params: $route.params }") Projects
+      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40.mr-1(:to="{ name: 'user-drips', params: $route.params }") Memberships
+      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40.mr-1(:to="{ name: 'user-splits', params: $route.params }") Splits
 
   main#main
     router-view

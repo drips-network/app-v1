@@ -67,7 +67,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- drips from
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
-      h6 💧&nbsp; Drips
+      h6 💧&nbsp; Drips In
     template(v-if="nfts") {{ nfts.length }}
       //- .flex.items-center
         | {{ nfts.length }}
