@@ -42,6 +42,10 @@ onBeforeMount(() => {
       h3.text-2xl.font-semibold.text-violet-650
         router-link(:to="projectRt") {{ meta.name || $store.getters.addrShort(props.project.id) }}
 
+    //- (join btn)
+    template(v-if="!isUsersProject")
+      router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt") Join
+
   //- progress bar
   project-progress-bar.my-20(:meta="meta")
 

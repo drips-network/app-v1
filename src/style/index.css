@@ -36,6 +36,9 @@ html {
 .btn-md {
   @apply h-54;
 }
+.btn-mdd {
+  @apply h-64;
+}
 .btn-lg {
   @apply h-80 text-xl font-semibold pt-2;
 }
@@ -55,7 +58,10 @@ html {
   @apply bg-indigo-900 notouch_hover_text-white transition duration-150;
 }
 .btn-white{
-  @apply bg-white text-blue-900;
+  @apply bg-white text-blue-900 transform duration-150;
+  &:not([disabled]) {
+    @apply notouch_hover_scale-102;
+  }
 }
 .btn-outline {
   @apply border border-violet-700 focus_border-violet-600;

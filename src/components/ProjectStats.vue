@@ -3,6 +3,7 @@ import { ref, computed, onBeforeMount } from 'vue'
 import api from '@/api'
 import ProjectStat from '@/components/ProjectStat'
 import SvgDai from '@/components/SvgDai'
+import IconSplit from '@/components/IconSplit'
 import { utils } from 'ethers'
 
 const props = defineProps({
@@ -53,7 +54,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- supporters
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !supporters}")
     template(v-slot:header)
-      h6 🙂&nbsp; Supporters
+      h6 🙂&nbsp; Members
     template(v-if="supporters") {{ supporters.length }}
       //- .flex.items-center
         | {{ supporters.length }}
@@ -66,7 +67,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- drips from
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
-      h6 💧&nbsp; Drips In
+      h6 💧&nbsp; Drips
     template(v-if="nfts") {{ nfts.length }}
       //- .flex.items-center
         | {{ nfts.length }}
@@ -79,7 +80,10 @@ section.project-stats.flex.w-full_10.-mx-5
   //- total revenue
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
     template(v-slot:header)
-      h6 💦&nbsp; Drips Out
+      h6.flex.items-center
+        div
+          <icon-split/>
+        | Splits
     template(v-if="drips") {{ drips.length }}
     template(v-else) ...
     //- .flex.items-center 0 <span class="hiddenff ml-3" style="font-size:0.65em">💦</span>

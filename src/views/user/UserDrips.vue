@@ -38,6 +38,10 @@ onBeforeMount(async () => {
 
 <template lang="pug">
 section.user-drips
+  //- .flex.justify-center.mb-40
+    .mx-auto.bg-indigo-800.rounded-2xlb.py-24.px-32.text-md.text-violet-650
+      | <b>Drips</b> from <b>Memberships</b> appear here.
+
   template(v-if="nfts")
     ul.flex.flex-wrap.px-20.w-full
       //- nfts...

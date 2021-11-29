@@ -33,6 +33,11 @@ const routes = [
         path: 'drips',
         name: 'user-drips',
         component: () => import(/* webpackChunkName: "user-drips" */ '../views/user/UserDrips.vue')
+      },
+      {
+        path: 'splits',
+        name: 'user-splits',
+        component: () => import(/* webpackChunkName: "user-splits" */ '../views/user/UserSplits.vue')
       }
     ]
   }
