@@ -40,7 +40,10 @@ html {
   @apply h-80 text-xl font-semibold pt-2;
 }
 .btn-xl{
-  @apply h-112 max-w-lg text-2xl font-semibold transform transition duration-150 notouch_hover_scale-102;
+  @apply h-112 max-w-lg text-2xl font-semibold transform transition duration-150;
+  &:not([disabled]) {
+    @apply notouch_hover_scale-102;
+  }
 }
 .btn-indigo{
   @apply bg-indigo-700
@@ -55,10 +58,16 @@ html {
   @apply bg-white text-blue-900;
 }
 .btn-outline {
-  @apply border border-violet-700 notouch_hover_border-violet-600 focus_border-violet-600 notouch_hover_bg-violet-600;
+  @apply border border-violet-700 focus_border-violet-600;
+  &:not([disabled]) {
+    @apply notouch_hover_border-violet-600 notouch_hover_bg-violet-600;
+  }
 }
 .btn-violet{
-  @apply bg-violet-600 border-2 border-transparent notouch_hover_border-white
+  @apply bg-violet-600 border-2 border-transparent;
+  &:not([disabled]) {
+    @apply notouch_hover_border-white
+  }
 }
 .btn-active-white {
   &.router-link-exact-active { @apply btn-white }
