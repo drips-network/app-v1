@@ -6,7 +6,7 @@ import Addr from '@/components/Addr'
 
 <template lang="pug">
 article.profile.pb-80
-  header.mt-40.px-36
+  header.mt-52.px-36
     .flex.items-endff.items-center.justify-between.w-full
       //- user tag
       .h-160.rounded-full.bg-indigo-700.flex.items-center
@@ -18,14 +18,40 @@ article.profile.pb-80
       //-
       //- button.ml-12.btn.btn-mdd.btn-outline.font-semibold.text-md.px-32 Fund&nbsp; 🌈
       template(v-if="$route.params.address !== $store.state.address")
-        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32 Fund&nbsp; 🌈
+        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32 Drip to 0x... 💧
 
-    nav.my-40.flex
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-36.mr-1(:to="{ name: 'user', params: $route.params }") Projects
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40.mr-1(:to="{ name: 'user-drips', params: $route.params }") Memberships
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40.mr-1(:to="{ name: 'user-splits', params: $route.params }") Splits
+    nav.mt-52.mb-32
+      .flex.items-start.opacity-50ff
+        .h-80.rounded-full.flex.items-center.px-7.bg-indigo-700
+          router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user', params: $route.params }", ) Pools
+          router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'bg-violet-600': $route.name.includes('user-drips')}") Drips
+          //- router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-splits', params: $route.params }") Splits
+
+        //- .h-64.rounded-full.flex.items-center.px-8.border.border-violet-700
+          router-link.btn.btn-active-violet.btn-sm.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user', params: $route.params }", ) Memberships
+          router-link.btn.btn-active-violet.btn-sm.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips', params: $route.params }") Splits
+
+        //- .flex.mt-8
+        template(v-if="$route.name.includes('user-drips')")
+          .w-40.h-40.border-b-2.border-indigo-700
+          .h-80.rounded-full.flex.items-center.px-7.bg-indigo-700
+            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips', params: $route.params }", ) Memberships
+            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-splits', params: $route.params }") Splits
+            //- router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-splits', params: $route.params }") Splits
+
+      //- .flex.mt-2(v-if="$route.name.includes('user-drips')")
+        router-link.btn.btn-dark.btn-active-violet.btn-lg.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips', params: $route.params }") Direct
+        router-link.btn.btn-dark.btn-active-violet.btn-lg.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-splits', params: $route.params }") Memberships
+        router-link.btn.btn-dark.btn-active-violet.btn-lg.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-splits', params: $route.params }") Splits
+      //- router-link.btn.btn-dark.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-splits', params: $route.params }") Splits
 
   main#main
+    //- nav.pt-28.mb-28.flex.justify-center
+      .max-w-full.flex.bg-indigo-900.rounded-full.p-8
+        //- button Drips
+        button.btn.btn-sm.px-20.font-semibold.text-md.btn-violet.mx-2 Memberships
+        button.btn.btn-sm.px-20.font-semibold.text-md.btn-viffolet.mx-2 Splits
+
     router-view
 
 </template>

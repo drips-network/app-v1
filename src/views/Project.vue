@@ -122,7 +122,7 @@ article.project.pb-96
               svg-discord.block
 
         .mt-44
-          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Fund 🌈
+          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Drip 💧
 
           .mt-16.text-violet-600(v-if="nftType") Min. {{ minDAI }} DAI/mo
         //- p

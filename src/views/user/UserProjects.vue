@@ -37,6 +37,9 @@ onBeforeMount(async () => {
 section.user-projects
   h2.sr-only Projects
 
+  //- p.mx-40.mb-40.border.border-violet-700.rounded-full.text-md.text-violet-650.h-80.flex.items-center.justify-center
+    div Incoming funds from <b>Drips</b> form <b>Pools</b>.
+
   template(v-if="projects")
     ul.px-40
       //- projects...
