@@ -86,10 +86,12 @@ const approve = async () => {
     state.approved = false
   }
 }
+
+const emit = defineEmits(['close'])
 </script>
 
 <template lang="pug">
-modal(v-bind="$attrs", v-on="$listeners")
+modal(v-bind="$attrs", @close="$emit('clos')")
 
   panel.z-10.m-auto(icon="🌈")
 

@@ -46,7 +46,7 @@ const update = async () => {
 </script>
 
 <template lang="pug">
-modal(v-bind="$attrs", v-on="$listeners")
+modal(v-bind="$attrs", @close="$emit('close')")
 
   panel.z-10.m-auto(icon="✏️")
 
