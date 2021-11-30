@@ -68,12 +68,14 @@ module.exports = {
         500: '#212064', // subtle borders
         600: '#4949DD', // bright bg's
         650: '#5151ff', // brighter for text
-        700: '#28258E' // bright borders
+        700: '#28258E', // bright borders
+        800: 'rgb(31 29 110)' // duller border, match shadow
       },
       indigo: {
         700: '#17164B',
         800: '#12123C',
-        900: '#0a0930' // #090928', // dark: rgb(9 14 24)', // softer: #0e1522', // figma: #101828', > deeper/saturated: #090928
+        900: '#0a0930', // #090928', // dark: rgb(9 14 24)', // softer: #0e1522', // figma: #101828', > deeper/saturated: #090928
+        950: '#070621' // equiv of black 30% opacity over 900
       },
       blue: {
         900: '#101828'
@@ -91,10 +93,12 @@ module.exports = {
       '2xs': ['0.8rem', { lineHeight: '1.2rem' }],
       xs: ['1rem', { lineHeight: '1.4rem' }],
       sm: ['1.2rem', { lineHeight: '1.6rem' }],
+      mss: ['1.4rem', { lineHeight: '1.6rem' }],
       ms: ['1.5rem', { lineHeight: '1.8rem' }],
       base: ['1.6rem', { lineHeight: '2rem' }],
       md: ['1.8rem', { lineHeight: '2.2rem' }],
       lg: ['2rem', { lineHeight: '2.4rem' }],
+      // lgg: ['2.2rem', { lineHeight: '2.6rem' }],
       xl: ['2.4rem', { lineHeight: '2.8rem' }],
       '2xl': ['3.2rem', { lineHeight: '1' }],
       '3xl': ['3.6rem', { lineHeight: '1' }],
@@ -812,6 +816,7 @@ module.exports = {
       '11x12': '91.666667%',
       full: '100%',
       full_10: 'calc(100% + 1rem)',
+      full_40: 'calc(100% + 4rem)',
       screen: '100vw',
       min: 'min-content',
       max: 'max-content'

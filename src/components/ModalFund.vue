@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, inject } from 'vue'
 import store from '@/store'
 import { BigNumber as bn, constants } from 'ethers'
 import { fromWei } from '@/utils'
@@ -16,6 +16,7 @@ const props = defineProps({
   projectAddress: String,
   nftType: Object
 })
+const meta = inject('projectMeta')
 
 const minDAIPerSec = fromWei(props.nftType.minAmtPerSec) // bn
 const minDAIPerMonth = minDAIPerSec.mul(30 * 24 * 60 * 60) // bn
@@ -91,16 +92,17 @@ const emit = defineEmits(['close'])
 </script>
 
 <template lang="pug">
-modal(v-bind="$attrs", @close="$emit('clos')")
+modal(v-bind="$attrs", @close="$emit('close')")
 
-  panel.z-10.m-auto(icon="🌈")
+  panel.z-10.m-auto(icon="💧")
 
     template(v-slot:header)
-      dialog-title Fund
+      dialog-title Drip
 
     template(v-slot:description)
-      dialog-description.text-base.mx-auto(style="max-width:23em")
-        | Fund this project and receive a unique NFT to show your support and vote on proposals.
+      dialog-description.text-md.mx-auto.leading-relaxed(style="max-widthff:23em")
+        | <b>Drip</b> 💧 funds to <b>{{ meta.name }}</b> and<br> receive an NFT <b>Member Token</b> 🧩
+        //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
     form(@submit.prevent, validate, :class="{'opacity-25 pointer-events-none': state.nft}")
       //- input rate

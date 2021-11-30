@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import { toRaw } from 'vue'
 //
 import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
@@ -36,13 +37,15 @@ export default createStore({
   state () {
     return {
       address: null,
+      addresses: [],
 
       // TODO - get this from the contract?
       dripsFractionMax: 1000000
     }
   },
   getters: {
-    addrShort: () => (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...'
+    addrShort: () => (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...',
+    isWalletAddr: (state) => (addr) => addr === state.address
   },
   mutations: {
     SIGN_IN (state, address) {
@@ -50,6 +53,11 @@ export default createStore({
     },
     SIGN_OUT (state) {
       state.address = null
+    },
+    SAVE_ADDRESS (state, { address, ens }) {
+      const addresses = toRaw(state.addresses)
+      addresses[address] = ens
+      state.addresses = addresses
     }
     // SET_CONTRACTS (state, provider) {
     //   console.log('registry', RadicleRegistry.address)
@@ -454,11 +462,18 @@ export default createStore({
       return contract.withdrawable(tokenId)
     },
 
-    async resolveAddr ({ getters, dispatch }, { address, short = true }) {
+    async resolveAddr ({ state, getters, commit, dispatch }, { address, short = true }) {
       const fallback = short ? getters.addrShort(address) : address
       try {
+        // saved?
+        const saved = state.addresses[address]
+        if (saved !== undefined) {
+          return saved || fallback
+        }
+        // fetch new...
         if (!provider) await dispatch('init')
         const ens = await provider.lookupAddress(address)
+        commit('SAVE_ADDRESS', { address, ens })
         return ens || fallback
       } catch (e) {
         console.error(e)

@@ -17,7 +17,7 @@ if (!myDrips.value.length) {
 </script>
 
 <template lang="pug">
-section.project-drips.relative
+section.project-splits.relative
   header.absolute.top-40.left-36
     .relative
       //- drip svg
@@ -25,7 +25,9 @@ section.project-drips.relative
         <path fill-rule="evenodd" clip-rule="evenodd" d="M26.703 1.4375C26.1883 10.7016 21.6907 31.2553 14.0312 46.2484C11.9986 50.2272 10.1248 53.5804 8.46873 56.5441C3.88435 64.7481 0.968262 69.9667 0.968262 77.2053C0.968262 89.5222 11.3443 103.613 26.703 103.613V1.4375ZM26.703 1.4375C27.2177 10.7016 31.7153 31.2553 39.3748 46.2484C41.4074 50.2272 43.2812 53.5804 44.9373 56.5441C49.5217 64.7481 52.4377 69.9667 52.4377 77.2053C52.4377 89.5222 42.0617 103.613 26.703 103.613V1.4375Z" fill="#17164B"/>
         </svg>
       //- title
-      h2.mb-6.text-3xl.font-semibold.text-violet-600.relative.z-10 Splits
+      h2.mb-6.text-3xl.font-semibold.text-violet-600.relative.z-10
+        | Splits
+        span.ml-12(style="font-size:1em") 💦
 
       //- .w-1x4.mx-auto
         <svg class="w-full block" viewBox="0 0 97 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio>

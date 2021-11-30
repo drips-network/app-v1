@@ -1,0 +1,7 @@
+<script setup>
+import InfoBar from '@/components/InfoBar'
+</script>
+
+<template lang="pug">
+info-bar.justify-center.font-bold Loading...
+</template>

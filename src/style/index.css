@@ -39,6 +39,9 @@ html {
 .btn-mdd {
   @apply h-64;
 }
+/* .btn-mddd {
+  @apply h-72;
+} */
 .btn-lg {
   @apply h-80 text-xl font-semibold pt-2;
 }
@@ -79,7 +82,7 @@ html {
   &.router-link-exact-active { @apply btn-white }
 }
 .btn-active-violet {
-  &.router-link-exact-active { @apply bg-violet-600 }
+  &.router-link-exact-active { @apply bg-violet-600 text-white }
   @apply border-2 border-transparent notouch_hover_border-violet-600;
 }
 

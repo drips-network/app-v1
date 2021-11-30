@@ -44,7 +44,7 @@ onBeforeMount(() => {
 
     //- (join btn)
     template(v-if="!isUsersProject")
-      router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt") Join
+      router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt") View
 
   //- progress bar
   project-progress-bar.my-20(:meta="meta")

@@ -67,7 +67,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- drips from
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
-      h6 💧&nbsp; Drips In
+      h6 🧩&nbsp; Member Tokens
     template(v-if="nfts") {{ nfts.length }}
       //- .flex.items-center
         | {{ nfts.length }}
@@ -80,7 +80,8 @@ section.project-stats.flex.w-full_10.-mx-5
   //- total revenue
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
     template(v-slot:header)
-      h6.flex.items-center
+      h6 💦&nbsp; Splits
+      //- h6.flex.items-center
         div
           <icon-split/>
         | Splits

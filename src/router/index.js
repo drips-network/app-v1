@@ -27,17 +27,41 @@ const routes = [
       {
         path: '',
         name: 'user',
+        redirect: { name: 'user-projects' }
+      },
+      // projects
+      {
+        path: 'projects',
+        name: 'user-projects',
         component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
       },
+      // memberships
+      {
+        path: 'memberships',
+        name: 'user-out-memberships',
+        component: () => import(/* webpackChunkName: "user-memberships" */ '../views/user/UserMemberships.vue')
+      },
+      // drips
       {
         path: 'drips',
         name: 'user-drips',
-        component: () => import(/* webpackChunkName: "user-drips" */ '../views/user/UserDrips.vue')
+        redirect: { name: 'user-drips-in' }
       },
+      {
+        path: 'drips/in',
+        name: 'user-drips-in',
+        component: () => import(/* webpackChunkName: "user-drips-in" */ '../views/user/UserDripsIn.vue')
+      },
+      {
+        path: 'drips/out',
+        name: 'user-drips-out',
+        component: () => import(/* webpackChunkName: "user-drips-out" */ '../views/user/UserDripsOut.vue')
+      },
+      // splits
       {
         path: 'splits',
         name: 'user-splits',
-        component: () => import(/* webpackChunkName: "user-splits" */ '../views/user/UserSplits.vue')
+        component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
       }
     ]
   }
@@ -45,7 +69,19 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior (to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      // don't scroll to top on user tab changes...
+      if (to.name.includes('user') && from.name.includes('user')) {
+        return
+      }
+      // scroll to top
+      return { top: 0 }
+    }
+  }
 })
 
 export default router

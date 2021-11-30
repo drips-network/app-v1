@@ -2,30 +2,52 @@
 // TODO - beforeRouteEnter() redirect if address is a project!
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
+import IconSplit from '@/components/IconSplit'
 </script>
 
 <template lang="pug">
 article.profile.pb-80
-  header.mt-40.px-36
+  header.mt-52.px-36
     .flex.items-endff.items-center.justify-between.w-full
       //- user tag
       .h-160.rounded-full.bg-indigo-700.flex.items-center
-        avatar-blockie.w-112.mx-24(:address="$route.params.address", width="112")
-        h1.text-2xl.font-semibold.pr-60
+        avatar-blockie.w-112.mx-24.mr-36(:address="$route.params.address", width="112")
+        h1.text-2xl.font-bold.pr-60
           template(v-if="$route.params.address === $store.state.address") You
           template(v-else)
             addr(:address="$route.params.address")
-      //-
-      //- button.ml-12.btn.btn-mdd.btn-outline.font-semibold.text-md.px-32 Fund&nbsp; 🌈
-      template(v-if="$route.params.address !== $store.state.address")
-        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32 Fund&nbsp; 🌈
 
-    nav.my-40.flex
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-36.mr-1(:to="{ name: 'user', params: $route.params }") Projects
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40.mr-1(:to="{ name: 'user-drips', params: $route.params }") Memberships
-      router-link.btn.btn-dark.btn-active-violet.btn-lg.px-40.mr-1(:to="{ name: 'user-splits', params: $route.params }") Splits
+      //- (drip-to btn)
+      template(v-if="!$store.getters.isWalletAddr($route.params.address)")
+        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl Drip to 0x... 💧
 
-  main#main
-    router-view
+    nav.mt-52.mb-20
+      .flex.items-start.justify-between.text-violet-650
+        .flex.tracking-wide
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-projects', params: $route.params }")
+            span.mr-12.-ml-2(style="font-size:1.27em") ✨
+            | Projects
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-out-memberships', params: $route.params }")
+            span.mr-14.-ml-4(style="font-size:1.23em") 🧩
+            | Memberships
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet text-white': $route.name.includes('drips') }")
+            span.mr-14.-ml-5(style="font-size:1.18em") 💧
+            | Drips
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-splits', params: $route.params }")
+            span.mr-16.-ml-5.-mt-2(style="font-size:1.28em") 💦
+            | Splits
+
+        //- (drips IN/OUT submenu)
+        template(v-if="$route.name.includes('user-drips')")
+          //- horizontal stem
+          //- .w-40.h-40.border-b-2.border-indigo-700
+          //- submenu body
+          .h-80.rounded-full.flex.items-center.px-7.bg-indigo-700
+            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-in', params: $route.params }", ) In
+            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-out', params: $route.params }", ) Out
+
+  main#main.px-36.min-h-screen
+
+    router-view(:key="$route.path")
 
 </template>

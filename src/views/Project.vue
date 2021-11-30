@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
@@ -11,7 +11,7 @@ import SvgTwitter from '@/components/SvgTwitter'
 import SvgGithub from '@/components/SvgGithub'
 import SvgDiscord from '@/components/SvgDiscord'
 import SvgDai from '@/components/SvgDai'
-import ProjectDrips from '@/components/ProjectDrips'
+import ProjectSplits from '@/components/ProjectSplits'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import ProjectStats from '@/components/ProjectStats'
 import Addr from '@/components/Addr'
@@ -71,6 +71,7 @@ onBeforeMount(async () => {
   }
 })
 
+provide('projectMeta', meta)
 </script>
 
 <template lang="pug">
@@ -122,7 +123,7 @@ article.project.pb-96
               svg-discord.block
 
         .mt-44
-          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Fund 🌈
+          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Drip 💧
 
           .mt-16.text-violet-600(v-if="nftType") Min. {{ minDAI }} DAI/mo
         //- p
@@ -133,7 +134,7 @@ article.project.pb-96
         project-stats(v-if="project", :project="project", :meta="meta", :drips="drips")
 
       //- (memberships)
-      section.mt-112(v-if="meta.memberships && meta.memberships.length")
+      //- section.mt-112(v-if="meta.memberships && meta.memberships.length")
         ul.flex.justify-center
           //- memberships...
           li.w-1x4.mx-5(v-for="membership in meta.memberships")
@@ -153,8 +154,8 @@ article.project.pb-96
                   //- TODO: join click
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
-    //- drips list
-    project-drips(v-if="drips", :drips="drips")
+    //- splits list
+    project-splits(v-if="drips", :drips="drips")
 
     //- (owner actions)
     template(v-if="canEdit")
