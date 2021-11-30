@@ -27,17 +27,35 @@ const routes = [
       {
         path: '',
         name: 'user',
+        redirect: { name: 'user-in-projects' }
+      },
+      // incoming funds
+      {
+        path: 'projects',
+        name: 'user-in-projects',
+        alias: 'user',
         component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
       },
       {
-        path: 'drips',
-        name: 'user-drips',
-        component: () => import(/* webpackChunkName: "user-drips" */ '../views/user/UserDrips.vue')
+        path: 'drips/in',
+        name: 'user-in-drips',
+        component: () => import(/* webpackChunkName: "user-drips-in" */ '../views/user/UserDripsIn.vue')
+      },
+      // outgoing funds
+      {
+        path: 'drips/out',
+        name: 'user-out-drips',
+        component: () => import(/* webpackChunkName: "user-drips-out" */ '../views/user/UserDripsOut.vue')
       },
       {
-        path: 'splits',
-        name: 'user-drips-splits',
-        component: () => import(/* webpackChunkName: "user-splits" */ '../views/user/UserSplits.vue')
+        path: 'memberships',
+        name: 'user-out-memberships',
+        component: () => import(/* webpackChunkName: "user-memberships" */ '../views/user/UserMemberships.vue')
+      },
+      {
+        path: 'splits/out',
+        name: 'user-out-splits',
+        component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
       }
     ]
   }

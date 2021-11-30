@@ -1,53 +1,28 @@
 <script setup>
-import UserNft from '@/components/UserNFT'
-import { ref, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router'
-import api from '@/api'
-
-const route = useRoute()
-
-const nfts = ref(null)
-
-const fetchUserNFTs = (nftReceiver) => {
-  return api({
-    variables: { nftReceiver },
-    query: `
-      query ($nftReceiver: Bytes!) {
-        nfts (where: {nftReceiver: $nftReceiver}) {
-          id
-          tokenId
-          owner: nftReceiver
-          projectAddress: nftRegistryAddress
-          typeId: nftTypeId
-          amtPerSec
-        }
-      }
-    `
-  })
-}
-
-onBeforeMount(async () => {
-  try {
-    const resp = await fetchUserNFTs(route.params.address)
-    nfts.value = resp.data.nfts
-  } catch (e) {
-    console.error(e)
-  }
-})
+import IconSplits from '@/components/IconSplit'
 </script>
 
 <template lang="pug">
-section.user-drips
-  //- .flex.justify-center.mb-40
-    .mx-auto.bg-indigo-800.rounded-2xlb.py-24.px-32.text-md.text-violet-650
-      | <b>Drips</b> from <b>Memberships</b> appear here.
+section.user-splits.mx-40
+  .border.border-violet-700.rounded-full.text-md.text-violet-650
 
-  template(v-if="nfts")
-    ul.flex.flex-wrap.px-20.w-full
-      //- nfts...
-      li.px-20.w-1x2.mb-40(v-for="nft in nfts")
-        user-nft(:nft="nft")
+    template(v-if="$store.state.address && $route.params.address === $store.state.address")
+      .h-80.flex.items-center.justify-between
+        .ml-32 <b>Split</b> revenue with others...
 
-  template(v-else)
-    p.px-40 Loading...
+        .flex.justify-center.mr-12
+          button.btn.btn-md.text-white.btn-violet.pl-24.pr-16.font-semibold
+            | Add Splits
+            .ml-8
+              icon-splits
+
+    template(v-else)
+      .h-80.flex.items-center.justify-center
+        | These addresses are splitting funds with 0x...
+        br
+        | These addresses are dripping funds to 0x... directly.
+        br
+        | 0x... supports
+        //- | This user is not splitting any revenue.
+
 </template>

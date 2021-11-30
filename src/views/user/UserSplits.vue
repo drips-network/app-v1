@@ -18,6 +18,9 @@ section.user-splits.mx-40
 
     template(v-else)
       .h-80.flex.items-center.justify-center
-        | This user is not splitting any revenue.
+        | These addresses are splitting funds with 0x...
+        br
+        | These addresses are dripping funds to you directly.
+        //- | This user is not splitting any revenue.
 
 </template>

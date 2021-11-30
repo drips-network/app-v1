@@ -68,7 +68,8 @@ module.exports = {
         500: '#212064', // subtle borders
         600: '#4949DD', // bright bg's
         650: '#5151ff', // brighter for text
-        700: '#28258E' // bright borders
+        700: '#28258E', // bright borders
+        800: 'rgb(31 29 110)' // duller border, match shadow
       },
       indigo: {
         700: '#17164B',

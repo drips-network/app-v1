@@ -3,6 +3,8 @@ import UserProject from '@/components/UserProject'
 import { ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/api'
+import InfoBar from '@/components/InfoBar'
+import Addr from '@/components/Addr'
 
 const route = useRoute()
 
@@ -34,18 +36,24 @@ onBeforeMount(async () => {
 </script>
 
 <template lang="pug">
-section.user-projects
+section.user-projects.mx-40
   h2.sr-only Projects
 
   //- p.mx-40.mb-40.border.border-violet-700.rounded-full.text-md.text-violet-650.h-80.flex.items-center.justify-center
     div Incoming funds from <b>Drips</b> form <b>Pools</b>.
 
+  info-bar.justify-center.px-32.mb-20
+    div
+      template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
+      template(v-else) #[addr.font-bold(:address="$route.params.address")] is
+      | &nbsp;collecting funds in <b>{{ projects.length }}</b> project{{ projects.length === 1 ? '' : 's' }}
+
   template(v-if="projects")
-    ul.px-40
+    ul
       //- projects...
       li(v-for="project in projects")
         user-project(:project="project")
 
   template(v-else)
-    p.px-40 Loading...
+    p Loading...
 </template>

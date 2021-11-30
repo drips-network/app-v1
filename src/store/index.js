@@ -42,7 +42,8 @@ export default createStore({
     }
   },
   getters: {
-    addrShort: () => (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...'
+    addrShort: () => (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...',
+    isWalletAddr: (state) => (addr) => addr === state.address
   },
   mutations: {
     SIGN_IN (state, address) {

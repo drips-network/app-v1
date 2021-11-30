@@ -45,6 +45,11 @@ store.dispatch('init')
   -moz-osx-font-smoothing: grayscale;
 }
 
+.font-sans{
+  /* inter font features? (doesn't seem to work like Inter on app.radicle.network/orgs) */
+  /* font-feature-settings: "ss01", "ss02", "cv01", "cv03"; */
+}
+
 /* purgecss start ignore */
 .web3modal-modal-lightbox{
   z-index: 50 !important;
