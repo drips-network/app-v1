@@ -1,13 +1,15 @@
-<script>
-</script>
-
 <script setup>
 import { ref, computed } from 'vue'
-export default { inheritAttrs: false }
 const props = defineProps(['id', 'name', 'value', 'modelValue'])
 const emit = defineEmits(['update:modelValue'])
 const isChecked = computed(() => props.value === props.modelValue)
 const onChange = () => emit('update:modelValue', props.value)
+</script>
+
+<script>
+export default {
+  inheritAttrs: false
+}
 </script>
 
 <template lang="pug">
