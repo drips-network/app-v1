@@ -23,14 +23,15 @@ store.dispatch('init')
       router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'home'}") Explore
       //- (profile btn)
       template(v-if="$store.state.address")
-        .group.btn.btn-sm.btn-darker.pl-6.pr-12.text-violet-650.font-semibold
-          router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")
-            //- avi
-            avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28")
-            //- address
-            | {{ $store.getters.addrShort($store.state.address) }}
-          button.notouch_hidden.notouch_group-hover_block.ml-12.ml-10(@click="$store.dispatch('disconnect')", title="Disconnect")
-            svg-x.h-12.w-12.text-white.mr-6(strokeWidth="1.5")
+        .btn.btn-sm.bg-indigo-900
+          .btn-darker.pl-6.text-violet-650.font-semibold.rounded-full
+            router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")
+              //- avi
+              avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28")
+              //- address
+              | {{ $store.getters.addrShort($store.state.address) }}
+          button.ml-2.p-10.mr-8.notouch_hover_text-white(@click="$store.dispatch('disconnect')", title="Disconnect")
+            svg-x.h-10.w-10(strokeWidth="1.5")
       //- (disconnect btn)
       template(v-else)
         button.btn.btn-sm.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
