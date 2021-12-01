@@ -100,6 +100,7 @@ module.exports = {
       lg: ['2rem', { lineHeight: '2.4rem' }],
       // lgg: ['2.2rem', { lineHeight: '2.6rem' }],
       xl: ['2.4rem', { lineHeight: '2.8rem' }],
+      xll: ['2.8rem', { lineHeight: '3.2rem' }],
       '2xl': ['3.2rem', { lineHeight: '1' }],
       '3xl': ['3.6rem', { lineHeight: '1' }],
       '3xlb': ['4.0rem', { lineHeight: '1' }],

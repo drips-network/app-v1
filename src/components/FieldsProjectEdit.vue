@@ -65,29 +65,30 @@ section
       input(v-model="owner", placeholder="owner", disabled)
   .my-10(v-if="props.isNewProject")
     input-body(label="Name*", :isFilled="modelValue.name.length")
-      input(v-model="modelValue.name", placeholder="Name*", required, autocomplete="new-password")
+      input(v-model="modelValue.name", placeholder="Computer Club", required, autocomplete="new-password")
   .my-10(v-if="props.isNewProject")
     //- TODO: format/validate symbol text?
-    input-body(label="Symbol*", :isFilled="modelValue.symbol.length")
-      input(v-model="modelValue.symbol", placeholder="Symbol*", required)
+    input-body(label="Member Token Symbol*", :isFilled="modelValue.symbol.length")
+      input(v-model="modelValue.symbol", placeholder="CC", required)
   .my-10
     //- TODO: use textarea
     input-body(label="Description", :isFilled="modelValue.descrip.length")
-      input(v-model="modelValue.descrip", placeholder="Description")
+      input(v-model="modelValue.descrip", placeholder="A club for computers.")
   .my-10
-    input-body(label="Website", :isFilled="modelValue.website.length", format="code")
-      input(v-model="modelValue.website", placeholder="Website", type="url")
+    input-body(label="Website URL", :isFilled="modelValue.website.length", format="code")
+      input(v-model="modelValue.website", placeholder="https://computers.club", type="url")
   .my-10
+    //- TODO: validate twitter
     input-body(label="Twitter Handle", :isFilled="modelValue.twitter.length")
-      input(v-model="modelValue.twitter", placeholder="Twitter")
+      input(v-model="modelValue.twitter", placeholder="computerclub")
   .my-10
-    input-body(label="Discord Invite Link", :isFilled="modelValue.discord.length")
-      input(v-model="modelValue.discord", placeholder="Discord")
+    input-body(label="Discord Invite URL", :isFilled="modelValue.discord.length", format="code")
+      input(v-model="modelValue.discord", placeholder="https://discord.com/...")
   .my-10
-    input-body(label="Radicle Project ID", :isFilled="modelValue.radicleProjectId.length", format="code")
-      input(v-model="modelValue.radicleProjectId", placeholder="Radicle Project ID")
+    input-body(label="Radicle ID", :isFilled="modelValue.radicleID.length", format="code")
+      input(v-model="modelValue.radicleID", placeholder="rad:git:hnrkq4w6pnnzpurokehxs69rbcqt6n4ipdfwy")
   .my-10
-    input-body(label="Github Project URL", :isFilled="modelValue.githubProject.length", format="code")
-      input(v-model="modelValue.githubProject", placeholder="Github Project URL", type="url")
+    input-body(label="GitHub Project URL", :isFilled="modelValue.githubProject.length", format="code")
+      input(v-model="modelValue.githubProject", placeholder="https://github.com/...", type="url")
 
 </template>

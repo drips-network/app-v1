@@ -30,16 +30,22 @@ const slots = useSlots()
 
 <template lang="pug">
 .input-body.relative
-  label.absolute.top-0.left-0.w-full.text-center.text-sm.text-violet-600.pt-4(:class="{'opacity-0': !isFilled}") {{ props.label }}
+  label.absolute.top-0.left-0.w-full.text-center.text-mss.text-violet-600.pt-5(:class="{'opacity-0ff': !isFilled}") {{ props.label }}
 
   //- field (input, textarea)
-  .min-h-80.flex.items-center.font-semibold.rounded-2xl.text-center(:class="[styling, themeing]")
+  .h-80.flex.items-center.font-semibold.rounded-2xl.text-center.leading-none.pt-9(:class="[styling, themeing]")
     slot
+
+    //- (symbol: dai)
+    template(v-if="props.symbol === 'dai'")
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+        .flex.items-center
+          svg-dai(size="lg").text-violet-650
 
     //- (symbol: daipermo)
     template(v-if="props.symbol === 'daipermo'")
       .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
-        .flex.items-center
+        .flex.items-center.text-violet-600
           svg-dai(size="lg")
           .text-lg.ml-4.tracking-tight / MO
 </template>
@@ -50,7 +56,7 @@ const slots = useSlots()
       @apply w-full h-80 flex items-center;
       &::placeholder{
         /* TODO: maybe font style <label> instead of placeholder... */
-        @apply font-sans text-xl;
+        /* @apply text-xl; */
       }
     }
     & textarea {

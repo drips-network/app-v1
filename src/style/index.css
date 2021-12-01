@@ -101,13 +101,13 @@ input, textarea {
   resize:none;
   min-width:0;
   &::placeholder{
-    opacity:0.5;
+    opacity:0.25;
     @apply text-violet-600;
   }
   &:focus{
     outline:none;
     &::placeholder{
-      opacity: 0.6;
+      /* opacity: 0.6; */
     }
   }
 }
@@ -125,5 +125,5 @@ input[type=number] {
 }
 
 .input-group {
-  @apply  rounded-2xlb bg-indigo-800 p-12;
+  @apply  rounded-2xlb bg-indigo-700 p-12;
 }

@@ -21,17 +21,18 @@ defineExpose({ open, close })
 
 <template lang="pug">
 section.panel.panel-dark.w-full.max-w-screen-sm.text-center
-  //- collapsed bar
-  button.h-80.w-full.flex.items-center.justify-center.relative.text-2xl.font-semibold.group(v-show="isCollapsed", @click.prevent="open")
+  //- (collapsed bar)
+  button.h-80.w-full.flex.items-center.justify-center.relative.text-xll.font-semibold.group(v-show="isCollapsed", @click.prevent="open")
+    //-
     .absolute.top-0.left-24.h-full.flex.items-center.text-xl {{ icon }}
     | {{ label }}
     .absolute.top-0.right-20.h-full.flex.items-center
       svg-pen.h-28.text-white.opacity-30.notouch_group-hover_opacity-100
 
-  //- open body
+  //- (open body)
   .pt-44.px-24.pb-24(v-show="!isCollapsed")
     header.mb-40.text-center
-      .mb-20.text-2xl(v-if="icon") {{ icon }}
+      .mb-24.text-3xl(v-if="icon") {{ icon }}
 
       .text-2xl.font-semibold.mb-40
         slot(name="header")

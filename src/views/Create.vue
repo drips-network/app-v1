@@ -60,7 +60,7 @@ const meta = ref({
   twitter: '',
   discord: '',
   // radicleOrg: '', // TODO
-  radicleProjectId: '',
+  radicleID: '',
   githubProject: '',
   goal: undefined,
   memberships: [newMembershipTempl()]
@@ -169,7 +169,7 @@ article.create.py-80.relative
     //- 1. PROJECT
     panel.mx-auto(ref="projectPanel", label="Project", icon="✨")
       template(v-slot:header)
-        h2 Project
+        h2 New Project
       section
         //- (connect bt)
         template(v-if="!owner")
@@ -186,9 +186,9 @@ article.create.py-80.relative
 
     //- 2. FUNDING
 
-    panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="Funding", icon="🌈")
+    panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="Member Tokens", icon="🧩")
       template(v-slot:header)
-        h2 Funding
+        h2 Member Tokens
 
       //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
 
@@ -199,7 +199,7 @@ article.create.py-80.relative
             button.absolute.overlay.flex.items-center.justify-center
               div.pt-16
                 .text-xl.font-semibold.mb-16 Subscriptions
-                p.text-violet-600 Recurring income from<br>your community
+                p.text-violet-600 Recurring income from<br>your community.
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
               .bg-violet-700.rounded-full.w-full
@@ -218,11 +218,11 @@ article.create.py-80.relative
       section.mt-40
         //- input monthly goal
         input-body.my-10(label="Monthly Goal", :isFilled="typeof meta.goal === 'number'", symbol="daipermo")
-          input(v-model="meta.goal", type="number", placeholder="Monthly Goal", required)
+          input(v-model="meta.goal", type="number", placeholder="1000", required)
 
         //- input min rate
         input-body(label="Minimum Subscription", :isFilled="typeof minDAIPerMonth === 'number'", symbol="daipermo")
-          input(v-model="minDAIPerMonth", type="number", placeholder="Minimum Subscription", required)
+          input(v-model="minDAIPerMonth", type="number", placeholder="10", required)
 
         .mt-40(v-show="step === 1")
           //- submit btn
@@ -231,9 +231,9 @@ article.create.py-80.relative
 
     //- 3. MEMBERSHIPS
 
-    panel.mx-auto.my-24(v-show="step > 1", ref="membershipsPanel", label="Memberships", icon="🏅")
+    panel.mx-auto.my-24(v-show="step > 1", ref="membershipsPanel", label="Benefits", icon="🏅")
       template(v-slot:header)
-        h2 Memberships
+        h2 Benefits
 
       p Optionally, set membership levels with different benefits you will provide.
 
@@ -245,17 +245,18 @@ article.create.py-80.relative
             .flex.-mx-5
               .w-1x2.px-5
                 input-body(label="Name", :isFilled="meta.memberships[i].name.length", theme="dark")
-                  input(v-model="meta.memberships[i].name", placeholder="Name", autocomplete="new-password")
+                  input(v-model="meta.memberships[i].name", placeholder="Bronze", autocomplete="new-password")
               .w-1x2.px-5
-                input-body(label="Min DAI", :isFilled="typeof meta.memberships[i].minDAI === 'number'", theme="dark")
-                  input(v-model="meta.memberships[i].minDAI", type="number", min="0", placeholder="Min DAI")
+                input-body(label="Min DAI", :isFilled="typeof meta.memberships[i].minDAI === 'number'", theme="dark", symbol="dai")
+                  input(v-model="meta.memberships[i].minDAI", type="number", min="0", placeholder="10")
 
             ul
               //- perks...
               li.relative.mt-10(v-for="(perk, ii) in membership.perks")
+                //- benefit input
                 input-body(label="Benefit", :isFilled="meta.memberships[i].perks[ii].length", theme="dark")
-                  input(v-model="meta.memberships[i].perks[ii]", placeholder="Benefit", @keydown="e => onPerkInputKeydown(e, i, ii)")
-                //-
+                  input(v-model="meta.memberships[i].perks[ii]", placeholder="Discord access", @keydown="e => onPerkInputKeydown(e, i, ii)")
+                //- add perk row btn
                 template(v-if="ii === membership.perks.length - 1")
                   .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-12
                     button.bg-indigo-800.flex.items-center.justify-center.h-54.w-54.rounded-full(@click.prevent="addPerk(i)")
@@ -273,7 +274,7 @@ article.create.py-80.relative
       template(v-slot:header)
         h2 Drips
 
-      p Share revenue with others with drips.<br>Add anything with an Ethereum address.
+      p Share revenue with others with <b>Drips</b>.<br>Add any Ethereum address and specify a percent of revenue.
 
       //- drips list
       //- form.mt-60(@submit.prevent="submit", autocomplete="off")
@@ -283,16 +284,17 @@ article.create.py-80.relative
           section.my-10.input-group
             //- input address
             .mb-10
-              input-body(label="ETH/ENS Address", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
-                input(v-model="drips[i].address", placeholder="ETH Address", autocomplete="new-password", @keydown="e => onDripInputKeydown(e, i)")
+              input-body(label="Ethereum Address", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
+                //- TODO: validate ethereum address
+                input(v-model="drips[i].address", placeholder="0x68fc...", autocomplete="new-password", @keydown="e => onDripInputKeydown(e, i)")
             //- input percent
             .flex.-mx-5
               //- .w-3x4.px-5
                 input-body(label="Name", :isFilled="drips[i].name.length", theme="dark")
                   input(v-model="drips[i].name", placeholder="Name")
               .flex-1
-                input-body(label="Drip Amount (%)", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
-                  input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="%")
+                input-body(label="% of Revenue", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
+                  input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5")
 
         button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
           svg-plus-minus-radicle
