@@ -5,10 +5,14 @@ import Panel from '@/components/Panel'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import Addr from '@/components/Addr'
 import InputBody from '@/components/InputBody'
+import InputRadio from '@/components/InputRadio'
 import SvgDai from '@/components/SvgDai'
 import { constants } from 'ethers'
 
 const props = defineProps(['address'])
+
+const dripAmt = ref(10)
+const dripType = ref('monthly')
 
 // const minDAIPerSec = constants.WeiPerEther // 1 DAI (bn)
 const minDAIPerMonth = 1 // minDAIPerSec.mul(30 * 24 * 60 * 60) // bn
@@ -55,51 +59,31 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="💧")
 
     template(v-slot:header)
-      dialog-title Drip to #[addr.text-violet-650(:address="props.address")]
+      dialog-title.leading-snug Drip to<br>#[addr.text-violet-650(:address="props.address")]
 
-    //- template(v-slot:description)
-      dialog-description.text-base.mx-auto.leading-relaxed(style="max-width:26em")
-        | Stream funds directly to #[addr.font-bold(:address="props.address")].
-        br
-        | Their income will also be shared among the addresses they've added as <b>Splits</b>.
+    template(v-slot:description)
+      dialog-description.text-base.mx-auto.leading-relaxed(style="max-widthff:26em")
+        template(v-if="dripType === 'monthly'")
+          | Stream DAI on a <b>monthly</b> basis.
+        template(v-if="dripType === 'split'")
+          | Share a <b>percent</b> of your incoming funds.
 
-    .h-80.border.btn.btn-outline.h-80.my-20
+    form(@submit.prevent, validate)
+      //- amount input
+      input.h-80.w-full.flex.items-center.justify-center.rounded-full.border.border-violet-700.focus_border-violet-600.text-2xl.font-semibold(type="number", v-model="dripAmt", min="0.01", step="0.01")
 
-    .flex
-      .w-1x2.bg-violet-600.h-80.flex.items-center.rounded-full.justify-center.text-xl DAI
-      .w-1x2.bg-violet-600.h-80.flex.items-center.rounded-full.justify-center.text-xl %
+      .mt-10.flex
+        //- option monthly
+        .w-1x2.pr-3
+          input-radio.w-full(v-model="dripType", value="monthly", name="drip type") DAI/month
+        //- option split
+        .w-1x2.pl-3
+          input-radio.w-full(v-model="dripType", value="split", name="drip type") % of drips
 
-    //- form(@submit.prevent, validate)
+      //- input-body.mt-10(v-show="dripType === 'monthly'", label="Pre-pay Months")
+        input(v-model="prePayMonths", type="number", min="1", step="1" required)
 
-      //- input rate
-      input-body.my-10(label="Monthly Rate (min 1)", symbol="dai")
-        input(v-model="rate", type="number", placeholder="1", :min="minDAIPerMonth", step="1", required)
-
-      //- input months prepay
-      input-body.my-10(label="Pre-pay (Months)", :isFilled="typeof prePayMonths === 'number'")
-        input(v-model="prePayMonths", type="number", placeholder="Pre-pay (Months)", min="1", step="1", required)
-
-      //- total due
-      .rounded-full.px-28.h-80.bg-indigo-700.flex.justify-between.items-center.font-semibold
-        .text-lg TOTAL
-        .text-2xl.flex.items-center
-          | {{ payTotalDAI }}
-          svg-dai.h-28.ml-16
-
-      //- (approve btn)
-      template(v-if="!approved")
-        .mt-40.mb-12.flex.justify-center
-          button.btn.btn-lg.btn-violet.min-w-sm.mx-auto(@click="approve")
-            template(v-if="approveTx") Approving...
-            template(v-else) 1. Approve
-
-      //- (drip btn)
-      template(v-else)
-        .mt-40.mb-6.flex.justify-center
-          button.btn.btn-lg.btn-violet.px-60.mx-auto(@click="drip", :disabled="!approved", :class="{'opacity-25': !approved}")
-            template(v-if="dripTx") Submitting...
-            template(v-else)
-              template(v-if="!approved") 2.
-              | Drip
+      .mt-40.mb-6
+        button.btn.btn-lg.btn-violet.px-60.mx-auto.tracking-wider Drip 💧
 
 </template>
