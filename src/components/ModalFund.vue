@@ -120,14 +120,14 @@ modal(v-bind="$attrs", @close="$emit('close')")
           | {{ payTotalDAI }}
           svg-dai.h-28.ml-16
 
-      //- TODO - show as second button for better UX
+      //- (approve btn)
       template(v-if="!state.approved")
         .mt-40.mb-12.flex.justify-center
           button.btn.btn-lg.btn-violet.min-w-sm.mx-auto(@click="approve")
             template(v-if="state.approveTx") Approving...
             template(v-else) 1. Approve
 
-      //- (fund button)
+      //- (drip btn)
       template(v-if="!state.nft")
         .mt-40.flex.justify-center
           button.btn.btn-lg.btn-violet.px-60.mx-auto(@click="mint", :disabled="!state.approved", :class="{'opacity-25': !state.approved}")

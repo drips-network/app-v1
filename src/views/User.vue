@@ -1,8 +1,12 @@
 <script setup>
 // TODO - beforeRouteEnter() redirect if address is a project!
+import { ref } from 'vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
 import IconSplit from '@/components/IconSplit'
+import ModalDripTo from '@/components/ModalDripTo'
+
+const dripModalOpen = ref(false)
 </script>
 
 <template lang="pug">
@@ -19,7 +23,7 @@ article.profile.pb-80
 
       //- (drip-to btn)
       template(v-if="!$store.getters.isWalletAddr($route.params.address)")
-        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl Drip to 0x... 💧
+        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true") Drip to 0x... 💧
 
     nav.mt-52.mb-20
       .flex.items-start.justify-between.text-violet-650
@@ -49,5 +53,8 @@ article.profile.pb-80
   main#main.px-36.min-h-screen
 
     router-view(:key="$route.path")
+
+  //- modals
+  modal-drip-to(v-if="dripModalOpen", :address="$route.params.address", :open="dripModalOpen", @close="dripModalOpen = false")
 
 </template>
