@@ -77,22 +77,11 @@ section.project-stats.flex.w-full_10.-mx-5
         </span>
     template(v-else) ...
 
-  //- total revenue
-  project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
-    template(v-slot:header)
-      h6 💦&nbsp; Splits
-      //- h6.flex.items-center
-        div
-          <icon-split/>
-        | Splits
-    template(v-if="drips") {{ drips.length }}
-    template(v-else) ...
-    //- .flex.items-center 0 <span class="hiddenff ml-3" style="font-size:0.65em">💦</span>
-
   //- Goal
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
+    //- TODO Dai/mo vs DAI
     template(v-slot:header)
-      h6 🏁&nbsp; Goal
+      h6 🏁&nbsp; Monthly Goal
     template(v-if="props.meta")
       .flex.items-end
         | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
@@ -114,4 +103,16 @@ section.project-stats.flex.w-full_10.-mx-5
       .absolute.bottom-0.right-0.p-22
         svg-dai.h-16.text-violet-650
     template(v-else) ...
+
+  //- total revenue
+  project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
+    template(v-slot:header)
+      h6 💦&nbsp; Splits
+      //- h6.flex.items-center
+        div
+          <icon-split/>
+        | Splits
+    template(v-if="drips") {{ drips.length }}
+    template(v-else) ...
+    //- .flex.items-center 0 <span class="hiddenff ml-3" style="font-size:0.65em">💦</span>
 </template>

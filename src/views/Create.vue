@@ -208,8 +208,8 @@ article.create.py-80.relative
           .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.opacity-50
             button.absolute.overlay.flex.items-center.justify-center.cursor-not-allowed(disabled)
               div.pt-16
-                .text-xl.font-semibold.mb-16 One-off Sale
-                p.text-violet-600 Create a limited edition<br> of single-purchase tokens.
+                .text-xl.font-semibold.mb-16 One-time Payment
+                p.text-violet-600 Create a limited edition membership.
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
               .bg-violet-700.rounded-full.w-full
@@ -270,11 +270,11 @@ article.create.py-80.relative
 
     //- 4. DRIPS
 
-    panel.mx-auto(v-show="step > 2", ref="dripsPanel", title="Drips", icon="💧")
+    panel.mx-auto(v-show="step > 2", ref="dripsPanel", title="Drips", icon="💦")
       template(v-slot:header)
-        h2 Drips
+        h2 Splits
 
-      p Share revenue with others with <b>Drips</b>.<br>Add any Ethereum address and specify a percent of revenue.
+      p Share revenue with others with <b>Splits</b>.<br>Add any Ethereum address and specify a percent of revenue.
 
       //- drips list
       //- form.mt-60(@submit.prevent="submit", autocomplete="off")

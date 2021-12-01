@@ -21,7 +21,7 @@ section.user-splits
 
   .mt-40
     button.btn.btn-lg.mx-auto.btn-violet.px-36(@click="modalSplitsOpen = true")
-      | {{ splits.length ? 'Edit' : 'Add' }} Splits 💦
+      | {{ splits.length ? 'Edit' : 'Add' }} Splits #[span.ml-10(style="font-size:1.2em") 💦]
 
   modal-splits-add(v-if="modalSplitsOpen", :open="modalSplitsOpen", @close="modalSplitsOpen = false")
 </template>
