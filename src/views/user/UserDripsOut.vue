@@ -13,6 +13,6 @@ section.user-splits
     div
       template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
       template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-      | &nbsp;<b>dripping</b> funds directly to <b>{{ dripsOut.length }} address{{ dripsOut.length === 1 ? '' : 'es' }}</b>
+      | &nbsp;<b>dripping</b> funds to <b>{{ dripsOut.length }} address{{ dripsOut.length === 1 ? '' : 'es' }}</b>
 
 </template>

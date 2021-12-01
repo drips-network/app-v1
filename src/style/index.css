@@ -73,7 +73,7 @@ html {
   }
 }
 .btn-violet{
-  @apply bg-violet-600 border-2 border-transparent;
+  @apply bg-violet-600 border-2 border-transparent text-white;
   &:not([disabled]) {
     @apply notouch_hover_border-white
   }

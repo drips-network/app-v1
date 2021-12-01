@@ -48,7 +48,7 @@ section.user-projects
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;raising funds in <b>{{ projects.length }} project{{ projects.length === 1 ? '' : 's' }}</b>
+        | &nbsp;raising funds in <b>{{ projects.length }} communities{{ projects.length === 1 ? '' : 's' }}</b>
 
     ul
       //- projects...

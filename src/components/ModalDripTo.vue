@@ -57,13 +57,19 @@ modal(v-bind="$attrs", @close="$emit('close')")
     template(v-slot:header)
       dialog-title Drip to #[addr.text-violet-650(:address="props.address")]
 
-    template(v-slot:description)
+    //- template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed(style="max-width:26em")
         | Stream funds directly to #[addr.font-bold(:address="props.address")].
         br
         | Their income will also be shared among the addresses they've added as <b>Splits</b>.
 
-    form(@submit.prevent, validate)
+    .h-80.border.btn.btn-outline.h-80.my-20
+
+    .flex
+      .w-1x2.bg-violet-600.h-80.flex.items-center.rounded-full.justify-center.text-xl DAI
+      .w-1x2.bg-violet-600.h-80.flex.items-center.rounded-full.justify-center.text-xl %
+
+    //- form(@submit.prevent, validate)
 
       //- input rate
       input-body.my-10(label="Monthly Rate (min 1)", symbol="dai")

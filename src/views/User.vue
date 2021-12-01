@@ -28,20 +28,20 @@ article.profile.pb-80
     nav.mt-52.mb-20
       .flex.items-start.justify-between.text-violet-650
         .flex.tracking-wide
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-projects', params: $route.params }")
-            span.mr-12.-ml-2(style="font-size:1.27em") ✨
-            | Projects
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-out-memberships', params: $route.params }")
-            span.mr-14.-ml-4(style="font-size:1.23em") 🧩
-            | Memberships
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet text-white': $route.name.includes('drips') }")
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-communities', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-communities') }")
+            span.mr-14.-ml-4(style="font-size:1.23em") 🙂
+            | Communities
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-drips') }")
             span.mr-14.-ml-5(style="font-size:1.18em") 💧
             | Drips
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-splits', params: $route.params }")
-            span.mr-16.-ml-5.-mt-2(style="font-size:1.28em") 💦
-            | Splits
 
-        //- (drips IN/OUT submenu)
+        //- (communities submenu)
+        template(v-if="$route.name.includes('user-communities')")
+          .h-80.rounded-full.flex.items-center.px-7.bg-indigo-700
+            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-communities', params: $route.params }") Created
+            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-communities-joined', params: $route.params }") Joined
+
+        //- (drips submenu)
         template(v-if="$route.name.includes('user-drips')")
           //- horizontal stem
           //- .w-40.h-40.border-b-2.border-indigo-700

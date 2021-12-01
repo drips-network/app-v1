@@ -27,25 +27,25 @@ const routes = [
       {
         path: '',
         name: 'user',
-        redirect: { name: 'user-projects' }
+        redirect: { name: 'user-communities' }
       },
       // projects
       {
-        path: 'projects',
-        name: 'user-projects',
+        path: 'communities',
+        name: 'user-communities',
         component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
       },
-      // memberships
+      // communities
       {
-        path: 'memberships',
-        name: 'user-out-memberships',
-        component: () => import(/* webpackChunkName: "user-memberships" */ '../views/user/UserMemberships.vue')
+        path: 'communities/joined',
+        name: 'user-communities-joined',
+        component: () => import(/* webpackChunkName: "user-communities" */ '../views/user/UserMemberships.vue')
       },
       // drips
       {
         path: 'drips',
         name: 'user-drips',
-        redirect: { name: 'user-drips-in' }
+        redirect: { name: 'user-drips-out' }
       },
       {
         path: 'drips/in',
@@ -56,13 +56,13 @@ const routes = [
         path: 'drips/out',
         name: 'user-drips-out',
         component: () => import(/* webpackChunkName: "user-drips-out" */ '../views/user/UserDripsOut.vue')
-      },
-      // splits
-      {
-        path: 'splits',
-        name: 'user-splits',
-        component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
       }
+      // splits
+      // {
+      //   path: 'splits',
+      //   name: 'user-splits',
+      //   component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
+      // }
     ]
   }
 ]

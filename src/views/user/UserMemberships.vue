@@ -48,9 +48,9 @@ section.user-memberships
   template(v-if="nfts")
     info-bar.mb-20.justify-center.px-32
       div
-        template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
-        template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;a <b>member</b> of <b>{{ nfts.length }} project{{ nfts.length === 1 ? '' : 's' }}</b>
+        template(v-if="$store.getters.isWalletAddr($route.params.address)") You
+        template(v-else) #[addr.font-bold(:address="$route.params.address")]
+        | &nbsp;joined <b>{{ nfts.length }} communities{{ nfts.length === 1 ? '' : 's' }}</b>
 
     section.px-2
       ul.flex.flex-wrap.w-full_40.-mx-20
