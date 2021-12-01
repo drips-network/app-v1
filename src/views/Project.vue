@@ -40,10 +40,10 @@ const getProjectMeta = async (ipfsHash) => {
   // TODO handle error for updating/editing meta?
 }
 
-onBeforeMount(async () => {
+const getProject = async () => {
   try {
     // get project...
-    project.value = (await store.dispatch('getProject', projectAddress))?.data?.fundingProject
+    project.value = await store.dispatch('getProject', projectAddress)
 
     if (!project.value) {
       status.value = 'Not Found :('
@@ -58,18 +58,29 @@ onBeforeMount(async () => {
       return false
     }
 
+    // get drips
+    store.dispatch('getProjectDrips', projectAddress).then(array => { drips.value = array })
+
+    // missing project info?
+    if (!project.value.projectOwner) {
+      console.log('project not found in API yet, refetching...')
+      // project likely just created and not in API yet (came from on-chain / partial data)
+      // retry every 1s...
+      return setTimeout(() => getProject(), 1000)
+    }
+
     // set nft
     nftType.value = project.value.nftTypes[0]
     minDAI.value = toDAIPerMo(nftType.value.minAmtPerSec)
 
-    // get drips
-    drips.value = await store.dispatch('getProjectDrips', projectAddress)
     return true
   } catch (e) {
     console.error(e)
     status.value = e.message ? 'Error: ' + e.message : 'Error'
   }
-})
+}
+
+onBeforeMount(() => getProject())
 
 provide('projectMeta', meta)
 </script>

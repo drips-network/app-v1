@@ -7,13 +7,12 @@ const props = defineProps({
   drips: Array
 })
 
-// TODO remove demo
 const myDrips = ref(props.drips)
 
 // TODO remove demo
-if (!myDrips.value.length) {
-  myDrips.value = Array(16).fill(0).map(() => ({ address: '0x87f3834fd4fce5781b4c12500de8b90b73342861', percent: 12 }))
-}
+// if (!myDrips.value.length) {
+//   myDrips.value = Array(16).fill(0).map(() => ({ address: '0x87f3834fd4fce5781b4c12500de8b90b73342861', percent: 12 }))
+// }
 </script>
 
 <template lang="pug">

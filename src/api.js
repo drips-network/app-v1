@@ -6,7 +6,7 @@ export default async function ({ query, variables }) {
   try {
     // cached ?
     let cached = sessionStorage.getItem(id)
-    if (cached) {
+    if (cached && cacheAPISec) {
       cached = JSON.parse(cached)
       const secSince = new Date().getTime() - cached.time
       if (secSince > cacheAPISec) {

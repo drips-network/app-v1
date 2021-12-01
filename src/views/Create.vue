@@ -133,9 +133,11 @@ async function submitProject () {
     projectAddress.value = await store.dispatch('waitForProjectCreate', tx.value)
 
     // go to project
-    // router.push({ name: 'project', params: { address } })
+    router.push({ name: 'project', params: { address: projectAddress.value.toLowerCase() } })
   } catch (e) {
     console.error(e)
+    alert('Error creating project')
+    tx.value = null
   }
 }
 
@@ -309,7 +311,8 @@ article.create.py-80.relative
     //- (create btn)
     .mt-40.flex.justify-center.w-full(v-show="step > 3")
       .text-center
-        button.btn.btn-xl.btn-white.min-w-md(type="submit")
+        button.btn.btn-xl.btn-white.min-w-md(type="submit", :disabled="tx")
+          template(v-if="projectAddress") Created!
           template(v-if="tx") Creating...
           template(v-else) Create ✨
 

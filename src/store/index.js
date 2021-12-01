@@ -212,7 +212,28 @@ export default createStore({
     },
 
     async getProject (_, projectAddress) {
-      return api({ query: queryProject, variables: { id: projectAddress } })
+      // check api
+      try {
+        // check api...
+        const project = await api({ query: queryProject, variables: { id: projectAddress } })
+
+        if (project) {
+          return project.data?.fundingProject
+        }
+
+        // check on-chain in case was just created...
+        const contract = getProjectContract(projectAddress)
+        const ipfsHash = await contract.contractURI()
+
+        if (ipfsHash) {
+          return { ipfsHash }
+        }
+
+        return null
+      } catch (e) {
+        console.error('@getProject', e)
+        return null
+      }
     },
 
     async getProjectMeta ({ dispatch }, { projectAddress, ipfsHash }) {
