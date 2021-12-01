@@ -95,7 +95,7 @@ module.exports = {
       sm: ['1.2rem', { lineHeight: '1.6rem' }],
       mss: ['1.4rem', { lineHeight: '1.6rem' }],
       ms: ['1.5rem', { lineHeight: '1.8rem' }],
-      base: ['1.6rem', { lineHeight: '2rem' }],
+      base: ['1.65rem', { lineHeight: '2rem' }],
       md: ['1.8rem', { lineHeight: '2.2rem' }],
       lg: ['2rem', { lineHeight: '2.4rem' }],
       // lgg: ['2.2rem', { lineHeight: '2.6rem' }],
