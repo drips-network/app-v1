@@ -53,7 +53,8 @@ module.exports = {
       144: '14.4rem',
       160: '16rem',
       180: '18rem',
-      196: '19.6rem'
+      196: '19.6rem',
+      260: '26rem'
     },
     colors: {
       transparent: 'transparent',
@@ -567,6 +568,7 @@ module.exports = {
       '5xl': '64rem',
       '6xl': '72rem',
       '7xl': '80rem',
+      '1x4': 'calc(100% / 4)',
       full: '100%',
       min: 'min-content',
       max: 'max-content'
