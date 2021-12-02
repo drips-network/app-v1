@@ -487,7 +487,7 @@ export default createStore({
       return contract.withdrawable(tokenId)
     },
 
-    async resolveAddr ({ state, getters, commit, dispatch }, { address, short = true }) {
+    async resolveAddress ({ state, getters, commit, dispatch }, { address, short = true }) {
       const fallback = short ? getters.addrShort(address) : address
       try {
         // saved?
@@ -503,6 +503,25 @@ export default createStore({
       } catch (e) {
         console.error(e)
         return fallback
+      }
+    },
+
+    async resolveENS ({ state, commit, dispatch }, ens) {
+      try {
+        // saved ?
+        let address = Object.keys(state.addresses).find(key => state.addresses[key] === ens)
+        if (address) return address
+        // resolve...
+        if (!provider) await dispatch('init')
+        address = await provider.resolveName(ens)
+        if (address) {
+          // save if resolved...
+          commit('SAVE_ADDRESS', { address, ens })
+        }
+        return address
+      } catch (e) {
+        console.error(e)
+        return null
       }
     },
 

@@ -9,7 +9,7 @@ const props = defineProps({
 const addr = ref(props.short ? store.getters.addrShort(props.address) : props.address)
 
 onBeforeMount(async () => {
-  addr.value = await store.dispatch('resolveAddr', {
+  addr.value = await store.dispatch('resolveAddress', {
     address: props.address,
     short: props.short
   })

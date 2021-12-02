@@ -1,29 +1,50 @@
 <script setup>
-// TODO - beforeRouteEnter() redirect if address is a project!
 import { ref } from 'vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
 import IconSplit from '@/components/IconSplit'
 import ModalDripTo from '@/components/ModalDripTo'
-// import store from '@/store'
-// import { utils } from 'ethers'
+import store from '@/store'
+import { utils } from 'ethers'
 
 const dripModalOpen = ref(false)
-
 </script>
 
 <script>
-export default {
-  async beforeRouteEnter (to, from, next) {
-    // TODO allow ENS Urls
-    // for now redirect ENS urls to the 0x...
-    // if (!utils.isAddress(to.params.address)) {
-    //   const address = await store.dispatch('resolveAddr', { ens: to.params.address, short: false })
-    //   next({ params: { address }})
-    // }
+const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
+  try {
+    // timeout for slow API prj lookup... (6s?)
+    const projectTimeout = setTimeout(() => {
+      console.warn('project lookup timeout. skipping...')
+      resolveRouteAddress(to, next, true)
+    }, 6000)
+    
+    // check if project? redirect...
+    if (!skipProjectLookup && await store.dispatch('getProject', to.params.address)) {
+      return next({ name: 'project', params: { address: to.params.address }})
+    }
+
+    clearTimeout(projectTimeout)
+    
+    // non-address? check if ENS name, redirect to 0x...
+    if (!utils.isAddress(to.params.address)) {
+      const address = await store.dispatch('resolveENS', to.params.address)
+      if (address) {
+        // TODO: allow ENS name urls instead of redirect
+        return next({ name: 'user', params: { address }})
+      }
+    }
+    // else
     next()
-    // next({ params: { address: ensOrAddr }})
+  } catch (e) {
+    console.error(e)
+    next()
   }
+}
+
+export default {
+  beforeRouteEnter: (to, from, next) => resolveRouteAddress(to, next),
+  beforeRouteUpdate: (to, from, next) => resolveRouteAddress(to, next)
 }
 </script>
 
