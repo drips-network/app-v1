@@ -113,7 +113,8 @@ article.project.pb-96
 
         //- project image
         figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative.overflow-hidden
-          img.absolute.overlay.object-cover.object-center(:src="ipfsUrl(meta.image)")
+          img.absolute.overlay.object-cover.object-center(v-if="meta.image", :src="ipfsUrl(meta.image)")
+          img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
         //- title
         h1.text-3xl.mb-36.font-semibold {{ meta.name }}
         //- descrip
@@ -134,7 +135,7 @@ article.project.pb-96
               svg-discord.block
 
         .mt-44
-          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Drip 💧
+          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Join 💧
 
           .mt-16.text-violet-600(v-if="nftType") Min. {{ minDAI }} DAI/mo
         //- p

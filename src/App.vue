@@ -10,7 +10,7 @@ store.dispatch('init')
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans
+#app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans.leading-normal
   header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
     //- left side
     router-link.pl-24.-ml-px.mb-px(to="/")

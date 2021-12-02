@@ -25,8 +25,9 @@ section.project-splits.relative
         </svg>
       //- title
       h2.mb-6.text-3xl.font-semibold.text-violet-600.relative.z-10
+        //- span.mr-12(style="font-size:1em") 💦
         | Drips
-        //- span.ml-12(style="font-size:1em") 💦
+        span.ml-8(style="font-size:1em") 💧
 
       //- .w-1x4.mx-auto
         <svg class="w-full block" viewBox="0 0 97 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio>

@@ -62,7 +62,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
       dialog-title.leading-snug Drip to<br>#[addr.text-violet-650(:address="props.address")]
 
     template(v-slot:description)
-      dialog-description.text-base.mx-auto.leading-relaxed(style="max-widthff:26em")
+      dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
         template(v-if="dripType === 'monthly'")
           | Stream DAI on a <b>monthly</b> basis.
         template(v-if="dripType === 'split'")

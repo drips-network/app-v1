@@ -50,11 +50,16 @@ const onImgFileChange = (e) => {
 
 <template lang="pug">
 //- avatar image upload
-.h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-700.mb-36
-  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer(tabindex="0", title="Project Image")
+.h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950.mb-36
+  //- (default image)
+  img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
+  //- add image btn
+  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Project Image")
     span.sr-only Project Image
     input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
     svg-plus-minus-radicle
+
+    //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB
   //- (image)
   img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
 
@@ -66,7 +71,7 @@ section
   .my-10(v-if="props.isNewProject")
     input-body(label="Name*", :isFilled="modelValue.name.length")
       input(v-model="modelValue.name", placeholder="Computer Club", required, autocomplete="new-password")
-  .my-10(v-if="props.isNewProject")
+  //- .my-10(v-if="props.isNewProject")
     //- TODO: format/validate symbol text?
     input-body(label="Member Token Symbol*", :isFilled="modelValue.symbol.length")
       input(v-model="modelValue.symbol", placeholder="CC", required)

@@ -20,6 +20,9 @@ const fetchUserProjects = (projectOwner) => {
           id
           projectOwner
           daiCollected
+          nftTypes {
+            nftTypeId
+          }
         }
       }
     `
@@ -48,7 +51,7 @@ section.user-projects
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;raising funds in <b>{{ projects.length }} communities{{ projects.length === 1 ? '' : 's' }}</b>
+        | &nbsp;raising funds in <b>{{ projects.length }} {{ projects.length === 1 ? 'community' : 'communities' }}</b>.
 
     ul
       //- projects...

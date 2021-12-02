@@ -27,7 +27,7 @@ onBeforeMount(async () => {
 <template lang="pug">
 article.explore.pb-144
   header.pl-1.mt-72.mb-28
-    h1.text-4xl.font-semibold.px-32 Explore
+    h1.text-4xl.font-semibold.px-32.text-violet-650 Communities
 
   template(v-if="projects")
     ul

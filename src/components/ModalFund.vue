@@ -97,11 +97,14 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="💧")
 
     template(v-slot:header)
-      dialog-title Drip funds to #[span.text-violet-650 {{ meta.name }}]
+      dialog-title
+        | Join community
+        br
+        | #[span.text-violet-650 {{ meta.name }}]
 
     template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed(style="max-widthff:23em")
-        | Support this project and receive a unique NFT <b>Member Token</b> 🧩
+        | Drip funds to this community<br>and receive a unique NFT <b>Member Token</b> 🧩
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
     form(@submit.prevent, validate, :class="{'opacity-25 pointer-events-none': state.nft}")

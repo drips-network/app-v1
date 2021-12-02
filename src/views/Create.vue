@@ -104,7 +104,7 @@ const openDripsPanel = () => {
   //
   projectPanel.value.close()
   fundingPanel.value.close()
-  membershipsPanel.value.close()
+  // membershipsPanel.value.close()
   window.scroll({ top: 0, behavior: 'smooth' })
   step.value++
 }
@@ -115,7 +115,7 @@ const openPanelsForReview = () => {
   //
   projectPanel.value.open()
   fundingPanel.value.open()
-  membershipsPanel.value.open()
+  // membershipsPanel.value.open()
   window.scroll({ top: 0, behavior: 'smooth' })
   step.value++
 }
@@ -169,9 +169,9 @@ article.create.py-80.relative
   form(@submit.prevent="submitProject")
 
     //- 1. PROJECT
-    panel.mx-auto(ref="projectPanel", label="Project", icon="✨")
+    panel.mx-auto(ref="projectPanel", label="Community", icon="✨")
       template(v-slot:header)
-        h2 New Project
+        h2 Create a Community
       section
         //- (connect bt)
         template(v-if="!owner")
@@ -179,12 +179,13 @@ article.create.py-80.relative
 
         //- (create form)
         template(v-else)
-          fields-project-edit(v-model="meta", :isNewProject="true")
+          form(@submit.prevent="openFundingPanel", validate)
+            fields-project-edit(v-model="meta", :isNewProject="true")
 
-          div.mt-40(v-show="step === 0")
-            //- create btn
-            button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openFundingPanel")
-              | Next
+            div.mt-40(v-show="step === 0")
+              //- create btn
+              button.btn.btn-lg.btn-violet.mx-auto.min-w-xs
+                | Next
 
     //- 2. FUNDING
 
@@ -192,6 +193,7 @@ article.create.py-80.relative
       template(v-slot:header)
         h2 Member Tokens
 
+      //- TODO description/text about how some can't be edited later !!!
       //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
 
       //- funding options as tiles
@@ -216,24 +218,26 @@ article.create.py-80.relative
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
               .bg-violet-700.rounded-full.w-full
 
-      //- form.mt-40(@submit.prevent="submit", validate)
-      section.mt-40
-        //- input monthly goal
-        input-body.my-10(label="Monthly Goal", :isFilled="typeof meta.goal === 'number'", symbol="daipermo")
-          input(v-model="meta.goal", type="number", placeholder="1000", required)
-
+      form.mt-40(@submit.prevent="openDripsPanel", validate)
         //- input min rate
-        input-body(label="Minimum Subscription", :isFilled="typeof minDAIPerMonth === 'number'", symbol="daipermo")
+        input-body.my-10(label="Minimum Subscription*", :isFilled="typeof minDAIPerMonth === 'number'", symbol="daipermo")
           input(v-model="minDAIPerMonth", type="number", placeholder="10", required)
+
+        input-body.my-10(label="Token Symbol*")
+          input(v-model="project.symbol", placeholder="CC", required)
+
+        //- input monthly goal
+        input-body.my-10(label="Monthly Funding Goal", :isFilled="typeof meta.goal === 'number'", symbol="daipermo")
+          input(v-model="meta.goal", type="number", placeholder="1000")
 
         .mt-40(v-show="step === 1")
           //- submit btn
-          button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openMembershipsPanel")
+          button.btn.btn-lg.btn-violet.mx-auto.min-w-xs
             | Next
 
     //- 3. MEMBERSHIPS
 
-    panel.mx-auto.my-24(v-show="step > 1", ref="membershipsPanel", label="Benefits", icon="🏅")
+    //- panel.mx-auto.my-24(v-show="step > 1", ref="membershipsPanel", label="Benefits", icon="🏅")
       template(v-slot:header)
         h2 Benefits
 
@@ -268,15 +272,16 @@ article.create.py-80.relative
           svg-plus-minus-radicle
 
         .mt-40(v-show="step === 2")
-          button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openDripsPanel") Next
+          button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel") Next
 
     //- 4. DRIPS
 
-    panel.mx-auto(v-show="step > 2", ref="dripsPanel", title="Drips", icon="💦")
+    panel.mx-auto(v-show="step > 1", ref="dripsPanel", title="Drips", icon="💧")
       template(v-slot:header)
-        h2 Splits
+        h2 Drips
 
-      p Share revenue with others with <b>Splits</b>.<br>Add any Ethereum address and specify a percent of revenue.
+      //- TODO allow ENS names...
+      p Share a <b>precent</b> of incoming funds others, <br>like your contributors or dependencies.
 
       //- drips list
       //- form.mt-60(@submit.prevent="submit", autocomplete="off")
@@ -284,32 +289,32 @@ article.create.py-80.relative
         //- drips...
         template(v-for="(drip, i) in drips")
           section.my-10.input-group
+            input-body(label="% of Revenue", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
+              input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5")
             //- input address
-            .mb-10
+            .mt-10
               input-body(label="Ethereum Address", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
                 //- TODO: validate ethereum address
                 input(v-model="drips[i].address", placeholder="0x68fc...", autocomplete="new-password", @keydown="e => onDripInputKeydown(e, i)")
             //- input percent
-            .flex.-mx-5
+            //- .flex.-mx-5
               //- .w-3x4.px-5
                 input-body(label="Name", :isFilled="drips[i].name.length", theme="dark")
                   input(v-model="drips[i].name", placeholder="Name")
               .flex-1
-                input-body(label="% of Revenue", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
-                  input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5")
 
         button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
           svg-plus-minus-radicle
 
-        .mt-40.flex.justify-center(v-show="step === 3")
+        .mt-40.flex.justify-center(v-show="step === 2")
           //- .mx-5
             button.btn.btn-lg.btn-outline.mx-auto.min-w-xs(@click.prevent="emit('skip')") Skip
           //- .mx-5
 
-          button.btn.btn-lg.btn-indigo.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
+          button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
 
     //- (create btn)
-    .mt-40.flex.justify-center.w-full(v-show="step > 3")
+    .sticky.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 2")
       .text-center
         button.btn.btn-xl.btn-white.min-w-md(type="submit", :disabled="tx")
           template(v-if="projectAddress") Created!

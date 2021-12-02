@@ -24,6 +24,9 @@ const query = `
 `
 
 const nfts = ref(null)
+const isMonthly = computed(() => {
+  return props.project?.nftTypes && props.project.nftTypes[0]?.nftTypeId === '0'
+})
 
 onBeforeMount(async () => {
   // get nfts by project address...
@@ -81,14 +84,14 @@ section.project-stats.flex.w-full_10.-mx-5
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
     //- TODO Dai/mo vs DAI
     template(v-slot:header)
-      h6 🏁&nbsp; Monthly Goal
+      h6 🌈&nbsp; Funding Goal
     template(v-if="props.meta")
       .flex.items-end
         | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
         span.ml-2(style="font-size:0.75em") K
-      .absolute.bottom-0.right-0.p-22
+      .absolute.bottom-0.right-0.p-22.flex.items-center
         svg-dai.h-16.text-violet-650
-
+        span.font-semibold.font-sans.text-base(v-if="isMonthly") /MO
     template(v-else) ...
 
   //- Total Revenue
@@ -96,9 +99,9 @@ section.project-stats.flex.w-full_10.-mx-5
     template(v-slot:header)
       h6 🧮&nbsp; Total Revenue
       //- alt: 💰🥞🔋📈
-    template(v-if="project")
+    template(v-if="props.project")
       .flex.items-end
-        | {{ currency(utils.formatEther(project.daiCollected)) }}
+        | {{ currency(utils.formatEther(props.project.daiCollected)) }}
         span.ml-2(style="font-size:0.75em") K
       .absolute.bottom-0.right-0.p-22
         svg-dai.h-16.text-violet-650
@@ -107,7 +110,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- total revenue
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
     template(v-slot:header)
-      h6 💦&nbsp; Splits
+      h6 💧&nbsp; Drips
       //- h6.flex.items-center
         div
           <icon-split/>

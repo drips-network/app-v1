@@ -16,8 +16,8 @@ const routes = [
     component: () => import(/* webpackChunkName: "create" */ '../views/Create.vue')
   },
   {
-    path: '/projects/:address',
-    name: 'project',
+    path: '/communities/:address',
+    name: 'project', // TODO rename
     component: () => import(/* webpackChunkName: "project" */ '../views/Project.vue')
   },
   {

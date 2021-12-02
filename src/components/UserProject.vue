@@ -10,7 +10,7 @@ const props = defineProps({
   project: Object
 })
 
-const meta = ref({})
+const meta = ref()
 const drips = ref()
 const projectRt = { name: 'project', params: { address: props.project.id } }
 
@@ -33,21 +33,22 @@ onBeforeMount(() => {
 <template lang="pug">
 .user-project.panel-indigo.mb-40.p-24
   //- avatar + title
-  header.flex.justify-between.items-center.mb-32
+  header.flex.justify-between.items-center
     .flex.items-center
       //- avatar
       router-link.relative.h-80.w-80.bg-indigo-800.rounded-full.mr-24.overflow-hidden(:to="projectRt")
-        img.absolute.overlay.object-cover.object-center(:v-if="meta.image", :src="ipfsUrl(meta.image)")
+        img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)")
+        img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
       //- title
       h3.text-2xl.font-semibold.text-violet-650
-        router-link(:to="projectRt") {{ meta.name || $store.getters.addrShort(props.project.id) }}
+        router-link(:to="projectRt") {{ meta ? meta.name : $store.getters.addrShort(props.project.id) }}
 
     //- (join btn)
     template(v-if="!isUsersProject")
       router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt") View
 
   //- progress bar
-  project-progress-bar.my-20(:meta="meta")
+  project-progress-bar.mt-32.mb-20(v-if="meta", :meta="meta")
 
   //- (funds)
   template(v-if="isUsersProject")

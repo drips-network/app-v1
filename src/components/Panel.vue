@@ -34,10 +34,11 @@ section.panel.panel-dark.w-full.max-w-screen-sm.text-center
     header.mb-40.text-center
       .mb-24.text-3xl(v-if="icon") {{ icon }}
 
-      .text-2xl.font-semibold.mb-40
+      .text-2xl.font-semibold.mb-40.leading-tight
         slot(name="header")
 
-      slot(name="description")
+      .text-md
+        slot(name="description")
 
     //- body
     .mt-40
