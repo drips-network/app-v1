@@ -44,7 +44,11 @@ export default createStore({
     }
   },
   getters: {
-    addrShort: () => (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...',
+    addrShort: (state) => (addr) => {
+      // return ENS name or shortened 0x8888...8888
+      return state.addresses[addr] ? state.addresses[addr]
+        : addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...'
+    },
     isWalletAddr: (state) => (addr) => addr === state.address
   },
   mutations: {

@@ -5,8 +5,26 @@ import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
 import IconSplit from '@/components/IconSplit'
 import ModalDripTo from '@/components/ModalDripTo'
+// import store from '@/store'
+// import { utils } from 'ethers'
 
 const dripModalOpen = ref(false)
+
+</script>
+
+<script>
+export default {
+  async beforeRouteEnter (to, from, next) {
+    // TODO allow ENS Urls
+    // for now redirect ENS urls to the 0x...
+    // if (!utils.isAddress(to.params.address)) {
+    //   const address = await store.dispatch('resolveAddr', { ens: to.params.address, short: false })
+    //   next({ params: { address }})
+    // }
+    next()
+    // next({ params: { address: ensOrAddr }})
+  }
+}
 </script>
 
 <template lang="pug">
