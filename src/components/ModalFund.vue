@@ -14,11 +14,11 @@ import InputBody from '@/components/InputBody'
 
 const props = defineProps({
   projectAddress: String,
-  nftType: Object
+  tokenType: Object
 })
 const meta = inject('projectMeta')
 
-const minDAIPerSec = fromWei(props.nftType.minAmtPerSec) // bn
+const minDAIPerSec = fromWei(props.tokenType.minAmt) // bn
 const minDAIPerMonth = minDAIPerSec.mul(30 * 24 * 60 * 60) // bn
 
 const rate = ref(Math.max(1, minDAIPerMonth.toNumber())) // min at least 1...

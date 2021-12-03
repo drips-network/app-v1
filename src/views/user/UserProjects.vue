@@ -20,8 +20,8 @@ const fetchUserProjects = (projectOwner) => {
           id
           projectOwner
           daiCollected
-          nftTypes {
-            nftTypeId
+          tokenTypes {
+            tokenTypeId
           }
         }
       }

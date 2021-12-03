@@ -1,13 +1,12 @@
 import { createStore } from 'vuex'
 import { toRaw } from 'vue'
-//
 import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-// contracts
-import { deploy, RadicleRegistry, DAI, FundingNFT, DAIPool } from '../../contracts'
-
 import api, { queryProjectMeta, queryProject } from '@/api'
+import { validateSplits } from '@/utils'
+// contracts
+import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
 
 let provider, signer, walletProvider
 
@@ -40,7 +39,7 @@ export default createStore({
       addresses: [],
 
       // TODO - get this from the contract?
-      dripsFractionMax: 1000000
+      splitsFractionMax: 1000000
     }
   },
   getters: {
@@ -164,6 +163,9 @@ export default createStore({
 
     async createProject ({ state, dispatch }, { project, meta }) {
       try {
+        // validate...
+        project.drips = await validateSplits(project.drips, provider)
+
         // save full data to IPFS/pinata...
         const ipfsHash = await pinJSONToIPFS(meta)
         console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
@@ -219,11 +221,13 @@ export default createStore({
       // check api
       try {
         // check api...
-        const project = await api({ query: queryProject, variables: { id: projectAddress } })
+        const resp = await api({ query: queryProject, variables: { id: projectAddress } })
 
-        if (project) {
-          return project.data?.fundingProject
+        if (resp.data?.fundingProject) {
+          return resp.data?.fundingProject
         }
+
+        console.log('API: project not found (just created?). Querying chain...', projectAddress)
 
         // check on-chain in case was just created...
         const contract = getProjectContract(projectAddress)
@@ -291,7 +295,7 @@ export default createStore({
           await dispatch('connect')
         }
 
-        const contract = new Ethers.Contract(projectAddress, FundingNFT.abi, provider)
+        const contract = new Ethers.Contract(projectAddress, DripsToken.abi, provider)
         const contractSigner = contract.connect(signer)
 
         const tx = await contractSigner['mint(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
@@ -432,48 +436,70 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
-    async getProjectDrips ({ state }, projectAddress) {
+    async getSplitsReceivers ({ state, dispatch }, address) {
       try {
-        let drips = []
-        const contract = getProjectContract(projectAddress)
-        const events = await contract.queryFilter('DripsUpdated')
+        if (!provider) await dispatch('init')
+        
+        let splits = []
+        let raw = []
 
-        // reformat to array of receivers and percents...
+        const contract = getHubContract()
+        // fetch events...
+        let events = await contract.queryFilter('SplitsUpdated')
+        // filter by the address
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+
+        // has splits?
         if (events?.length) {
-          const current = events.pop().args // last event
-          const fraction = current[0] // number ~ 150000 (max 1M)
-          const receivers = current[1] // array ~ ['0x...', BigNum]
+          const currentReceivers = events.pop().args[1]
+          raw = currentReceivers
 
-          // add the weights/amtPerSec up — (dangerous to convert to number from BigNumber?)
-          const weightsTotal = receivers.reduce((acc, itm) => acc + itm[1].toNumber(), 0)
-
-          drips = receivers.map(item => {
-            const address = item[0]
-            const weight = item[1].toNumber()
-            let percent = (weight / weightsTotal) * fraction / state.dripsFractionMax * 100
-            percent = percent.toFixed(3)
+          // reformat...
+          splits = currentReceivers.map(item => {
+            const address = item[0].toLowerCase()
+            const weight = item[1] // .toNumber()
+            let percent = weight / state.splitsFractionMax * 100
+            percent = Number(percent.toFixed(3))
             return {
               address,
               percent
             }
           })
+
           // sort by percent descending
-          drips = drips.sort((a, b) => a.percent < b.percent ? -1 : a.percent > b.percent ? 1 : 0)
+          splits = splits.sort((a, b) => a.percent > b.percent ? -1 : a.percent < b.percent ? 1 : 0)
         }
-        return drips
+
+        return { percents: splits, weights: raw }
       } catch (e) {
         console.error(e)
-        return []
+        return { percents: [], weights: [] }
       }
     },
 
-    getProjectDripReceivers (_, projectAddress) {
-      const contract = getPoolContract()
-      return contract.getReceiversHash(projectAddress)
+    async updateAddressSplits (_, { currentReceivers, newReceivers }) {
+      try {
+        // validate...
+        newReceivers = await validateSplits(newReceivers, provider)
+
+        const contract = getHubContract()
+        const contractSigner = contract.connect(signer)
+        // tx...
+        console.log('update splits:', { currentReceivers, newReceivers })
+        return contractSigner.setSplits(currentReceivers, newReceivers)  
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
     },
 
+    // getSplitsReceivers (_, address) {
+    //   const contract = getHubContract()
+    //   return contract.getReceiversHash(address)
+    // },
+
     getProjectDripFraction (_, projectAddress) {
-      const contract = getPoolContract()
+      const contract = getHubContract()
       return contract.getDripsFraction(projectAddress)
     },
 
@@ -487,19 +513,19 @@ export default createStore({
       return contract.withdrawable(tokenId)
     },
 
-    async resolveAddress ({ state, getters, commit, dispatch }, { address, short = true }) {
-      const fallback = short ? getters.addrShort(address) : address
+    async resolveAddress ({ state, getters, commit, dispatch }, { address  }) {
       try {
         // saved?
         const saved = state.addresses[address]
         if (saved !== undefined) {
-          return saved || fallback
+          return saved
         }
         // fetch new...
         if (!provider) await dispatch('init')
         const ens = await provider.lookupAddress(address)
+        // save even if null so we don't have to lookup again
         commit('SAVE_ADDRESS', { address, ens })
-        return ens || fallback
+        return ens
       } catch (e) {
         console.error(e)
         return fallback
@@ -540,15 +566,15 @@ function getRadicleRegistryContract () {
 }
 
 function getProjectContract (address) {
-  return new Ethers.Contract(address, FundingNFT.abi, provider)
+  return new Ethers.Contract(address, DripsToken.abi, provider)
 }
 
 function getDAIContract () {
   return new Ethers.Contract(DAI.address, DAI.abi, provider)
 }
 
-function getPoolContract () {
-  return new Ethers.Contract(DAIPool.address, DAIPool.abi, provider)
+function getHubContract () {
+  return new Ethers.Contract(DaiDripsHub.address, DaiDripsHub.abi, provider)
 }
 
 function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes, drips }) {

@@ -21,6 +21,7 @@ const themeing = computed(() => {
   switch (props.theme) {
     case 'outline': return 'border border-violet-700 focus-within_border-violet-600'
     case 'dark': return 'bg-indigo-900'
+    // case 'red': return 'borderff border-red-600ff focus-within_border-red-500ff'
     default: return ''
   }
 })
@@ -29,25 +30,25 @@ const slots = useSlots()
 </script>
 
 <template lang="pug">
-.input-body.relative
-  label.absolute.top-0.left-0.w-full.text-center.text-mss.text-violet-600.pt-5(:class="{'opacity-0ff': !isFilled}") {{ props.label }}
+.input-body.relative.text-violet-600
+  label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-5(:class="{'opacity-0ff': !isFilled, 'text-red-600': theme === 'red'}") {{ props.label }}
 
   //- field (input, textarea)
-  .h-80.flex.items-center.font-semibold.rounded-2xl.text-center.leading-none.pt-9(:class="[styling, themeing]")
+  .h-80.flex.items-center.font-semibold.rounded-2xl.text-center.leading-none.pt-9.text-white(:class="[styling, themeing]")
     slot
 
     //- (symbol: dai)
     template(v-if="props.symbol === 'dai'")
       .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
         .flex.items-center
-          svg-dai(size="lg").text-violet-650
+          svg-dai(size="lg").text-violet-600
 
     //- (symbol: daipermo)
     template(v-if="props.symbol === 'daipermo'")
       .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
         .flex.items-center.text-violet-600
           svg-dai(size="lg")
-          .text-lg.ml-4.tracking-tight / MO
+          .text-lg.tracking-tight /MO
 </template>
 
 <style lang="postcss">

@@ -13,26 +13,31 @@ const props = defineProps({
 })
 
 const query = `
-  query ($nftRegistryAddress: Bytes!) {
-    nfts (where: {nftRegistryAddress: $nftRegistryAddress}) {
+  query ($tokenRegistryAddress: Bytes!) {
+    tokens (where: {tokenRegistryAddress: $tokenRegistryAddress}) {
       id
-      owner: nftReceiver
+      owner: tokenReceiver
       tokenId
-      nftTypeId
+      tokenTypeId
     }
   }
 `
 
 const nfts = ref(null)
 const isMonthly = computed(() => {
-  return props.project?.nftTypes && props.project.nftTypes[0]?.nftTypeId === '0'
+  return props.project?.tokenTypes && props.project.tokenTypes[0]?.tokenTypeId === '0'
 })
 
 onBeforeMount(async () => {
   // get nfts by project address...
-  const variables = { nftRegistryAddress: props.project.id }
-  const resp = await api({ query, variables })
-  nfts.value = resp.data.nfts
+  try {
+    const variables = { tokenRegistryAddress: props.project.id }
+    const resp = await api({ query, variables })
+    nfts.value = resp.data.tokens
+  } catch (e) {
+    console.error(e)
+    nfts.value = []
+  }
 })
 
 const supporters = computed(() => {
@@ -48,7 +53,8 @@ const supporters = computed(() => {
 
 const currency = (num) => {
   num = Number(num)
-  return Math.round(Number(num) / 1000)
+  return num >= 1000 ? Math.round(Number(num) / 1000)
+    : num
 }
 </script>
 
@@ -88,7 +94,7 @@ section.project-stats.flex.w-full_10.-mx-5
     template(v-if="props.meta")
       .flex.items-end
         | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
-        span.ml-2(style="font-size:0.75em") K
+        span.ml-2(v-if="props.meta.goal >= 1000", style="font-size:0.75em") K
       .absolute.bottom-0.right-0.p-22.flex.items-center
         svg-dai.h-16.text-violet-650
         span.font-semibold.font-sans.text-base(v-if="isMonthly") /MO
@@ -102,7 +108,7 @@ section.project-stats.flex.w-full_10.-mx-5
     template(v-if="props.project")
       .flex.items-end
         | {{ currency(utils.formatEther(props.project.daiCollected)) }}
-        span.ml-2(style="font-size:0.75em") K
+        span.ml-2(v-if="props.project.daiCollected >= 1000", style="font-size:0.75em") K
       .absolute.bottom-0.right-0.p-22
         svg-dai.h-16.text-violet-650
     template(v-else) ...

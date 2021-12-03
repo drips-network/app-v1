@@ -1,12 +1,12 @@
-const apiUrl = 'https://api.studio.thegraph.com/query/9578/funding-subgraph-v6/v0.0.2'
-const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC
+const apiUrl = 'https://api.studio.thegraph.com/query/9578/drips-subgraph-v8/v0.0.1'
+const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC // string
 
 export default async function ({ query, variables }) {
   const id = btoa(JSON.stringify({ query, variables }))
   try {
     // cached ?
     let cached = sessionStorage.getItem(id)
-    if (cached && cacheAPISec) {
+    if (cached && cacheAPISec > 0) {
       cached = JSON.parse(cached)
       const secSince = new Date().getTime() - cached.time
       if (secSince > cacheAPISec) {
@@ -51,11 +51,11 @@ export const queryProject = `
       projectOwner
       daiCollected
       ipfsHash
-      nftTypes {
+      tokenTypes {
         # id
-        nftTypeId
+        tokenTypeId
         limit
-        minAmtPerSec
+        minAmt: minAmtPerSec
       }
     }
   }

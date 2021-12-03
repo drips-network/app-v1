@@ -14,17 +14,17 @@ const dripModalOpen = ref(false)
 const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
   try {
     // timeout for slow API prj lookup... (6s?)
-    const projectTimeout = setTimeout(() => {
-      console.warn('project lookup timeout. skipping...')
-      resolveRouteAddress(to, next, true)
-    }, 6000)
+    // const projectTimeout = setTimeout(() => {
+    //   console.warn('project lookup timeout. skipping...')
+    //   resolveRouteAddress(to, next, true)
+    // }, 6000)
     
     // check if project? redirect...
-    if (!skipProjectLookup && await store.dispatch('getProject', to.params.address)) {
-      return next({ name: 'project', params: { address: to.params.address }})
-    }
+    // if (!skipProjectLookup && await store.dispatch('getProject', to.params.address)) {
+    //   return next({ name: 'project', params: { address: to.params.address }})
+    // }
 
-    clearTimeout(projectTimeout)
+    // clearTimeout(projectTimeout)
     
     // non-address? check if ENS name, redirect to 0x...
     if (!utils.isAddress(to.params.address)) {

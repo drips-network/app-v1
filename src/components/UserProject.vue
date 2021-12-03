@@ -25,8 +25,8 @@ onBeforeMount(() => {
   store.dispatch('getProjectMeta', { projectAddress: props.project.id })
     .then(data => { meta.value = data })
   // get drips
-  store.dispatch('getProjectDrips', props.project.id)
-    .then(arr => { drips.value = arr })
+  store.dispatch('getSplitsReceivers', props.project.id)
+    .then(receivers => { drips.value = receivers.percents })
 })
 </script>
 

@@ -24,7 +24,7 @@ const route = useRoute()
 const projectAddress = route.params.address
 const project = ref()
 const meta = ref(null)
-const nftType = ref()
+const tokenType = ref()
 const minDAI = ref()
 const drips = ref()
 
@@ -59,7 +59,8 @@ const getProject = async () => {
     }
 
     // get drips
-    store.dispatch('getProjectDrips', projectAddress).then(array => { drips.value = array })
+    store.dispatch('getSplitsReceivers', projectAddress)
+      .then(receivers => { drips.value = receivers.percents })
 
     // missing project info?
     if (!project.value.projectOwner) {
@@ -70,8 +71,8 @@ const getProject = async () => {
     }
 
     // set nft
-    nftType.value = project.value.nftTypes[0]
-    minDAI.value = toDAIPerMo(nftType.value.minAmtPerSec)
+    tokenType.value = project.value.tokenTypes[0]
+    minDAI.value = toDAIPerMo(tokenType.value.minAmt)
 
     return true
   } catch (e) {
@@ -135,9 +136,9 @@ article.project.pb-96
               svg-discord.block
 
         .mt-44
-          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!nftType") Join 💧
+          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!tokenType") Join 💧
 
-          .mt-16.text-violet-600(v-if="nftType") Min. {{ minDAI }} DAI/mo
+          .mt-16.text-violet-600(v-if="tokenType") Min. {{ minDAI }} DAI/mo
         //- p
           a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 
@@ -189,7 +190,7 @@ article.project.pb-96
                 | Close
                 svg-x-circle.h-32.ml-12.text-white.opacity-30
 
-    modal-fund(v-if="nftType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :nftType="nftType")
+    modal-fund(v-if="tokenType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :tokenType="tokenType")
 
     modal-edit-project-info(v-if="editProject", :open="editProject", @updated="getProjectMeta", @close="editProject = editMenuOpen = false", :meta="meta", :projectAddress="projectAddress")
 
