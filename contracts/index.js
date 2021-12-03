@@ -1,20 +1,20 @@
 import RadicleRegistryABI from './RadicleRegistry.json'
-import FundingNFTABI from './FundingNFT.json'
-import DAIABI from './Dai.json'
-import DIAPoolABI from './DaiPool.json'
+import DripsTokenABI from './DripsToken.json'
+import DaiABI from './Dai.json'
+import DaiDripsHubABI from './DaiDripsHub.json'
 
 export const deploy = JSON.parse(`
 {
-  "NAME": "6th Rinkeby Deployment",
+  "NAME" : "8th Rinkeby Deployment",
   "CONTRACT_DAI": "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
-  "CONTRACT_FUNDING_POOL": "0xA7010F93ecd465cE26c804dF20bd671D32B3cf18",
-  "CONTRACT_RADICLE_REGISTRY": "0xa5a37BAC49E2B4993905d0E33b112fA2aC16183d",
-  "CONTRACT_BUILDER": "0xfBDB1136630387667163f48028A9f544C1f96d15",
+  "CONTRACT_DRIPS_HUB": "0xb4293691053EbE933989515e86ff800542b0D033",
+  "CONTRACT_RADICLE_REGISTRY": "0x2AD4fFD1A3a5756e68FeDaE6F1bF445565cb4ee4",
+  "CONTRACT_BUILDER": "0x48A3D42F0050074ABd49FDdf222a38D92f70efE5",
   "NETWORK": "rinkeby",
   "DEPLOY_ADDRESS": "eca823848221a1da310e1a711e19d82f43101b07",
   "CYCLE_SECS": "86400",
-  "COMMIT_HASH": "39467779ecb0f0df0b924463619be011fc58fc76",
-  "GOVERNANCE_ADDRESS": "0xeCa823848221a1DA310E1a711E19D82F43101B07"
+  "COMMIT_HASH": "2171091612fb152bdc0cc20c0ee607f12c3badc2",
+  "GOVERNANCE_ADDRESS": "0xeca823848221a1da310e1a711e19d82f43101b07"
 }
 `)
 
@@ -23,17 +23,17 @@ export const RadicleRegistry = {
   abi: RadicleRegistryABI
 }
 
-export const FundingNFT = {
+export const DripsToken = {
   // address: ...from each project
-  abi: FundingNFTABI
+  abi: DripsTokenABI
 }
 
 export const DAI = {
   address: deploy.CONTRACT_DAI,
-  abi: DAIABI
+  abi: DaiABI
 }
 
-export const DAIPool = {
-  address: deploy.CONTRACT_FUNDING_POOL,
-  abi: DIAPoolABI
+export const DaiDripsHub = {
+  address: deploy.CONTRACT_DRIPS_HUB,
+  abi: DaiDripsHubABI
 }

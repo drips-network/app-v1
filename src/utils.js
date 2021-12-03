@@ -64,3 +64,63 @@ export const formatDrips = (drips) => {
   ]
   // "empty" drips = [0, []]
 }
+
+/*
+ * format drips for contract method input (no dripFraction :)
+ * @param drips [{ address, percent }]
+*/
+export const formatSplits = (splits) => {
+  splits = splits || []
+  let receivers = []
+  const splitFractionMax = 1000000
+
+  const hasDrips = splits.length && splits.find(split => split.percent > 0 && split.address.length)
+
+  if (hasDrips) {
+    // format as array
+    receivers = splits.map(split => {
+      const amtPerSec = parseInt(split.percent / 100 * splitFractionMax)
+      return [
+        split.address, // receiver
+        amtPerSec
+      ]
+    })
+
+    // sort by address alphabetical
+    receivers = receivers.sort((a, b) => {
+      a = a[0].toUpperCase()
+      b = b[0].toUpperCase()
+      return (a < b) ? -1 : (a > b) ? 1 : 0
+    })
+  }
+
+  return receivers
+}
+
+export function validateSplits (drips, provider) {
+  drips = drips || []
+  const validate = async () => {
+    // validate each address...
+    for (var i = 0; i < drips.length; i++) {
+      if (!utils.isAddress(drips[i][0])) {
+        // !! not an ENS
+        if (!drips[i][0].endsWith('.eth')) {
+          throw new Error(`Invalid drip recipient: ${drips[i][0]} is not an Ethereum address or ENS name (must end in .eth).`)
+        }
+        // resolve ENS name...
+        const address = await provider.resolveName(drips[i][0])
+
+        if (!address) {
+          throw new Error(`Invalid drip recipient: ${drips[i][0]} does not resolve to an Ethereum address.`)
+        }
+
+        // replace ens with address
+        drips[i][0] = address
+      }
+    }
+
+    return drips
+  }
+
+  return new Promise((resolve, reject) => validate().then(resolve).catch(reject))
+}

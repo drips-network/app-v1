@@ -14,17 +14,17 @@ const dripModalOpen = ref(false)
 const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
   try {
     // timeout for slow API prj lookup... (6s?)
-    const projectTimeout = setTimeout(() => {
-      console.warn('project lookup timeout. skipping...')
-      resolveRouteAddress(to, next, true)
-    }, 6000)
+    // const projectTimeout = setTimeout(() => {
+    //   console.warn('project lookup timeout. skipping...')
+    //   resolveRouteAddress(to, next, true)
+    // }, 6000)
     
     // check if project? redirect...
-    if (!skipProjectLookup && await store.dispatch('getProject', to.params.address)) {
-      return next({ name: 'project', params: { address: to.params.address }})
-    }
+    // if (!skipProjectLookup && await store.dispatch('getProject', to.params.address)) {
+    //   return next({ name: 'project', params: { address: to.params.address }})
+    // }
 
-    clearTimeout(projectTimeout)
+    // clearTimeout(projectTimeout)
     
     // non-address? check if ENS name, redirect to 0x...
     if (!utils.isAddress(to.params.address)) {
@@ -76,18 +76,18 @@ article.profile.pb-80
 
         //- (communities submenu)
         template(v-if="$route.name.includes('user-communities')")
-          .h-80.rounded-full.flex.items-center.px-7.bg-indigo-700
-            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-communities', params: $route.params }") Created
-            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-communities-joined', params: $route.params }") Joined
+          .h-80.rounded-full.flex.items-center.px-16.bg-indigo-700
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24.mr-2(:to="{ name: 'user-communities', params: $route.params }") Created
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24.mr-2(:to="{ name: 'user-communities-joined', params: $route.params }") Joined
 
         //- (drips submenu)
         template(v-if="$route.name.includes('user-drips')")
           //- horizontal stem
           //- .w-40.h-40.border-b-2.border-indigo-700
           //- submenu body
-          .h-80.rounded-full.flex.items-center.px-7.bg-indigo-700
-            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-in', params: $route.params }", ) In
-            router-link.btn.btn-active-violet.btn-mdd.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-out', params: $route.params }", ) Out
+          .h-80.rounded-full.flex.items-center.px-16.bg-indigo-700
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-in', params: $route.params }", ) In
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-out', params: $route.params }", ) Out
 
   main#main.px-36.min-h-screen
 

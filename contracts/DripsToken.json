@@ -2,8 +2,8 @@
   {
     "inputs": [
       {
-        "internalType": "contract DaiPool",
-        "name": "pool_",
+        "internalType": "contract DaiDripsHub",
+        "name": "hub_",
         "type": "address"
       }
     ],
@@ -58,37 +58,6 @@
       }
     ],
     "name": "ApprovalForAll",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "dripFraction",
-        "type": "uint32"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "receiver",
-            "type": "address"
-          },
-          {
-            "internalType": "uint128",
-            "name": "amtPerSec",
-            "type": "uint128"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct Receiver[]",
-        "name": "drips",
-        "type": "tuple[]"
-      }
-    ],
-    "name": "DripsUpdated",
     "type": "event"
   },
   {
@@ -151,7 +120,38 @@
         "type": "uint128"
       }
     ],
-    "name": "NewNFT",
+    "name": "NewStreamingToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint128",
+        "name": "typeId",
+        "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "giveAmt",
+        "type": "uint128"
+      }
+    ],
+    "name": "NewToken",
     "type": "event"
   },
   {
@@ -172,11 +172,17 @@
       {
         "indexed": false,
         "internalType": "uint128",
-        "name": "minAmtPerSec",
+        "name": "minAmt",
         "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "streaming",
+        "type": "bool"
       }
     ],
-    "name": "NewNFTType",
+    "name": "NewType",
     "type": "event"
   },
   {
@@ -196,6 +202,31 @@
       }
     ],
     "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct SplitsReceiver[]",
+        "name": "splits",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "SplitsUpdated",
     "type": "event"
   },
   {
@@ -222,19 +253,6 @@
     ],
     "name": "Transfer",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "WITHDRAW_ALL",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [
@@ -297,6 +315,34 @@
         "type": "string"
       }
     ],
+    "name": "addStreamingType",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "newTypeId",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint64",
+        "name": "limit",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint128",
+        "name": "minGiveAmt",
+        "type": "uint128"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      }
+    ],
     "name": "addType",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -318,8 +364,13 @@
           },
           {
             "internalType": "uint128",
-            "name": "minAmtPerSec",
+            "name": "minAmt",
             "type": "uint128"
+          },
+          {
+            "internalType": "bool",
+            "name": "streaming",
+            "type": "bool"
           },
           {
             "internalType": "string",
@@ -327,8 +378,8 @@
             "type": "string"
           }
         ],
-        "internalType": "struct InputNFTType[]",
-        "name": "inputNFTTypes",
+        "internalType": "struct InputType[]",
+        "name": "inputTypes",
         "type": "tuple[]"
       }
     ],
@@ -416,11 +467,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint32",
-        "name": "dripFraction",
-        "type": "uint32"
-      },
-      {
         "components": [
           {
             "internalType": "address",
@@ -428,13 +474,13 @@
             "type": "address"
           },
           {
-            "internalType": "uint128",
-            "name": "amtPerSec",
-            "type": "uint128"
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
           }
         ],
-        "internalType": "struct Receiver[]",
-        "name": "currDrips",
+        "internalType": "struct SplitsReceiver[]",
+        "name": "currSplits",
         "type": "tuple[]"
       },
       {
@@ -445,17 +491,17 @@
             "type": "address"
           },
           {
-            "internalType": "uint128",
-            "name": "amtPerSec",
-            "type": "uint128"
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
           }
         ],
-        "internalType": "struct Receiver[]",
-        "name": "newDrips",
+        "internalType": "struct SplitsReceiver[]",
+        "name": "newSplits",
         "type": "tuple[]"
       }
     ],
-    "name": "changeDripReceiver",
+    "name": "changeSplitsReceivers",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -470,13 +516,13 @@
             "type": "address"
           },
           {
-            "internalType": "uint128",
-            "name": "amtPerSec",
-            "type": "uint128"
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
           }
         ],
-        "internalType": "struct Receiver[]",
-        "name": "currDrips",
+        "internalType": "struct SplitsReceiver[]",
+        "name": "currSplits",
         "type": "tuple[]"
       }
     ],
@@ -489,7 +535,7 @@
       },
       {
         "internalType": "uint128",
-        "name": "dripped",
+        "name": "split",
         "type": "uint128"
       }
     ],
@@ -506,13 +552,13 @@
             "type": "address"
           },
           {
-            "internalType": "uint128",
-            "name": "amtPerSec",
-            "type": "uint128"
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
           }
         ],
-        "internalType": "struct Receiver[]",
-        "name": "currDrips",
+        "internalType": "struct SplitsReceiver[]",
+        "name": "currSplits",
         "type": "tuple[]"
       }
     ],
@@ -525,7 +571,7 @@
       },
       {
         "internalType": "uint128",
-        "name": "toDrip",
+        "name": "toSplit",
         "type": "uint128"
       }
     ],
@@ -584,6 +630,19 @@
   },
   {
     "inputs": [],
+    "name": "cycleSecs",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "dai",
     "outputs": [
       {
@@ -620,6 +679,19 @@
     "outputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "hub",
+    "outputs": [
+      {
+        "internalType": "contract DaiDripsHub",
         "name": "",
         "type": "address"
       }
@@ -682,8 +754,13 @@
           },
           {
             "internalType": "uint128",
-            "name": "minAmtPerSec",
+            "name": "minAmt",
             "type": "uint128"
+          },
+          {
+            "internalType": "bool",
+            "name": "streaming",
+            "type": "bool"
           },
           {
             "internalType": "string",
@@ -691,8 +768,8 @@
             "type": "string"
           }
         ],
-        "internalType": "struct InputNFTType[]",
-        "name": "inputNFTTypes",
+        "internalType": "struct InputType[]",
+        "name": "inputTypes",
         "type": "tuple[]"
       },
       {
@@ -703,31 +780,19 @@
       {
         "components": [
           {
-            "internalType": "uint32",
-            "name": "dripFraction",
-            "type": "uint32"
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
           },
           {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "receiver",
-                "type": "address"
-              },
-              {
-                "internalType": "uint128",
-                "name": "amtPerSec",
-                "type": "uint128"
-              }
-            ],
-            "internalType": "struct Receiver[]",
-            "name": "dripReceiver",
-            "type": "tuple[]"
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
           }
         ],
-        "internalType": "struct DripInput",
-        "name": "drips",
-        "type": "tuple"
+        "internalType": "struct SplitsReceiver[]",
+        "name": "splits",
+        "type": "tuple[]"
       }
     ],
     "name": "init",
@@ -786,13 +851,62 @@
       },
       {
         "internalType": "uint128",
-        "name": "topUpAmt",
+        "name": "giveAmt",
+        "type": "uint128"
+      }
+    ],
+    "name": "mint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint128",
+        "name": "typeId",
         "type": "uint128"
       },
       {
         "internalType": "uint128",
-        "name": "amtPerSec",
+        "name": "amtGive",
         "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expiry",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
       }
     ],
     "name": "mint",
@@ -854,11 +968,45 @@
         "type": "bytes32"
       }
     ],
-    "name": "mint",
+    "name": "mintStreaming",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint128",
+        "name": "typeId",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "topUpAmt",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "amtPerSec",
+        "type": "uint128"
+      }
+    ],
+    "name": "mintStreaming",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
         "type": "uint256"
       }
     ],
@@ -900,8 +1048,13 @@
       },
       {
         "internalType": "uint128",
-        "name": "minAmtPerSec",
+        "name": "minAmt",
         "type": "uint128"
+      },
+      {
+        "internalType": "bool",
+        "name": "streaming",
+        "type": "bool"
       },
       {
         "internalType": "string",
@@ -924,13 +1077,23 @@
     "outputs": [
       {
         "internalType": "uint64",
-        "name": "minted",
+        "name": "timeMinted",
         "type": "uint64"
       },
       {
         "internalType": "uint128",
-        "name": "amtPerSecond",
+        "name": "amt",
         "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "lastBalance",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint64",
+        "name": "lastUpdate",
+        "type": "uint64"
       }
     ],
     "stateMutability": "view",
@@ -961,19 +1124,6 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "pool",
-    "outputs": [
-      {
-        "internalType": "contract DaiPool",
         "name": "",
         "type": "address"
       }
@@ -1055,6 +1205,25 @@
     "name": "setApprovalForAll",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "streaming",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

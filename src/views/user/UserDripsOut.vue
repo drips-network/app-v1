@@ -1,18 +1,37 @@
 <script setup>
+import { computed, ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import DripRow from '@/components/DripRow'
 import InfoBar from '@/components/InfoBar'
 import Addr from '@/components/Addr'
+import store from '@/store'
 
 const route = useRoute()
 
-const dripsOut = [
-  { sender: route.params.address, receiver: '0x0630a42785b8a92205a492b3092279529990ed0c', amount: 10 },
-  { sender: route.params.address, receiver: '0x0630a42785b8a92205a492b3092279529990ed0c', percent: 5 },
-  { sender: route.params.address, receiver: '0xeca823848221a1da310e1a711e19d82f43101b07', amount: 5 },
-  // to project...
-  { sender: route.params.address, receiver: '0x87f3834fd4fce5781b4c12500de8b90b73342861', percent: 3 }
-]
+const splits = ref([])
+
+// const dripsOut = [
+//   { sender: route.params.address, receiver: '0x0630a42785b8a92205a492b3092279529990ed0c', amount: 10 },
+//   { sender: route.params.address, receiver: '0x0630a42785b8a92205a492b3092279529990ed0c', percent: 5 },
+//   { sender: route.params.address, receiver: '0xeca823848221a1da310e1a711e19d82f43101b07', amount: 5 },
+//   // to project...
+//   { sender: route.params.address, receiver: '0x87f3834fd4fce5781b4c12500de8b90b73342861', percent: 3 }
+// ]
+
+const splitsOut = computed(() => {
+  return splits.value.map(split => ({
+    sender: route.params.address,
+    receiver: split.address,
+    percent: split.percent
+  }))
+})
+
+const dripsOut = computed(() => splitsOut.value || [])
+
+onBeforeMount(async () => {
+  const receivers = await store.dispatch('getSplitsReceivers', route.params.address)
+  splits.value = receivers.percents
+})
 </script>
 
 <template lang="pug">

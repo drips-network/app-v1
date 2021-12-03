@@ -2,8 +2,8 @@
   {
     "inputs": [
       {
-        "internalType": "contract DaiPool",
-        "name": "pool_",
+        "internalType": "contract DaiDripsHub",
+        "name": "hub_",
         "type": "address"
       },
       {
@@ -13,7 +13,7 @@
       },
       {
         "internalType": "address",
-        "name": "governance_",
+        "name": "owner_",
         "type": "address"
       }
     ],
@@ -38,8 +38,8 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "contract FundingNFT",
-        "name": "fundingNFT",
+        "internalType": "contract DripsToken",
+        "name": "fundingToken",
         "type": "address"
       },
       {
@@ -56,6 +56,25 @@
       }
     ],
     "name": "NewProject",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -86,10 +105,10 @@
   },
   {
     "inputs": [],
-    "name": "fundingNFTTemplate",
+    "name": "dripTokenTemplate",
     "outputs": [
       {
-        "internalType": "contract FundingNFT",
+        "internalType": "contract DripsToken",
         "name": "",
         "type": "address"
       }
@@ -146,8 +165,13 @@
           },
           {
             "internalType": "uint128",
-            "name": "minAmtPerSec",
+            "name": "minAmt",
             "type": "uint128"
+          },
+          {
+            "internalType": "bool",
+            "name": "streaming",
+            "type": "bool"
           },
           {
             "internalType": "string",
@@ -155,44 +179,32 @@
             "type": "string"
           }
         ],
-        "internalType": "struct InputNFTType[]",
-        "name": "inputNFTTypes",
+        "internalType": "struct InputType[]",
+        "name": "inputTypes",
         "type": "tuple[]"
       },
       {
         "components": [
           {
-            "internalType": "uint32",
-            "name": "dripFraction",
-            "type": "uint32"
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
           },
           {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "receiver",
-                "type": "address"
-              },
-              {
-                "internalType": "uint128",
-                "name": "amtPerSec",
-                "type": "uint128"
-              }
-            ],
-            "internalType": "struct Receiver[]",
-            "name": "dripReceiver",
-            "type": "tuple[]"
+            "internalType": "uint32",
+            "name": "weight",
+            "type": "uint32"
           }
         ],
-        "internalType": "struct DripInput",
-        "name": "drips",
-        "type": "tuple"
+        "internalType": "struct SplitsReceiver[]",
+        "name": "splits",
+        "type": "tuple[]"
       }
     ],
     "name": "newProject",
     "outputs": [
       {
-        "internalType": "contract FundingNFT",
+        "internalType": "contract DripsToken",
         "name": "",
         "type": "address"
       }
@@ -214,6 +226,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -224,12 +249,32 @@
     "name": "projectAddr",
     "outputs": [
       {
-        "internalType": "contract FundingNFT",
+        "internalType": "contract DripsToken",
         "name": "",
         "type": "address"
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
