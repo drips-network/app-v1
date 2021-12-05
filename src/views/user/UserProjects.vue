@@ -61,8 +61,8 @@ section.user-projects
       li(v-for="project in projects")
         user-project(:project="project")
 
-      template(v-if="!projects.length")
-        .mt-60.flex.justify-center
-          router-link.btn.btn-xl.btn-outline.px-60(to="/create") Create ✨
+    footer(v-if="!projects.length")
+      .mt-40.flex.justify-center
+        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/create") Create ✨
 
 </template>
