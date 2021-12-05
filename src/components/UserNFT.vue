@@ -143,8 +143,14 @@ onBeforeMount(() => {
 
   .flex-1
     figure.mt-32.mb-32
+      //- (custom nft image)
+      template(v-if="nftMeta.image")
+        .flex.justify-center
+          img.block.max-w-full.rounded-md(:src="ipfsUrl(nftMeta.image)", alt="Member Token Image")
+
       //- inline svg (for exteneral ipfs bg/assets)
-      .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
+      template(v-else)
+        .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
 
       //- svg-nft-test-2.max-w-full.mx-auto
       //- img.max-w-full.mx-auto(src="https://cloudflare-ipfs.com/ipfs/QmXmduqpDqS5aY1ZAf5tSig5UWL2P9Wo31QUuVTq9hJY33")
