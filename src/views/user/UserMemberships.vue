@@ -17,10 +17,11 @@ const fetchUserNFTs = (tokenReceiver) => {
     query: `
       query ($tokenReceiver: Bytes!) {
         tokens (where: {tokenReceiver: $tokenReceiver}) {
-          streaming: tokenType { streaming }
+          tokenId
+          tokenType { streaming }
           owner: tokenReceiver
           projectAddress: tokenRegistryAddress
-          amtPerSec
+          amount: amtPerSec
         }
       }
     `
@@ -30,7 +31,7 @@ const fetchUserNFTs = (tokenReceiver) => {
 onBeforeMount(async () => {
   try {
     const resp = await fetchUserNFTs(route.params.address)
-    nfts.value = resp.data.nfts || []
+    nfts.value = resp.data?.tokens || []
   } catch (e) {
     console.error(e)
   }
@@ -48,13 +49,13 @@ section.user-memberships
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You
         template(v-else) #[addr.font-bold(:address="$route.params.address")]
-        | &nbsp;joined <b>{{ nfts.length }} communities{{ nfts.length === 1 ? '' : 's' }}</b>
+        | &nbsp;are a <b>member</b> of <b>{{ nfts.length }} communities{{ nfts.length === 1 ? '' : 's' }}</b>
 
     section.px-2
       ul.flex.flex-wrap.w-full_40.-mx-20
         //- nfts...
-        li.px-20.w-1x2.mb-40(v-for="nft in nfts")
-          user-nft(:nft="nft")
+        li.px-20.w-1x2.mb-40.flex(v-for="nft in nfts")
+          user-nft.w-full(:nft="nft")
 
   template(v-else)
     loading-bar

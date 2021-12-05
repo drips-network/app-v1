@@ -359,8 +359,9 @@ export default createStore({
 
     async getNFTBalance (_, { projectAddress, tokenId }) {
       try {
+        if (!provider) await dispatch('init')
         const contract = getProjectContract(projectAddress)
-        return await contract.withdrawable(tokenId)
+        return contract['withdrawable(uint256)'](tokenId)
       } catch (e) {
         console.error('@getNFTBalance', e, arguments)
       }
@@ -523,7 +524,7 @@ export default createStore({
         return ens
       } catch (e) {
         console.error(e)
-        return fallback
+        return null
       }
     },
 

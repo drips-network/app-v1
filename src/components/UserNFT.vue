@@ -16,7 +16,7 @@ const props = defineProps({
 })
 
 const nft = markRaw(props.nft)
-const nftRate = toDAIPerMo(nft.amtPerSec)
+const nftRate = toDAIPerMo(nft.amount)
 const tokenId = nft.tokenId
 const nftMeta = ref({})
 const nftExpiryDate = ref()
@@ -132,94 +132,97 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-.user-nft.shadow-md-blue.rounded-2xl.p-28
+.user-nft.shadow-md-blue.rounded-2xl.p-28.flex.flex-col
+  //- TODO redesign owner actions below tile(?)
   h6.flex.items-center
     .h-36.w-36.rounded-full.overflow-hidden.relative.mr-16.bg-indigo-800
-      img.absolute.overlay.object-cover.object-center(:src="ipfsUrl(projectMeta.image)")
+      img.absolute.overlay.object-cover.object-center(v-if="projectMeta.image", :src="ipfsUrl(projectMeta.image)")
+      img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
     router-link.text-xl.font-semibold.text-violet-600.-mt-3(:to="{name: 'project', params: { address: projectAddress }}")
       | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
 
-  figure.mt-32.mb-40
-    //- inline svg (for exteneral ipfs bg/assets)
-    .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
+  .flex-1
+    figure.mt-32.mb-32
+      //- inline svg (for exteneral ipfs bg/assets)
+      .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
 
-    //- svg-nft-test-2.max-w-full.mx-auto
-    //- img.max-w-full.mx-auto(src="https://cloudflare-ipfs.com/ipfs/QmXmduqpDqS5aY1ZAf5tSig5UWL2P9Wo31QUuVTq9hJY33")
+      //- svg-nft-test-2.max-w-full.mx-auto
+      //- img.max-w-full.mx-auto(src="https://cloudflare-ipfs.com/ipfs/QmXmduqpDqS5aY1ZAf5tSig5UWL2P9Wo31QUuVTq9hJY33")
 
-    //- filler graphic
-    //- .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative.overflow-hidden
-      //- nft meta img
-      img.absolute.overlay.object-contain.object-center(v-if="nftMeta.image", :src="nftMeta.image")
+      //- filler graphic
+      //- .rounded-2xl.border.border-indigo-700.text-violet-600.aspect-w-16.aspect-h-9.relative.overflow-hidden
+        //- nft meta img
+        img.absolute.overlay.object-contain.object-center(v-if="nftMeta.image", :src="nftMeta.image")
 
-      //- temp img
-      //- .absolute.overlay.flex.items-center.justify-center.text-center
-        | {{ '#' + nft.tokenId }}<br>
-        | Type {{ nft.typeId }}<br>
-        | {{ nftRate }} DAI/mo
+        //- temp img
+        //- .absolute.overlay.flex.items-center.justify-center.text-center
+          | {{ '#' + nft.tokenId }}<br>
+          | Type {{ nft.typeId }}<br>
+          | {{ nftRate }} DAI/mo
 
-  //- (owner actions)
-  template(v-if="nft.owner === $store.state.address")
-    //- balance/valid
-    .flex.my-10.-mx-5
-      //- balance
-      .flex-1.px-5
-        .font-medium.text-center.mb-12 Balance
-        .h-80.rounded-full.bg-indigo-700.flex.items-center
-          svg-dai.w-32.h-32.ml-16.mr-6
-          .flex-1
-            .text-2xl.w-full.text-center.font-semibold {{ balanceDAI }}
-          button.flex-shrink-0.h-54.w-54.bg-indigo-900.flex.items-center.justify-center.rounded-full.mr-12.ml-2.transform.duration-150off(@click="toggleAdjust", :class="{'rotate-45': adjust}")
-            svg-plus-minus
-      //- valid for
-      .w-1x2.px-5(v-show="!adjust")
-        .font-medium.text-center.mb-12 Valid for
-        .h-80.rounded-full.bg-indigo-700.flex.items-center
-          .text-2xl.w-full.text-center.font-semibold(:title="nftExpiryDate")
-            template(v-if="nftActiveForDays === null") -
-            span.text-red-500(v-else-if="nftActiveForDays < 0") INACTIVE
-            span.text-red-500(v-else-if="nftActiveForDays < 1") &lt;1 day
-            //- template(v-else-if="nftActiveForDays < 2") 1 day
-            span(v-else, :class="{'text-red-500': nftActiveForDays < 10}")
-              | {{ Math.ceil(nftActiveForDays) }} days
+    //- (owner actions)
+    template(v-if="nft.owner === $store.state.address && nft.tokenType.streaming")
+      //- balance/valid
+      .flex.my-10.-mx-5
+        //- balance
+        .flex-1.px-5
+          .font-medium.text-center.mb-12 Balance
+          .h-80.rounded-full.bg-indigo-700.flex.items-center
+            svg-dai.w-32.h-32.ml-16.mr-6
+            .flex-1
+              .text-2xl.w-full.text-center.font-semibold {{ balanceDAI }}
+            button.flex-shrink-0.h-54.w-54.bg-indigo-900.flex.items-center.justify-center.rounded-full.mr-12.ml-2.transform.duration-150off(@click="toggleAdjust", :class="{'rotate-45': adjust}")
+              svg-plus-minus
+        //- valid for
+        .w-1x2.px-5(v-show="!adjust")
+          .font-medium.text-center.mb-12 Valid for
+          .h-80.rounded-full.bg-indigo-700.flex.items-center
+            .text-2xl.w-full.text-center.font-semibold(:title="nftExpiryDate")
+              template(v-if="nftActiveForDays === null") -
+              span.text-red-500(v-else-if="nftActiveForDays < 0") INACTIVE
+              span.text-red-500(v-else-if="nftActiveForDays < 1") &lt;1 day
+              //- template(v-else-if="nftActiveForDays < 2") 1 day
+              span(v-else, :class="{'text-red-500': nftActiveForDays < 10}")
+                | {{ Math.ceil(nftActiveForDays) }} days
 
-    //- (edit balance buttons)
-    .flex.my-10.-mx-5(v-show="adjust === 'edit'")
-      button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'add'") Add
-      button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="showWithdrawForm") Withdraw
+      //- (edit balance buttons)
+      .flex.my-10.-mx-5(v-show="adjust === 'edit'")
+        button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="adjust = 'add'") Add
+        button.btn.btn-lg.btn-outline.flex-1.mx-5.font-semibold.text-xl(@click="showWithdrawForm") Withdraw
 
-    //- (add balance)
-    form.my-10(v-if="adjust === 'add'", validate, @submit.prevent="topUp")
-      .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
-        .flex.items-center
-          svg-dai.w-32.h-32.ml-16.mr-6
+      //- (add balance)
+      form.my-10(v-if="adjust === 'add'", validate, @submit.prevent="topUp")
+        .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex
+          .flex.items-center
+            svg-dai.w-32.h-32.ml-16.mr-6
 
-        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", step="0.01", required, v-autofocus)
+          input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="topUpAmt", type="number", step="0.01", required, v-autofocus)
 
-        .w-32.mr-16.ml-6
-        //- .flex.items-center
-          button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32(type="submit") Add
-      button.mt-10.btn.btn-lg.bg-violet-600.w-full.mx-auto.font-semibold.text-xl(type="submit")
-        | Add
+          .w-32.mr-16.ml-6
+          //- .flex.items-center
+            button.ml-6.mr-12.h-54.w-112.rounded-full.bg-indigo-800.text-lg.font-semibold.px-32(type="submit") Add
+        button.mt-10.btn.btn-lg.bg-violet-600.w-full.mx-auto.font-semibold.text-xl(type="submit")
+          | Add
 
-      tx-link(v-if="topUpTx", :tx="topUpTx")
+        tx-link(v-if="topUpTx", :tx="topUpTx")
 
-    //- (withdraw balance)
-    form.my-10(v-if="adjust === 'withdraw'", validate, @submit.prevent="withdraw")
-      .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex.items-center
-        .flex.items-center
-          svg-dai.w-32.h-32.ml-16.mr-18
+      //- (withdraw balance)
+      form.my-10(v-if="adjust === 'withdraw'", validate, @submit.prevent="withdraw")
+        .h-80.rounded-full.border.border-violet-700.focus-within_border-violet-600.flex.items-center
+          .flex.items-center
+            svg-dai.w-32.h-32.ml-16.mr-18
 
-        input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="withdrawAmt", type="number", :min="1 / precision", :max="withdrawMax", :step="1 / precision", required, v-autofocus)
+          input.flex-1.flex.items-center.text-center.font-semibold.text-2xl(v-model="withdrawAmt", type="number", :min="1 / precision", :max="withdrawMax", :step="1 / precision", required, v-autofocus)
 
-        .mr-24.text-violet-600.text-base.ml-12
-          //- TODO: add max click
-          button.py-6(@click.prevent="setWithdrawToMax") MAX
+          .mr-24.text-violet-600.text-base.ml-12
+            //- TODO: add max click
+            button.py-6(@click.prevent="setWithdrawToMax") MAX
 
-      button.mt-10.btn.btn-lg.bg-violet-600.w-full.mx-auto.font-semibold.text-xl(type="submit")
-        | Withdraw
+        button.mt-10.btn.btn-lg.bg-violet-600.w-full.mx-auto.font-semibold.text-xl(type="submit")
+          | Withdraw
 
-      tx-link(v-if="withdrawTx", :tx="withdrawTx")
+        tx-link(v-if="withdrawTx", :tx="withdrawTx")
 
-  footer.mt-32.flex.justify-end
+  footer.mt-12.flex.justify-end
     a.text-violet-600(:href="`https://testnets.opensea.io/assets/${projectAddress}/${tokenId}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
 </template>
