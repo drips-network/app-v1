@@ -11,6 +11,8 @@ export const toWei = (dai) => {
   return constants.WeiPerEther.mul(dai)
 }
 
+export const toDAI = wei => utils.formatEther(wei)
+
 export const toDAIPerMo = (weiBN) => {
   const dai = utils.formatEther(weiBN) * 30 * 24 * 60 * 60
   // round to nearest hundredth

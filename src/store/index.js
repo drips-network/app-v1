@@ -289,54 +289,49 @@ export default createStore({
       return daiContract.allowance(state.address, projectAddress)
     },
 
-    async mintProjectNFT ({ state, dispatch }, { projectAddress, typeId = 0, topUpAmt, amtPerSec }) {
-      try {
-        if (!state.address) {
-          await dispatch('connect')
-        }
-
-        const contract = new Ethers.Contract(projectAddress, DripsToken.abi, provider)
-        const contractSigner = contract.connect(signer)
-
-        const tx = await contractSigner['mint(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
-        return tx
-      } catch (e) {
-        console.error('@mintProjectNFT', e)
-        if (e.message) {
-          alert(e.message)
-        }
-        throw e
-      }
-    },
-
-    async waitForNFTMint ({ state }, { projectAddress }) {
+    /* mint non-streaming / one-time payment nft */
+    mintNFT ({ state }, { projectAddress, typeId, giveAmt }) {
       const contract = getProjectContract(projectAddress)
-
-      return new Promise((resolve) => {
-        // listener
-        const onNewNFT = async (newTokenId, nftReceiver, typeId, topUpAmt, amtPerSec) => {
-          const nft = {
-            tokenId: newTokenId.toString(),
-            nftReceiver,
-            projectAddress,
-            typeId: typeId.toString(),
-            topUpAmt: typeId.toString(),
-            amtPerSec: amtPerSec.toString()
-          }
-          console.log('@NewNFT', nft)
-
-          // if owner matches tx sender...
-          if (nftReceiver.toLowerCase() === state.address.toLowerCase()) {
-            contract.off('NewNFT', onNewNFT)
-            return resolve(nft)
-          }
-        }
-
-        // listen!
-        console.log('listen for new NFT...')
-        contract.on('NewNFT', onNewNFT)
-      })
+      const contractSigner = contract.connect(signer)
+      return contractSigner['mint(address,uint128,uint128)'](state.address, typeId, giveAmt)
     },
+
+    async mintStreamingNFT ({ state }, { projectAddress, typeId, topUpAmt, amtPerSec }) {
+      const contract = getProjectContract(projectAddress)
+      const contractSigner = contract.connect(signer)
+      return contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
+    },
+
+    // async waitForMint ({ state }, { projectAddress, isStreaming, typeId }) {
+    //   const contract = getProjectContract(projectAddress)
+    //   const eventName = isStreaming ? 'NewStreamingToken' : 'NewToken'
+
+    //   return new Promise((resolve) => {
+    //     // listener
+    //     const onNewNFT = async (newTokenId, receiver, newTypeId) => {
+    //       const nft = {
+    //         tokenId: newTokenId.toString(),
+    //         receiver,
+    //         projectAddress,
+    //         typeId: newTypeId.toString(),
+    //       }
+    //       console.log('@NewNFT', nft)
+
+    //       // if owner matches tx sender...
+    //       if (
+    //         receiver.toLowerCase() === state.address.toLowerCase()
+    //         // && typeId === newTypeId
+    //       ) {
+    //         contract.off(eventName, onNewNFT)
+    //         return resolve(nft)
+    //       }
+    //     }
+
+    //     // listen!
+    //     console.log('listen for new NFT...')
+    //     contract.on(eventName, onNewNFT)
+    //   })
+    // },
 
     async collectProjectFunds (_, { projectAddress }) {
       try {
@@ -439,7 +434,7 @@ export default createStore({
     async getSplitsReceivers ({ state, dispatch }, address) {
       try {
         if (!provider) await dispatch('init')
-        
+
         let splits = []
         let raw = []
 
@@ -447,7 +442,7 @@ export default createStore({
         // fetch events...
         let events = await contract.queryFilter('SplitsUpdated')
         // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
         // has splits?
         if (events?.length) {
@@ -486,7 +481,7 @@ export default createStore({
         const contractSigner = contract.connect(signer)
         // tx...
         console.log('update splits:', { currentReceivers, newReceivers })
-        return contractSigner.setSplits(currentReceivers, newReceivers)  
+        return contractSigner.setSplits(currentReceivers, newReceivers)
       } catch (e) {
         console.error(e)
         throw e
@@ -513,7 +508,7 @@ export default createStore({
       return contract.withdrawable(tokenId)
     },
 
-    async resolveAddress ({ state, getters, commit, dispatch }, { address  }) {
+    async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
         // saved?
         const saved = state.addresses[address]

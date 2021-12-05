@@ -11,17 +11,15 @@ const route = useRoute()
 
 const nfts = ref()
 
-const fetchUserNFTs = (nftReceiver) => {
+const fetchUserNFTs = (tokenReceiver) => {
   return api({
-    variables: { nftReceiver },
+    variables: { tokenReceiver },
     query: `
-      query ($nftReceiver: Bytes!) {
-        nfts (where: {nftReceiver: $nftReceiver}) {
-          id
-          tokenId
-          owner: nftReceiver
-          projectAddress: nftRegistryAddress
-          typeId: nftTypeId
+      query ($tokenReceiver: Bytes!) {
+        tokens (where: {tokenReceiver: $tokenReceiver}) {
+          streaming: tokenType { streaming }
+          owner: tokenReceiver
+          projectAddress: tokenRegistryAddress
           amtPerSec
         }
       }
