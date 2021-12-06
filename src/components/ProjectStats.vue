@@ -17,15 +17,17 @@ const query = `
     tokens (where: {tokenRegistryAddress: $tokenRegistryAddress}) {
       id
       owner: tokenReceiver
-      tokenId
-      tokenTypeId
+      # tokenId
+      # tokenType {
+      #   streaming
+      # }
     }
   }
 `
 
 const nfts = ref(null)
 const isMonthly = computed(() => {
-  return props.project?.tokenTypes && props.project.tokenTypes[0]?.tokenTypeId === '0'
+  return props.project?.tokenTypes && props.project.tokenTypes[0]?.streaming
 })
 
 onBeforeMount(async () => {
@@ -33,6 +35,7 @@ onBeforeMount(async () => {
   try {
     const variables = { tokenRegistryAddress: props.project.id }
     const resp = await api({ query, variables })
+    console.log(props.project.id, resp)
     nfts.value = resp.data.tokens
   } catch (e) {
     console.error(e)
@@ -77,7 +80,8 @@ section.project-stats.flex.w-full_10.-mx-5
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
       h6 🧩&nbsp; Member Tokens
-    template(v-if="nfts") {{ nfts.length }}
+    template(v-if="nfts")
+      | {{ nfts.length }}
       //- .flex.items-center
         | {{ nfts.length }}
         <span class="hiddenff ml-6 relative py-2 mt-3" style="font-size:0.75em">
@@ -85,6 +89,10 @@ section.project-stats.flex.w-full_10.-mx-5
           .absolute.overlay.bg-violet-600(style="mix-blend-mode:darken")
         </span>
     template(v-else) ...
+    //- (limit)
+    .absolute.bottom-0.right-0.p-22.flex.items-center
+      span.font-semibold.font-sans.text-base(v-if="!isMonthly")
+        | of {{ props.project.tokenTypes[0].limit }}
 
   //- Goal
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")

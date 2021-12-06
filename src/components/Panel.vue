@@ -37,7 +37,7 @@ section.panel.panel-dark.w-full.max-w-screen-sm.text-center
       .text-2xl.font-semibold.mb-40.leading-tight
         slot(name="header")
 
-      .text-md.text-violet-650
+      .text-md
         slot(name="description")
 
     //- body

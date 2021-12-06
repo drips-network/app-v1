@@ -67,9 +67,9 @@ html {
   }
 }
 .btn-outline {
-  @apply border border-violet-700 focus_border-violet-600;
+  @apply border border-violet-700;
   &:not([disabled]) {
-    @apply notouch_hover_border-violet-600 notouch_hover_bg-violet-600;
+    @apply notouch_hover_border-white notouch_hover_bg-violet-600;
   }
 }
 .btn-violet{

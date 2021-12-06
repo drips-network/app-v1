@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import store from '@/store'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import InputBody from '@/components/InputBody'
-import ModalFund from '@/components/ModalFund'
+import ModalMint from '@/components/ModalMint'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
@@ -17,7 +17,7 @@ import ProjectStats from '@/components/ProjectStats'
 import Addr from '@/components/Addr'
 import SvgPen from '@/components/SvgPen'
 import SvgXCircle from '@/components/SvgXCircle'
-import { fromWei, toDAIPerMo, ipfsUrl } from '@/utils'
+import { fromWei, toDAI, toDAIPerMo, ipfsUrl } from '@/utils'
 
 const route = useRoute()
 
@@ -72,7 +72,9 @@ const getProject = async () => {
 
     // set nft
     tokenType.value = project.value.tokenTypes[0]
-    minDAI.value = toDAIPerMo(tokenType.value.minAmt)
+    // set min
+    minDAI.value = tokenType.value.streaming ? toDAIPerMo(tokenType.value.minAmt)
+      : Number(toDAI(tokenType.value.minAmt)).toFixed(0)
 
     return true
   } catch (e) {
@@ -190,7 +192,7 @@ article.project.pb-96
                 | Close
                 svg-x-circle.h-32.ml-12.text-white.opacity-30
 
-    modal-fund(v-if="tokenType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :tokenType="tokenType")
+    modal-mint(v-if="tokenType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :tokenType="tokenType")
 
     modal-edit-project-info(v-if="editProject", :open="editProject", @updated="getProjectMeta", @close="editProject = editMenuOpen = false", :meta="meta", :projectAddress="projectAddress")
 

@@ -1,4 +1,4 @@
-const apiUrl = 'https://api.studio.thegraph.com/query/9578/drips-subgraph-v8/v0.0.1'
+const apiUrl = 'https://api.studio.thegraph.com/query/9578/drips-subgraph-v8/v0.0.2'
 const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC // string
 
 export default async function ({ query, variables }) {
@@ -56,6 +56,7 @@ export const queryProject = `
         tokenTypeId
         limit
         minAmt: minAmtPerSec
+        streaming
       }
     }
   }

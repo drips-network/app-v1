@@ -21,7 +21,9 @@ const fetchUserProjects = (projectOwner) => {
           projectOwner
           daiCollected
           tokenTypes {
-            tokenTypeId
+            # tokenTypeId
+            streaming
+            limit
           }
         }
       }
@@ -46,7 +48,10 @@ section.user-projects
   //- p.mx-40.mb-40.border.border-violet-700.rounded-full.text-md.text-violet-650.h-80.flex.items-center.justify-center
     div Incoming funds from <b>Drips</b> form <b>Pools</b>.
 
-  template(v-if="projects")
+  template(v-if="!projects")
+    loading-bar
+
+  template(v-else)
     info-bar.justify-center.px-32.mb-20
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
@@ -58,6 +63,8 @@ section.user-projects
       li(v-for="project in projects")
         user-project(:project="project")
 
-  template(v-else)
-    loading-bar
+    footer(v-if="!projects.length")
+      .mt-40.flex.justify-center
+        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/create") Create ✨
+
 </template>

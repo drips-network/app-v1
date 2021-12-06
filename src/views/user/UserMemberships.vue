@@ -11,18 +11,17 @@ const route = useRoute()
 
 const nfts = ref()
 
-const fetchUserNFTs = (nftReceiver) => {
+const fetchUserNFTs = (tokenReceiver) => {
   return api({
-    variables: { nftReceiver },
+    variables: { tokenReceiver },
     query: `
-      query ($nftReceiver: Bytes!) {
-        nfts (where: {nftReceiver: $nftReceiver}) {
-          id
+      query ($tokenReceiver: Bytes!) {
+        tokens (where: {tokenReceiver: $tokenReceiver}) {
           tokenId
-          owner: nftReceiver
-          projectAddress: nftRegistryAddress
-          typeId: nftTypeId
-          amtPerSec
+          tokenType { streaming }
+          owner: tokenReceiver
+          projectAddress: tokenRegistryAddress
+          amount: amtPerSec
         }
       }
     `
@@ -32,7 +31,7 @@ const fetchUserNFTs = (nftReceiver) => {
 onBeforeMount(async () => {
   try {
     const resp = await fetchUserNFTs(route.params.address)
-    nfts.value = resp.data.nfts || []
+    nfts.value = resp.data?.tokens || []
   } catch (e) {
     console.error(e)
   }
@@ -45,19 +44,24 @@ section.user-memberships
     .mx-auto.bg-indigo-800.rounded-2xlb.py-24.px-32.text-md.text-violet-650
       | <b>Drips</b> from <b>Memberships</b> appear here.
 
-  template(v-if="nfts")
+  template(v-if="!nfts")
+    loading-bar
+
+  template(v-else)
     info-bar.mb-20.justify-center.px-32
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You
         template(v-else) #[addr.font-bold(:address="$route.params.address")]
-        | &nbsp;joined <b>{{ nfts.length }} communities{{ nfts.length === 1 ? '' : 's' }}</b>
+        | &nbsp;are a <b>member</b> of <b>{{ nfts.length }} communities{{ nfts.length === 1 ? '' : 's' }}</b>
 
     section.px-2
       ul.flex.flex-wrap.w-full_40.-mx-20
         //- nfts...
-        li.px-20.w-1x2.mb-40(v-for="nft in nfts")
-          user-nft(:nft="nft")
+        li.px-20.w-1x2.mb-40.flex(v-for="nft in nfts")
+          user-nft.w-full(:nft="nft")
 
-  template(v-else)
-    loading-bar
+    footer(v-if="!nfts.length")
+      .mt-40.flex.justify-center
+        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/explore") Explore &nbsp;🔎
+
 </template>

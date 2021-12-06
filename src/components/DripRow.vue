@@ -14,11 +14,11 @@ const props = defineProps(['drip'])
 
   router-link.h-80.flex.items-center.rounded-full.bg-indigo-700.px-16.mr-2.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': props.drip.percent }", :to="{name: 'user', params: { address: props.drip.sender }}")
     //- sender avatar / blockie
-    avatar-blockie.w-44.h-44.flex-shrink-0(:address="props.drip.sender", width="44")
+    avatar-blockie.w-44.h-44.flex-shrink-0(:address="props.drip.sender", width="44", :key="props.drip.sender")
 
     .flex-1.min-w-0.truncate.inline.mx-12.text-center
       .inline
-        addr.font-bold.inline(:address="props.drip.sender")
+        addr.font-bold.inline(:address="props.drip.sender", :youOn="true", :key="props.drip.sender")
 
   //- drip icon
   .w-80.h-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': props.drip.percent }")
@@ -92,6 +92,6 @@ const props = defineProps(['drip'])
   router-link.h-80.flex.items-center.justify-end.rounded-full.bg-indigo-700.px-16.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': props.drip.percent }", :to="{name: 'user', params: { address: props.drip.receiver }}")
     .flex-1.min-w-0.truncate.inline.mx-12.text-center
       .inline
-        addr.font-bold.inline(:address="props.drip.receiver")
-    avatar-blockie.w-44(:address="props.drip.receiver", width="44")
+        addr.font-bold.inline(:address="props.drip.receiver", :youOn="true", :key="props.drip.receiver")
+    avatar-blockie.w-44(:address="props.drip.receiver", width="44", :key="props.drip.receiver")
 </template>

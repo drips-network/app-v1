@@ -49,6 +49,12 @@ const slots = useSlots()
         .flex.items-center.text-violet-600
           svg-dai(size="lg")
           .text-lg.tracking-tight /MO
+
+    //- (symbol: months)
+    template(v-if="props.symbol === 'months'")
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+        .flex.items-center.text-violet-600
+          .text-lg.tracking-tight MO
 </template>
 
 <style lang="postcss">

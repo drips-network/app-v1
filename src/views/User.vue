@@ -13,6 +13,13 @@ const dripModalOpen = ref(false)
 <script>
 const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
   try {
+    const address = to.params.address.toLowerCase()
+    
+    // enforce lowercase
+    if (address !== to.params.address) {
+      next({name: 'user', params: { address }})
+    }
+
     // timeout for slow API prj lookup... (6s?)
     // const projectTimeout = setTimeout(() => {
     //   console.warn('project lookup timeout. skipping...')
@@ -56,9 +63,7 @@ article.profile.pb-80
       .h-160.rounded-full.bg-indigo-700.flex.items-center
         avatar-blockie.w-112.mx-24.mr-36(:address="$route.params.address", width="112")
         h1.text-2xl.font-bold.pr-60
-          template(v-if="$route.params.address === $store.state.address") You
-          template(v-else)
-            addr(:address="$route.params.address")
+          addr(:address="$route.params.address", :youOn="true")
 
       //- (drip-to btn)
       template(v-if="!$store.getters.isWalletAddr($route.params.address)")
@@ -95,5 +100,7 @@ article.profile.pb-80
 
   //- modals
   modal-drip-to(v-if="dripModalOpen", :address="$route.params.address", :open="dripModalOpen", @close="dripModalOpen = false")
+    template(v-slot:header)
+     h6 Drip to<br>#[addr.text-violet-650(:address="props.address")]
 
 </template>

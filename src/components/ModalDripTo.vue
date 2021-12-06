@@ -8,12 +8,15 @@ import InputBody from '@/components/InputBody'
 import InputRadio from '@/components/InputRadio'
 import SvgDai from '@/components/SvgDai'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit'
+import ModalDripsEdit from '@/components/ModalDripsEdit'
 import { constants } from 'ethers'
 
 const props = defineProps(['address'])
 
 const dripAmt = ref(10)
 const dripType = ref('monthly')
+
+const dripToReceiver = ref(props.address)
 
 // const minDAIPerSec = constants.WeiPerEther // 1 DAI (bn)
 const minDAIPerMonth = 1 // minDAIPerSec.mul(30 * 24 * 60 * 60) // bn
@@ -49,11 +52,15 @@ const weiPerSec = computed(() => {
 // }
 
 const confirmSplits = ref(false)
+const confirmDrips = ref(false)
 
 const dripTx = ref()
 const drip = () => {
   if (dripType.value === 'split') {
     confirmSplits.value = true
+  }
+  if (dripType.value === 'monthly') {
+    confirmDrips.value = true
   }
 }
 
@@ -66,12 +73,15 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="💧")
 
     template(v-slot:header)
-      dialog-title.leading-snug Drip to<br>#[addr.text-violet-650(:address="props.address")]
+      dialog-title.leading-snug
+        | Drip to
+        br
+        addr.text-violet-650(:address="props.address", @ens="ens => { dripToReceiver = ens }")
 
     template(v-slot:description)
       dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
         template(v-if="dripType === 'monthly'")
-          | Stream DAI on a <b>monthly</b> basis.
+          | Stream DAI on a #[b.text-violet-650 monthly] basis.
         template(v-if="dripType === 'split'")
           | Share a <b class="text-violet-650">percent</b> of your incoming funds.
 
@@ -91,14 +101,20 @@ modal(v-bind="$attrs", @close="$emit('close')")
         input(v-model="prePayMonths", type="number", min="1", step="1" required)
 
       .mt-40.mb-6
-        button.btn.btn-lg.btn-violet.px-60.mx-auto.tracking-wider(type="submit") Drip 💧
+        button.btn.btn-lg.btn-violet.px-60.mx-auto(type="submit") Review
 
-  modal-splits-edit(v-if="confirmSplits", :open="confirmSplits", :newRecipient="{ address: props.address, percent: dripAmt }", @close="confirmSplits = false")
+  modal-splits-edit(v-if="confirmSplits", :open="confirmSplits", :newRecipient="{ receiverInput: dripToReceiver, percent: dripAmt }", @close="confirmSplits = false")
     template(v-slot:header)
       h6 Confirm Drip Shares
 
     template(v-slot:description)
       p Review all the addresses you will now #[b.text-violet-650 share]<br>your incoming funds with.
 
+  modal-drips-edit(v-if="confirmDrips", :open="confirmDrips", :newRecipient="{ receiverInput: dripToReceiver, amount: dripAmt }", @close="confirmDrips = false")
+    template(v-slot:header)
+      h6 Confirm Drips
+
+    template(v-slot:description)
+      p Review your new monthly drip recipients and their amounts.
 
 </template>

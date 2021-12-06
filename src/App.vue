@@ -27,7 +27,7 @@ store.dispatch('init')
           .btn-darker.pl-6.text-violet-650.font-semibold.rounded-full
             router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")
               //- avi
-              avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28")
+              avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28", :key="$store.state.address")
               //- address
               | {{ $store.getters.addrShort($store.state.address) }}
           button.ml-2.p-10.mr-8.notouch_hover_text-white(@click="$store.dispatch('disconnect')", title="Disconnect")

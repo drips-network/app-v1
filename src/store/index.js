@@ -46,7 +46,7 @@ export default createStore({
     addrShort: (state) => (addr) => {
       // return ENS name or shortened 0x8888...8888
       return state.addresses[addr] ? state.addresses[addr]
-        : addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...'
+        : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address
   },
@@ -266,77 +266,77 @@ export default createStore({
       }
     },
 
-    async approveDAIContract ({ state, dispatch }, projectAddress) {
+    async approveDAIContract ({ state, dispatch }, address) {
       try {
-        if (!state.address) {
-          await dispatch('connect')
-        }
+        if (!state.address) await dispatch('connect')
+
+        // if no address defined, set to DripsHub address
+        address = address || DaiDripsHub.address
 
         const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
         const contractSigner = contract.connect(signer)
         // approve max amount
         const amount = Ethers.constants.MaxUint256
-        const tx = await contractSigner.approve(projectAddress, amount)
+        const tx = await contractSigner.approve(address, amount)
         return tx
       } catch (e) {
         console.error('@approveDAIContract', e)
       }
     },
 
-    async getProjectAllowance ({ state, dispatch }, projectAddress) {
+    /* See how much DAI an address is allowed to spend on behalf of the signed-in user */
+    async getAllowance ({ state, dispatch }, address) {
       if (!state.address) await dispatch('connect')
+      // if no address defined, set to DripsHub address
+      address = address || DaiDripsHub.address
+      // get
       const daiContract = getDAIContract()
-      return daiContract.allowance(state.address, projectAddress)
+      return daiContract.allowance(state.address, address)
     },
 
-    async mintProjectNFT ({ state, dispatch }, { projectAddress, typeId = 0, topUpAmt, amtPerSec }) {
-      try {
-        if (!state.address) {
-          await dispatch('connect')
-        }
-
-        const contract = new Ethers.Contract(projectAddress, DripsToken.abi, provider)
-        const contractSigner = contract.connect(signer)
-
-        const tx = await contractSigner['mint(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
-        return tx
-      } catch (e) {
-        console.error('@mintProjectNFT', e)
-        if (e.message) {
-          alert(e.message)
-        }
-        throw e
-      }
-    },
-
-    async waitForNFTMint ({ state }, { projectAddress }) {
+    /* mint non-streaming / one-time payment nft */
+    mintNFT ({ state }, { projectAddress, typeId, giveAmt }) {
       const contract = getProjectContract(projectAddress)
-
-      return new Promise((resolve) => {
-        // listener
-        const onNewNFT = async (newTokenId, nftReceiver, typeId, topUpAmt, amtPerSec) => {
-          const nft = {
-            tokenId: newTokenId.toString(),
-            nftReceiver,
-            projectAddress,
-            typeId: typeId.toString(),
-            topUpAmt: typeId.toString(),
-            amtPerSec: amtPerSec.toString()
-          }
-          console.log('@NewNFT', nft)
-
-          // if owner matches tx sender...
-          if (nftReceiver.toLowerCase() === state.address.toLowerCase()) {
-            contract.off('NewNFT', onNewNFT)
-            return resolve(nft)
-          }
-        }
-
-        // listen!
-        console.log('listen for new NFT...')
-        contract.on('NewNFT', onNewNFT)
-      })
+      const contractSigner = contract.connect(signer)
+      return contractSigner['mint(address,uint128,uint128)'](state.address, typeId, giveAmt)
     },
+
+    async mintStreamingNFT ({ state }, { projectAddress, typeId, topUpAmt, amtPerSec }) {
+      const contract = getProjectContract(projectAddress)
+      const contractSigner = contract.connect(signer)
+      return contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
+    },
+
+    // async waitForMint ({ state }, { projectAddress, isStreaming, typeId }) {
+    //   const contract = getProjectContract(projectAddress)
+    //   const eventName = isStreaming ? 'NewStreamingToken' : 'NewToken'
+
+    //   return new Promise((resolve) => {
+    //     // listener
+    //     const onNewNFT = async (newTokenId, receiver, newTypeId) => {
+    //       const nft = {
+    //         tokenId: newTokenId.toString(),
+    //         receiver,
+    //         projectAddress,
+    //         typeId: newTypeId.toString(),
+    //       }
+    //       console.log('@NewNFT', nft)
+
+    //       // if owner matches tx sender...
+    //       if (
+    //         receiver.toLowerCase() === state.address.toLowerCase()
+    //         // && typeId === newTypeId
+    //       ) {
+    //         contract.off(eventName, onNewNFT)
+    //         return resolve(nft)
+    //       }
+    //     }
+
+    //     // listen!
+    //     console.log('listen for new NFT...')
+    //     contract.on(eventName, onNewNFT)
+    //   })
+    // },
 
     async collectProjectFunds (_, { projectAddress }) {
       try {
@@ -364,8 +364,9 @@ export default createStore({
 
     async getNFTBalance (_, { projectAddress, tokenId }) {
       try {
+        if (!provider) await dispatch('init')
         const contract = getProjectContract(projectAddress)
-        return await contract.withdrawable(tokenId)
+        return contract['withdrawable(uint256)'](tokenId)
       } catch (e) {
         console.error('@getNFTBalance', e, arguments)
       }
@@ -436,10 +437,55 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
+    async getUserDripsReceivers ({ state, dispatch }, address) {
+      try {
+        if (!provider) await dispatch('init')
+
+        const lastUpdate = {
+          receivers: [],
+          timestamp: 0,
+          balance: 0
+        }
+
+        const contract = getHubContract()
+        // fetch events...
+        let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
+
+        // filter by the address
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+
+        if (events.length) {
+          const lastEvent = events.pop()
+          lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
+          lastUpdate.balance = lastEvent.args[1]
+          lastUpdate.receivers = lastEvent.args[2]
+        }
+
+        return lastUpdate
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
+    async updateUserDrips ({ dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
+      try {
+        if (!signer) await dispatch('connect')
+
+        const contract = getHubContract()
+        const contractSigner = contract.connect(signer)
+        // tx...
+        return contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
     async getSplitsReceivers ({ state, dispatch }, address) {
       try {
         if (!provider) await dispatch('init')
-        
+
         let splits = []
         let raw = []
 
@@ -447,7 +493,7 @@ export default createStore({
         // fetch events...
         let events = await contract.queryFilter('SplitsUpdated')
         // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
         // has splits?
         if (events?.length) {
@@ -486,7 +532,7 @@ export default createStore({
         const contractSigner = contract.connect(signer)
         // tx...
         console.log('update splits:', { currentReceivers, newReceivers })
-        return contractSigner.setSplits(currentReceivers, newReceivers)  
+        return contractSigner.setSplits(currentReceivers, newReceivers)
       } catch (e) {
         console.error(e)
         throw e
@@ -513,7 +559,7 @@ export default createStore({
       return contract.withdrawable(tokenId)
     },
 
-    async resolveAddress ({ state, getters, commit, dispatch }, { address  }) {
+    async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
         // saved?
         const saved = state.addresses[address]
@@ -528,7 +574,7 @@ export default createStore({
         return ens
       } catch (e) {
         console.error(e)
-        return fallback
+        return null
       }
     },
 
