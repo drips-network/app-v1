@@ -37,7 +37,7 @@ const onImgFileChange = (e) => {
         return true
       } catch (e) {
         console.error(e)
-        alert('Image upload error. Perhaps the image is too large (200kb max) or the request timed out and you may try again.')
+        alert('Image upload error. Perhaps the image is too large (500kb max) or the request timed out and you may try again.')
         // revert img to current / empty
         imgSrc.value = imgSrcCurrent
       }

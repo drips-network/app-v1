@@ -17,10 +17,10 @@ exports.handler = async function (event, context) {
     const data = new FormData()
 
     // !! image too large (200kb max)
-    if (Buffer.byteLength(imgBuffer) > 200000) {
+    if (Buffer.byteLength(imgBuffer) > 500000) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ status: 400, message: 'Image must be <200kb', error: true })
+        body: JSON.stringify({ status: 400, message: 'Image must be <500kb', error: true })
       }
     }
 
