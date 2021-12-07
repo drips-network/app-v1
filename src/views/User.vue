@@ -27,7 +27,8 @@ watch(isMyUser, () => getMyCollectable())
 
 const getMyCollectable = () => {
   store.dispatch('getCollectable', { address: route.params.address })
-    .then(amts => { console.log(amts, amts.toString()); collectableAmts.value = amts })
+    .then(amts => { collectableAmts.value = amts })
+    .catch(console.error)
 }
 
 onMounted(() => isMyUser.value && getMyCollectable())
