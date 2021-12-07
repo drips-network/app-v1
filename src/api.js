@@ -50,6 +50,7 @@ export const queryProject = `
       id
       projectOwner
       daiCollected
+      daiSplit
       ipfsHash
       tokenTypes {
         # id

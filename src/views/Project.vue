@@ -102,7 +102,7 @@ article.project.pb-96
     //- main project panel
     section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
-      project-progress-bar.mx-10(:meta="meta")
+      project-progress-bar.mx-10.bg-indigo-800(v-if="project && meta", :meta="meta", :project="project")
 
       header.text-center.relative.pt-44
         //- owner

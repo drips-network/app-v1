@@ -70,7 +70,7 @@ onBeforeMount(() => {
       router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt") View
 
   //- progress bar
-  project-progress-bar.mt-20.mb-20(v-if="meta", :meta="meta")
+  project-progress-bar.mt-20.mb-20.bg-indigo-800(v-if="meta && project", :meta="meta", :project="project")
 
   //- (funds)
   template(v-if="isUsersProject")

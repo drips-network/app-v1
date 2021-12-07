@@ -589,30 +589,6 @@ export default createStore({
       return contractSigner.changeContractURI(ipfsHash)
     },
 
-    // async getProjectCollectable ({ dispatch }, projectAddress) {
-    //   try {
-    //     if (!provider) await dispatch('init')
-    //     const currSplits = (await dispatch('getSplitsReceivers', projectAddress)).weights
-    //     const contract = getProjectContract(projectAddress)
-    //     return contract.collectable(currSplits)
-    //   } catch (e) {
-    //     console.error(e)
-    //     throw e
-    //   }
-    // },
-
-    // async getUserCollectable ({ dispatch }, address) {
-    //   try {
-    //     if (!provider) await dispatch('init')
-    //     const currSplits = (await dispatch('getSplitsReceivers', address)).weights
-    //     const contract = getHubContract()
-    //     return contract.collectable(currSplits)
-    //   } catch (e) {
-    //     console.error(e)
-    //     throw e
-    //   }
-    // },
-
     async getCollectable ({ dispatch }, { projectAddress, address }) {
       try {
         if (!provider) await dispatch('init')
@@ -645,35 +621,7 @@ export default createStore({
         console.error('@collectFunds', e)
         throw e
       }
-    },
-
-    // async collectProjectFunds ({ dispatch }, projectAddress) {
-    //   try {
-    //     const currSplits = (await dispatch('getSplitsReceivers', projectAddress)).weights
-    //     const contract = getProjectContract(projectAddress)
-    //     const contractSigner = contract.connect(signer)
-    //     const tx = await contractSigner.collect(currSplits)
-    //     console.log('collect tx:', tx)
-    //     return tx
-    //   } catch (e) {
-    //     console.error('@collectProjectFunds', e)
-    //     throw e
-    //   }
-    // },
-
-    // async collectUserFunds ({ dispatch }, address) {
-    //   try {
-    //     const currSplits = (await dispatch('getSplitsReceivers', address)).weights
-    //     const contract = getHubContract()
-    //     const contractSigner = contract.connect(signer)
-    //     const tx = await contractSigner.collect(address, currSplits)
-    //     console.log('collect tx:', tx)
-    //     return tx
-    //   } catch (e) {
-    //     console.error('@collectUserFunds', e)
-    //     throw e
-    //   }
-    // },
+    }
   }
 })
 

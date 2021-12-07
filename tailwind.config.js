@@ -86,7 +86,10 @@ module.exports = {
         600: '#af2828'
       },
       greenbright: {
-        500: ''
+        500: '#11C559' // '#00F143', // progress bar left
+      },
+      turquoise: {
+        500: '#0FA7BC'
       },
 
       white: 'white'
@@ -970,7 +973,7 @@ module.exports = {
     ringWidth: ['responsive', 'focus-within', 'focus'],
     rotate: ['responsive', 'hover', 'focus'],
     saturate: ['responsive'],
-    scale: ['responsive', 'hover', 'focus'],
+    scale: ['responsive', 'hover', 'focus', 'group-hover'],
     sepia: ['responsive'],
     skew: ['responsive', 'hover', 'focus'],
     space: ['responsive'],

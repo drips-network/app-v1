@@ -3,5 +3,5 @@ import InfoBar from '@/components/InfoBar'
 </script>
 
 <template lang="pug">
-info-bar.justify-center.font-bold Loading...
+info-bar.justify-center.font-bold.animate-pulse Loading...
 </template>

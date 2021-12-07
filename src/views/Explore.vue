@@ -2,6 +2,7 @@
 import { ref, onBeforeMount } from 'vue'
 import api from '@/api'
 import ProjectThumbProgress from '@/components/ProjectThumbProgress'
+import LoadingBar from '@/components/LoadingBar'
 
 const projects = ref()
 
@@ -13,6 +14,11 @@ const getProjects = () => {
           id
           name: projectName
           owner: projectOwner
+          daiCollected
+          daiSplit
+          tokenTypes {
+            streaming
+          }
         }
       }
     `
@@ -33,8 +39,8 @@ article.explore.pb-144
     ul
       //- projects...
       li(v-for="project in projects")
-        project-thumb-progress.-mb-px(:project="project")
+        project-thumb-progress.-mb-pxff.my-2(:project="project")
 
   template(v-else)
-    p.px-40 Loading...
+    loading-bar
 </template>
