@@ -23,7 +23,7 @@ const totalFunds = computed(() => {
   return collectableAmts.value ? num(collectableAmts.value[0].add(collectableAmts.value[1])) : -1
 })
 
-watch(isMyUser, () => getMyCollectable())
+watch(isMyUser, (val) => val && getMyCollectable())
 
 const getMyCollectable = () => {
   store.dispatch('getCollectable', { address: route.params.address })
@@ -85,14 +85,14 @@ article.profile.pb-80
     .flex.items-endff.items-center.justify-between.w-full
       //- user tag
       .h-160.rounded-full.bg-indigo-700.flex.items-center
-        avatar-blockie.w-112.mx-24.mr-36(:address="$route.params.address", width="112")
+        avatar-blockie.w-112.mx-24.mr-36(:address="$route.params.address", width="112", :key="$route.params.address")
         h1.text-2xl.font-bold.pr-60
           addr(:address="$route.params.address", :youOn="true")
 
       //- (collect btn)
       template(v-if="isMyUser")
         //- template(v-if="totalFunds > -1")
-        .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-36(:class="{'text-violet-650': totalFunds <= 0}")
+        .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-36(:class="{'text-violet-650': totalFunds <= 0}", :key="$route.params.address")
           template(v-if="totalFunds > -1")
             svg-dai.mr-6(size="lg")
             | {{ totalFunds }}

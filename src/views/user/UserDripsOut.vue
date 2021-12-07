@@ -54,7 +54,7 @@ const getSplits = async () => {
 const getDrips = async () => {
   try {
     loading.value = true
-    drips.value = (await store.dispatch('getUserDripsReceivers', route.params.address)).receivers
+    drips.value = (await store.dispatch('getDripsReceivers', route.params.address)).receivers
     loading.value = false
   } catch (e) {
     console.error(e)

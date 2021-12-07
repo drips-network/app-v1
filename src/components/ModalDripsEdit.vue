@@ -32,7 +32,7 @@ const getDrips = async () => {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
     // get...
-    lastUpdate = await store.dispatch('getUserDripsReceivers', store.state.address)
+    lastUpdate = await store.dispatch('getDripsReceivers', store.state.address)
 
     // set drips
     const receivers = toRaw(lastUpdate.receivers)

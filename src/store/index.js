@@ -423,7 +423,7 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
-    async getUserDripsReceivers ({ state, dispatch }, address) {
+    async getDripsReceivers ({ state, dispatch }, address) {
       try {
         if (!provider) await dispatch('init')
 
@@ -437,8 +437,12 @@ export default createStore({
         // fetch events...
         let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
 
-        // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+        if (!address) {
+          return events
+        }
+        
+        // filter by the address        
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
 
         if (events.length) {
           const lastEvent = events.pop()
@@ -478,8 +482,13 @@ export default createStore({
         const contract = getHubContract()
         // fetch events...
         let events = await contract.queryFilter('SplitsUpdated')
-        // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+
+        if (!address) {
+          return events
+        }
+        
+        // filter by the address?
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
 
         // has splits?
         if (events?.length) {
@@ -524,11 +533,6 @@ export default createStore({
         throw e
       }
     },
-
-    // getSplitsReceivers (_, address) {
-    //   const contract = getHubContract()
-    //   return contract.getReceiversHash(address)
-    // },
 
     getProjectDripFraction (_, projectAddress) {
       const contract = getHubContract()

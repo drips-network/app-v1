@@ -37,7 +37,7 @@ store.dispatch('init')
         button.btn.btn-sm.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
 
   main#main
-    router-view(:key="$route.name && $route.name.split('-')[0]")
+    router-view(:key="$route.params && JSON.stringify($route.parms)")
 </template>
 
 <style>

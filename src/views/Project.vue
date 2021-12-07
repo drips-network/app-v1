@@ -181,10 +181,14 @@ article.project.pb-96
             button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(@click="editProject = true")
               | Edit Info
               span.transform.-scale-x-100.ml-12 ✏️
-            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(disabled) Edit Drips 💧
+
+            //- TODO edit project splits
+            //- button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(disabled) Edit Drips 💧
+          
           //- toggle menu btn
           .my-3
-            button.btn.btn-lg.shadow-md.pl-36.pr-28.font-semibold.tracking-wide(:class="{'btn-violet': !editMenuOpen, 'btn-darker': editMenuOpen}", @click="editMenuOpen = !editMenuOpen")
+            button.btn.btn-lg.shadow-md.pl-36.pr-28.font-semibold.tracking-wide(:class="{'btn-violet': !editMenuOpen, 'btn-darker': editMenuOpen}", @click="editProject = true")
+              //- , @click="editMenuOpen = !editMenuOpen")
               .flex.items-center(v-show="!editMenuOpen")
                 | Edit
                 svg-pen.h-28.ml-12.text-white.opacity-30
