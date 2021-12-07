@@ -4,7 +4,8 @@ import api from '@/api'
 import ProjectStat from '@/components/ProjectStat'
 import SvgDai from '@/components/SvgDai'
 import IconSplit from '@/components/IconSplit'
-import { utils } from 'ethers'
+import { toDAI } from '@/utils'
+import { BigNumber as bn } from 'ethers'
 
 const props = defineProps({
   project: Object,
@@ -17,15 +18,17 @@ const query = `
     tokens (where: {tokenRegistryAddress: $tokenRegistryAddress}) {
       id
       owner: tokenReceiver
-      tokenId
-      tokenTypeId
+      # tokenId
+      # tokenType {
+      #   streaming
+      # }
     }
   }
 `
 
 const nfts = ref(null)
 const isMonthly = computed(() => {
-  return props.project?.tokenTypes && props.project.tokenTypes[0]?.tokenTypeId === '0'
+  return props.project?.tokenTypes && props.project.tokenTypes[0]?.streaming
 })
 
 onBeforeMount(async () => {
@@ -53,15 +56,18 @@ const supporters = computed(() => {
 
 const currency = (num) => {
   num = Number(num)
-  return num >= 1000 ? Math.round(Number(num) / 1000)
-    : num
+  return num >= 1000 ? Math.round(Number(num) / 1000).toFixed(2)
+    : parseInt(num) - num < 0 ? num.toFixed(2) : num // remove trailing 0s
 }
+
+// sum of daiCollected and daiSplit
+const totalRevenue = computed(() => props.project && Number(toDAI(bn.from(props.project.daiCollected).add(props.project.daiSplit))))
 </script>
 
 <template lang="pug">
 section.project-stats.flex.w-full_10.-mx-5
   //- supporters
-  project-stat.flex-1.mx-5(:class="{'animate-pulse': !supporters}")
+  //- project-stat.flex-1.mx-5(:class="{'animate-pulse': !supporters}")
     template(v-slot:header)
       h6 🙂&nbsp; Members
     template(v-if="supporters") {{ supporters.length }}
@@ -76,8 +82,9 @@ section.project-stats.flex.w-full_10.-mx-5
   //- drips from
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
-      h6 🧩&nbsp; Member Tokens
-    template(v-if="nfts") {{ nfts.length }}
+      h6 🧩&nbsp; Memberships
+    template(v-if="nfts")
+      | {{ nfts.length }}
       //- .flex.items-center
         | {{ nfts.length }}
         <span class="hiddenff ml-6 relative py-2 mt-3" style="font-size:0.75em">
@@ -85,6 +92,10 @@ section.project-stats.flex.w-full_10.-mx-5
           .absolute.overlay.bg-violet-600(style="mix-blend-mode:darken")
         </span>
     template(v-else) ...
+    //- (limit)
+    .absolute.bottom-0.right-0.p-22.flex.items-center
+      span.font-semibold.font-sans.text-base(v-if="!isMonthly")
+        | of {{ props.project.tokenTypes[0].limit }}
 
   //- Goal
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
@@ -103,12 +114,12 @@ section.project-stats.flex.w-full_10.-mx-5
   //- Total Revenue
   project-stat.flex-1.mx-5
     template(v-slot:header)
-      h6 🧮&nbsp; Total Revenue
+      h6 🧮&nbsp; Cumulative Revenue
       //- alt: 💰🥞🔋📈
     template(v-if="props.project")
       .flex.items-end
-        | {{ currency(utils.formatEther(props.project.daiCollected)) }}
-        span.ml-2(v-if="props.project.daiCollected >= 1000", style="font-size:0.75em") K
+        | {{ currency(totalRevenue) }}
+        span.ml-2(v-if="totalRevenue >= 1000", style="font-size:0.75em") K
       .absolute.bottom-0.right-0.p-22
         svg-dai.h-16.text-violet-650
     template(v-else) ...
@@ -116,7 +127,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- total revenue
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
     template(v-slot:header)
-      h6 💧&nbsp; Drips
+      h6 💧&nbsp; Drips to
       //- h6.flex.items-center
         div
           <icon-split/>

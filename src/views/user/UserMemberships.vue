@@ -44,7 +44,10 @@ section.user-memberships
     .mx-auto.bg-indigo-800.rounded-2xlb.py-24.px-32.text-md.text-violet-650
       | <b>Drips</b> from <b>Memberships</b> appear here.
 
-  template(v-if="nfts")
+  template(v-if="!nfts")
+    loading-bar
+
+  template(v-else)
     info-bar.mb-20.justify-center.px-32
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You
@@ -57,6 +60,8 @@ section.user-memberships
         li.px-20.w-1x2.mb-40.flex(v-for="nft in nfts")
           user-nft.w-full(:nft="nft")
 
-  template(v-else)
-    loading-bar
+    footer(v-if="!nfts.length")
+      .mt-40.flex.justify-center
+        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/explore") Explore &nbsp;🔎
+
 </template>

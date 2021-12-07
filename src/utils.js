@@ -1,4 +1,7 @@
 import { BigNumber as bn, constants, utils } from 'ethers'
+import store from '@/store'
+
+const oneMonth = 30 * 24 * 60 * 60
 
 export const ipfsUrl = hash => process.env.VUE_APP_IPFS_GATEWAY + '/ipfs/' + hash
 
@@ -13,8 +16,9 @@ export const toWei = (dai) => {
 
 export const toDAI = wei => utils.formatEther(wei)
 
-export const toDAIPerMo = (weiBN) => {
-  const dai = utils.formatEther(weiBN) * 30 * 24 * 60 * 60
+export const toDAIPerMo = (wei) => {
+  wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
+  const dai = utils.formatEther(wei.mul(oneMonth))
   // round to nearest hundredth
   return Math.round(dai * 100) / 100
 }
@@ -22,7 +26,7 @@ export const toDAIPerMo = (weiBN) => {
 export const toWeiPerSec = (dai = 0) => {
   // warning! BN will clip off the decimal...
   // (but maybe good for when setting minAmtPerSec)
-  return utils.parseUnits(dai.toString()).div(30 * 24 * 60 * 60)
+  return utils.parseUnits(dai.toString()).div(oneMonth)
 }
 
 /*
@@ -67,6 +71,29 @@ export const formatDrips = (drips) => {
   // "empty" drips = [0, []]
 }
 
+export const validateAddressInput = input => {
+  return new Promise((resolve, reject) => {
+    if (utils.isAddress(input)) {
+      resolve(input)
+    }
+
+    // !! not even ENS
+    if (!input.endsWith('.eth')) {
+      reject(new Error(`"${input}" is neither an Ethereum address or ENS name (ends in .eth).`))
+    }
+
+    // check ENS...
+    store.dispatch('resolveENS', input)
+      .then(addr => {
+        if (!addr) {
+          reject(new Error(`"${input}" does not resolve to an Ethereum address`))
+        }
+        resolve(addr)
+      })
+      .catch(reject)
+  })
+}
+
 /*
  * format drips for contract method input (no dripFraction :)
  * @param drips [{ address, percent }]
@@ -107,13 +134,13 @@ export function validateSplits (drips, provider) {
       if (!utils.isAddress(drips[i][0])) {
         // !! not an ENS
         if (!drips[i][0].endsWith('.eth')) {
-          throw new Error(`Invalid drip recipient: ${drips[i][0]} is not an Ethereum address or ENS name (must end in .eth).`)
+          throw new Error(`Invalid drip recipient: "${drips[i][0]}" is not an Ethereum address or ENS name (must end in .eth).`)
         }
         // resolve ENS name...
         const address = await provider.resolveName(drips[i][0])
 
         if (!address) {
-          throw new Error(`Invalid drip recipient: ${drips[i][0]} does not resolve to an Ethereum address.`)
+          throw new Error(`Invalid drip recipient: "${drips[i][0]}" does not resolve to an Ethereum address.`)
         }
 
         // replace ens with address
@@ -125,4 +152,11 @@ export function validateSplits (drips, provider) {
   }
 
   return new Promise((resolve, reject) => validate().then(resolve).catch(reject))
+}
+
+export function getDripPctFromAmts (amts) {
+  if (!amts) return 0
+  const sum = amts[0].add(amts[1])
+  const pct = (amts[1].toString() / sum.toString()) * 100  // dumb javascript
+  return pct > 0 && pct < .01 ? '>0' : parseFloat(pct.toFixed(2))
 }

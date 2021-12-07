@@ -46,7 +46,7 @@ export default createStore({
     addrShort: (state) => (addr) => {
       // return ENS name or shortened 0x8888...8888
       return state.addresses[addr] ? state.addresses[addr]
-        : addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '...'
+        : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address
   },
@@ -266,27 +266,32 @@ export default createStore({
       }
     },
 
-    async approveDAIContract ({ state, dispatch }, projectAddress) {
+    async approveDAIContract ({ state, dispatch }, address) {
       try {
-        if (!state.address) {
-          await dispatch('connect')
-        }
+        if (!state.address) await dispatch('connect')
+
+        // if no address defined, set to DripsHub address
+        address = address || DaiDripsHub.address
 
         const contract = new Ethers.Contract(DAI.address, DAI.abi, provider)
         const contractSigner = contract.connect(signer)
         // approve max amount
         const amount = Ethers.constants.MaxUint256
-        const tx = await contractSigner.approve(projectAddress, amount)
+        const tx = await contractSigner.approve(address, amount)
         return tx
       } catch (e) {
         console.error('@approveDAIContract', e)
       }
     },
 
-    async getProjectAllowance ({ state, dispatch }, projectAddress) {
+    /* See how much DAI an address is allowed to spend on behalf of the signed-in user */
+    async getAllowance ({ state, dispatch }, address) {
       if (!state.address) await dispatch('connect')
+      // if no address defined, set to DripsHub address
+      address = address || DaiDripsHub.address
+      // get
       const daiContract = getDAIContract()
-      return daiContract.allowance(state.address, projectAddress)
+      return daiContract.allowance(state.address, address)
     },
 
     /* mint non-streaming / one-time payment nft */
@@ -332,20 +337,6 @@ export default createStore({
     //     contract.on(eventName, onNewNFT)
     //   })
     // },
-
-    async collectProjectFunds (_, { projectAddress }) {
-      try {
-        const contract = getProjectContract(projectAddress)
-        const contractSigner = contract.connect(signer)
-
-        const tx = await contractSigner.collect()
-        console.log('collect tx', tx)
-        console.log(await tx.wait())
-      } catch (e) {
-        console.error('@collectProjectFunds', e)
-        throw e
-      }
-    },
 
     async getNFTType (_, { projectAddress, nftTypeId = 0 }) {
       try {
@@ -430,6 +421,51 @@ export default createStore({
       const contract = getProjectContract(projectAddress)
       const contractSigner = contract.connect(signer)
       return contractSigner.drip(dripFraction, receiverWeights) // tx
+    },
+
+    async getUserDripsReceivers ({ state, dispatch }, address) {
+      try {
+        if (!provider) await dispatch('init')
+
+        const lastUpdate = {
+          receivers: [],
+          timestamp: 0,
+          balance: 0
+        }
+
+        const contract = getHubContract()
+        // fetch events...
+        let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
+
+        // filter by the address
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+
+        if (events.length) {
+          const lastEvent = events.pop()
+          lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
+          lastUpdate.balance = lastEvent.args[1]
+          lastUpdate.receivers = lastEvent.args[2]
+        }
+
+        return lastUpdate
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
+    async updateUserDrips ({ dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
+      try {
+        if (!signer) await dispatch('connect')
+
+        const contract = getHubContract()
+        const contractSigner = contract.connect(signer)
+        // tx...
+        return contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
     },
 
     async getSplitsReceivers ({ state, dispatch }, address) {
@@ -551,7 +587,93 @@ export default createStore({
       const contract = getProjectContract(address)
       const contractSigner = contract.connect(signer)
       return contractSigner.changeContractURI(ipfsHash)
-    }
+    },
+
+    // async getProjectCollectable ({ dispatch }, projectAddress) {
+    //   try {
+    //     if (!provider) await dispatch('init')
+    //     const currSplits = (await dispatch('getSplitsReceivers', projectAddress)).weights
+    //     const contract = getProjectContract(projectAddress)
+    //     return contract.collectable(currSplits)
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
+
+    // async getUserCollectable ({ dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
+    //     const currSplits = (await dispatch('getSplitsReceivers', address)).weights
+    //     const contract = getHubContract()
+    //     return contract.collectable(currSplits)
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
+
+    async getCollectable ({ dispatch }, { projectAddress, address }) {
+      try {
+        if (!provider) await dispatch('init')
+        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
+        // get...
+        return projectAddress ? contract.collectable(currSplits) // from project
+          : contract.collectable(address, currSplits) // from hub
+      } catch (e) {
+        console.error('@getCollectable', e)
+        throw e
+      }
+    },
+
+    async collectFunds ({ dispatch }, { projectAddress, address }) {
+      try {
+        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        // project or hubs contract?
+        const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
+        const contractSigner = contract.connect(signer)
+        let tx
+        if (projectAddress) {
+          tx = await contractSigner.collect(currSplits)
+        } else {
+          tx = await contractSigner.collect(address, currSplits)
+        }
+        console.log('collect tx:', tx)
+        return tx
+      } catch (e) {
+        console.error('@collectFunds', e)
+        throw e
+      }
+    },
+
+    // async collectProjectFunds ({ dispatch }, projectAddress) {
+    //   try {
+    //     const currSplits = (await dispatch('getSplitsReceivers', projectAddress)).weights
+    //     const contract = getProjectContract(projectAddress)
+    //     const contractSigner = contract.connect(signer)
+    //     const tx = await contractSigner.collect(currSplits)
+    //     console.log('collect tx:', tx)
+    //     return tx
+    //   } catch (e) {
+    //     console.error('@collectProjectFunds', e)
+    //     throw e
+    //   }
+    // },
+
+    // async collectUserFunds ({ dispatch }, address) {
+    //   try {
+    //     const currSplits = (await dispatch('getSplitsReceivers', address)).weights
+    //     const contract = getHubContract()
+    //     const contractSigner = contract.connect(signer)
+    //     const tx = await contractSigner.collect(address, currSplits)
+    //     console.log('collect tx:', tx)
+    //     return tx
+    //   } catch (e) {
+    //     console.error('@collectUserFunds', e)
+    //     throw e
+    //   }
+    // },
   }
 })
 
