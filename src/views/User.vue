@@ -1,13 +1,36 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
 import IconSplit from '@/components/IconSplit'
 import ModalDripTo from '@/components/ModalDripTo'
+import ModalCollectDrips from '@/components/ModalCollectDrips'
+import SvgDai from '@/components/SvgDai'
 import store from '@/store'
 import { utils } from 'ethers'
+import { toDAI } from '@/utils'
 
+const route = useRoute()
 const dripModalOpen = ref(false)
+const collectModalOpen = ref(false)
+
+const isMyUser = computed(() => store.state.address === route.params.address)
+
+const collectableAmts = ref()
+const num = wei => Number(toDAI(wei)).toFixed(2)
+const totalFunds = computed(() => {
+  return collectableAmts.value ? num(collectableAmts.value[0].add(collectableAmts.value[1])) : -1
+})
+
+watch(isMyUser, () => getMyCollectable())
+
+const getMyCollectable = () => {
+  store.dispatch('getCollectable', { address: route.params.address })
+    .then(amts => { console.log(amts, amts.toString()); collectableAmts.value = amts })
+}
+
+onMounted(() => isMyUser.value && getMyCollectable())
 </script>
 
 <script>
@@ -65,8 +88,20 @@ article.profile.pb-80
         h1.text-2xl.font-bold.pr-60
           addr(:address="$route.params.address", :youOn="true")
 
-      //- (drip-to btn)
-      template(v-if="!$store.getters.isWalletAddr($route.params.address)")
+      //- (collect btn)
+      template(v-if="isMyUser")
+        //- template(v-if="totalFunds > -1")
+        .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-36(:class="{'text-violet-650': totalFunds <= 0}")
+          template(v-if="totalFunds > -1")
+            svg-dai.mr-6(size="lg")
+            | {{ totalFunds }}
+          template(v-else)
+            .animate-pulse ...
+          
+          button.ml-32.btn.btn-lg.btn-white.text-xl.font-semibold.pl-36.pr-32(@click="collectModalOpen = true") Collect 💧
+      
+      //- (drip to btn)
+      template(v-else)
         button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true") Drip to 0x... 💧
 
     nav.mt-52.mb-20
@@ -102,5 +137,7 @@ article.profile.pb-80
   modal-drip-to(v-if="dripModalOpen", :address="$route.params.address", :open="dripModalOpen", @close="dripModalOpen = false")
     template(v-slot:header)
      h6 Drip to<br>#[addr.text-violet-650(:address="props.address")]
+
+  modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="getMyCollectable", dripPct="1")
 
 </template>

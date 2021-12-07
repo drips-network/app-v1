@@ -338,20 +338,6 @@ export default createStore({
     //   })
     // },
 
-    async collectProjectFunds (_, { projectAddress }) {
-      try {
-        const contract = getProjectContract(projectAddress)
-        const contractSigner = contract.connect(signer)
-
-        const tx = await contractSigner.collect()
-        console.log('collect tx', tx)
-        console.log(await tx.wait())
-      } catch (e) {
-        console.error('@collectProjectFunds', e)
-        throw e
-      }
-    },
-
     async getNFTType (_, { projectAddress, nftTypeId = 0 }) {
       try {
         const contract = getProjectContract(projectAddress)
@@ -601,7 +587,93 @@ export default createStore({
       const contract = getProjectContract(address)
       const contractSigner = contract.connect(signer)
       return contractSigner.changeContractURI(ipfsHash)
-    }
+    },
+
+    // async getProjectCollectable ({ dispatch }, projectAddress) {
+    //   try {
+    //     if (!provider) await dispatch('init')
+    //     const currSplits = (await dispatch('getSplitsReceivers', projectAddress)).weights
+    //     const contract = getProjectContract(projectAddress)
+    //     return contract.collectable(currSplits)
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
+
+    // async getUserCollectable ({ dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
+    //     const currSplits = (await dispatch('getSplitsReceivers', address)).weights
+    //     const contract = getHubContract()
+    //     return contract.collectable(currSplits)
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
+
+    async getCollectable ({ dispatch }, { projectAddress, address }) {
+      try {
+        if (!provider) await dispatch('init')
+        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
+        // get...
+        return projectAddress ? contract.collectable(currSplits) // from project
+          : contract.collectable(address, currSplits) // from hub
+      } catch (e) {
+        console.error('@getCollectable', e)
+        throw e
+      }
+    },
+
+    async collectFunds ({ dispatch }, { projectAddress, address }) {
+      try {
+        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        // project or hubs contract?
+        const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
+        const contractSigner = contract.connect(signer)
+        let tx
+        if (projectAddress) {
+          tx = await contractSigner.collect(currSplits)
+        } else {
+          tx = await contractSigner.collect(address, currSplits)
+        }
+        console.log('collect tx:', tx)
+        return tx
+      } catch (e) {
+        console.error('@collectFunds', e)
+        throw e
+      }
+    },
+
+    // async collectProjectFunds ({ dispatch }, projectAddress) {
+    //   try {
+    //     const currSplits = (await dispatch('getSplitsReceivers', projectAddress)).weights
+    //     const contract = getProjectContract(projectAddress)
+    //     const contractSigner = contract.connect(signer)
+    //     const tx = await contractSigner.collect(currSplits)
+    //     console.log('collect tx:', tx)
+    //     return tx
+    //   } catch (e) {
+    //     console.error('@collectProjectFunds', e)
+    //     throw e
+    //   }
+    // },
+
+    // async collectUserFunds ({ dispatch }, address) {
+    //   try {
+    //     const currSplits = (await dispatch('getSplitsReceivers', address)).weights
+    //     const contract = getHubContract()
+    //     const contractSigner = contract.connect(signer)
+    //     const tx = await contractSigner.collect(address, currSplits)
+    //     console.log('collect tx:', tx)
+    //     return tx
+    //   } catch (e) {
+    //     console.error('@collectUserFunds', e)
+    //     throw e
+    //   }
+    // },
   }
 })
 

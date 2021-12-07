@@ -11,34 +11,33 @@ const route = useRoute()
 
 const projects = ref()
 
-const fetchUserProjects = (projectOwner) => {
-  return api({
-    variables: { projectOwner },
-    query: `
-      query ($projectOwner: Bytes!) {
-        fundingProjects (where: { projectOwner: $projectOwner }) {
-          id
-          projectOwner
-          daiCollected
-          tokenTypes {
-            # tokenTypeId
-            streaming
-            limit
+const getUsersProjects = async () => {
+  try {
+    const resp = await api({
+      variables: { projectOwner: route.params.address },
+      query: `
+        query ($projectOwner: Bytes!) {
+          fundingProjects (where: { projectOwner: $projectOwner }) {
+            id
+            projectOwner
+            daiSplit
+            daiCollected
+            tokenTypes {
+              # tokenTypeId
+              streaming
+              limit
+            }
           }
         }
-      }
-    `
-  })
-}
-
-onBeforeMount(async () => {
-  try {
-    const resp = await fetchUserProjects(route.params.address)
+      `
+    })
     projects.value = resp.data.fundingProjects
   } catch (e) {
     console.error(e)
   }
-})
+}
+
+onBeforeMount(() => getUsersProjects())
 </script>
 
 <template lang="pug">
@@ -61,7 +60,7 @@ section.user-projects
     ul
       //- projects...
       li(v-for="project in projects")
-        user-project(:project="project")
+        user-project(:project="project", @collected="getUsersProjects")
 
     footer(v-if="!projects.length")
       .mt-40.flex.justify-center

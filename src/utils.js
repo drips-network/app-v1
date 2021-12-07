@@ -153,3 +153,10 @@ export function validateSplits (drips, provider) {
 
   return new Promise((resolve, reject) => validate().then(resolve).catch(reject))
 }
+
+export function getDripPctFromAmts (amts) {
+  if (!amts) return 0
+  const sum = amts[0].add(amts[1])
+  const pct = (amts[1].toString() / sum.toString()) * 100  // dumb javascript
+  return pct > 0 && pct < .01 ? '>0' : parseFloat(pct.toFixed(2))
+}

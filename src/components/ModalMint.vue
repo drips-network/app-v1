@@ -48,7 +48,7 @@ const mint = async () => {
 
     if (isStreaming) {
       // check allowance
-      const allowance = await store.dispatch('getProjectAllowance', props.projectAddress)
+      const allowance = await store.dispatch('getAllowance', props.projectAddress)
 
       if (allowance.lt(props.tokenType.minAmt)) {
         alert('You must first approve this community\'s contract to be able to withdraw from your DAI balance periodically.')

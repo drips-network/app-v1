@@ -4,20 +4,40 @@ import store from '@/store'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import ProjectStats from '@/components/ProjectStats'
 import SvgDai from '@/components/SvgDai'
-import { ipfsUrl } from '@/utils'
+import AvailableFundsBar from '@/components/AvailableFundsBar'
+import { ipfsUrl, toDAI } from '@/utils'
 
 const props = defineProps({
   project: Object
 })
+const emit = defineEmits(['collected'])
 
 const meta = ref()
 const drips = ref()
+const dripsPct = computed(() => drips.value?.reduce((acc, curr) => acc + curr.percent, 0))
 const projectRt = { name: 'project', params: { address: props.project.id } }
 
 const isUsersProject = computed(() => props.project.projectOwner === store._state.data.address)
 
-const collect = () => {
-  store.dispatch('collectProjectFunds', { projectAddress: props.project.id })
+const collectableAmts = ref(0)
+
+const tx = ref()
+const collect = async () => {
+  try {
+    tx.value = await store.dispatch('collectFunds', { projectAddress: props.project.id })
+    await tx.value.wait()
+    emit('collected')
+    getCollectable()
+    tx.value = null
+  } catch (e) {
+    alert('Error collecting: ' + e.message)
+    collecTx.value = null
+  }
+}
+
+const getCollectable = () => {
+  store.dispatch('getCollectable', { projectAddress: props.project.id })
+    .then(amounts => { collectableAmts.value = amounts })
 }
 
 onBeforeMount(() => {
@@ -27,11 +47,13 @@ onBeforeMount(() => {
   // get drips
   store.dispatch('getSplitsReceivers', props.project.id)
     .then(receivers => { drips.value = receivers.percents })
+  //
+  getCollectable()
 })
 </script>
 
 <template lang="pug">
-.user-project.panel-indigo.mb-40.p-24
+.user-project.panel-indigo.mb-36.p-24
   //- avatar + title
   header.flex.justify-between.items-center
     .flex.items-center
@@ -48,17 +70,14 @@ onBeforeMount(() => {
       router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt") View
 
   //- progress bar
-  project-progress-bar.mt-32.mb-20(v-if="meta", :meta="meta")
+  project-progress-bar.mt-20.mb-20(v-if="meta", :meta="meta")
 
   //- (funds)
   template(v-if="isUsersProject")
-    .mt-20.h-80.rounded-full.bg-indigo-800.flex.justify-between.items-center
-      h4.ml-32.text-xl.font-semibold Available Funds
-      .flex.items-center.mr-16
-        .text-2xl.font-semibold.mr-32.flex.items-center
-          svg-dai.mr-12(size="xl")
-          | {{ project.daiCollected.toString() }}
-        button.btn-md.btn-violet.text-md.font-semibold.rounded-full.px-20(@click="collect") WITHDRAW
+    available-funds-bar.bg-indigo-800(:amts="collectableAmts", @collect="collect", :tx="tx", :dripPct="dripsPct")
+      template(v-slot:allfunds) Available Funds
+      template(v-slot:toyou)
+        span.text-white Your Funds
 
   //- stats
   project-stats.mt-20(v-if="project", :project="project", :meta="meta", :drips="drips")

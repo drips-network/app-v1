@@ -4,7 +4,8 @@ import api from '@/api'
 import ProjectStat from '@/components/ProjectStat'
 import SvgDai from '@/components/SvgDai'
 import IconSplit from '@/components/IconSplit'
-import { utils } from 'ethers'
+import { toDAI } from '@/utils'
+import { BigNumber as bn } from 'ethers'
 
 const props = defineProps({
   project: Object,
@@ -35,7 +36,6 @@ onBeforeMount(async () => {
   try {
     const variables = { tokenRegistryAddress: props.project.id }
     const resp = await api({ query, variables })
-    console.log(props.project.id, resp)
     nfts.value = resp.data.tokens
   } catch (e) {
     console.error(e)
@@ -56,15 +56,18 @@ const supporters = computed(() => {
 
 const currency = (num) => {
   num = Number(num)
-  return num >= 1000 ? Math.round(Number(num) / 1000)
-    : num
+  return num >= 1000 ? Math.round(Number(num) / 1000).toFixed(2)
+    : parseInt(num) - num < 0 ? num.toFixed(2) : num // remove trailing 0s
 }
+
+// sum of daiCollected and daiSplit
+const totalRevenue = computed(() => props.project && Number(toDAI(bn.from(props.project.daiCollected).add(props.project.daiSplit))))
 </script>
 
 <template lang="pug">
 section.project-stats.flex.w-full_10.-mx-5
   //- supporters
-  project-stat.flex-1.mx-5(:class="{'animate-pulse': !supporters}")
+  //- project-stat.flex-1.mx-5(:class="{'animate-pulse': !supporters}")
     template(v-slot:header)
       h6 🙂&nbsp; Members
     template(v-if="supporters") {{ supporters.length }}
@@ -79,7 +82,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- drips from
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
-      h6 🧩&nbsp; Member Tokens
+      h6 🧩&nbsp; Memberships
     template(v-if="nfts")
       | {{ nfts.length }}
       //- .flex.items-center
@@ -111,12 +114,12 @@ section.project-stats.flex.w-full_10.-mx-5
   //- Total Revenue
   project-stat.flex-1.mx-5
     template(v-slot:header)
-      h6 🧮&nbsp; Total Revenue
+      h6 🧮&nbsp; Cumulative Revenue
       //- alt: 💰🥞🔋📈
     template(v-if="props.project")
       .flex.items-end
-        | {{ currency(utils.formatEther(props.project.daiCollected)) }}
-        span.ml-2(v-if="props.project.daiCollected >= 1000", style="font-size:0.75em") K
+        | {{ currency(totalRevenue) }}
+        span.ml-2(v-if="totalRevenue >= 1000", style="font-size:0.75em") K
       .absolute.bottom-0.right-0.p-22
         svg-dai.h-16.text-violet-650
     template(v-else) ...
@@ -124,7 +127,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- total revenue
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
     template(v-slot:header)
-      h6 💧&nbsp; Drips
+      h6 💧&nbsp; Drips to
       //- h6.flex.items-center
         div
           <icon-split/>
