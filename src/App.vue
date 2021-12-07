@@ -4,6 +4,7 @@
 import SvgLogo from './components/SvgLogo.vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import SvgX from './components/SvgX.vue'
+import SvgDai from './components/SvgDai.vue'
 import store from '@/store'
 
 store.dispatch('init')
@@ -11,33 +12,39 @@ store.dispatch('init')
 
 <template lang="pug">
 #app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans.leading-normal
-  header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
-    //- left side
-    router-link.pl-24.-ml-px.mb-px(to="/")
-      svg-logo.text-white
+  .flex.flex-col.min-h-screen
+    header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
+      //- left side
+      router-link.pl-24.-ml-px.mb-px(to="/")
+        svg-logo.text-white
 
-    //- right side
-    .flex.items-center.mr-24.text-violet-650
-      //- links
-      router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Create
-      router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'home'}") Explore
-      //- (profile btn)
-      template(v-if="$store.state.address")
-        .btn.btn-sm.bg-indigo-900
-          .btn-darker.pl-6.text-violet-650.font-semibold.rounded-full
-            router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")
-              //- avi
-              avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28", :key="$store.state.address")
-              //- address
-              | {{ $store.getters.addrShort($store.state.address) }}
-          button.ml-2.p-10.mr-8.notouch_hover_text-white(@click="$store.dispatch('disconnect')", title="Disconnect")
-            svg-x.h-10.w-10(strokeWidth="1.5")
-      //- (disconnect btn)
-      template(v-else)
-        button.btn.btn-sm.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
+      //- right side
+      .flex.items-center.mr-24.text-violet-650
+        //- links
+        router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Create
+        router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'home'}") Explore
+        //- (profile btn)
+        template(v-if="$store.state.address")
+          .btn.btn-sm.bg-indigo-900
+            .btn-darker.pl-6.text-violet-650.font-semibold.rounded-full
+              router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")
+                //- avi
+                avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28", :key="$store.state.address")
+                //- address
+                | {{ $store.getters.addrShort($store.state.address) }}
+            button.ml-2.p-10.mr-8.notouch_hover_text-white(@click="$store.dispatch('disconnect')", title="Disconnect")
+              svg-x.h-10.w-10(strokeWidth="1.5")
+        //- (disconnect btn)
+        template(v-else)
+          button.btn.btn-sm.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
 
-  main#main
-    router-view(:key="$route.params && JSON.stringify($route.parms)")
+    main#main.flex-1
+      router-view(:key="$route.params && JSON.stringify($route.parms)")
+
+  footer.p-6
+    .bg-indigo-900.text-ms.text-violet-650.rounded-full.font-semibold.flex.items-center
+      svg-dai.h-12
+      | 1 ≈ $1
 </template>
 
 <style>
