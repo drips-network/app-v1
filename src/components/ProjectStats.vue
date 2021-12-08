@@ -128,7 +128,7 @@ section.project-stats.flex.w-full_10.-mx-5
     template(v-else) ...
 
   //- drips
-  router-link.flex-1.mx-5.block(to="#drips")
+  router-link.flex-1.mx-5.block(:to="{ name: 'project', params: { address: props.project.id }, hash: '#drips' }")
     project-stat.w-full(:class="{'animate-pulse': !drips}")
       template(v-slot:header)
         h6 💧&nbsp; Drips to
