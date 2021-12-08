@@ -20,12 +20,14 @@ onBeforeMount(async () => {
 router-link.project-thumb-progress.relative.block(:to="{name: 'project', params: { address: props.project.id }}")
   //- progress as background
   .absolute.overlay(v-if="meta")
-    project-progress-bar(:meta="meta", :project="props.project", :goalHidden="true")
+    project-progress-bar(:meta="meta", :project="props.project", rightSide="percent")
 
-  .h-80.w-full.rounded-full.flex.items-center.justify-between.border.border-violet-700.px-14
+  //- row body
+  .h-80.w-full.rounded-full.flex.items-center.justify-between.border.border-violet-800
     //- profile icon
-    .relative.z-10.w-54.h-54.rounded-full.overflow-hidden
-      img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)", alt="avatar")
+    .w-80.h-80.relative.z-10.flex.items-center.justify-center
+      .w-54.h-54.relative.rounded-full.overflow-hidden
+        img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)", alt="avatar")
 
     //- user icon
     //- router-link.flex.items-center.px-8(:to="{name: 'user', params: {address: props.project.owner}}").flex.items-center
