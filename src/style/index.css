@@ -3,19 +3,19 @@
 @tailwind utilities;
 
 /* fonts */
-@font-face {
+/* @font-face {
   font-family: 'kaeru-kaeru';
   src: url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff2') format('woff2'),
        url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff') format('woff');
   font-style: normal;
-}
-
-/* @font-face {
-  font-family: 'kaeru-kaeru';
-  src: url('../assets/fonts/cheee/Cheee-Bingbong.woff2') format('woff2'),
-       url('../assets/fonts/cheee/Cheee-Bingbong.woff') format('woff');
-  font-style: normal;
 } */
+
+@font-face {
+  font-family: 'cheee';
+  src: url('../assets/fonts/cheee/Cheee-Conshred.woff2') format('woff2'),
+       url('../assets/fonts/cheee/Cheee-Conshred.woff') format('woff');
+  font-style: normal;
+}
 
 html {
   font-size: 10px; /* 1rem / Tailwind default */

@@ -56,8 +56,11 @@ const supporters = computed(() => {
 
 const currency = (num) => {
   num = Number(num)
-  return num >= 1000 ? Math.round(Number(num) / 1000).toFixed(2)
-    : parseInt(num) - num < 0 ? num.toFixed(2) : num // remove trailing 0s
+  num = num >= 1000 ? Math.round(Number(num) / 1000).toFixed(1)
+    : num < 1 ? num.toFixed(2)
+      : num.toFixed(0)
+  return parseFloat(num)
+  // : parseInt(num) - num < 0 ? num.toFixed(2) : num // remove trailing 0s
 }
 
 // sum of daiCollected and daiSplit
@@ -95,7 +98,7 @@ section.project-stats.flex.w-full_10.-mx-5
     //- (limit)
     .absolute.bottom-0.right-0.p-22.flex.items-center
       span.font-semibold.font-sans.text-base(v-if="!isMonthly")
-        | of {{ props.project.tokenTypes[0].limit }}
+        | of max {{ props.project.tokenTypes[0].limit }}
 
   //- Goal
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")

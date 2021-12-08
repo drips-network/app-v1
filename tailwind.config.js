@@ -111,12 +111,13 @@ module.exports = {
       '3xlb': ['4.0rem', { lineHeight: '1' }],
       '4xl': ['4.8rem', { lineHeight: '1' }],
       '5xl': ['6.4rem', { lineHeight: '1' }],
-      '6xl': ['7.2rem', { lineHeight: '1' }]
+      '6xl': ['7.2rem', { lineHeight: '1' }],
+      '8xl': ['10.8rem', { lineHeight: '1' }]
     },
     fontFamily: {
       sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       mono: ['Source Code Pro', 'monospace'],
-      kaeru: ['kaeru-kaeru', 'Inter', 'system-ui', '-apple-system', 'sans-serif']
+      cheee: ['cheee', 'Inter', 'system-ui', '-apple-system', 'sans-serif']
     },
     animation: {
       none: 'none',

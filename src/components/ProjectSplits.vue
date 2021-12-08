@@ -54,7 +54,7 @@ section.project-splits.relative
           .absolute.overlay.flex.items-center.justify-center
             div.text-center
               //- percent
-              .font-kaeru.text-6xl.text-violet-650.font-normal(style="margin-top:38%")
+              .font-cheee.text-8xl.text-violet-650.font-normal(style="margin-top:38%")
                 | {{ parseInt(drip.percent) }}
                 span(style="font-size: 0.75em") %
               .mt-24.text-violet-650.font-semibold.text-lg
