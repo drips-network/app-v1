@@ -120,9 +120,9 @@ modal(v-bind="$attrs", @close="$emit('close')")
     template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed
         .mx-auto.px-24(v-if="isStreaming", style="max-widthff:25em")
-          | Drip funds to this community every <b>month</b> and receive a unique NFT&nbsp;<b>Member Token</b> 🧩. Top-up your balance periodically to make sure your membership doesn't become inactive!
+          | Drip funds to this community every <b>month</b> and receive a unique <b>Membership Token</b> 🧩. Top-up your balance periodically to make sure your membership doesn't become inactive!
         .mx-auto(v-else, style="max-width:25em")
-          | Join this community by purchasing a unique NFT&nbsp;<b>Member Token</b> 🧩 with a one-time payment.
+          | Join this community by purchasing a unique <b>Membership Token</b> 🧩 with a one-time payment.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
     form(@submit.prevent, validate)

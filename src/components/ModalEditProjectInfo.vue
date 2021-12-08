@@ -17,6 +17,7 @@ const newMeta = ref(toRaw(props.meta))
 const status = ref()
 
 const tx = ref()
+const txReceipt = ref()
 
 const update = async () => {
   try {
@@ -27,9 +28,9 @@ const update = async () => {
     console.log('new tx...', tx.value)
 
     status.value = 'Waiting...'
-    const receipt = await tx.value.wait()
+    txReceipt.value = await tx.value.wait()
 
-    if (!receipt) {
+    if (!txReceipt.value) {
       throw new Error('Transcation was not confirmed')
     }
 
@@ -51,17 +52,15 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="✏️")
 
     template(v-slot:header)
-      dialog-title Edit Project
-
-    //- template(v-slot:description)
-      dialog-description.text-base.mx-auto(style="max-width:23em")
-        | Fund this project and receive a unique NFT to show your support and vote on proposals.
+      dialog-title Edit Community
 
     form(@submit.prevent="update")
       fields-project-edit(v-model="newMeta")
 
-      .mt-40
-        button.mx-auto.btn.btn-lg.btn-violet.px-36(type="submit", :disabled="status")
+      .mt-40.flex.justify-center
+        button.btn.btn-lg.btn-outline.px-36.mr-4(@click="$emit('close')")
+          | {{ tx || txReceipt ? 'Close' : 'Cancel' }}
+        button.btn.btn-lg.btn-violet.px-36(type="submit", :disabled="status")
           | {{ status || 'Update' }}
 
     tx-link(v-if="tx", :tx="tx")
