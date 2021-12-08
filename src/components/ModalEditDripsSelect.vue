@@ -12,11 +12,11 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="💧")
     template(v-slot:header)
       dialog-title.leading-snug
-        | Select Drip Type
+        | Configure Drips
 
     template(v-slot:description)
       dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
-        | Which type of drip would you like to {{ edit ? 'edit' : 'add' }}?
+        | Which #[b.text-violet-650 type] of drips would you like to {{ edit ? 'configure' : 'add' }}?
 
     .mt-40.flex.justify-center
       button.btn.btn-lg.btn-violet.mx-3.px-40(@click="$emit('select', 'drips')") DAI/month

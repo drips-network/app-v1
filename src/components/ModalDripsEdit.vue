@@ -6,6 +6,7 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import TxLink from '@/components/TxLink'
 import SvgX from '@/components/SvgX'
+import LoadingBar from '@/components/LoadingBar'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import store from '@/store'
@@ -176,7 +177,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     //- (loading...)
     template(v-if="loading")
-      .h-80.animate-pulse.btn.btn-lg.btn-outline.text-violet-650.w-full Loading...
+      loading-bar.w-full
 
     //- (edit)
     template(v-else)
