@@ -8,11 +8,12 @@ import api from '@/api'
 const props = defineProps(['meta', 'project', 'goalHidden'])
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
-const pct = ref(0)
+const pct = ref(-1)
 const pctPretty = computed(() => {
-  return pct.value > 0 && pct.value < 1 ? '<1'
-    // : pct.value > 99 && pct.value < 100 ? '<99'
-    : parseFloat(pct.value.toFixed(2))
+  return pct.value < 0 ? ''
+    : pct.value > 0 && pct.value < 1 ? '<1%'
+      // : pct.value > 99 && pct.value < 100 ? '<99'
+      : parseFloat(pct.value.toFixed(2)) + '%'
 })
 
 const getProjectStreamingTotalWei = async () => {
@@ -70,9 +71,9 @@ onMounted(() => getPercent())
 <template lang="pug">
 .h-80.rounded-full.relative.flex(v-if="props.meta.goal")
   //- bar
-  .relative.z-10.max-w-full.min-w-80.rounded-full.flex.justify-end.items-center.px-24.bg-gradient-to-r.from-turquoise-500.to-greenbright-500.overflow-hidden(:style="{width: pct + '%', transition: 'width 1000ms 100ms, opacity 500ms'}", :class="{'opacity-0': !pct}")
-    div.transition.duration-500.delay-200(:class="{'opacity-0': !pct}")
-      | {{ pctPretty }}%
+  .relative.z-10.max-w-full.min-w-80.rounded-full.flex.justify-end.items-center.px-24.bg-gradient-to-r.from-turquoise-500.to-greenbright-500.overflow-hidden(:style="{width: Math.max(0, pct) + '%', transition: 'width 1000ms 100ms, opacity 500ms'}", :class="{'opacity-0': pct < 0}")
+    div.transition.duration-500.delay-200(:class="{'opacity-0': pct < 0}")
+      | {{ pctPretty }}
       template(v-if="pct >= 99.99") &nbsp;🎉
       template(v-else-if="pct > 90") &nbsp;🔥
   //- right info
