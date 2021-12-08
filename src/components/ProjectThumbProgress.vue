@@ -25,7 +25,7 @@ router-link.project-thumb-progress.relative.block(:to="{name: 'project', params:
   //- row body
   .h-80.w-full.rounded-full.flex.items-center.justify-between.border.border-violet-800
     //- profile icon
-    .w-80.h-80.relative.z-10.flex.items-center.justify-center
+    .w-80.h-80.relative.z-10.flex.items-center.justify-center.-ml-px
       .w-54.h-54.relative.rounded-full.overflow-hidden
         img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)", alt="avatar")
 
