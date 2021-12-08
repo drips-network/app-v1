@@ -122,9 +122,9 @@ export default createStore({
     },
 
     /* disconnect wallet */
-    disconnect ({ commit, dispatch }) {
+    async disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
-      web3Modal.clearCachedProvider()
+      await web3Modal.clearCachedProvider()
       // if (walletProvider.off) {
       //   walletProvider.off('accountsChanged')
       //   walletProvider.off('disconnect')
@@ -440,9 +440,9 @@ export default createStore({
         if (!address) {
           return events
         }
-        
-        // filter by the address        
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+
+        // filter by the address
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
         if (events.length) {
           const lastEvent = events.pop()
@@ -486,9 +486,9 @@ export default createStore({
         if (!address) {
           return events
         }
-        
+
         // filter by the address?
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
         // has splits?
         if (events?.length) {
