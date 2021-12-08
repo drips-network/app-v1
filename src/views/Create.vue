@@ -351,7 +351,7 @@ article.create.py-80.relative
       .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Preview HTML
       div.px-24.pb-20.pt-28.text-left.text-xl.font-semibold.child-links-underline.pointer-events-none.child-lists-list(v-html="benefitsInputHtml")
 
-    .mt-40.flex.justify-center
+    .mt-40.flex.justify-center(v-if="!review")
       button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel")
         | {{ benefitsInputMd.length ? 'Next' : 'Skip' }}
 
