@@ -6,6 +6,7 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import TxLink from '@/components/TxLink'
 import SvgX from '@/components/SvgX'
+import SvgDai from '@/components/SvgDai'
 import LoadingBar from '@/components/LoadingBar'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
@@ -21,7 +22,7 @@ const loading = ref(false)
 
 const drips = ref([])
 
-const topUp = ref(0) // DAI
+const topUpDAI = ref(0) // DAI
 
 const addDrip = () => drips.value.push({ address: '', amtPerSec: null })
 const removeDrip = i => drips.value.splice(i, 1)
@@ -63,13 +64,14 @@ const approveTx = ref()
 const approveDAI = async () => {
   try {
     // send...
-    approveTx.value = await store.dispatch('approveDAIContract', props.projectAddress)
+    approveTx.value = await store.dispatch('approveDAIContract')
     console.log('approve tx...', approveTx.value)
 
     // wait for confirmation...
     await approveTx.value.wait() // receipt
 
     approvedDAI.value = true // topUpWei.value.toString()
+    approveTx.value = null
   } catch (e) {
     console.error(e)
     approvedDAI.value = false
@@ -83,7 +85,7 @@ const update = async () => {
   try {
     tx.value = null
     txReceipt.value = null
-    const topUpWei = toWei(topUp.value).toString()
+    const topUpWei = toWei(topUpDAI.value) // .toString()
 
     // check allowance
     const allowance = await store.dispatch('getAllowance') // of dripsHub
@@ -204,11 +206,19 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
         //- TODO topup input
 
-        //- .mt-20
-          .text-md.font-semibold.text-center.mb-8 Current Balance
-          .h-80.btn.btn-outline.btn-lg 0
+        .mt-56
+          h6.text-2xl.font-semibold.mb-40.leading-tight Update Balance
+          p.mt-20.mb-40.text-md.mx-auto(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drip recipients can collect their funds every month.
+          //- TODO add user topup balance
+          //- https://discord.com/channels/841318878125490186/875668327614255164/918094059732623411
+          .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
+            .pl-32.text-xl.font-semibold Balance
+            .pr-20.flex.items-center
+              span.text-2xl.font-semibold ??
+              svg-dai.ml-12(size="xl")
 
-          input-body.mt-10(label="Add to Balance")
+          input-body.mt-10(label="Add to Balance", symbol="dai")
+            input(v-model="topUpDAI", type="number", step="0.01", required)
 
         //- btns
         .mt-40.flex.justify-center

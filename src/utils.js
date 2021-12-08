@@ -11,7 +11,7 @@ export const fromWei = (wei) => {
 }
 
 export const toWei = (dai) => {
-  return constants.WeiPerEther.mul(dai)
+  return utils.parseUnits(dai.toString())
 }
 
 export const toDAI = wei => utils.formatEther(wei)
@@ -157,6 +157,6 @@ export function validateSplits (drips, provider) {
 export function getDripPctFromAmts (amts) {
   if (!amts) return 0
   const sum = amts[0].add(amts[1])
-  const pct = (amts[1].toString() / sum.toString()) * 100  // dumb javascript
-  return pct > 0 && pct < .01 ? '>0' : parseFloat(pct.toFixed(2))
+  const pct = (amts[1].toString() / sum.toString()) * 100 // dumb javascript
+  return pct > 0 && pct < 0.01 ? '>0' : parseFloat(pct.toFixed(2))
 }

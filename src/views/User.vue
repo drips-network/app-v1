@@ -87,7 +87,7 @@ article.profile.pb-80
       .h-160.rounded-full.bg-indigo-700.flex.items-center
         avatar-blockie.w-112.mx-24.mr-36(:address="$route.params.address", width="112", :key="$route.params.address")
         h1.text-2xl.font-bold.pr-60
-          addr(:address="$route.params.address", :youOn="true")
+          addr(:address="$route.params.address", :youOn="true", :key="$route.params.address")
 
       //- (collect btn)
       template(v-if="isMyUser")

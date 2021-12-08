@@ -39,20 +39,20 @@ const slots = useSlots()
 
     //- (symbol: dai)
     template(v-if="props.symbol === 'dai'")
-      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-20
         .flex.items-center
           svg-dai(size="lg").text-violet-600
 
     //- (symbol: daipermo)
     template(v-if="props.symbol === 'daipermo'")
-      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-20
         .flex.items-center.text-violet-600
-          svg-dai(size="lg")
+          svg-dai(size="xl")
           .text-lg.tracking-tight /MO
 
     //- (symbol: months)
     template(v-if="props.symbol === 'months'")
-      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-20
         .flex.items-center.text-violet-600
           .text-lg.tracking-tight MO
 </template>
