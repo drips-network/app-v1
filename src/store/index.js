@@ -31,6 +31,8 @@ const web3Modal = new Web3Modal({
   theme: 'dark'
 })
 
+let initializing = false
+
 export default createStore({
   // modules: { },
   state () {
@@ -70,19 +72,34 @@ export default createStore({
   actions: {
     /* setup provider */
     async init ({ state, commit, dispatch }) {
-      try {
-        // auto-connect?
-        if (web3Modal.cachedProvider) {
-          await dispatch('connect')
-        }
-
-        // fallback provider
-        if (!provider) {
-          dispatch('setupFallbackProvider')
-        }
-      } catch (e) {
-        console.error('@init', e)
+      // de-dupe
+      if (initializing) {
+        return initializing
       }
+
+      const setup = async () => {
+        try {
+          // auto-connect?
+          if (web3Modal.cachedProvider) {
+            await dispatch('connect')
+          }
+
+          // fallback provider
+          if (!provider) {
+            dispatch('setupFallbackProvider')
+          }
+          initializing = false
+        } catch (e) {
+          console.error('@init', e)
+          initializing = false
+          throw e
+        }
+      }
+
+      // create a promise for the handler
+      initializing = new Promise((resolve, reject) => setup().then(resolve).catch(reject))
+
+      return initializing
     },
 
     async setupFallbackProvider () {
@@ -104,7 +121,7 @@ export default createStore({
       try {
         // connect and update provider, signer
         walletProvider = await web3Modal.connect()
-        const provider = new Ethers.providers.Web3Provider(walletProvider)
+        provider = new Ethers.providers.Web3Provider(walletProvider)
         signer = provider.getSigner()
 
         // set user address
@@ -125,12 +142,15 @@ export default createStore({
     disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
       web3Modal.clearCachedProvider()
+      // manually clear walletconnect --- https://github.com/Web3Modal/web3modal/issues/354
+      localStorage.removeItem('walletconnect')
+
       // if (walletProvider.off) {
       //   walletProvider.off('accountsChanged')
       //   walletProvider.off('disconnect')
       // }
-      commit('SIGN_OUT')
 
+      commit('SIGN_OUT')
       dispatch('setupFallbackProvider')
     },
 
@@ -440,9 +460,9 @@ export default createStore({
         if (!address) {
           return events
         }
-        
-        // filter by the address        
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+
+        // filter by the address
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
         if (events.length) {
           const lastEvent = events.pop()
@@ -486,9 +506,9 @@ export default createStore({
         if (!address) {
           return events
         }
-        
+
         // filter by the address?
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())  
+        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
         // has splits?
         if (events?.length) {
