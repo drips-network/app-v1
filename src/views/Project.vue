@@ -20,6 +20,7 @@ import SvgXCircle from '@/components/SvgXCircle'
 import { fromWei, toDAI, toDAIPerMo, ipfsUrl } from '@/utils'
 
 const route = useRoute()
+const view = ref('benefits')
 
 const projectAddress = route.params.address
 const project = ref()
@@ -145,8 +146,25 @@ article.project.pb-96
           a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 
       //- (stats)
-      .mt-96.mb-120.px-20
+      .mt-96.mb-96.px-20
         project-stats(v-if="project", :project="project", :meta="meta", :drips="drips")
+
+      nav.flex.justify-center.w-full
+        .h-80.rounded-full.flex.items-center.px-16.bg-indigo-800
+          button.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-28.mr-2(@click="view = 'benefits'", :class="{'btn-violet': view === 'benefits' }")
+            | Benefits
+          button.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-28.mr-2(@click="view = 'proposals'", :class="{'btn-violet': view === 'proposals' }")
+            | Proposals
+
+      section.mt-24.flex.justify-center.px-10.mb-96
+        //- (benefits)
+        .w-full.max-w-6xl.rounded-2xlb.text-xl.text-violet-650.font-semibold.bg-indigo-800.child-links-underline(v-show="view === 'benefits'")
+          .min-h-80.p-24.px-36(v-if="meta.benefits && meta.benefits.length", v-html="meta.benefits")
+          .h-80.flex.items-center.justify-center.text-lg(v-else) ¯\_(ツ)_/¯
+
+        //- (proposals)
+        .w-full.max-w-6xl.h-80.flex.items-center.justify-center.borderff.border-violet-700.bg-indigo-800.text-violet-650.rounded-full.text-lg(v-show="view === 'proposals'")
+          div #[a.font-bold(href="https://snapshot.org", target="_blank", rel="noopener noreferrer") Snapshot ] voting coming soon...
 
       //- (memberships)
       //- section.mt-112(v-if="meta.memberships && meta.memberships.length")
@@ -184,7 +202,7 @@ article.project.pb-96
 
             //- TODO edit project splits
             //- button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(disabled) Edit Drips 💧
-          
+
           //- toggle menu btn
           .my-3
             button.btn.btn-lg.shadow-md.pl-36.pr-28.font-semibold.tracking-wide(:class="{'btn-violet': !editMenuOpen, 'btn-darker': editMenuOpen}", @click="editProject = true")

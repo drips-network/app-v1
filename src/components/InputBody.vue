@@ -34,7 +34,7 @@ const slots = useSlots()
   label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-5(:class="{'opacity-0ff': !isFilled, 'text-red-600': theme === 'red'}") {{ props.label }}
 
   //- field (input, textarea)
-  .h-80.flex.items-center.font-semibold.rounded-2xl.text-center.leading-none.pt-9.text-white(:class="[styling, themeing]")
+  .min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.pt-9.text-white(:class="[styling, themeing]")
     slot
 
     //- (symbol: dai)
@@ -67,7 +67,7 @@ const slots = useSlots()
       }
     }
     & textarea {
-      @apply w-full min-h-80 flex items-center;
+      @apply w-full min-h-80 flex items-center pt-26 text-left px-24 leading-tight;
       &::placeholder{
         @apply font-sans text-xl;
       }

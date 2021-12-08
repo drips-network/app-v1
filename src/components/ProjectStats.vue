@@ -127,15 +127,16 @@ section.project-stats.flex.w-full_10.-mx-5
         svg-dai.h-16.text-violet-650
     template(v-else) ...
 
-  //- total revenue
-  project-stat.flex-1.mx-5(:class="{'animate-pulse': !drips}")
-    template(v-slot:header)
-      h6 💧&nbsp; Drips to
-      //- h6.flex.items-center
-        div
-          <icon-split/>
-        | Splits
-    template(v-if="drips") {{ drips.length }}
-    template(v-else) ...
+  //- drips
+  router-link.flex-1.mx-5.block(to="#drips")
+    project-stat.w-full(:class="{'animate-pulse': !drips}")
+      template(v-slot:header)
+        h6 💧&nbsp; Drips to
+        //- h6.flex.items-center
+          div
+            <icon-split/>
+          | Splits
+      template(v-if="drips") {{ drips.length }}
+      template(v-else) ...
     //- .flex.items-center 0 <span class="hiddenff ml-3" style="font-size:0.65em">💦</span>
 </template>

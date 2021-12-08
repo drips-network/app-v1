@@ -2,6 +2,7 @@
 import { ref, computed, onBeforeMount } from 'vue'
 import store from '@/store'
 import Addr from '@/components/Addr'
+import AvatarBlockie from '@/components/AvatarBlockie'
 
 const props = defineProps({
   drips: Array
@@ -16,7 +17,7 @@ const myDrips = ref(props.drips)
 </script>
 
 <template lang="pug">
-section.project-splits.relative
+section#drips.project-splits.relative
   header.absolute.top-40.left-36
     .relative
       //- drip svg
@@ -47,21 +48,23 @@ section.project-splits.relative
         .block.-mt-px.mb-32(v-if="i < 3")
           img.mx-auto(src="../assets/icons/drip-off-point.svg")
         //- drip
-        router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20(:to="{name: 'user', params: { address: drip.address }}")
+        router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20.group(:to="{name: 'user', params: { address: drip.address }}")
           //- drip graphic
           img.w-full.block(src="../assets/icons/drip-big.svg", alt="blue raindrop")
           //- text
           .absolute.overlay.flex.items-center.justify-center
-            div.text-center
+            div.text-center.text-violet-650
               //- percent
-              .font-cheee.text-8xl.text-violet-650.font-normal(style="margin-top:38%")
+              .pt-24.font-cheee.text-8xl.font-normal.notouch_group-hover_text-greenbright-500(style="margin-top:38%")
                 | {{ parseInt(drip.percent) }}
                 span(style="font-size: 0.75em") %
-              .mt-24.text-violet-650.font-semibold.text-lg
+              .mt-20.font-semibold.text-whiteff.text-lg.notouch_group-hover_text-white
                 addr(:address="drip.address")
+              .mt-10.mb-2.flex.justify-center.w-full
+                avatar-blockie(:address="drip.address", width="16", :key="drip.address")
               //- TODO calc amount
               //- .mt-8.font-mono.text-ms.text-violet-650 XXX Ð/mo
-              .mb-20
+              //- .mb-20
 
 </template>
 

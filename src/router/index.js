@@ -73,7 +73,12 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior (to, from, savedPosition) {
-    if (savedPosition) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth'
+      }
+    } else if (savedPosition) {
       return savedPosition
     } else {
       // don't scroll to top on user tab changes...

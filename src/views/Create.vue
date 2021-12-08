@@ -14,11 +14,12 @@ import { toWei, toWeiPerSec, formatSplits } from '@/utils'
 import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 import SvgX from '@/components/SvgX'
 import { constants } from 'ethers'
-
+import showdown from 'showdown'
 const route = useRoute()
 const router = useRouter()
 
 const step = ref(0)
+const review = ref(false)
 const tx = ref()
 const owner = computed(() => store.state.address)
 const projectAddress = ref(null)
@@ -75,8 +76,15 @@ const meta = ref({
   radicleID: '',
   githubProject: '',
   goal: undefined,
-  memberships: [newMembershipTempl()]
+  memberships: [], // [newMembershipTempl()],
+  benefits: ''
 })
+
+// benefits
+const benefitsInputMd = ref('')
+const converter = new showdown.Converter()
+const benefitsInputHtml = computed(() => converter.makeHtml(benefitsInputMd.value))
+const benefitsInputHidden = ref(false)
 
 // compiled project
 const project = computed(() => {
@@ -97,6 +105,7 @@ const removeDrip = (i) => drips.value.splice(i, 1)
 const projectPanel = ref()
 const fundingPanel = ref()
 const membershipsPanel = ref()
+const benefitsPanel = ref()
 const dripsPanel = ref()
 
 const openFundingPanel = async () => {
@@ -114,9 +123,15 @@ const openMembershipsPanel = () => {
   step.value++
 }
 
+const openBenefitsPanel = async () => {
+  step.value++
+  await nextTick()
+  benefitsPanel.value.$el.scrollIntoView({ behavior: 'smooth' })
+}
+
 const openDripsPanel = async () => {
   // validate memberships
-  // meta.value.memberships = meta.value.memberships.filter(m => m.name.length && m.minDAI > 0)
+  meta.value.memberships = meta.value.memberships.filter(m => m.name.length && m.minDAI > 0)
   //
   // projectPanel.value.close()
   // fundingPanel.value.close()
@@ -136,6 +151,8 @@ const openPanelsForReview = () => {
   // membershipsPanel.value.open()
   window.scroll({ top: 0, behavior: 'smooth' })
   step.value++
+  review.value = true
+  benefitsInputHidden.value = true
 }
 
 async function submitProject () {
@@ -143,7 +160,10 @@ async function submitProject () {
     // TODO - better UX to break ipfs and create into separate actions with error handling inside this component
     tx.value = await store.dispatch('createProject', {
       project: toRaw(project.value),
-      meta: toRaw(meta.value)
+      meta: toRaw({
+        ...meta.value,
+        benefits: benefitsInputHtml.value
+      })
     })
     console.log('tx', tx.value)
 
@@ -188,10 +208,10 @@ article.create.py-80.relative
   panel.mx-auto(ref="projectPanel", label="Community", icon="✨")
     template(v-slot:header)
       h2
-        template(v-if="step < 2") Create a Community
+        template(v-if="!review") Create a Community
         template(v-else) Review your Community
 
-    template(v-if="step >= 2", v-slot:description)
+    template(v-if="review", v-slot:description)
       p Fields in #[span.text-red-500.font-bold red] you can't edit later!
 
     section
@@ -244,7 +264,7 @@ article.create.py-80.relative
           .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
             .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
 
-    form.mt-40(@submit.prevent="openDripsPanel", validate)
+    form.mt-40(@submit.prevent="openBenefitsPanel", validate)
       //- (input monthly rate)
       template(v-if="isSubscription")
         input-body.my-10.text-red-600(label="Minimum Subscription", symbol="daipermo")
@@ -268,7 +288,7 @@ article.create.py-80.relative
         input(v-model="meta.goal", type="number", placeholder="1000")
 
       //- custom image ipfs hash
-      input-body.my-10.text-red-600(label="Custom Token Image IPFS Hash (optional)", format="code")
+      input-body.my-10.text-red-600(label="Custom Token Image IPFS Hash (optional)", format="code", style="display:none")
         input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
 
       .mt-40(v-show="step === 1")
@@ -315,9 +335,29 @@ article.create.py-80.relative
       .mt-40(v-show="step === 2")
         button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel") Next
 
+  //- 3. BENEFITS
+  panel.mx-auto.my-24(ref="benefitsPanel", v-show="step > 1", title="Benefits", icon="🧧")
+    template(v-slot:header)
+      h2 Benefits
+
+    //- TODO allow ENS names...
+    template(v-slot:description)
+      p.mx-auto(style="max-width:26em") Describe any perks or benefits that come with membership to your community.
+
+    input-body(label="Benefits (Markdown)", v-show="!benefitsInputHidden")
+      textarea.font-mono(v-model="benefitsInputMd", placeholder="Discord access..." rows="7")
+
+    .mt-10.min-h-80.bg-indigo-700.rounded-2xlb.relative.leading-tight(@click="benefitsInputHidden = false")
+      .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Preview HTML
+      div.px-24.pb-20.pt-28.text-left.text-xl.font-semibold.child-links-underline.pointer-events-none.child-lists-list(v-html="benefitsInputHtml")
+
+    .mt-40.flex.justify-center
+      button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel")
+        | {{ benefitsInputMd.length ? 'Next' : 'Skip' }}
+
   //- 4. DRIPS
 
-  panel.mx-auto(ref="dripsPanel", v-show="step > 1", title="Drips", icon="💧")
+  panel.mx-auto(ref="dripsPanel", v-show="step > 2", title="Drips", icon="💧")
     template(v-slot:header)
       h2 Drip to Others
 
@@ -346,7 +386,7 @@ article.create.py-80.relative
       button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
         svg-plus-minus-radicle
 
-      .mt-40.flex.justify-center(v-show="step === 2")
+      .mt-40.flex.justify-center(v-show="step === 3")
         //- .mx-5
           button.btn.btn-lg.btn-outline.mx-auto.min-w-xs(@click.prevent="emit('skip')") Skip
         //- .mx-5
@@ -354,7 +394,7 @@ article.create.py-80.relative
         button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
 
   //- (create btn)
-  .sticky.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 2")
+  .sticky.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
     .text-center
       button.btn.btn-xl.btn-white.min-w-md(@click="submitProject", :disabled="tx")
         template(v-if="projectAddress") Created!

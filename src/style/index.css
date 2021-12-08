@@ -134,3 +134,9 @@ input[type=number] {
 .input-group {
   @apply  rounded-2xlb bg-indigo-700 p-12;
 }
+
+.child-links-underline a { @apply underline }
+.child-lists-list{
+  & ul { @apply list-disc pl-20 },
+  & ol { @apply list-decimal pl-20 }
+}
