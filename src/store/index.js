@@ -3,6 +3,7 @@ import { toRaw } from 'vue'
 import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import Fortmatic from 'fortmatic'
 import api, { queryProjectMeta, queryProject } from '@/api'
 import { validateSplits } from '@/utils'
 // contracts
@@ -25,6 +26,13 @@ const web3Modal = new Web3Modal({
       package: WalletConnectProvider, // required
       options: {
         infuraId: '1cf5614cae9f49968fe604b818804be6' // required
+      }
+    },
+    fortmatic: {
+      package: Fortmatic, // required
+      options: {
+        // TODO mainent key
+        key: 'pk_test_5D4682C2410466E3' // required
       }
     }
   },
@@ -73,6 +81,7 @@ export default createStore({
       try {
         // auto-connect?
         if (web3Modal.cachedProvider) {
+          alert('has cached')
           await dispatch('connect')
         }
 
@@ -122,15 +131,17 @@ export default createStore({
     },
 
     /* disconnect wallet */
-    async disconnect ({ commit, dispatch }) {
+    disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
-      await web3Modal.clearCachedProvider()
+
+      const resp = web3Modal.clearCachedProvider()
+      console.log(resp)
       // if (walletProvider.off) {
       //   walletProvider.off('accountsChanged')
       //   walletProvider.off('disconnect')
       // }
-      commit('SIGN_OUT')
 
+      commit('SIGN_OUT')
       dispatch('setupFallbackProvider')
     },
 
