@@ -17,10 +17,15 @@ const networks = {
   rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }
 }
 
+const resetCachedWallet = sessionStorage.getItem('forceClearWeb3Modal')
+if (resetCachedWallet) {
+  sessionStorage.removeItem('forceClearWeb3Modal')
+}
+
 // setup web3 modal
 const web3Modal = new Web3Modal({
   network, // optional
-  cacheProvider: true, // optional
+  cacheProvider: false, // optional
   providerOptions: { // required
     walletconnect: {
       package: WalletConnectProvider, // required
@@ -38,6 +43,8 @@ const web3Modal = new Web3Modal({
   },
   theme: 'dark'
 })
+
+let initializing = false
 
 export default createStore({
   // modules: { },
@@ -78,20 +85,33 @@ export default createStore({
   actions: {
     /* setup provider */
     async init ({ state, commit, dispatch }) {
-      try {
-        // auto-connect?
-        if (web3Modal.cachedProvider) {
-          alert('has cached')
-          await dispatch('connect')
-        }
-
-        // fallback provider
-        if (!provider) {
-          dispatch('setupFallbackProvider')
-        }
-      } catch (e) {
-        console.error('@init', e)
+      // de-dupe
+      if (initializing) {
+        return initializing
       }
+
+      const setup = async () => {
+        try {
+          // auto-connect?
+          if (web3Modal.cachedProvider) {
+            await dispatch('connect')
+            alert('loaded cached')
+          }
+
+          // fallback provider
+          if (!provider) {
+            dispatch('setupFallbackProvider')
+          }
+        } catch (e) {
+          console.error('@init', e)
+          throw e
+        }
+      }
+
+      // create a promise for the handler
+      initializing = new Promise((resolve, reject) => setup().then(resolve).catch(reject))
+
+      return initializing
     },
 
     async setupFallbackProvider () {
@@ -134,8 +154,11 @@ export default createStore({
     disconnect ({ commit, dispatch }) {
       // clear so they can re-select from scratch
 
-      const resp = web3Modal.clearCachedProvider()
-      console.log(resp)
+      web3Modal.clearCachedProvider()
+      // sessionStorage.setItem('forceClearWeb3Modal', 1)
+      // resetCachedWallet = sessionStorage.getItem('forceClearWeb3Modal')
+      // alert('cleared?', resetCachedWallet)
+
       // if (walletProvider.off) {
       //   walletProvider.off('accountsChanged')
       //   walletProvider.off('disconnect')
