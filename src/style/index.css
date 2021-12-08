@@ -10,6 +10,13 @@
   font-style: normal;
 }
 
+/* @font-face {
+  font-family: 'kaeru-kaeru';
+  src: url('../assets/fonts/cheee/Cheee-Bingbong.woff2') format('woff2'),
+       url('../assets/fonts/cheee/Cheee-Bingbong.woff') format('woff');
+  font-style: normal;
+} */
+
 html {
   font-size: 10px; /* 1rem / Tailwind default */
 }
