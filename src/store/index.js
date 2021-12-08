@@ -4,7 +4,7 @@ import { ethers as Ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import api, { queryProjectMeta, queryProject } from '@/api'
-import { validateSplits } from '@/utils'
+import { validateSplits, getDripsWithdrawable } from '@/utils'
 // contracts
 import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
 
@@ -133,8 +133,10 @@ export default createStore({
         dispatch('listenToWalletProvider')
       } catch (e) {
         console.error('@connect', e)
-        // clear in case
+        // clear wallet in case
         dispatch('disconnect')
+        // throw error so stops any flows (closes modal too)
+        throw e
       }
     },
 
@@ -469,6 +471,7 @@ export default createStore({
           lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
           lastUpdate.balance = lastEvent.args[1]
           lastUpdate.receivers = lastEvent.args[2]
+          lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
         }
 
         return lastUpdate

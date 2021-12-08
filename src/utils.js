@@ -5,6 +5,8 @@ const oneMonth = 30 * 24 * 60 * 60
 
 export const ipfsUrl = hash => process.env.VUE_APP_IPFS_GATEWAY + '/ipfs/' + hash
 
+export const round = num => (Math.floor(num * 100) / 100).toFixed(2)
+
 export const fromWei = (wei) => {
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
   return wei.div(constants.WeiPerEther)
@@ -14,7 +16,14 @@ export const toWei = (dai) => {
   return utils.parseUnits(dai.toString())
 }
 
-export const toDAI = wei => utils.formatEther(wei)
+export const toDAI = (wei, frmt) => {
+  let dai = utils.formatEther(wei)
+  if (frmt === 'financial') {
+    // 1.00 - clip to nearest hundredth before toFixed (so no rounding)
+    dai = round(dai)
+  }
+  return dai
+}
 
 export const toDAIPerMo = (wei) => {
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
@@ -159,4 +168,27 @@ export function getDripPctFromAmts (amts) {
   const sum = amts[0].add(amts[1])
   const pct = (amts[1].toString() / sum.toString()) * 100 // dumb javascript
   return pct > 0 && pct < 0.01 ? '>0' : parseFloat(pct.toFixed(2))
+}
+
+export const getDripsWithdrawable = async (event) => {
+  // https://discord.com/channels/841318878125490186/875668327614255164/918094059732623411
+  // - Look at the latest user's DripsUpdated, it has a timestamp, uint128 balance and DripsReceiver[] receivers
+  // - Add up all the receiers' amtPerSec, it's totalAmtPerSec
+  // - withdrawable = eventBalance - (currTimestamp - eventTimestamp) * totalAmtPerSec
+  // - if withdrawable < 0, withdrawable = eventBalance % totalAmtPerSec
+  try {
+    const currTimestamp = Math.floor(new Date().getTime() / 1000) // sec
+    const eventTimestamp = (await event.getBlock()).timestamp // sec
+    const receivers = event.args[2]
+    const totalAmtPerSec = receivers.reduce((acc, curr) => acc.add(curr[1]), bn.from(0))
+    const eventBalance = event.args[1]
+    let withdrawable = eventBalance.sub(totalAmtPerSec.mul(currTimestamp - eventTimestamp))
+    if (withdrawable.lt(0)) {
+      withdrawable = eventBalance.mod(totalAmtPerSec)
+    }
+    return withdrawable
+  } catch (e) {
+    console.error(e)
+    return null
+  }
 }

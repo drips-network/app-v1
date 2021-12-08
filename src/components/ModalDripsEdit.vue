@@ -11,8 +11,8 @@ import LoadingBar from '@/components/LoadingBar'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import store from '@/store'
-import { utils, constants } from 'ethers'
-import { toWei, toWeiPerSec, toDAIPerMo, validateAddressInput } from '@/utils'
+import { utils, constants, BigNumber as bn } from 'ethers'
+import { round, toDAI, toWei, toWeiPerSec, toDAIPerMo, validateAddressInput } from '@/utils'
 
 const props = defineProps(['newRecipient'])
 const emit = defineEmits(['close', 'updated'])
@@ -29,6 +29,12 @@ const removeDrip = i => drips.value.splice(i, 1)
 
 let lastUpdate = null
 
+let getWithdrawable
+const withdrawable = ref('0')
+// balance / max DAI withdrawable
+const balance = computed(() => round(toDAI(withdrawable.value)))
+const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
+
 const getDrips = async () => {
   try {
     // connected?
@@ -36,10 +42,16 @@ const getDrips = async () => {
     // get...
     lastUpdate = await store.dispatch('getDripsReceivers', store.state.address)
 
-    // set drips
+    // set balance
+    // balance.value = round(toDAI(lastUpdate.balance))
+    // set withdrawable
+    getWithdrawable = () => lastUpdate.withdrawable()
+    withdrawable.value = await getWithdrawable()
+
+    // set receivers
     const receivers = toRaw(lastUpdate.receivers)
 
-    // format for form input
+    // format receivers for form input
     const receiversFormatted = []
     for (var i = 0; i < receivers.length; i++) {
       const ens = await store.dispatch('resolveAddress', { address: receivers[i][0] })
@@ -87,14 +99,25 @@ const update = async () => {
     txReceipt.value = null
     const topUpWei = toWei(topUpDAI.value) // .toString()
 
-    // check allowance
-    const allowance = await store.dispatch('getAllowance') // of dripsHub
+    // check allowance if top-up
+    if (topUpWei.gt(0)) {
+      const allowance = await store.dispatch('getAllowance') // of dripsHub
 
-    // !! below allowance
-    if (allowance.lt(topUpWei)) {
-      alert('You must first approve the contract to withdraw your DAI periodically.')
-      approvedDAI.value = false
-      return false
+      // !! below allowance
+      if (allowance.lt(topUpWei)) {
+        alert('You must first approve the contract to withdraw your DAI periodically.')
+        approvedDAI.value = false
+        return false
+      }
+    }
+
+    // check max if withdraw
+    if (topUpWei.lt(0)) {
+      withdrawable.value = await getWithdrawable()
+      if (topUpWei.lt(withdrawable)) {
+        alert(`You can only withdraw ${balance.value} DAI.`)
+        return
+      }
     }
 
     // validate receivers
@@ -207,18 +230,21 @@ modal(v-bind="$attrs", @close="$emit('close')")
         //- TODO topup input
 
         .mt-56
-          h6.text-2xl.font-semibold.mb-40.leading-tight Update Balance
+          h6.text-2xl.font-semibold.mb-40.leading-tight Add Funds
           p.mt-20.mb-40.text-md.mx-auto(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drip recipients can collect their funds every month.
-          //- TODO add user topup balance
-          //- https://discord.com/channels/841318878125490186/875668327614255164/918094059732623411
+
           .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
-            .pl-32.text-xl.font-semibold Balance
-            .pr-20.flex.items-center
-              span.text-2xl.font-semibold ??
+            .pl-32.text-xl.font-semibold
+              | Balance
+            .pr-20.flex.items-center(:class="{'text-red-500': newBalance < Number(balance), 'text-greenbright-500': newBalance > Number(balance) }")
+              span.text-2xl.font-semibold {{ newBalance }}
               svg-dai.ml-12(size="xl")
 
           input-body.mt-10(label="Add to Balance", symbol="dai")
-            input(v-model="topUpDAI", type="number", step="0.01", required)
+            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
+          //- (max withdraw note)
+          .mt-4.text-sm.text-red-600.relative(v-if="topUpDAI < -balance")
+            .absolute.top-0.left-0.w-full.text-center Max Withdraw -{{balance}} DAI
 
         //- btns
         .mt-40.flex.justify-center

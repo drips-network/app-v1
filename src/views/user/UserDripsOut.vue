@@ -103,8 +103,7 @@ section.user-splits
         template(v-slot:header)
           h6 Drip to Others
         template(v-slot:description)
-          p {{ allDrips.length ? 'Edit the' : 'Add' }} addresses to drip funds to every month.
-           //- Top-up your balance periodically to ensure funds are available!
+          p {{ allDrips.length ? 'Edit the' : 'Add' }} addresses to drip funds to #[b.text-violet-650 every month.]
 
       //- edit splits...
       modal-splits-edit(v-if="edit==='splits'", :open="edit === 'splits'", @close="edit = null; getSplits", @updated="getSplits")
