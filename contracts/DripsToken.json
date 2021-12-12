@@ -180,6 +180,12 @@
         "internalType": "bool",
         "name": "streaming",
         "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
       }
     ],
     "name": "NewType",
@@ -403,6 +409,35 @@
     ],
     "name": "approve",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftReceiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint128",
+        "name": "typeId",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "value",
+        "type": "uint128"
+      }
+    ],
+    "name": "authMint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
