@@ -1,10 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Explore from '../views/Explore.vue'
+import Landing from '../views/Landing.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
+    component: Landing
+  },
+  {
+    path: '/explore',
+    name: 'explore',
     component: Explore
   },
   {

@@ -22,7 +22,7 @@ store.dispatch('init')
       .flex.items-center.mr-24.text-violet-650
         //- links
         router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Create
-        router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'home'}") Explore
+        router-link.mr-28.notouch_hover_text-white.transition.duration-100(:to="{name: 'explore'}") Explore
         //- (profile btn)
         template(v-if="$store.state.address")
           .btn.btn-sm.bg-indigo-900
