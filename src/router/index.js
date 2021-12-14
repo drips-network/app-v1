@@ -5,8 +5,10 @@ import Landing from '../views/Landing.vue'
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: Landing
+    name: 'landing',
+    beforeEnter: () => {
+      window.location.href = 'https://radicle.xyz'
+    }
   },
   {
     path: '/explore',
