@@ -2,18 +2,13 @@
   {
     "inputs": [
       {
-        "internalType": "contract DaiDripsHub",
-        "name": "hub_",
-        "type": "address"
-      },
-      {
         "internalType": "contract IBuilder",
         "name": "builder_",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "owner_",
+        "name": "owner",
         "type": "address"
       }
     ],

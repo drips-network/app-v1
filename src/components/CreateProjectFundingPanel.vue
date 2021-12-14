@@ -100,6 +100,6 @@ panel.mx-auto(icon="🌈")
 
       //- (tx link)
       //- .mt-16.text-violet-600(v-if="state.tx")
-        a(:href="`https://rinkeby.etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+        a(:href="`https://etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
 </template>

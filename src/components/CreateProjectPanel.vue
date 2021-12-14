@@ -121,7 +121,7 @@ panel.mx-auto(icon="✨")
 
           //- (tx link)
           //- .mt-16.text-violet-600(v-if="state.tx")
-            a(:href="`https://rinkeby.etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+            a(:href="`https://etherscan.io/tx/${state.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
 //- .mt-4(v-if="state.projectAddress")
   router-link(:to="{name: 'project', params: { address: state.projectAddress }}") View Project

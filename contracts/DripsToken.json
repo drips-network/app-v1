@@ -5,6 +5,11 @@
         "internalType": "contract DaiDripsHub",
         "name": "hub_",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "deployer_",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",

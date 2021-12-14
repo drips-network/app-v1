@@ -403,7 +403,7 @@ article.create.py-80.relative
 
       //- (tx link)
       .mt-16.text-violet-600.py-8.px-16.rounded-full.bg-indigo-900(v-if="tx")
-        a(:href="`https://rinkeby.etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+        a(:href="`https://etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
   //- post-create
   //- section

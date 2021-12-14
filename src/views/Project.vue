@@ -143,7 +143,7 @@ article.project.pb-96
 
           .mt-16.text-violet-600(v-if="tokenType") Min. {{ minDAI }} DAI/mo
         //- p
-          a(:href="`https://rinkeby.etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
+          a(:href="`https://etherscan.io/address/${this.projectAddress}`", target="blank") Etherscan ↗
 
       //- (stats)
       .mt-96.mb-96.px-20
