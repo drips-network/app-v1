@@ -7,7 +7,7 @@ const routes = [
     path: '/',
     name: 'landing',
     beforeEnter: () => {
-      window.location.href = 'https://radicle-drips-mainnet.netlify.app/'
+      window.location.href = 'https://drips.radicle.network/'
     }
   },
   {
