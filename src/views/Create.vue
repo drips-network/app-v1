@@ -288,7 +288,7 @@ article.create.py-80.relative
         input(v-model="meta.goal", type="number", placeholder="1000")
 
       //- custom image ipfs hash
-      input-body.my-10.text-red-600(label="Custom Token Image IPFS Hash (optional)", format="code", style="display:none")
+      input-body.my-10.text-red-600(label="Custom Token Image IPFS Hash (optional)", format="code")
         input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
 
       .mt-40(v-show="step === 1")
