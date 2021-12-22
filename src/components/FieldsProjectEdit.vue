@@ -50,12 +50,13 @@ const onImgFileChange = (e) => {
 
 <template lang="pug">
 //- avatar image upload
-.h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950.mb-36
+
+.h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950
   //- (default image)
   img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
   //- add image btn
-  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Project Image")
-    span.sr-only Project Image
+  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Community Avatar Image")
+    span.sr-only Community Avatar Image
     input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
     svg-plus-minus-radicle
 
@@ -63,13 +64,15 @@ const onImgFileChange = (e) => {
   //- (image)
   img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
 
+.mt-8.text-sm.text-violet-650 Avatar
+
 //- form(@submit.prevent="save", validate)
-section
+section.mt-40
   //- .my-10
     input-body(label="Owner", :isFilled="owner.length", format="code")
       input(v-model="owner", placeholder="owner", disabled)
   .my-10(v-if="props.isNewProject")
-    input-body(label="Name*", :isFilled="modelValue.name.length", :class="{'text-red-600': props.isNewProject }")
+    input-body(label="Community Name*", :isFilled="modelValue.name.length", :class="{'text-red-600': props.isNewProject }")
       input(v-model="modelValue.name", placeholder="Computer Club", required, autocomplete="new-password")
   //- .my-10(v-if="props.isNewProject")
     //- TODO: format/validate symbol text?

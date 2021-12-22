@@ -2,6 +2,7 @@
 // This app is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import SvgLogo from './components/SvgLogo.vue'
+import SvgLogoDrop from './components/SvgLogoDrop.vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import SvgX from './components/SvgX.vue'
 import SvgDai from './components/SvgDai.vue'
@@ -26,8 +27,10 @@ store.dispatch('init')
     header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
       //- left side
       .flex.items-center
-        router-link.pl-24.-ml-px.mb-px(to="/")
-          svg-logo.text-white
+        router-link.flex.items-center.-mt-px(to="/")
+          .w-80.flex.justify-center.items-center.pb-px
+            svg-logo-drop
+          svg-logo.text-violet-650
         //- (test network name)
         .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
 
@@ -51,8 +54,8 @@ store.dispatch('init')
         template(v-else)
           button.btn.btn-sm.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
 
-    main#main.flex-1
-      router-view(:key="$route.params && JSON.stringify($route.params)")
+    main#main.flex-1.flex
+      router-view.w-full(:key="$route.params && JSON.stringify($route.params)")
 
   footer.p-6
     .bg-indigo-900.text-ms.text-violet-650.rounded-full.font-semibold.flex.items-center

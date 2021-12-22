@@ -6,7 +6,11 @@ const routes = [
   {
     path: '/',
     name: 'landing',
-    beforeEnter: () => {
+    beforeEnter: (to, from, next) => {
+      if (process.env.NODE_ENV === 'development') {
+        return next('/explore')
+      }
+      // else redirect to landing page site
       window.location.href = 'https://drips.radicle.network/'
     }
   },
@@ -22,6 +26,14 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "create" */ '../views/Create.vue')
+  },
+  {
+    path: '/create/community',
+    name: 'create-community',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "create-community" */ '../views/CreateCommunity.vue')
   },
   {
     path: '/communities/:address',

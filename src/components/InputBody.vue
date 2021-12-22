@@ -31,7 +31,7 @@ const slots = useSlots()
 
 <template lang="pug">
 .input-body.relative.text-violet-600
-  label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-5(:class="{'opacity-0ff': !isFilled, 'text-red-600': theme === 'red'}") {{ props.label }}
+  label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-4(:class="{'opacity-0ff': !isFilled, 'text-red-600': theme === 'red'}") {{ props.label }}
 
   //- field (input, textarea)
   .min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.text-white(:class="[styling, themeing]")
