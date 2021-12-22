@@ -86,6 +86,9 @@ module.exports = {
         500: '#F52727',
         600: '#af2828'
       },
+      yellow: {
+        500: '#F4F056'
+      },
       greenbright: {
         500: '#11C559' // '#00F143', // progress bar left
       },

@@ -10,7 +10,7 @@ import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../con
 
 let provider, signer, walletProvider
 
-const network = deploy.NETWORK // JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
   rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }
@@ -37,6 +37,7 @@ export default createStore({
   // modules: { },
   state () {
     return {
+      networkId: null,
       address: null,
       addresses: [],
 
@@ -50,7 +51,8 @@ export default createStore({
       return state.addresses[addr] ? state.addresses[addr]
         : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
-    isWalletAddr: (state) => (addr) => addr === state.address
+    isWalletAddr: (state) => (addr) => addr === state.address,
+    isWrongNetwork: state => state.networkId && state.networkId !== networks[network].id
   },
   mutations: {
     SIGN_IN (state, address) {
@@ -63,6 +65,9 @@ export default createStore({
       const addresses = toRaw(state.addresses)
       addresses[address] = ens
       state.addresses = addresses
+    },
+    SET_NETWORK_ID (state, id) {
+      state.networkId = id
     }
     // SET_CONTRACTS (state, provider) {
     //   console.log('registry', RadicleRegistry.address)
@@ -88,6 +93,7 @@ export default createStore({
           if (!provider) {
             dispatch('setupFallbackProvider')
           }
+
           initializing = false
         } catch (e) {
           console.error('@init', e)
@@ -102,7 +108,7 @@ export default createStore({
       return initializing
     },
 
-    async setupFallbackProvider () {
+    async setupFallbackProvider ({ dispatch }) {
       try {
         if (window.ethereum) {
           // metamask
@@ -111,9 +117,17 @@ export default createStore({
           // infura
           provider = new Ethers.getDefaultProvider(networks[network].infura)
         }
+        // set network
+        dispatch('getNetworkId', provider)
       } catch (e) {
         console.error(e)
       }
+    },
+
+    getNetworkId ({ commit }, provider) {
+      provider.getNetwork()
+        .then(network => commit('SET_NETWORK_ID', network.chainId))
+        .catch(console.error)
     },
 
     /* connect wallet */
@@ -127,6 +141,9 @@ export default createStore({
         // set user address
         const address = await signer.getAddress()
         commit('SIGN_IN', address)
+
+        // set network id
+        dispatch('getNetworkId', provider)
 
         // commit('SET_CONTRACTS', provider)
 
@@ -154,6 +171,7 @@ export default createStore({
 
       commit('SIGN_OUT')
       dispatch('setupFallbackProvider')
+      signer = null
     },
 
     /* wallet events */

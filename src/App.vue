@@ -1,5 +1,5 @@
 <script setup>
-// This starter template is using Vue 3 <script setup> SFCs
+// This app is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import SvgLogo from './components/SvgLogo.vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
@@ -7,16 +7,29 @@ import SvgX from './components/SvgX.vue'
 import SvgDai from './components/SvgDai.vue'
 import store from '@/store'
 
+const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+
 store.dispatch('init')
 </script>
 
 <template lang="pug">
 #app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans.leading-normal
   .flex.flex-col.min-h-screen
+    //- (wrong network banner)
+    template(v-if="$store.getters.isWrongNetwork")
+      .sticky.z-20.top-10.left-0.w-full.h-80.rounded-full.bg-yellow-500.text-black.flex.items-center.justify-between.mb-10
+        .w-80.text-center.text-2xl ⚠️
+        .flex-1.text-center.font-semibold Wrong Network! Switch to #[span.capitalize {{ networkName }}]!
+        .w-80
+
+    //- app header
     header.h-80.rounded-full.bg-indigo-700.flex.items-center.justify-between
       //- left side
-      router-link.pl-24.-ml-px.mb-px(to="/")
-        svg-logo.text-white
+      .flex.items-center
+        router-link.pl-24.-ml-px.mb-px(to="/")
+          svg-logo.text-white
+        //- (test network name)
+        .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
 
       //- right side
       .flex.items-center.mr-24.text-violet-650
@@ -39,7 +52,7 @@ store.dispatch('init')
           button.btn.btn-sm.btn-darker.px-20(@click="$store.dispatch('connect')") Connect
 
     main#main.flex-1
-      router-view(:key="$route.params && JSON.stringify($route.parms)")
+      router-view(:key="$route.params && JSON.stringify($route.params)")
 
   footer.p-6
     .bg-indigo-900.text-ms.text-violet-650.rounded-full.font-semibold.flex.items-center
