@@ -194,7 +194,7 @@ onMounted(async () => {
 </script>
 
 <template lang="pug">
-panel.z-10.m-auto(icon="💧")
+panel(icon="🗓")
 
   template(v-slot:header)
     .leading-snug
@@ -204,7 +204,7 @@ panel.z-10.m-auto(icon="💧")
   template(v-slot:description)
     .mx-auto.leading-relaxed(style="max-widthff:26em")
       //- slot(name="description")
-      p.text-violet-650 Define where will you send DAI to #[b every month].
+      p.text-violet-650 Who do you want to send DAI to #[b every month]?
 
   //- (loading...)
   template(v-if="loading")
@@ -230,12 +230,12 @@ panel.z-10.m-auto(icon="💧")
               svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
 
       //- add drip row btn
-      button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
+      button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addDrip")
         svg-plus-minus-radicle
 
       //- TODO topup input
 
-      .mt-56
+      .mt-72
         div.mb-24.text-3xl 🔋
         h6.text-2xl.font-semibold.leading-snug Add Funds
         p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drip recipients have funds to collect every month.
@@ -258,12 +258,12 @@ panel.z-10.m-auto(icon="💧")
       //- btns
       .mt-40.flex.justify-center
         //- (close btn)
-        template(v-if="cancelBtn")
+        template(v-if="props.cancelBtn")
           button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')") Cancel
 
         //- (view btn)
         template(v-if="txReceipt")
-          button.btn.btn-violet.btn-lg.px-36(@click="viewMyDrips") View your Drips
+          button.btn.btn-violet.btn-lg.px-36(@click.prevent="viewMyDrips") View your Drips
 
         //- (approve btn)
         template(v-else-if="!approvedDAI")
@@ -273,10 +273,10 @@ panel.z-10.m-auto(icon="💧")
 
         //- (submit btn)
         template(v-else)
-          button.btn.btn-lg.px-36.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
-            template(v-if="txReceipt") Updated
-            template(v-else-if="tx") Updating...
-            template(v-else) Update
+          button.btn.btn-lg.px-40.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
+            template(v-if="txReceipt") Success!
+            template(v-else-if="tx") Waiting...
+            template(v-else) Submit
 
       tx-link(v-if="approveTx", :tx="approveTx")
       tx-link(v-if="tx", :tx="tx")

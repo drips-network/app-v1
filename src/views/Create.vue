@@ -1,8 +1,11 @@
 <script setup>
+import { ref, computed, watch } from 'vue'
 import store from '@/store'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
+const route = useRoute()
 const router = useRouter()
+const entryPanel = ref()
 
 const onDripBtnClick = async () => {
   try {
@@ -13,12 +16,21 @@ const onDripBtnClick = async () => {
     alert('You must connect a wallet to start dripping funds.')
   }
 }
+
+const isIndex = computed(() => route.name === 'create')
+const childRoute = ref()
+watch(route, (to) => {
+  if (to.name !== 'create') {
+    entryPanel.value.close()
+    childRoute.value.scrollIntoView({ behavior: 'smooth' })
+  }
+})
 </script>
 
 <template lang="pug">
-section.flex.w-full.items-center.justify-center.py-52
+section.py-72
 
-  panel.mx-auto.my-10(icon="☔️")
+  panel.mx-auto.transition.duration-200(ref="entryPanel", icon="☔️", label="Create Drips", :collapsed="!isIndex", :isEditable="false", @open="router.push({name: 'create' })", :class="{'opacity-30 notouch_hover_opacity-100 transition duration-150': !isIndex}")
     template(v-slot:header)
       h1.text-violet-650ff Create Drips
 
@@ -29,8 +41,15 @@ section.flex.w-full.items-center.justify-center.py-52
       //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
 
     //- funding options as tiles
-    .flex.-mx-10.mt-40.flex-row-reverse
-      //- TODO convert to radio buttons for accessibility
+    .flex.-mx-10.mt-40
+      .w-1x2.px-10
+        .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
+          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
+            div.pb-24
+              div.text-2xl.mb-20 💧
+              .text-xl.font-semibold.mb-16 Drip to Others
+              p.text-violet-600.px-10.leading-tight Drip funds #[span.font-bold every month] or #[span.font-bold share&nbsp;a&nbsp;percent] of your incoming drips with anyone.
+
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-community' }")
@@ -38,25 +57,8 @@ section.flex.w-full.items-center.justify-center.py-52
               div.text-3xl.mb-20 ✨
               .text-xl.font-semibold.mb-16 Create a Community
               p.text-violet-600.px-10.leading-tight Fund your community by selling #[span.font-bold member tokens] or offering #[span.font-bold subscriptions].
-          //- circle
-          //- .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-            .rounded-full.w-full(:class="{'bg-violet-700': isSubscription}")
 
-      .w-1x2.px-10
-        .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
-          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
-            div.pb-24
-              div.text-2xl.mb-20 💧
-              .text-xl.font-semibold.mb-16 Drip to Others
-              p.text-violet-600.px-10.leading-tight Drip funds #[span.font-bold every month] or #[span.font-bold share&nbsp;a&nbsp;percent] of your incoming funds with anyone.
-          //- circle
-          //- .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-            .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
+  section.pt-24(ref="childRoute")
+    router-view(:key="$route.path")
 
-//- section.flex.w-full.items-center.justify-center
-  .flex.flex-col.items-center
-      div
-        router-link.btn.btn-xl.btn-indigo.px-48(:to="{name: 'create-community' }") Create a Community ✨
-      div.mt-10
-        button.btn.btn-xl.btn-indigo.px-56(@click="onDripBtnClick") Drip funds 💧
 </template>

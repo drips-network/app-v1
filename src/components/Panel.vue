@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useSlots, useAttrs } from 'vue'
+import { ref, useSlots, useAttrs, watch } from 'vue'
 import SvgPen from '@/components/SvgPen'
 
 const slots = useSlots()
@@ -7,12 +7,18 @@ const slots = useSlots()
 const props = defineProps({
   label: String,
   icon: String,
-  collapsed: { type: Boolean, default: false }
+  collapsed: { type: Boolean, default: false },
+  isEditable: { type: Boolean, default: true }
 })
 
-const isCollapsed = ref(props.collapsed.value)
+const emit = defineEmits(['open'])
 
-const open = () => { isCollapsed.value = false }
+const isCollapsed = ref(props.collapsed)
+
+const open = () => {
+  isCollapsed.value = false
+  emit('open')
+}
 const close = () => { isCollapsed.value = true }
 
 // make close() available in parent component
@@ -24,10 +30,11 @@ section.panel.panel-dark.w-full.max-w-6xl.text-center
   //- (collapsed bar)
   button.h-80.w-full.flex.items-center.justify-center.relative.text-xll.font-semibold.group(v-show="isCollapsed", @click.prevent="open")
     //-
-    .absolute.top-0.left-24.h-full.flex.items-center.text-xl {{ icon }}
+    .absolute.top-0.left-28.h-full.flex.items-center.text-2xl {{ icon }}
     | {{ label }}
     .absolute.top-0.right-20.h-full.flex.items-center
-      svg-pen.h-28.text-white.opacity-30.notouch_group-hover_opacity-100
+      template(v-if="props.editable")
+        svg-pen.h-28.text-white.opacity-30.notouch_group-hover_opacity-100
 
   //- (open body)
   .pt-44.px-24.pb-24(v-show="!isCollapsed")

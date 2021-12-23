@@ -55,12 +55,18 @@ const slots = useSlots()
       .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-20
         .flex.items-center.text-violet-600
           .text-lg.tracking-tight MO
+
+    //- (symbol: percent)
+    template(v-if="props.symbol === 'percent'")
+      .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
+        .flex.items-center.text-violet-600
+          .text-xl.tracking-tight.font-bold %
 </template>
 
 <style lang="postcss">
   .input-body{
     & input {
-      @apply w-full h-80 flex items-center;
+      @apply w-full h-80 flex items-center pt-2;
       &::placeholder{
         /* TODO: maybe font style <label> instead of placeholder... */
         /* @apply text-xl; */
