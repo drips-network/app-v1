@@ -71,9 +71,9 @@ html {
   @apply bg-indigo-900 notouch_hover_text-white transition duration-150;
 }
 .btn-white{
-  @apply bg-white text-blue-900 transform duration-150;
+  @apply bg-white text-black border-2 border-transparent;
   &:not([disabled]) {
-    @apply notouch_hover_scale-102;
+    /* @apply notouch_hover_border-gray-300; */
   }
 }
 .btn-outline {

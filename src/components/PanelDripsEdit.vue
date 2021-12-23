@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, toRaw, onMounted } from 'vue'
+import { ref, computed, toRaw, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
@@ -23,8 +23,12 @@ const drips = ref([])
 
 const topUpDAI = ref(0) // DAI
 
-const addDrip = () => drips.value.push({ receiverInput: '', amount: null })
+const addDrip = () => {
+  drips.value.push({ receiverInput: '', amount: null })
+  nextTick().then(() => receiverInputEls.value[drips.value.length - 1].focus())
+}
 const removeDrip = i => drips.value.splice(i, 1)
+const receiverInputEls = ref([])
 
 let lastUpdate = null
 
@@ -198,13 +202,11 @@ panel(icon="🗓")
 
   template(v-slot:header)
     .leading-snug
-      //- slot(name="header")
       h2 Monthly Drips
 
   template(v-slot:description)
-    .mx-auto.leading-relaxed(style="max-widthff:26em")
-      //- slot(name="description")
-      p.text-violet-650 Who do you want to send DAI to #[b every month]?
+    p.text-violet-650.mx-auto.leading-relaxed
+      | Who do you want to send DAI to #[b every month]?
 
   //- (loading...)
   template(v-if="loading")
@@ -219,7 +221,7 @@ panel(icon="🗓")
           //- address
           input-body(label="Recipient's Ethereum Address or ENS name", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
             //- TODO: validate ethereum address
-            input(v-model="drips[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
+            input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
           //- rate
           input-body.mt-10(label="Monthly DAI Amount", :isFilled="typeof drips[i].amount === 'number'", theme="dark", symbol="daipermo")
             input(v-model="drips[i].amount", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)

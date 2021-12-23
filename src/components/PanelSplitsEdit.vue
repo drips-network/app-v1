@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, toRaw, onBeforeMount } from 'vue'
+import { ref, computed, toRaw, onBeforeMount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
@@ -18,8 +18,13 @@ const loading = ref(false)
 
 const splits = ref([])
 
-const addSplit = () => splits.value.push({ receiverInput: '', percent: null })
+const addSplit = () => {
+  splits.value.push({ receiverInput: '', percent: null })
+  // focus new input
+  nextTick().then(() => receiverInputEls.value[splits.value.length - 1].focus())
+}
 const removeSplit = i => splits.value.splice(i, 1)
+const receiverInputEls = ref([])
 
 let currentReceivers = []
 
@@ -148,7 +153,7 @@ panel(icon="💦")
           //- input address
           input-body(label="Recipient's Ethereum Address or ENS name", :isFilled="splits[i].receiverInput === 'length'", theme="dark", format="code")
             //- TODO: validate ethereum address
-            input(v-model="splits[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
+            input(:ref="el => { receiverInputEls[i] = el }", v-model="splits[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
           //- amount
           input-body.mt-10(label="Percent to share", :isFilled="typeof splits[i].percent === 'number'", theme="dark", symbol="percent")
             input(v-model="splits[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
@@ -157,7 +162,7 @@ panel(icon="💦")
             button.w-32.h-32.flex.items-center.justify-center.-mr-12.bg-indigo-900.rounded-full.border-violet-700.border-2.notouch_hover_border-white(@click.prevent="removeSplit(i)")
               svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
 
-      button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addSplit", style="border-style:dashed")
+      button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addSplit", aria-label="Add Split")
         svg-plus-minus-radicle
 
       //- btns

@@ -1,22 +1,27 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
 import IconSplit from '@/components/IconSplit'
 import ModalDripTo from '@/components/ModalDripTo'
 import ModalCollectDrips from '@/components/ModalCollectDrips'
+import ModalEditDripsSelect from '@/components/ModalEditDripsSelect'
+import ModalDripsEdit from '@/components/ModalDripsEdit'
+import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import SvgDai from '@/components/SvgDai'
 import store from '@/store'
 import { utils } from 'ethers'
-import { toDAI } from '@/utils'
+import { toDAI, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
 
+// my account
 const isMyUser = computed(() => store.state.address === route.params.address)
-
+const editDripsSelect = ref(false)
+const edit = ref(null) // 'drips' : 'splits'
 const collectableAmts = ref()
 const num = wei => Number(toDAI(wei)).toFixed(2)
 const totalFunds = computed(() => {
@@ -31,7 +36,61 @@ const getMyCollectable = () => {
     .catch(console.error)
 }
 
-onMounted(() => isMyUser.value && getMyCollectable())
+// drips
+const loading = ref(true)
+const splits = ref([])
+const drips = ref([])
+
+const splitsOut = computed(() => {
+  return splits.value.map(split => ({
+    sender: route.params.address,
+    receiver: split.address,
+    percent: split.percent
+  }))
+})
+
+const dripsOut = computed(() => {
+  return drips.value.map(drip => ({
+    sender: route.params.address,
+    receiver: drip[0],
+    amount: toDAIPerMo(drip[1])
+  }))
+})
+
+const allDripsOut = computed(() => [...dripsOut.value, ...splitsOut.value])
+
+const getSplits = async () => {
+  try {
+    loading.value = true
+    splits.value = (await store.dispatch('getSplitsReceivers', route.params.address)).percents
+    loading.value = false
+  } catch (e) {
+    console.error(e)
+    loading.value = false
+  }
+}
+
+const getDrips = async () => {
+  try {
+    loading.value = true
+    drips.value = (await store.dispatch('getDripsReceivers', route.params.address)).receivers
+    loading.value = false
+  } catch (e) {
+    console.error(e)
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  if (isMyUser.value) {
+    getMyCollectable()
+  }
+  getSplits()
+  getDrips()
+})
+
+provide('isMyUser', isMyUser)
+provide('allDripsOut', allDripsOut)
 </script>
 
 <script>
@@ -91,15 +150,19 @@ article.profile.pb-80
 
       //- (collect btn)
       template(v-if="isMyUser")
-        //- template(v-if="totalFunds > -1")
-        .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-36(:class="{'text-violet-650': totalFunds <= 0}", :key="$route.params.address")
-          template(v-if="totalFunds > -1")
-            svg-dai.mr-6(size="lg")
-            | {{ totalFunds }}
-          template(v-else)
-            .animate-pulse ...
-          
-          button.ml-32.btn.btn-lg.btn-white.text-xl.font-semibold.pl-36.pr-32(@click="collectModalOpen = true") Collect 💧
+        .flex.items-center
+          //- template(v-if="totalFunds > -1")
+          .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-32(:class="{'text-violet-650': totalFunds <= 0}", :key="$route.params.address")
+            template(v-if="totalFunds > -1")
+              svg-dai.mr-6(size="lg")
+              | {{ totalFunds }}
+            template(v-else)
+              .animate-pulse ...
+            
+            button.ml-24.btn.btn-lg.btn-white.text-xl.font-semibold.pl-36.pr-32(@click="collectModalOpen = true") Collect 💧
+
+          //- (edit drips btn)
+          button.ml-6.btn.btn-lg.btn-violet.text-xl.font-semibold.pl-36.pr-32(@click="editDripsSelect = true") Edit Drips 💧
       
       //- (drip to btn)
       template(v-else)
@@ -132,13 +195,42 @@ article.profile.pb-80
 
   main#main.px-36.min-h-screen
 
-    router-view(:key="$route.path")
+    router-view(:key="$route.path", @editDrips="editDripsSelect = true")
 
-  //- modals
-  modal-drip-to(v-if="dripModalOpen", :address="$route.params.address", :open="dripModalOpen", @close="dripModalOpen = false")
-    template(v-slot:header)
-     h6 Drip to<br>#[addr.text-violet-650(:address="props.address")]
+  //- MY USER
+  template(v-if="isMyUser")
+    //- COLLECT
+    modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="getMyCollectable", dripPct="1")
 
-  modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="getMyCollectable", dripPct="1")
+    //- EDIT
+    //- select drip type to edit...
+    modal-edit-drips-select(:open="editDripsSelect", @close="editDripsSelect = false", @select="e => { edit = e; editDripsSelect = false }", :edit="allDripsOut.length")
+
+    //- edit drips...
+    template(v-if="edit === 'drips'")
+      modal-drips-edit(:open="edit === 'drips'", @close="edit = null; getDrips()", @updated="getDrips")
+        template(v-slot:header)
+          h6 Drip to Others
+        template(v-slot:description)
+          p {{ allDripsOut.length ? 'Edit the' : 'Add' }} addresses to drip funds to #[b.text-violet-650 every month.]
+
+    //- edit splits...
+    template(v-if="edit==='splits'")
+      modal-splits-edit(:open="edit === 'splits'", @close="edit = null; getSplits()", @updated="getSplits")
+        template(v-slot:header)
+          h6 Share your drips
+        template(v-slot:description)
+          template(v-if="splits.length")
+            | Edit the addresses you #[b.text-violet-650 share]<br>your incoming funds with.
+          template(v-else)
+            | Add addresses that you will #[b.text-violet-650 share]<br>your incoming funds with.
+
+  //- OTHER USER
+  template(v-else)
+    template(v-if="dripModalOpen")
+      //- drip to this user
+      modal-drip-to(:address="$route.params.address", :open="dripModalOpen", @close="dripModalOpen = false")
+        template(v-slot:header)
+         h6 Drip to<br>#[addr.text-violet-650(:address="props.address")]
 
 </template>

@@ -74,6 +74,11 @@ panel.mx-auto(icon="💧")
   //- (edit drips)
   template(v-else-if="type === 'drip'")
     panel-drips-edit
+      template(v-slot:header)
+        h2.leading-snug Monthly Drips
+      template(v-slot:description)
+        p.text-violet-650.mx-auto.leading-relaxed(style="max-widthff:26em")
+          | Who do you want to send DAI to #[b every month]? 
 
   //- (edit splits)
   template(v-else-if="type === 'split'")

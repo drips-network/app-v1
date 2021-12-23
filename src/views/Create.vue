@@ -20,9 +20,12 @@ const onDripBtnClick = async () => {
 const isIndex = computed(() => route.name === 'create')
 const childRoute = ref()
 watch(route, (to) => {
-  if (to.name !== 'create') {
+  if (to.name === 'create') {
+    entryPanel.value.open()
+  } else {
     entryPanel.value.close()
-    childRoute.value.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => childRoute.value.scrollIntoView({ behavior: 'smooth' }), 200)
+    
   }
 })
 </script>
