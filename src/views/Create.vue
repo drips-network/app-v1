@@ -16,7 +16,7 @@ const onDripBtnClick = async () => {
 </script>
 
 <template lang="pug">
-section.flex.w-full.items-center.justify-center
+section.flex.w-full.items-center.justify-center.py-52
 
   panel.mx-auto.my-10(icon="☔️")
     template(v-slot:header)
@@ -44,7 +44,7 @@ section.flex.w-full.items-center.justify-center
 
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
-          button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
+          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
             div.pb-24
               div.text-2xl.mb-20 💧
               .text-xl.font-semibold.mb-16 Drip to Others

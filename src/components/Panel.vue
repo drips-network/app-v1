@@ -32,7 +32,7 @@ section.panel.panel-dark.w-full.max-w-6xl.text-center
   //- (open body)
   .pt-44.px-24.pb-24(v-show="!isCollapsed")
     header.mb-40.text-center
-      .mb-20.text-4xl(v-if="icon") {{ icon }}
+      .mb-20.text-3xl(v-if="icon") {{ icon }}
 
       .text-2xl.font-semibold.mb-24.leading-tight
         slot(name="header")

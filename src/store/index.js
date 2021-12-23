@@ -470,7 +470,8 @@ export default createStore({
         const lastUpdate = {
           receivers: [],
           timestamp: 0,
-          balance: 0
+          balance: 0,
+          withdrawable: () => '0'
         }
 
         const contract = getHubContract()
