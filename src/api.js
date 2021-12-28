@@ -1,4 +1,4 @@
-const apiUrl = 'https://api.studio.thegraph.com/query/9578/drips-subgraph-mainnet-v2/v0.0.1'
+const apiUrl = 'https://api.thegraph.com/subgraphs/name/codesandwich/radicle-drips-optimism-kovan-v0'
 
 const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC // string
 
