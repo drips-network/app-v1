@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, provide } from 'vue'
+import { ref, computed, watch, onMounted, provide, toRaw } from 'vue'
 import { useRoute } from 'vue-router'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
@@ -37,12 +37,11 @@ const getMyCollectable = () => {
 }
 
 // drips
-const loading = ref(true)
-const splits = ref([])
-const drips = ref([])
+const splits = ref()
+const drips = ref()
 
 const splitsOut = computed(() => {
-  return splits.value.map(split => ({
+  return splits.value?.map(split => ({
     sender: route.params.address,
     receiver: split.address,
     percent: split.percent
@@ -50,34 +49,38 @@ const splitsOut = computed(() => {
 })
 
 const dripsOut = computed(() => {
-  return drips.value.map(drip => ({
+  return drips.value?.map(drip => ({
     sender: route.params.address,
     receiver: drip[0],
     amount: toDAIPerMo(drip[1])
   }))
 })
 
-const allDripsOut = computed(() => [...dripsOut.value, ...splitsOut.value])
+const allDripsOut = computed(() => {
+  if (!dripsOut.value && !splitsOut.value) {
+    return undefined // "loading"
+  }
+  const dOut = dripsOut.value || []
+  const sOut = splitsOut.value || []
+  return [...dOut, ...sOut]
+})
+  
 
 const getSplits = async () => {
   try {
-    loading.value = true
     splits.value = (await store.dispatch('getSplitsReceivers', route.params.address)).percents
-    loading.value = false
+    console.log(toRaw(splits.value))
   } catch (e) {
     console.error(e)
-    loading.value = false
   }
 }
 
 const getDrips = async () => {
   try {
-    loading.value = true
     drips.value = (await store.dispatch('getDripsReceivers', route.params.address)).receivers
-    loading.value = false
+    console.log(toRaw(drips.value))
   } catch (e) {
     console.error(e)
-    loading.value = false
   }
 }
 
@@ -204,7 +207,7 @@ article.profile.pb-80
 
     //- EDIT
     //- select drip type to edit...
-    modal-edit-drips-select(:open="editDripsSelect", @close="editDripsSelect = false", @select="e => { edit = e; editDripsSelect = false }", :edit="allDripsOut.length")
+    modal-edit-drips-select(:open="editDripsSelect", @close="editDripsSelect = false", @select="e => { edit = e; editDripsSelect = false }", :edit="allDripsOut && allDripsOut.length")
 
     //- edit drips...
     template(v-if="edit === 'drips'")
@@ -212,7 +215,7 @@ article.profile.pb-80
         template(v-slot:header)
           h6 Drip to Others
         template(v-slot:description)
-          p {{ allDripsOut.length ? 'Edit the' : 'Add' }} addresses to drip funds to #[b.text-violet-650 every month.]
+          p {{ allDripsOut && allDripsOut.length ? 'Edit the' : 'Add' }} addresses to drip funds to #[b.text-violet-650 every month.]
 
     //- edit splits...
     template(v-if="edit==='splits'")
@@ -220,7 +223,7 @@ article.profile.pb-80
         template(v-slot:header)
           h6 Share your drips
         template(v-slot:description)
-          template(v-if="splits.length")
+          template(v-if="splitsOut && splitsOut.length")
             | Edit the addresses you #[b.text-violet-650 share]<br>your incoming funds with.
           template(v-else)
             | Add addresses that you will #[b.text-violet-650 share]<br>your incoming funds with.

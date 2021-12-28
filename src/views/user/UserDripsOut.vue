@@ -21,7 +21,7 @@ const emit = defineEmits(['editDrips'])
 section.user-splits
 
   //- (loading bar)
-  template(v-if="!allDrips.length")
+  template(v-if="allDrips === undefined")
     loading-bar
 
   //-
