@@ -52,7 +52,7 @@ section.user-memberships
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You
         template(v-else) #[addr.font-bold(:address="$route.params.address")]
-        | &nbsp;are a <b>member</b> of <b>{{ nfts.length }} communities{{ nfts.length === 1 ? '' : 's' }}</b>
+        | &nbsp;are a <b>member</b> of <b>{{ nfts.length }} communit{{ nfts.length === 1 ? 'y' : 'ies' }}</b>
 
     section.px-2
       ul.flex.flex-wrap.w-full_40.-mx-20
