@@ -125,21 +125,21 @@ article.project.pb-96
         p.text-lg {{ meta.descrip }}
         //- links
         ul.flex.items-center.justify-center.mt-32
-          li.m-8(v-if="meta.website")
-            a(:href="meta.website", target="_blank", rel="noopener noreferrer")
-              svg-globe.block
-          li.m-8(v-if="meta.githubProject")
-            a(:href="meta.githubProject", target="_blank", rel="noopener noreferrer")
-              svg-github.block
-          li.m-8(v-if="meta.twitter")
-            a(:href="`https://twitter.com/${meta.twitter}`", target="_blank", rel="noopener noreferrer")
-              svg-twitter.block
-          li.m-8(v-if="meta.discord")
-            a(:href="meta.discord", target="_blank", rel="noopener noreferrer")
-              svg-discord.block
+          li(v-if="meta.website")
+            a.block.p-6.notouch_hover_text-greenbright-500(:href="meta.website", target="_blank", rel="noopener noreferrer", title="Website")
+              svg-globe.block.h-40
+          li(v-if="meta.githubProject")
+            a.block.p-6.notouch_hover_text-greenbright-500(:href="meta.githubProject", target="_blank", rel="noopener noreferrer", title="GitHub")
+              svg-github.block.h-40
+          li(v-if="meta.twitter")
+            a.block.p-6.notouch_hover_text-greenbright-500(:href="`https://twitter.com/${meta.twitter}`", target="_blank", rel="noopener noreferrer", title="Twitter")
+              svg-twitter.block.h-40
+          li(v-if="meta.discord")
+            a.block.p-6.notouch_hover_text-greenbright-500(:href="meta.discord", target="_blank", rel="noopener noreferrer", title="Discord")
+              svg-discord.block.h-40
 
         .mt-44
-          button.btn.btn-xl.btn-white.w-full.mx-auto(@click="mintModal = !mintModal", :disabled="!tokenType") Join 💧
+          button.btn.btn-xl.btn-white.px-64.mx-auto(@click="mintModal = !mintModal", :disabled="!tokenType") Join 💧
 
           .mt-16.text-violet-600(v-if="tokenType") Min. {{ minDAI }} DAI/mo
         //- p

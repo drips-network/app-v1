@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, provide, toRaw } from 'vue'
 import { useRoute } from 'vue-router'
+import UserTag from '@/components/UserTag'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
 import IconSplit from '@/components/IconSplit'
@@ -69,7 +70,6 @@ const allDripsOut = computed(() => {
 const getSplits = async () => {
   try {
     splits.value = (await store.dispatch('getSplitsReceivers', route.params.address)).percents
-    console.log(toRaw(splits.value))
   } catch (e) {
     console.error(e)
   }
@@ -78,7 +78,6 @@ const getSplits = async () => {
 const getDrips = async () => {
   try {
     drips.value = (await store.dispatch('getDripsReceivers', route.params.address)).receivers
-    console.log(toRaw(drips.value))
   } catch (e) {
     console.error(e)
   }
@@ -146,10 +145,7 @@ article.profile.pb-80
   header.mt-52.px-36
     .flex.items-endff.items-center.justify-between.w-full
       //- user tag
-      .h-160.rounded-full.bg-indigo-700.flex.items-center
-        avatar-blockie.w-112.mx-24.mr-36(:address="$route.params.address", width="112", :key="$route.params.address")
-        h1.text-2xl.font-bold.pr-60
-          addr(:address="$route.params.address", :youOn="true", :key="$route.params.address")
+      user-tag(:address="$route.params.address")
 
       //- (collect btn)
       template(v-if="isMyUser")

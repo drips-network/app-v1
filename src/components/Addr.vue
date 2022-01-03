@@ -13,7 +13,7 @@ const addr = ref(props.short ? store.getters.addrShort(props.address) : props.ad
 const isYou = computed(() => props.address === store.state.address)
 
 onMounted(() => {
-  if (props.youOn && isYou.value) return
+  // if (props.youOn && isYou.value) return
   // get ENS...
   store.dispatch('resolveAddress', { address: props.address })
     .then(ens => {

@@ -667,6 +667,15 @@ export default createStore({
         console.error('@collectFunds', e)
         throw e
       }
+    },
+
+    async getENSResolver ({ dispatch }, ensName) {
+      try {
+        if (!provider) await dispatch('init')
+        return provider.getResolver(ensName)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 })
