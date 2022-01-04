@@ -16,6 +16,7 @@ import { utils } from 'ethers'
 import { toDAI, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
+const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
 
@@ -165,17 +166,17 @@ article.profile.pb-80
       
       //- (drip to btn)
       template(v-else)
-        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true") Drip to 0x... 💧
+        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true") Drip to {{ ensName || '0x...' }} 💧
 
     nav.mt-52.mb-20
       .flex.items-start.justify-between.text-violet-650
         .flex.tracking-wide
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-communities', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-communities') }")
-            span.mr-14.-ml-4(style="font-size:1.23em") 🙂
-            | Communities
           router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-drips') }")
             span.mr-14.-ml-5(style="font-size:1.18em") 💧
             | Drips
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-communities', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-communities') }")
+            span.mr-14.-ml-4(style="font-size:1.23em") 🙂
+            | Communities
 
         //- (communities submenu)
         template(v-if="$route.name.includes('user-communities')")

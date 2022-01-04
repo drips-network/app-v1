@@ -31,7 +31,7 @@ section.user-splits
       div
         template(v-if="canEdit") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;<b>dripping</b> funds to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>
+        | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>
 
     ul
       //- all drips...

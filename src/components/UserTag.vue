@@ -18,7 +18,7 @@ const avatarBroken = ref(false)
 <template lang="pug">
 .user-tag.h-160.rounded-full.bg-indigo-700.flex.items-center.pr-60
   //- avatar
-  .mx-24.mr-36
+  router-link.block.rounded-full.mx-24.mr-36(:to="{name: 'user', params: { address: props.address }}")
     user-avatar.w-112.h-112(:address="props.address", blockieSize="112")
 
   div

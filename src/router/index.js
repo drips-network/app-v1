@@ -57,7 +57,7 @@ const routes = [
       {
         path: '',
         name: 'user',
-        redirect: { name: 'user-communities' }
+        redirect: { name: 'user-drips-out' }
       },
       // projects
       {
