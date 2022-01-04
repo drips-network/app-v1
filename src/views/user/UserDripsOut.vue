@@ -36,7 +36,7 @@ section.user-splits
     ul
       //- all drips...
       li(v-for="drip in allDrips")
-        drip-row.my-2(:drip="drip")
+        drip-row.my-2(:drip="drip", :alternateColors="true")
 
     //- edit btn footer
     template(v-if="canEdit")

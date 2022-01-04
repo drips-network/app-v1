@@ -89,6 +89,6 @@ onMounted(() => getPercent())
     //- (goal)
     template(v-else)
       svg-dai.mr-4(size="sm")
-      span.text-lg.font-semibol
+      span.text-md.font-semibold
         | {{ typeof meta.goal === 'number' ? meta.goal.toLocaleString() : '?' }}{{ isStreaming ? '/mo' : '' }}
 </template>

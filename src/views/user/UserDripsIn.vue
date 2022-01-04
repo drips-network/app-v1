@@ -86,11 +86,11 @@ const getSplitsIn = async () => {
           sender: event.args[0],
           receiver: split[0].toLowerCase(),
           percent: split[1] / store.state.splitsFractionMax * 100
-        })  
+        })
       })
     })
     // set
-    splitsIn.value = mySplitsIn    
+    splitsIn.value = mySplitsIn
   } catch (e) {
     console.error(e)
   }
@@ -120,6 +120,6 @@ section.user-drips-in
 
     ul
       li(v-for="drip in allDripsIn")
-        drip-row.my-2(:drip="drip")
+        drip-row.my-2(:drip="drip", :alternateColors="true")
 
 </template>

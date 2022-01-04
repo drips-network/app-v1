@@ -1,8 +1,17 @@
 <script setup>
+import { computed } from 'vue'
 import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
 import SvgDai from '@/components/SvgDai'
-const props = defineProps(['drip'])
+const props = defineProps(['drip', 'alternateColors'])
+const isSummary = typeof props.drip.receiver === 'number'
+const altBg = drip => drip.percent && props.alternateColors
+const receiverRt = computed(() => {
+  if (isSummary) {
+    return { name: 'user-drips-out', params: { address: props.drip.sender } }
+  }
+  return { name: 'user', params: { address: props.drip.receiver } }
+})
 </script>
 
 <template lang="pug">
@@ -12,20 +21,20 @@ const props = defineProps(['drip'])
     //- img(src="~@/assets/icons/drip-row-icon.svg")
     span(style="font-size:1.8em") 💧
 
-  router-link.h-80.flex.items-center.rounded-full.bg-indigo-700.px-16.mr-2.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': props.drip.percent }", :to="{name: 'user', params: { address: props.drip.sender }}")
+  router-link.h-80.flex.items-center.rounded-full.bg-indigo-700.px-12.mr-2.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="{name: 'user', params: { address: props.drip.sender }}")
     //- sender avatar / blockie
-    user-avatar.w-44.h-44.flex-shrink-0(:address="props.drip.sender", blockieSize="44", :key="props.drip.sender")
+    user-avatar.w-54.h-54.flex-shrink-0(:address="props.drip.sender", blockieSize="44", :key="props.drip.sender")
 
     .flex-1.min-w-0.truncate.inline.mx-12.text-center
       .inline
         addr.font-bold.inline(:address="props.drip.sender", :youOn="true", :key="props.drip.sender")
 
   //- drip icon
-  .w-80.h-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': props.drip.percent }")
+  .w-80.h-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
     //- img(src="~@/assets/icons/drip-row-icon.svg")
     span(style="font-size:1.75em") 💧
 
-  .flex-1.flex.bg-indigo-700.rounded-full.px-20.mr-2(:class="{'bg-indigo-800': props.drip.percent }")
+  .flex-1.flex.bg-indigo-700.rounded-full.px-20.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
 
     .w-full.flex.items-center.justify-center
       template(v-if="props.drip.amount")
@@ -85,13 +94,18 @@ const props = defineProps(['drip'])
       .mr-8
         addr.font-bold(:address="props.drip.receiver")
 
-  .h-80.w-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': props.drip.percent }")
+  .h-80.w-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
     img.h-20(src="~@/assets/icons/arrow-right-violet.svg")
 
-  //- receiver blockie
-  router-link.h-80.flex.items-center.justify-end.rounded-full.bg-indigo-700.px-16.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': props.drip.percent }", :to="{name: 'user', params: { address: props.drip.receiver }}")
-    .flex-1.min-w-0.truncate.inline.mx-12.text-center
-      .inline
-        addr.font-bold.inline(:address="props.drip.receiver", :youOn="true", :key="props.drip.receiver")
-    user-avatar.w-44.h-44(:address="props.drip.receiver", blockieSize="44", :key="props.drip.receiver")
+  //- receiver(s)
+  router-link.h-80.flex.items-center.justify-end.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
+    //- (summary - "10 addresses")
+    template(v-if="isSummary")
+      .w-full.text-center.font-bold {{ props.drip.receiver }} addresses
+    //- (single receiver)
+    template(v-else)
+      .flex-1.min-w-0.truncate.inline.mx-12.text-center
+        .inline
+          addr.font-bold.inline(:address="props.drip.receiver", :youOn="true", :key="props.drip.receiver")
+      user-avatar.w-54.h-54(:address="props.drip.receiver", blockieSize="44", :key="props.drip.receiver")
 </template>

@@ -619,7 +619,6 @@ export default createStore({
           })
         }
 
-        // return name (records added async)
         return { ens }
       } catch (e) {
         console.error(e)

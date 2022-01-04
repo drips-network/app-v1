@@ -17,20 +17,20 @@ onBeforeMount(async () => {
 </script>
 
 <template lang="pug">
-router-link.project-thumb-progress.relative.block(:to="{name: 'project', params: { address: props.project.id }}")
+router-link.project-thumb-progress.relative.block.group(:to="{name: 'project', params: { address: props.project.id }}")
   //- progress as background
   .absolute.overlay(v-if="meta")
     project-progress-bar(:meta="meta", :project="props.project", rightSide="percent")
 
   //- row body
-  .h-80.w-full.rounded-full.flex.items-center.justify-between.border.border-violet-800
+  .h-80.w-full.rounded-full.flex.items-center.justify-between.bg-indigo-700.border-2.border-transparent.notouch_group-hover_border-violet-600
     //- profile icon
-    .w-80.h-80.relative.z-10.flex.items-center.justify-center.-ml-px
+    .w-80.h-80.relative.z-10.flex.items-center.justify-center.-ml-2
       .w-54.h-54.relative.rounded-full.overflow-hidden
         img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)", alt="avatar")
 
     //- title
-    .relative.z-10.flex-1.text-xl.font-semibold.text-center
+    .relative.z-10.flex-1.text-lg.font-semibold.text-center
       | {{ project.name }}
     .w-54
 
