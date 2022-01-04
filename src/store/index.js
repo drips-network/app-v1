@@ -39,7 +39,7 @@ export default createStore({
     return {
       networkId: null,
       address: null,
-      addresses: [],
+      addresses: {},
 
       // TODO - get this from the contract?
       splitsFractionMax: 1000000
@@ -48,7 +48,7 @@ export default createStore({
   getters: {
     addrShort: (state) => (addr) => {
       // return ENS name or shortened 0x8888...8888
-      return state.addresses[addr] ? state.addresses[addr]
+      return state.addresses[addr]?.ens ? state.addresses[addr].ens
         : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
@@ -62,9 +62,10 @@ export default createStore({
       state.address = null
     },
     SAVE_ADDRESS (state, { address, ens }) {
-      const addresses = toRaw(state.addresses)
-      addresses[address] = ens
-      state.addresses = addresses
+      state.addresses[address.toLowerCase()] = { ens, records: {} }
+    },
+    SAVE_ADDRESS_RECORD (state, { address, record }) {
+      state.addresses[address].records[record.name] = record.value
     },
     SET_NETWORK_ID (state, id) {
       state.networkId = id
@@ -593,9 +594,11 @@ export default createStore({
 
     async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
+        // sanitize
+        address = (address || '').toLowerCase()
         // saved?
         const saved = state.addresses[address]
-        if (saved !== undefined) {
+        if (saved && saved.ens !== undefined) {
           return saved
         }
         // fetch new...
@@ -603,7 +606,21 @@ export default createStore({
         const ens = await provider.lookupAddress(address)
         // save even if null so we don't have to lookup again
         commit('SAVE_ADDRESS', { address, ens })
-        return ens
+
+        if (ens) {
+          // get records async...
+          const resolver = await provider.getResolver(ens)
+          const records = ['avatar', 'url', 'com.twitter', 'vnd.twitter', 'com.github', 'vnd.github', 'com.discord', 'vnd.discord']
+          // records...
+          records.forEach(name => {
+            resolver.getText(name)
+              .then(value => commit('SAVE_ADDRESS_RECORD', { address, record: { name, value } }))
+              // .catch(e => console.error(`Error getting ENS text record (${name} from ${ens}): ` + e ))
+          })
+        }
+
+        // return name (records added async)
+        return { ens }
       } catch (e) {
         console.error(e)
         return null

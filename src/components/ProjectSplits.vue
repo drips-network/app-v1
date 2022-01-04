@@ -2,7 +2,7 @@
 import { ref, computed, onBeforeMount } from 'vue'
 import store from '@/store'
 import Addr from '@/components/Addr'
-import AvatarBlockie from '@/components/AvatarBlockie'
+import UserAvatar from '@/components/UserAvatar'
 
 const props = defineProps({
   drips: Array
@@ -61,7 +61,7 @@ section#drips.project-splits.relative
               .mt-20.font-semibold.text-whiteff.text-lg.notouch_group-hover_text-white
                 addr(:address="drip.address")
               .mt-10.mb-2.flex.justify-center.w-full
-                avatar-blockie(:address="drip.address", width="16", :key="drip.address")
+                user-avatar(:address="drip.address", blockieSize="16", :key="drip.address")
               //- TODO calc amount
               //- .mt-8.font-mono.text-ms.text-violet-650 XXX Ð/mo
               //- .mb-20

@@ -2,7 +2,7 @@
 import { ref, computed, onBeforeMount, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import store from '@/store'
-import AvatarBlockie from '@/components/AvatarBlockie'
+import UserAvatar from '@/components/UserAvatar'
 import InputBody from '@/components/InputBody'
 import ModalMint from '@/components/ModalMint'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo'
@@ -111,7 +111,7 @@ article.project.pb-96
           //- profile link
           router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full(:to="{name: 'user', params: {address: project.projectOwner}}")
             //- avatar
-            avatar-blockie.w-36.mr-12(:address="project.projectOwner", width="36")
+            user-avatar.w-36.h-36.mr-12(:address="project.projectOwner", blockieSize="36")
             .text-violet-600.font-semibold.pr-6
               addr(:address="project.projectOwner")
 

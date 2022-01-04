@@ -3,7 +3,7 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import SvgLogo from './components/SvgLogo.vue'
 import SvgLogoDrop from './components/SvgLogoDrop.vue'
-import AvatarBlockie from '@/components/AvatarBlockie'
+import UserAvatar from '@/components/UserAvatar'
 import SvgX from './components/SvgX.vue'
 import SvgDai from './components/SvgDai.vue'
 import store from '@/store'
@@ -45,7 +45,7 @@ store.dispatch('init')
             .btn-darker.pl-6.text-violet-650.font-semibold.rounded-full
               router-link.flex.items-center.text-ms(:to="{name: 'user', params: {address: $store.state.address}}")
                 //- avi
-                avatar-blockie.w-28.mr-6(:address="$store.state.address", width="28", :key="$store.state.address")
+                user-avatar.w-28.h-28.mr-6(:address="$store.state.address", blockieSize="28")
                 //- address
                 | {{ $store.getters.addrShort($store.state.address) }}
             button.ml-2.p-10.mr-8.notouch_hover_text-white(@click="$store.dispatch('disconnect')", title="Disconnect")

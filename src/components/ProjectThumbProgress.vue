@@ -29,11 +29,6 @@ router-link.project-thumb-progress.relative.block(:to="{name: 'project', params:
       .w-54.h-54.relative.rounded-full.overflow-hidden
         img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)", alt="avatar")
 
-    //- user icon
-    //- router-link.flex.items-center.px-8(:to="{name: 'user', params: {address: props.project.owner}}").flex.items-center
-      .border-6.border-transparent.notouch_hover_border-violet-700.rounded-full
-        avatar-blockie.w-54(:address="props.project.owner", width="54")
-
     //- title
     .relative.z-10.flex-1.text-xl.font-semibold.text-center
       | {{ project.name }}
