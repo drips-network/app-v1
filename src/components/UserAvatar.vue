@@ -5,14 +5,18 @@ import AvatarBlockie from '@/components/AvatarBlockie'
 const props = defineProps(['address', 'blockieSize'])
 const profile = computed(() => store.state.addresses[props.address.toLowerCase()]?.records || {})
 const avatarImgError = ref(false)
+const onImgError = (e) => {
+  console.error(e)
+  avatarImgError.value = true
+}
 </script>
 
 <template lang="pug">
 //- set size in parent
-.user-avatar.rounded-full.overflow-hidden.relative
+.user-avatar.rounded-full.overflow-hidden.relative.bg-indigo-950
   //- (custom ens image)
   template(v-if="profile.avatar && !avatarImgError")
-    img.absolute.overlay.object-cover.object-center.transition.duration-150(:src="profile.avatar", alt="Avatar Image", @error="avatarImgError = true")
+    img.absolute.overlay.object-cover.object-center.transition.duration-150(:src="profile.avatar", alt="Avatar Image", @error="onImgError")
 
   //- (blockie)
   template(v-else)

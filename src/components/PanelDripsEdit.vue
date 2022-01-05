@@ -57,11 +57,11 @@ const getDrips = async () => {
     // format receivers for form input
     const receiversFormatted = []
     for (var i = 0; i < receivers.length; i++) {
-      const ens = await store.dispatch('resolveAddress', { address: receivers[i][0] })
+      const profile = await store.dispatch('resolveAddress', { address: receivers[i][0] })
       receiversFormatted.push({
         address: receivers[i][0],
         amount: toDAIPerMo(receivers[i][1]),
-        receiverInput: ens || receivers[i][0]
+        receiverInput: profile?.ens || receivers[i][0]
       })
     }
 

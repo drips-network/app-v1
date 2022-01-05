@@ -43,8 +43,8 @@ const getSplits = async () => {
 
     // format for input
     for (var i = 0; i < splits.length; i++) {
-      const ens = await store.dispatch('resolveAddress', { address: splits[i].address })
-      splits[i].receiverInput = ens || splits[i].address
+      const profile = await store.dispatch('resolveAddress', { address: splits[i].address })
+      splits[i].receiverInput = profile?.ens || splits[i].address
     }
 
     return splits
