@@ -19,7 +19,7 @@ store.dispatch('init')
   .flex.flex-col.min-h-screen
     //- (wrong network banner)
     template(v-if="$store.getters.isWrongNetwork")
-      .sticky.z-20.top-10.left-0.w-full.h-80.rounded-full.bg-yellow-500.text-black.flex.items-center.justify-between.mb-10
+      .sticky.z-50.top-10.left-0.w-full.h-80.rounded-full.bg-yellow-500.text-black.flex.items-center.justify-between.mb-10
         .w-80.text-center.text-2xl ⚠️
         .flex-1.text-center.font-semibold Wrong Network! Switch to #[span.capitalize {{ networkName }}]!
         .w-80
