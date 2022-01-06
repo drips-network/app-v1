@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import store from '@/store'
 import DripRow from '@/components/DripRow'
 import LoadingBar from '@/components/LoadingBar'
+import { round } from '@/utils'
 
 const splits = ref()
 
@@ -20,12 +21,16 @@ const getSplitsEvents = async () => {
         }
       })
     // format for drip rows
-    splits.value = currentEvents.map(e => ({
-      blockNumber: e.blockNumber,
-      sender: e.args[0],
-      receiver: e.args[1].length >= 2 ? e.args[1].length : e.args[1][0][0],
-      percent: e.args[1].reduce((acc, cur) => acc + cur[1], 0) / store.state.splitsFractionMax * 100
-    }))
+    splits.value = currentEvents.map(e => {
+      let percent = e.args[1].reduce((acc, cur) => acc + cur[1], 0) / store.state.splitsFractionMax * 100
+      percent = percent > 0 && !parseInt(percent) ? '<1%' : parseFloat(percent.toFixed(2))
+      return {
+        blockNumber: e.blockNumber,
+        sender: e.args[0],
+        receiver: e.args[1].length >= 2 ? e.args[1].length : e.args[1][0][0],
+        percent
+      }
+    })
   } catch (e) {
     console.error(e)
   }

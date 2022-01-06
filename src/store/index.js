@@ -599,8 +599,6 @@ export default createStore({
         // saved?
         const saved = state.addresses[address]
         if (saved && saved.ens !== undefined) {
-          console.log('svd', address, saved)
-          debugger
           return saved
         }
         // fetch new...
