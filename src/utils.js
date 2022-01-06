@@ -83,12 +83,12 @@ export const formatDrips = (drips) => {
 export const validateAddressInput = input => {
   return new Promise((resolve, reject) => {
     if (utils.isAddress(input)) {
-      resolve(input)
+      return resolve(input)
     }
 
     // !! not even ENS
     if (!input.endsWith('.eth')) {
-      reject(new Error(`"${input}" is neither an Ethereum address or ENS name (ends in .eth).`))
+      return reject(new Error(`"${input}" is neither an Ethereum address or ENS name (ends in .eth).`))
     }
 
     // check ENS...

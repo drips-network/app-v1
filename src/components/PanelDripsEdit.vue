@@ -242,20 +242,20 @@ panel(icon="🗓")
         h6.text-2xl.font-semibold.leading-snug Add Funds
         p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drip recipients have funds to collect every month.
 
+        .relative
+          input-body.mb-10(label="Add DAI to Balance", symbol="dai")
+            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
+          //- (max withdraw note)
+          .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
+            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
+            template(v-else) There are no funds to withdraw
+
         .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
           .pl-32.text-xl.font-semibold
             | Balance
-          .pr-20.flex.items-center(:class="{'text-red-500': newBalance < Number(balance), 'text-greenbright-500': newBalance > Number(balance) }")
+          .pr-20.flex.items-center(:class="{'text-red-500': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
             span.text-2xl.font-semibold {{ newBalance }}
             svg-dai.ml-12(size="xl")
-
-        input-body.mt-10(label="Add DAI to Balance", symbol="dai")
-          input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
-        //- (max withdraw note)
-        .mt-4.text-sm.text-red-600.relative(v-if="topUpDAI < -balance")
-          .absolute.top-0.left-0.w-full.text-center
-            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
-            template(v-else) There are no funds to withdraw
 
       //- btns
       .mt-40.flex.justify-center

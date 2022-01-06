@@ -599,6 +599,8 @@ export default createStore({
         // saved?
         const saved = state.addresses[address]
         if (saved && saved.ens !== undefined) {
+          console.log('svd', address, saved)
+          debugger
           return saved
         }
         // fetch new...
@@ -629,7 +631,7 @@ export default createStore({
     async resolveENS ({ state, commit, dispatch }, ens) {
       try {
         // saved ?
-        let address = Object.keys(state.addresses).find(key => state.addresses[key] === ens)
+        let address = Object.keys(state.addresses).find(key => ens && state.addresses[key].ens === ens)
         if (address) return address
         // resolve...
         if (!provider) await dispatch('init')

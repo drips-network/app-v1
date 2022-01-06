@@ -15,7 +15,7 @@ const isYou = computed(() => props.address.toLowerCase() === store.state.address
 onMounted(async () => {
   try {
     const profile = await store.dispatch('resolveAddress', { address: props.address })
-    addr.value = profile.ens || defaultAddr
+    addr.value = profile?.ens || defaultAddr
   } catch (e) {
     addr.value = defaultAddr
   }
