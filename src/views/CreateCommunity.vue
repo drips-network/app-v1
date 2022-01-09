@@ -4,7 +4,7 @@
 
 // TODO - auto-update when re-editing areas? Or change button to "SAVE" in each panel??
 
-import { ref, computed, toRaw, onMounted, nextTick } from 'vue'
+import { ref, computed, toRaw, onMounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
@@ -111,6 +111,9 @@ const dripsPanel = ref()
 const openFundingPanel = async () => {
   // projectPanel.value.close()
   // window.scroll({ top: 0, behavior: 'smooth' })
+  if (!meta.value.symbol.length) {
+    meta.value.symbol = toRaw(meta.value.name).replaceAll(' ', '').toUpperCase()
+  }
   step.value++
   await nextTick()
   fundingPanel.value.$el.scrollIntoView({ behavior: 'smooth' })
@@ -282,13 +285,13 @@ projectAddress.value = isDev ? route.query.project : null
         input-body.my-10(label="Token Limit*", warning="⚠️ You cannot edit this later!")
           input(v-model="tokenLimit", type="number", min="1", step="1", :max="tokenLimitCeiling" placeholder="1000", required)
 
-      //- token symbol
-      input-body.my-10(label="Token Symbol*", warning="⚠️ You cannot edit this later!")
-        input(v-model="meta.symbol", placeholder="CC", required)
-
       //- input goal
       input-body.my-10(:label="isSubscription ? 'Monthly Funding Goal' : 'Funding Goal'", :isFilled="typeof meta.goal === 'number'", :symbol="isSubscription ? 'daipermo' : 'dai'")
         input(v-model="meta.goal", type="number", placeholder="1000")
+
+      //- token symbol
+      input-body.my-10(label="Token Ticker Symbol*", warning="⚠️ You cannot edit this later!")
+        input(v-model="meta.symbol", placeholder="CC", required)
 
       //- custom image ipfs hash
       input-body.my-10(label="Custom Token Image IPFS Hash (optional)", format="code", warning="⚠️ You cannot edit this later!")
