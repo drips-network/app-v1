@@ -1,8 +1,9 @@
 <script setup>
 import { ref, toRaw } from 'vue'
 import InputBody from '@/components/InputBody'
+import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import { pinImageToIPFS } from '@/store'
+// import { pinImageToIPFS } from '@/store'
 import { ipfsUrl } from '@/utils'
 
 const props = defineProps(['modelValue', 'isNewProject'])
@@ -13,39 +14,11 @@ const imgSrcCurrent = props.modelValue.image ? ipfsUrl(props.modelValue.image) :
 
 const imgSrc = ref(imgSrcCurrent)
 
-// TODO - handle on submit ?
-const onImgFileChange = (e) => {
-  const input = e.target
-  if (input.files && input.files[0]) {
-    var reader = new FileReader()
-    reader.onload = async function (event) {
-      imgSrc.value = event.target.result
-
-      // upload to ipfs
-      // TODO: upload only on create() to save ipfs uploads...
-      try {
-        let resp = await pinImageToIPFS(imgSrc.value)
-        resp = await resp.json()
-        // oops
-        if (resp.error) {
-          throw new Error(resp.message)
-        }
-        // save
-        const clone = toRaw(props.modelValue)
-        clone.image = resp.IpfsHash
-        emit('update:modelValue', clone)
-        return true
-      } catch (e) {
-        console.error(e)
-        alert('Image upload error. Perhaps the image is too large (500kb max) or the request timed out and you may try again.')
-        // revert img to current / empty
-        imgSrc.value = imgSrcCurrent
-      }
-    }
-    reader.readAsDataURL(input.files[0])
-  }
+const onIpfsHash = (hash) => {
+  const clone = toRaw(props.modelValue)
+  clone.image = hash
+  emit('update:modelValue', clone)
 }
-
 </script>
 
 <template lang="pug">
@@ -55,9 +28,10 @@ const onImgFileChange = (e) => {
   //- (default image)
   img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
   //- add image btn
-  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Community Avatar Image")
+  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Community Avatar Image", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
     span.sr-only Community Avatar Image
-    input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
+    //- input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
+    input-upload-file-ipfs.hidden(@read="e => { imgSrc = e }", @hash="onIpfsHash", @error="imgSrc = imgSrcCurrent")
     svg-plus-minus-radicle
 
     //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB

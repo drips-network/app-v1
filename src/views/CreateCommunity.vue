@@ -10,11 +10,13 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import store from '@/store'
-import { toWei, toWeiPerSec, formatSplits } from '@/utils'
+import { toWei, toWeiPerSec, formatSplits, ipfsUrl } from '@/utils'
 import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 import SvgX from '@/components/SvgX'
 import { constants } from 'ethers'
 import showdown from 'showdown'
+import SvgPen from '@/components/SvgPen'
+import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 const route = useRoute()
 const router = useRouter()
 
@@ -80,12 +82,6 @@ const meta = ref({
   benefits: ''
 })
 
-// benefits
-const benefitsInputMd = ref('')
-const converter = new showdown.Converter()
-const benefitsInputHtml = computed(() => converter.makeHtml(benefitsInputMd.value))
-const benefitsInputHidden = ref(false)
-
 // compiled project
 const project = computed(() => {
   return {
@@ -95,6 +91,25 @@ const project = computed(() => {
     drips: dripsFormatted.value
   }
 })
+
+// prefill token image with avatar (if empty)
+watch(meta, () => {
+  if (meta.value.image && !nftImageIpfsHash.value) {
+    nftImageIpfsHash.value = meta.value.image
+  }
+}, { deep: true })
+
+// token image preview
+const previewNftImageHash = computed(() => {
+  // TODO use contract default hash...
+  return nftImageIpfsHash.value || 'QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx'
+})
+
+// benefits input
+const benefitsInputMd = ref('')
+const converter = new showdown.Converter()
+const benefitsInputHtml = computed(() => converter.makeHtml(benefitsInputMd.value))
+const benefitsInputHidden = ref(false)
 
 const addMembership = () => meta.value.memberships.push(newMembershipTempl())
 const addPerk = (index) => meta.value.memberships[index].perks.push('')
@@ -294,8 +309,21 @@ projectAddress.value = isDev ? route.query.project : null
         input(v-model="meta.symbol", placeholder="CC", required)
 
       //- custom image ipfs hash
-      input-body.my-10(label="Custom Token Image IPFS Hash (optional)", format="code", warning="⚠️ You cannot edit this later!")
+      //- input-body.my-10(label="Custom Token Image IPFS Hash (optional)", format="code", warning="⚠️ You cannot edit this later!")
         input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
+
+      input-body.my-10(label="Token Image", format="code", warning="⚠️ Max 500KB. You cannot change the image later.")
+        .mx-auto.w-1x2.py-56
+          //- TODO - get contract default
+          img.block.w-full(:src="ipfsUrl(previewNftImageHash)")
+
+          //- add image btn
+          label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-700.focus_border-violet-600.rounded-2xlb.focus_outline-none.group(tabindex="0", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
+            span.sr-only Token Image
+            //- input(type="file", accept=".png,.jpeg,.jpg,.svg", style="display:none")
+            input-upload-file-ipfs(@hash="hash => { nftImageIpfsHash = hash }", @error="meta.image = null", style="display:none")
+            .absolute.top-0.right-0.h-80.px-24.flex.items-center
+              svg-pen.block.h-32.text-violet-600
 
       .mt-40(v-show="step === 1")
         //- submit btn
@@ -417,7 +445,7 @@ projectAddress.value = isDev ? route.query.project : null
     .mt-40.flex.justify-center(v-show="viewBtnVisible")
       router-link.btn.btn-lg.btn-white.min-w-xs(:to="{name: 'project', params: { address: projectAddress }}") View Project
 
-  button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
+  //- button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
 
 <style>
