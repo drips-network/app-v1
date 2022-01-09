@@ -7,7 +7,8 @@ const props = defineProps({
   isFilled: [Number, Boolean], // input has content
   format: String,
   symbol: String,
-  theme: { type: String, default: 'outline' }
+  theme: { type: String, default: 'outline' },
+  warning: String
 })
 
 const styling = computed(() => {
@@ -34,7 +35,7 @@ const slots = useSlots()
   label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-4(:class="{'opacity-0ff': !isFilled, 'text-red-600': theme === 'red'}") {{ props.label }}
 
   //- field (input, textarea)
-  .min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.text-white(:class="[styling, themeing]")
+  .input-body__wrapper.min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.text-white.group(:class="[styling, themeing]")
     slot
 
     //- (symbol: dai)
@@ -61,6 +62,13 @@ const slots = useSlots()
       .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-24
         .flex.items-center.text-violet-600
           .text-xl.tracking-tight.font-bold %
+
+    //- (bottom warning)
+    template(v-if="warning")
+      .input-body__warning.absolute.bottom-0.z-10.left-0.w-full.text-center.text-sm.text-orange-600.pb-3.opacity-0.transition.duration-150.font-normal.pointer-events-none.font-sans
+        | {{ warning }}
+        //- template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
+        //- template(v-else) There are no funds to withdraw
 </template>
 
 <style lang="postcss">
@@ -76,6 +84,14 @@ const slots = useSlots()
       @apply w-full min-h-80 flex items-center pt-26 px-24 leading-tight;
       &::placeholder{
         @apply font-sans text-xl;
+      }
+    }
+
+    /* show warning on input focus */
+    & > .input-body__wrapper:focus-within,
+    .input-warnings-visible & {
+      & .input-body__warning{
+        @apply opacity-100 pointer-events-auto;
       }
     }
   }

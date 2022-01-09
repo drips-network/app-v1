@@ -202,217 +202,219 @@ projectAddress.value = isDev ? route.query.project : null
 </script>
 
 <template lang="pug">
-//- 1. PROJECT
-panel.mx-auto(ref="projectPanel", label="Community", icon="✨")
-  template(v-slot:header)
-    h2
-      template(v-if="!review") Create a Community
-      template(v-else) Review your Community
+.create-community(:class="{'input-warnings-visible': review}")
 
-  template(v-slot:description)
-    template(v-if="!review")
-      p.text-violet-650.mx-auto(style="max-width:23em") Register your #[span.font-bold community] and start raising funds with #[span.font-bold member tokens] 🧩.
-    template(v-else)
-      p Fields in #[span.text-red-500.font-bold red] you can't edit later!
+  //- 1. PROJECT
+  panel.mx-auto(ref="projectPanel", label="Community", icon="✨")
+    template(v-slot:header)
+      h2
+        template(v-if="!review") Create a Community
+        template(v-else) Review your Community
 
-  section
-    //- (connect bt)
-    template(v-if="!owner")
-      button.btn.btn-lg.btn-violet.mx-auto.px-36(@click.prevent="$store.dispatch('connect')") Connect Wallet
+    template(v-slot:description)
+      template(v-if="!review")
+        p.text-violet-650.mx-auto(style="max-width:23em") Register your #[span.font-bold community] and start raising funds with #[span.font-bold member tokens] 🧩.
+      template(v-else)
+        p Some fields you #[b cannot edit later].
 
-    //- (create form)
-    template(v-else)
-      form(@submit.prevent="openFundingPanel", validate)
-        fields-project-edit(v-model="meta", :isNewProject="true")
+    section
+      //- (connect bt)
+      template(v-if="!owner")
+        button.btn.btn-lg.btn-violet.mx-auto.px-36(@click.prevent="$store.dispatch('connect')") Connect Wallet
 
-        div.mt-40(v-show="step === 0")
-          //- create btn
-          button.btn.btn-lg.btn-violet.mx-auto.min-w-xs
-            | Next
+      //- (create form)
+      template(v-else)
+        form(@submit.prevent="openFundingPanel", validate)
+          fields-project-edit(v-model="meta", :isNewProject="true")
 
-//- 2. FUNDING
+          div.mt-40(v-show="step === 0")
+            //- create btn
+            button.btn.btn-lg.btn-violet.mx-auto.min-w-xs
+              | Next
 
-panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="Member Tokens", icon="🧩")
-  template(v-slot:header)
-    h2 Member Tokens
+  //- 2. FUNDING
 
-  //- TODO description/text about how some can't be edited later !!!
-  //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
-  template(v-slot:description)
-    p Decide on how to <b>fund your community</b>.<br>For now, you can only have <b>one membership type</b>.
-    //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
+  panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="Member Tokens", icon="🧩")
+    template(v-slot:header)
+      h2 Member Tokens
 
-  //- funding options as tiles
-  .flex.-mx-10.mt-40
-    //- TODO convert to radio buttons for accessibility
-    .w-1x2.px-10
-      .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': !isSubscription, 'border border-violet-700': isSubscription}")
-        button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = true")
-          div.pt-16
-            .text-xl.font-semibold.mb-16 Subscriptions
-            p.text-violet-600 Recurring income from<br>your community.
-        //- circle
-        .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-          .rounded-full.w-full(:class="{'bg-violet-700': isSubscription}")
+    //- TODO description/text about how some can't be edited later !!!
+    //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
+    template(v-slot:description)
+      p.text-violet-650 Decide on how to <b>fund your community</b>.<br>For now, you can only have <b>one membership type</b>.
+      //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
 
-    .w-1x2.px-10
-      .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': isSubscription, 'border border-violet-700': !isSubscription}")
-        button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
-          div.pt-16
-            .text-xl.font-semibold.mb-16 One-time Payment
-            p.text-violet-600 Create a limited edition membership.
-        //- circle
-        .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-          .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
+    //- funding options as tiles
+    .flex.-mx-10.mt-40
+      //- TODO convert to radio buttons for accessibility
+      .w-1x2.px-10
+        .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': !isSubscription, 'border border-violet-700': isSubscription}")
+          button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = true")
+            div.pt-16
+              .text-xl.font-semibold.mb-16 Subscriptions
+              p.text-violet-600 Recurring income from<br>your community.
+          //- circle
+          .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
+            .rounded-full.w-full(:class="{'bg-violet-700': isSubscription}")
 
-  form.mt-40(@submit.prevent="openBenefitsPanel", validate)
-    //- (input monthly rate)
-    template(v-if="isSubscription")
-      input-body.my-10.text-red-600(label="Minimum Subscription", symbol="daipermo")
-        input(v-model="minDAIPerMonth", type="number", placeholder="10", required)
+      .w-1x2.px-10
+        .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': isSubscription, 'border border-violet-700': !isSubscription}")
+          button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
+            div.pt-16
+              .text-xl.font-semibold.mb-16 One-time Payment
+              p.text-violet-600 Create a limited edition membership.
+          //- circle
+          .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
+            .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
 
-    //- (one-time payment inputs)
-    template(v-else)
-      //- min price
-      input-body.my-10.text-red-600(label="Minimum Price*", symbol="dai")
-        input(v-model="minDAIPrice", type="number", placeholder="100", required)
-      //- token limit
-      input-body.my-10.text-red-600(label="Token Limit*")
-        input(v-model="tokenLimit", type="number", min="1", step="1", :max="tokenLimitCeiling" placeholder="1000", required)
+    form.mt-40(@submit.prevent="openBenefitsPanel", validate)
+      //- (input monthly rate)
+      template(v-if="isSubscription")
+        input-body.my-10(label="Minimum Subscription*", symbol="daipermo", warning="⚠️ You cannot edit this later!")
+          input(v-model="minDAIPerMonth", type="number", placeholder="10", required)
 
-    //- token symbol
-    input-body.my-10.text-red-600(label="Token Symbol*")
-      input(v-model="meta.symbol", placeholder="CC", required)
+      //- (one-time payment inputs)
+      template(v-else)
+        //- min price
+        input-body.my-10(label="Minimum Price*", symbol="dai", warning="⚠️ You cannot edit this later!")
+          input(v-model="minDAIPrice", type="number", placeholder="100", required)
+        //- token limit
+        input-body.my-10(label="Token Limit*", warning="⚠️ You cannot edit this later!")
+          input(v-model="tokenLimit", type="number", min="1", step="1", :max="tokenLimitCeiling" placeholder="1000", required)
 
-    //- input goal
-    input-body.my-10(:label="isSubscription ? 'Monthly Funding Goal' : 'Funding Goal'", :isFilled="typeof meta.goal === 'number'", :symbol="isSubscription ? 'daipermo' : 'dai'")
-      input(v-model="meta.goal", type="number", placeholder="1000")
+      //- token symbol
+      input-body.my-10(label="Token Symbol*", warning="⚠️ You cannot edit this later!")
+        input(v-model="meta.symbol", placeholder="CC", required)
 
-    //- custom image ipfs hash
-    input-body.my-10.text-red-600(label="Custom Token Image IPFS Hash (optional)", format="code")
-      input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
+      //- input goal
+      input-body.my-10(:label="isSubscription ? 'Monthly Funding Goal' : 'Funding Goal'", :isFilled="typeof meta.goal === 'number'", :symbol="isSubscription ? 'daipermo' : 'dai'")
+        input(v-model="meta.goal", type="number", placeholder="1000")
 
-    .mt-40(v-show="step === 1")
-      //- submit btn
-      button.btn.btn-lg.btn-violet.mx-auto.min-w-xs
-        | Next
+      //- custom image ipfs hash
+      input-body.my-10(label="Custom Token Image IPFS Hash (optional)", format="code", warning="⚠️ You cannot edit this later!")
+        input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
 
-//- 3. MEMBERSHIPS
+      .mt-40(v-show="step === 1")
+        //- submit btn
+        button.btn.btn-lg.btn-violet.mx-auto.min-w-xs
+          | Next
 
-//- panel.mx-auto.my-24(v-show="step > 1", ref="membershipsPanel", label="Benefits", icon="🏅")
-  template(v-slot:header)
-    h2 Benefits
+  //- 3. MEMBERSHIPS
 
-  p Optionally, set membership levels with different benefits you will provide.
+  //- panel.mx-auto.my-24(v-show="step > 1", ref="membershipsPanel", label="Benefits", icon="🏅")
+    template(v-slot:header)
+      h2 Benefits
 
-  //- form.mt-60(@submit.prevent="submit")
-  section.mt-60
-    //- memberships...
-    template(v-for="(membership, i) in meta.memberships")
-      section.my-10.input-group
-        .flex.-mx-5
-          .w-1x2.px-5
-            input-body(label="Name", :isFilled="meta.memberships[i].name.length", theme="dark")
-              input(v-model="meta.memberships[i].name", placeholder="Bronze", autocomplete="new-password")
-          .w-1x2.px-5
-            input-body(label="Min DAI", :isFilled="typeof meta.memberships[i].minDAI === 'number'", theme="dark", symbol="dai")
-              input(v-model="meta.memberships[i].minDAI", type="number", min="0", placeholder="10")
+    p Optionally, set membership levels with different benefits you will provide.
 
-        ul
-          //- perks...
-          li.relative.mt-10(v-for="(perk, ii) in membership.perks")
-            //- benefit input
-            input-body(label="Benefit", :isFilled="meta.memberships[i].perks[ii].length", theme="dark")
-              input(v-model="meta.memberships[i].perks[ii]", placeholder="Discord access", @keydown="e => onPerkInputKeydown(e, i, ii)")
-            //- add perk row btn
-            template(v-if="ii === membership.perks.length - 1")
-              .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-12
-                button.bg-indigo-800.flex.items-center.justify-center.h-54.w-54.rounded-full(@click.prevent="addPerk(i)")
-                  svg-plus-minus-radicle
+    //- form.mt-60(@submit.prevent="submit")
+    section.mt-60
+      //- memberships...
+      template(v-for="(membership, i) in meta.memberships")
+        section.my-10.input-group
+          .flex.-mx-5
+            .w-1x2.px-5
+              input-body(label="Name", :isFilled="meta.memberships[i].name.length", theme="dark")
+                input(v-model="meta.memberships[i].name", placeholder="Bronze", autocomplete="new-password")
+            .w-1x2.px-5
+              input-body(label="Min DAI", :isFilled="typeof meta.memberships[i].minDAI === 'number'", theme="dark", symbol="dai")
+                input(v-model="meta.memberships[i].minDAI", type="number", min="0", placeholder="10")
 
-    button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addMembership", style="border-style:dashed")
-      svg-plus-minus-radicle
+          ul
+            //- perks...
+            li.relative.mt-10(v-for="(perk, ii) in membership.perks")
+              //- benefit input
+              input-body(label="Benefit", :isFilled="meta.memberships[i].perks[ii].length", theme="dark")
+                input(v-model="meta.memberships[i].perks[ii]", placeholder="Discord access", @keydown="e => onPerkInputKeydown(e, i, ii)")
+              //- add perk row btn
+              template(v-if="ii === membership.perks.length - 1")
+                .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-12
+                  button.bg-indigo-800.flex.items-center.justify-center.h-54.w-54.rounded-full(@click.prevent="addPerk(i)")
+                    svg-plus-minus-radicle
 
-    .mt-40(v-show="step === 2")
-      button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel") Next
+      button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addMembership", style="border-style:dashed")
+        svg-plus-minus-radicle
 
-//- 3. BENEFITS
-panel.mx-auto.my-24(ref="benefitsPanel", v-show="step > 1", title="Benefits", icon="🧧")
-  template(v-slot:header)
-    h2 Benefits
+      .mt-40(v-show="step === 2")
+        button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel") Next
 
-  //- TODO allow ENS names...
-  template(v-slot:description)
-    p.mx-auto(style="max-width:26em") Describe any perks or benefits that come with membership to your community.
+  //- 3. BENEFITS
+  panel.mx-auto.my-24(ref="benefitsPanel", v-show="step > 1", title="Benefits", icon="🧧")
+    template(v-slot:header)
+      h2 Benefits
 
-  input-body(label="Benefits (Markdown)", v-show="!benefitsInputHidden")
-    textarea.font-mono.text-left(v-model="benefitsInputMd", placeholder="Discord access..." rows="7")
+    //- TODO allow ENS names...
+    template(v-slot:description)
+      p.text-violet-650.mx-auto(style="max-width:26em") Describe any perks or benefits that come with membership to your community.
 
-  .mt-10.min-h-80.bg-indigo-700.rounded-2xlb.relative.leading-tight(@click="benefitsInputHidden = false")
-    .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Preview HTML
-    div.px-24.pb-20.pt-28.text-left.text-xl.font-semibold.child-links-underline.pointer-events-none.child-lists-list(v-html="benefitsInputHtml")
+    input-body(label="Benefits (Markdown)", v-show="!benefitsInputHidden")
+      textarea.font-mono.text-left(v-model="benefitsInputMd", placeholder="Discord access..." rows="7")
 
-  .mt-40.flex.justify-center(v-if="!review")
-    button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel")
-      | {{ benefitsInputMd.length ? 'Next' : 'Skip' }}
+    .mt-10.min-h-80.bg-indigo-700.rounded-2xlb.relative.leading-tight(@click="benefitsInputHidden = false")
+      .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Preview HTML
+      div.px-24.pb-20.pt-28.text-left.text-xl.font-semibold.child-links-underline.pointer-events-none.child-lists-list(v-html="benefitsInputHtml")
 
-//- 4. DRIPS
+    .mt-40.flex.justify-center(v-if="!review")
+      button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openDripsPanel")
+        | {{ benefitsInputMd.length ? 'Next' : 'Skip' }}
 
-panel.mx-auto(ref="dripsPanel", v-show="step > 2", title="Drips", icon="💧")
-  template(v-slot:header)
-    h2 Drip to Others
+  //- 4. DRIPS
 
-  //- TODO allow ENS names...
-  template(v-slot:description)
-    p Share a <b>precent</b> of incoming funds with others, <br>like your contributors or dependencies.
+  panel.mx-auto(ref="dripsPanel", v-show="step > 2", title="Drips", icon="💧")
+    template(v-slot:header)
+      h2 Drip to Others
 
-  //- drips list
-  //- form.mt-60(@submit.prevent="submit", autocomplete="off")
-  section.mt-60
-    //- drips...
-    template(v-for="(drip, i) in drips")
-      section.my-10.input-group.relative
-        input-body(label="% of Revenue*", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
-          input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
-        //- input address
-        .mt-10
-          input-body(label="Ethereum/ENS Address*", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
-            //- TODO: validate ethereum address
-            input(v-model="drips[i].address", placeholder="name.eth", autocomplete="new-password", required)
-        //- rmv btn
-        .absolute.top-0.right-0.h-full.flex.items-center
-          button.w-32.h-32.flex.items-center.justify-center.-mr-12.bg-indigo-900.rounded-full.border-violet-700.border-2.notouch_hover_border-white(@click="removeDrip(i)")
-            svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
+    //- TODO allow ENS names...
+    template(v-slot:description)
+      p.text-violet-650 Share a <b>precent</b> of incoming funds with others, <br>like your contributors or dependencies.
 
-    button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
-      svg-plus-minus-radicle
+    //- drips list
+    //- form.mt-60(@submit.prevent="submit", autocomplete="off")
+    section.mt-60
+      //- drips...
+      template(v-for="(drip, i) in drips")
+        section.my-10.input-group.relative
+          input-body(label="% of Revenue*", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
+            input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
+          //- input address
+          .mt-10
+            input-body(label="Ethereum/ENS Address*", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
+              //- TODO: validate ethereum address
+              input(v-model="drips[i].address", placeholder="name.eth", autocomplete="new-password", required)
+          //- rmv btn
+          .absolute.top-0.right-0.h-full.flex.items-center
+            button.w-32.h-32.flex.items-center.justify-center.-mr-12.bg-indigo-900.rounded-full.border-violet-700.border-2.notouch_hover_border-white(@click="removeDrip(i)")
+              svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
 
-    .mt-40.flex.justify-center(v-show="step === 3")
-      //- .mx-5
-        button.btn.btn-lg.btn-outline.mx-auto.min-w-xs(@click.prevent="emit('skip')") Skip
-      //- .mx-5
+      button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
+        svg-plus-minus-radicle
 
-      button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
+      .mt-40.flex.justify-center(v-show="step === 3")
+        //- .mx-5
+          button.btn.btn-lg.btn-outline.mx-auto.min-w-xs(@click.prevent="emit('skip')") Skip
+        //- .mx-5
 
-//- (create btn)
-.sticky.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
-  .text-center
-    button.btn.btn-xl.btn-white.min-w-md(@click="submitProject", :disabled="tx")
-      template(v-if="projectAddress") Created!
-      template(v-else-if="tx") Creating...
-      template(v-else) Create ✨
+        button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
 
-    //- (tx link)
-    .mt-16.text-violet-600.py-8.px-16.rounded-full.bg-indigo-900(v-if="tx")
-      a(:href="`https://etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+  //- (create btn)
+  .sticky.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
+    .text-center
+      button.btn.btn-xl.btn-white.min-w-md(@click="submitProject", :disabled="tx")
+        template(v-if="projectAddress") Created!
+        template(v-else-if="tx") Creating...
+        template(v-else) Create ✨
 
-//- post-create
-//- section
-  //- (view link)
-  .mt-40.flex.justify-center(v-show="viewBtnVisible")
-    router-link.btn.btn-lg.btn-white.min-w-xs(:to="{name: 'project', params: { address: projectAddress }}") View Project
+      //- (tx link)
+      .mt-16.text-violet-600.py-8.px-16.rounded-full.bg-indigo-900(v-if="tx")
+        a(:href="`https://etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
-button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
+  //- post-create
+  //- section
+    //- (view link)
+    .mt-40.flex.justify-center(v-show="viewBtnVisible")
+      router-link.btn.btn-lg.btn-white.min-w-xs(:to="{name: 'project', params: { address: projectAddress }}") View Project
+
+  button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
 
 <style>

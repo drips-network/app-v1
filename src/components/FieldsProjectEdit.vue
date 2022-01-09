@@ -72,7 +72,7 @@ section.mt-40
     input-body(label="Owner", :isFilled="owner.length", format="code")
       input(v-model="owner", placeholder="owner", disabled)
   .my-10(v-if="props.isNewProject")
-    input-body(label="Community Name*", :isFilled="modelValue.name.length", :class="{'text-red-600': props.isNewProject }")
+    input-body(label="Community Name*", :isFilled="modelValue.name.length", warning="⚠️ You cannot edit this later!")
       input(v-model="modelValue.name", placeholder="Computer Club", required, autocomplete="new-password")
   //- .my-10(v-if="props.isNewProject")
     //- TODO: format/validate symbol text?

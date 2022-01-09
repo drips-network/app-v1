@@ -87,6 +87,10 @@ module.exports = {
         500: '#F52727',
         600: '#af2828'
       },
+      orange: {
+        500: '#e78d03',
+        600: '#BA7318'
+      },
       yellow: {
         500: '#F4F056'
       },
@@ -958,7 +962,7 @@ module.exports = {
     mixBlendMode: ['responsive'],
     objectFit: ['responsive'],
     objectPosition: ['responsive'],
-    opacity: ['responsive', 'group-hover', 'focus-within', 'hover', 'focus'],
+    opacity: ['responsive', 'group-hover', 'group-focus', 'focus-within', 'hover', 'focus'],
     order: ['responsive'],
     outline: ['responsive', 'focus-within', 'focus'],
     overflow: ['responsive'],
