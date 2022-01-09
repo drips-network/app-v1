@@ -79,9 +79,8 @@ section.mt-40
     input-body(label="Member Token Symbol*", :isFilled="modelValue.symbol.length")
       input(v-model="modelValue.symbol", placeholder="CC", required)
   .my-10
-    //- TODO: use textarea
-    input-body(label="Description", :isFilled="modelValue.descrip.length")
-      input(v-model="modelValue.descrip", placeholder="A club for computers.")
+    input-body(label="Description")
+      textarea.text-center.scrollbars-hidden(v-model="modelValue.descrip", placeholder="A club for computers." rows="6")
   .my-10
     input-body(label="Website URL", :isFilled="modelValue.website.length", format="code")
       input(v-model="modelValue.website", placeholder="https://computers.club", type="url")

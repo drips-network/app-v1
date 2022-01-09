@@ -346,7 +346,7 @@ panel.mx-auto.my-24(ref="benefitsPanel", v-show="step > 1", title="Benefits", ic
     p.mx-auto(style="max-width:26em") Describe any perks or benefits that come with membership to your community.
 
   input-body(label="Benefits (Markdown)", v-show="!benefitsInputHidden")
-    textarea.font-mono(v-model="benefitsInputMd", placeholder="Discord access..." rows="7")
+    textarea.font-mono.text-left(v-model="benefitsInputMd", placeholder="Discord access..." rows="7")
 
   .mt-10.min-h-80.bg-indigo-700.rounded-2xlb.relative.leading-tight(@click="benefitsInputHidden = false")
     .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Preview HTML

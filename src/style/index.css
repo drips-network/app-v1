@@ -25,6 +25,8 @@ html {
   @apply top-0 left-0 h-full w-full;
 }
 
+.scrollbars-hidden::-webkit-scrollbar{ display: none; }
+
 /* panels */
 .panel-indigo{
   @apply bg-indigo-700 rounded-2xlb;

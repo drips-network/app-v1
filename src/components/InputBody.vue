@@ -73,7 +73,7 @@ const slots = useSlots()
       }
     }
     & textarea {
-      @apply w-full min-h-80 flex items-center pt-26 text-left px-24 leading-tight;
+      @apply w-full min-h-80 flex items-center pt-26 px-24 leading-tight;
       &::placeholder{
         @apply font-sans text-xl;
       }
