@@ -50,7 +50,7 @@ modal(v-bind="$attrs", @close="emit('close')")
       dialog-title Collect your Drips
     template(v-slot:description)
       dialog-description
-        p.mx-auto.leading-snug(style="max-width:25em")
+        p.mx-auto.leading-snug.text-violet-650(style="max-width:25em")
           template(v-if="!hasFunds")
             | You don't have any funds to collect.
           template(v-else)

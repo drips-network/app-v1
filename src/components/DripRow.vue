@@ -32,7 +32,8 @@ const receiverRt = computed(() => {
   //- drip icon
   .w-80.h-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
     //- img(src="~@/assets/icons/drip-row-icon.svg")
-    span(style="font-size:1.75em") 💧
+    span(v-if="props.drip.amount", style="font-size:1.75em") 💧
+    span(v-else-if="props.drip.percent", style="font-size:1.8em") 💦
 
   .flex-1.flex.bg-indigo-700.rounded-full.px-20.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
 

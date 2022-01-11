@@ -76,9 +76,12 @@ const getSplits = async () => {
   }
 }
 
+const withdrawable = ref()
 const getDrips = async () => {
   try {
-    drips.value = (await store.dispatch('getDripsReceivers', route.params.address)).receivers
+    const lastUpdate = await store.dispatch('getDripsReceivers', route.params.address)
+    drips.value = lastUpdate.receivers
+    withdrawable.value = await lastUpdate.withdrawable()
   } catch (e) {
     console.error(e)
   }
@@ -94,6 +97,8 @@ onMounted(() => {
 
 provide('isMyUser', isMyUser)
 provide('allDripsOut', allDripsOut)
+provide('dripsOut', dripsOut)
+provide('withdrawable', withdrawable)
 </script>
 
 <script>
@@ -195,7 +200,7 @@ article.profile.pb-80
 
   main#main.px-36.min-h-screen
 
-    router-view(:key="$route.path", @editDrips="editDripsSelect = true")
+    router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'")
 
   //- MY USER
   template(v-if="isMyUser")
@@ -208,7 +213,7 @@ article.profile.pb-80
 
     //- edit drips...
     template(v-if="edit === 'drips'")
-      modal-drips-edit(:open="edit === 'drips'", @close="edit = null; getDrips()", @updated="getDrips")
+      modal-drips-edit(:open="edit === 'drips'", @close="edit = null; getDrips()", @updated="getDrips", :addFundsOnly="edit === 'funds'")
         template(v-slot:header)
           h6 Drip to Others
         template(v-slot:description)
