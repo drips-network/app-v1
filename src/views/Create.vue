@@ -73,7 +73,7 @@ section.py-72
               div
                 div.text-2xl.mb-20 ✨
                 .text-xl.font-semibold.mb-16 Create a Community
-                p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:23em") Fund your community or project by selling #[span.font-bold member tokens] or offering #[span.font-bold subscriptions], and optionally drip funds to others.
+                p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:23em") Fund your community or project by selling #[span.font-bold member tokens] or #[span.font-bold subscriptions] and optionally drip funds to others.
             .pb-20.flex.justify-center.w-full
               .border.border-violet-600.rounded-full.h-40.text-violet-650.px-28.flex.items-center.text-ms.notouch_group-hover_bg-violet-600.notouch_group-hover_text-indigo-900.transition.duration-150 Select
 
