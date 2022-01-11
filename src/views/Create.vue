@@ -46,27 +46,36 @@ section.py-72
     .flex.flex-wrap.-mx-10.mt-40
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
-          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
-            div.pb-24
-              div.text-2xl.mb-20 💧
-              .text-xl.font-semibold.mb-16 Drip Monthly
-              p.text-violet-600.px-10.leading-tight Stream DAI #[span.font-bold every month]<br>to anyone.
+          router-link.absolute.overlay.flex.flex-col.group(:to="{name: 'create-drips' }")
+            div.flex-1.flex.items-center.justify-center
+              div
+                div.text-2xl.mb-20 💧
+                .text-xl.font-semibold.mb-16 Drip Monthly
+                p.text-violet-600.px-10.leading-tight Stream DAI #[span.font-bold every 30 days]<br>to anyone.
+            .pb-20.flex.justify-center.w-full
+              .border.border-violet-600.rounded-full.h-40.text-violet-650.px-28.flex.items-center.text-ms.notouch_group-hover_bg-violet-600.notouch_group-hover_text-indigo-900.transition.duration-150 Select
 
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
-          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
-            div.pb-24
-              div.text-3xl.mb-20 💦
-              .text-xl.font-semibold.mb-16 Share your drips
-              p.text-violet-600.px-10.leading-tight Share a #[b percent] of your incoming drips with anyone.
+          router-link.absolute.overlay.flex.flex-col.group(:to="{name: 'create-drips' }")
+            div.flex-1.flex.items-center.justify-center
+              div
+                div.text-2xl.mb-20 💦
+                .text-xl.font-semibold.mb-16 Share your drips
+                p.text-violet-600.px-10.leading-tight Share a #[b percent] of your incoming drips with anyone.
+            .pb-20.flex.justify-center.w-full
+              .border.border-violet-600.rounded-full.h-40.text-violet-650.px-28.flex.items-center.text-ms.notouch_group-hover_bg-violet-600.notouch_group-hover_text-indigo-900.transition.duration-150 Select
 
       .w-full.px-10.mt-20
         .aspect-w-2.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
-          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-community' }")
-            div.pb-24
-              div.text-3xl.mb-20 ✨
-              .text-xl.font-semibold.mb-16 Create a Community
-              p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:24em") Fund your community or project by selling #[span.font-bold member tokens] or offering #[span.font-bold subscriptions].
+          router-link.absolute.overlay.flex.flex-col.group(:to="{name: 'create-community' }")
+            div.flex-1.flex.items-center.justify-center
+              div
+                div.text-2xl.mb-20 ✨
+                .text-xl.font-semibold.mb-16 Create a Community
+                p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:24em") Fund your community or project by selling #[span.font-bold member tokens] or offering #[span.font-bold subscriptions].
+            .pb-20.flex.justify-center.w-full
+              .border.border-violet-600.rounded-full.h-40.text-violet-650.px-28.flex.items-center.text-ms.notouch_group-hover_bg-violet-600.notouch_group-hover_text-indigo-900.transition.duration-150 Select
 
   section.pt-24(ref="childRoute")
     router-view(:key="$route.path")
