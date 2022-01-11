@@ -49,7 +49,7 @@ store.dispatch('init')
                 user-avatar.w-36.h-36.mr-10(:address="$store.state.address", blockieSize="28")
                 //- address
                 //- | {{ $store.getters.addrShort($store.state.address) }}
-                addr(:address="store.state.address")
+                addr(:address="store.state.address", :key="store.state.address")
             button.ml-2.p-10.mr-8.notouch_hover_text-white(@click="$store.dispatch('disconnect')", title="Disconnect")
               svg-x.h-12.w-12(strokeWidth="2")
         //- (connect btn)
