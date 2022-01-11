@@ -25,7 +25,6 @@ watch(route, (to) => {
   } else {
     entryPanel.value.close()
     setTimeout(() => childRoute.value.scrollIntoView({ behavior: 'smooth' }), 200)
-    
   }
 })
 </script>
@@ -44,22 +43,30 @@ section.py-72
       //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
 
     //- funding options as tiles
-    .flex.-mx-10.mt-40
+    .flex.flex-wrap.-mx-10.mt-40
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
             div.pb-24
               div.text-2xl.mb-20 💧
-              .text-xl.font-semibold.mb-16 Drip to Others
-              p.text-violet-600.px-10.leading-tight Drip funds #[span.font-bold every month] or #[span.font-bold share&nbsp;a&nbsp;percent] of your incoming drips with anyone.
+              .text-xl.font-semibold.mb-16 Drip Monthly
+              p.text-violet-600.px-10.leading-tight Stream DAI #[span.font-bold every month]<br>to anyone.
 
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
+          router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
+            div.pb-24
+              div.text-3xl.mb-20 💦
+              .text-xl.font-semibold.mb-16 Share your drips
+              p.text-violet-600.px-10.leading-tight Share a #[b percent] of your incoming drips with anyone.
+
+      .w-full.px-10.mt-20
+        .aspect-w-2.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-community' }")
             div.pb-24
               div.text-3xl.mb-20 ✨
               .text-xl.font-semibold.mb-16 Create a Community
-              p.text-violet-600.px-10.leading-tight Fund your community by selling #[span.font-bold member tokens] or offering #[span.font-bold subscriptions].
+              p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:24em") Fund your community or project by selling #[span.font-bold member tokens] or offering #[span.font-bold subscriptions].
 
   section.pt-24(ref="childRoute")
     router-view(:key="$route.path")
