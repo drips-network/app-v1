@@ -198,11 +198,11 @@ onMounted(async () => {
 </script>
 
 <template lang="pug">
-panel(icon="🗓")
+panel(icon="💧")
 
   template(v-slot:header)
     .leading-snug
-      h2 Monthly Drips
+      h2 Drip Monthly
 
   template(v-slot:description)
     p.text-violet-650.mx-auto.leading-relaxed
