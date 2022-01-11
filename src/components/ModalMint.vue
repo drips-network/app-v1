@@ -50,8 +50,8 @@ const mint = async () => {
       // check allowance
       const allowance = await store.dispatch('getAllowance', props.projectAddress)
 
+      // !! not approved
       if (allowance.lt(props.tokenType.minAmt)) {
-        alert('You must first approve this community\'s contract to be able to withdraw from your DAI balance periodically.')
         state.approved = false
         return
       }
@@ -72,10 +72,7 @@ const mint = async () => {
       state.mintTx = await store.dispatch('mintNFT', {
         projectAddress: props.projectAddress,
         typeId,
-        // TODO - remove temp + 1 wei once issue resolved:
-        // https://github.com/radicle-dev/radicle-drips/issues/58
-        giveAmt: toWei(amountDAI.value).eq(minAmt) ? toWei(amountDAI.value).add(1)
-          : toWei(amountDAI.value)
+        giveAmt: toWei(amountDAI.value)
       })
     }
     console.log('mint tx', state.mintTx)
@@ -94,11 +91,12 @@ const approve = async () => {
     // send...
     state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
     console.log('approve tx', state.approveTx)
+    debugger
 
     // wait for confirmation...
     await state.approveTx.wait() // receipt
 
-    state.approved = topUpWei.value.toString()
+    state.approved = true
   } catch (e) {
     console.error(e)
     state.approved = false
@@ -115,12 +113,13 @@ modal(v-bind="$attrs", @close="$emit('close')")
       dialog-title
         | Join
         br
-        | #[span.text-violet-650 {{ meta.name }}]
+        | {{ meta.name }}
 
     template(v-slot:description)
-      dialog-description.text-base.mx-auto.leading-relaxed
-        .mx-auto.px-24(v-if="isStreaming", style="max-widthff:25em")
-          | Drip funds to this community every <b>month</b> and receive a unique <b>Membership Token</b> 🧩. Top-up your balance periodically to make sure your membership doesn't become inactive!
+      dialog-description.text-base.mx-auto.leading-relaxed.text-violet-650
+        .mx-auto.px-24(v-if="isStreaming", style="max-width:30em")
+          | Drip funds to this community <b>every month</b> and receive a unique <b>Member Token</b> 🧩. #[b Prepay] some months to ensure your membership doesn't become inactive!
+          //- | Add funds to your token's balance periodically to ensure your membership doesn't become inactive!
         .mx-auto(v-else, style="max-width:25em")
           | Join this community by purchasing a unique <b>Membership Token</b> 🧩 with a one-time payment.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
@@ -129,11 +128,11 @@ modal(v-bind="$attrs", @close="$emit('close')")
       //- (subscription fields)
       template(v-if="isStreaming")
         //- input rate
-        input-body.my-10(label="DAI Rate*", :isFilled="typeof rate === 'number'", symbol="daipermo")
+        input-body.my-10(label="DAI per month*", :isFilled="typeof rate === 'number'", symbol="daipermo")
           input(v-model="rate", type="number", :placeholder="`min ${minDAI}`", :min="minDAI", step="0.01", required)
 
         //- input months prepay
-        input-body.my-10(label="Pre-pay*", :isFilled="typeof prePayMonths === 'number'", symbol="months")
+        input-body.my-10(label="Number of months to prepay*", :isFilled="typeof prePayMonths === 'number'", symbol="months")
           input(v-model="prePayMonths", type="number", placeholder="6", min="1", step="1", required)
 
         //- total due
@@ -143,32 +142,38 @@ modal(v-bind="$attrs", @close="$emit('close')")
             | {{ payTotalDAI }}
             svg-dai.h-28.ml-16
 
+      //- (one-time fields)
       template(v-else)
-        //- (one-time fields)
         input-body(:label="`Amount (min. ${minDAI} DAI)`", symbol="dai")
           input(v-model="amountDAI", type="number", :placeholder="minDAI", :min="minDAI", step="0.01", required)
 
-      //- (approve btn)
+      //- (not approved message)
+      template(v-if="!state.approved")
+        .mt-40.text-center.text-orange-600.text-base.mx-auto.leading-normal.border.border-current.p-20.rounded-lg(style="width:calc(100% - 2rem); max-width:34em")
+          p Before you can join, you must first #[b allow] the community to #[b withdraw your DAI] periodically to continue for your membership.
+          .mt-20.flex.justify-center
+            button.btn.btn-sm.btn-outline-orange.px-32.border-orange-600.notouch_hover_text-indigo-900(@click.prevent="approve")
+              template(v-if="state.approveTx") Allowing...
+              template(v-else) Allow
+
+          tx-link(v-if="state.approveTx && !state.approved", :tx="state.approveTx", clss="text-orange-600 text-sm")
+
+      //- (btns)
       .mt-40.flex.justify-center.mb-6
         button.btn.btn-lg.btn-outline.mr-6.px-48(@click="$emit('close')")
           | {{ state.nft ? 'Close' : 'Cancel' }}
 
-        template(v-if="!state.approved")
-          button.btn.btn-lg.btn-violet.px-48(@click.prevent="approve")
-            template(v-if="state.approveTx") Approving...
-            template(v-else) Approve
-
         //- (drip btn)
-        template(v-else-if="!state.nft")
-          button.btn.btn-lg.btn-violet.px-48(@click="mint", :disabled="!state.approved", :class="{'opacity-25': !state.approved}")
-            template(v-if="state.mintTx") Submitting...
+        template(v-if="!state.nft")
+          button.btn.btn-lg.btn-violet.px-48(@click="mint", :disabled="!state.approved", :class="{'opacity-40': !state.approved}")
+            template(v-if="state.mintTx") Joining...
             template(v-else)
-              | Drip 💧
+              | Join 💧
 
         //- (view btn)
         template(v-else)
           router-link.btn.btn-lg.btn-violet.px-48(:to="{name: 'user-communities-joined', params: {address: $store.state.address}}")
-            | View
+            | View Token
 
       tx-link(v-if="state.mintTx && !state.nft", :tx="state.mintTx")
 

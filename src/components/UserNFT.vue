@@ -181,7 +181,7 @@ onBeforeMount(() => {
               svg-plus-minus
         //- valid for
         .w-1x2.px-5(v-show="!adjust")
-          .font-medium.text-center.mb-12 Valid for
+          .font-medium.text-center.mb-12 Membership Expires
           .h-80.rounded-full.bg-indigo-700.flex.items-center
             .text-2xl.w-full.text-center.font-semibold(:title="nftExpiryDate")
               template(v-if="nftActiveForDays === null") -

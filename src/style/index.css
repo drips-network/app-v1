@@ -84,6 +84,12 @@ html {
     @apply notouch_hover_border-white notouch_hover_bg-violet-600;
   }
 }
+.btn-outline-orange{
+  @apply border border-orange-600;
+  &:not([disabled]) {
+    @apply notouch_hover_bg-orange-600;
+  }
+}
 .btn-violet{
   @apply bg-violet-600 border-2 border-transparent text-white;
   &:not([disabled]) {

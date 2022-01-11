@@ -322,6 +322,8 @@ export default createStore({
         return tx
       } catch (e) {
         console.error('@approveDAIContract', e)
+        if (e.message) alert(e.message)
+        throw e
       }
     },
 

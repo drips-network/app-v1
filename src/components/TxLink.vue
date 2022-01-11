@@ -1,10 +1,11 @@
 <script setup>
 const props = defineProps({
-  tx: Object
+  tx: Object,
+  clss: { type: String, default: 'text-violet-600 text-base' }
 })
 </script>
 
 <template lang="pug">
-.mt-16.text-violet-600.text-center.text-base
+.mt-16.text-center(:class="props.clss")
   a(:href="`https://etherscan.io/tx/${props.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 </template>
