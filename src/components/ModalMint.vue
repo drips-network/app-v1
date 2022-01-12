@@ -46,16 +46,15 @@ const mint = async () => {
   try {
     if (!store.state.address) await store.dispatch('connect')
 
+    // check allowance
+    const allowance = await store.dispatch('getAllowance', props.projectAddress)
+    // !! not allowed
+    if (allowance.lt(props.tokenType.minAmt)) {
+      state.approved = false
+      return
+    }
+
     if (isStreaming) {
-      // check allowance
-      const allowance = await store.dispatch('getAllowance', props.projectAddress)
-
-      // !! not approved
-      if (allowance.lt(props.tokenType.minAmt)) {
-        state.approved = false
-        return
-      }
-
       // convert to wei
       const topUpAmt = toWei(payTotalDAI.value)
       const amtPerSec = toWeiPerSec(rate.value)
@@ -149,8 +148,8 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
       //- (not approved message)
       template(v-if="!state.approved")
-        .mt-40.text-center.text-orange-600.text-base.mx-auto.leading-normal.border.border-current.p-20.rounded-lg(style="width:calc(100% - 2rem); max-width:34em")
-          p Before you can join, you must first #[b allow] the community to #[b withdraw your DAI] periodically to continue for your membership.
+        .mt-40.text-center.text-orange-600.text-base.mx-auto.leading-normal.border.border-current.p-20.rounded-lg(style="width:calc(100% - 8rem);")
+          p Before you can join, you must first #[b allow] the community to #[b withdraw your DAI]{{ isStreaming ? ' periodically to continue your membership' : '' }}.
           .mt-20.flex.justify-center
             button.btn.btn-sm.btn-outline-orange.px-32.border-orange-600.notouch_hover_text-indigo-900(@click.prevent="approve")
               template(v-if="state.approveTx") Allowing...
