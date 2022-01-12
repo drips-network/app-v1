@@ -7,6 +7,7 @@ import SvgLogoDrop from './components/SvgLogoDrop.vue'
 import UserAvatar from '@/components/UserAvatar'
 import SvgX from './components/SvgX.vue'
 import SvgDai from './components/SvgDai.vue'
+import SvgLogoRadicle from './components/SvgLogoRadicle.vue'
 import Addr from '@/components/Addr'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
@@ -33,7 +34,7 @@ store.dispatch('init')
             svg-logo-drop
           svg-logo.text-violet-650
         //- (test network name)
-        .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
+        //- .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
 
       //- right side
       nav.app__nav.flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.pr-16.pl-12
@@ -59,10 +60,34 @@ store.dispatch('init')
     main#main.flex-1.flex
       router-view.w-full(:key="$route.params && JSON.stringify($route.params)")
 
-  footer.p-6
+  //- footer.p-6.mt-144.flex.justify-between.items-end
     .bg-indigo-900.text-ms.text-violet-650.rounded-full.font-semibold.flex.items-center
       svg-dai.h-12
       | 1 ≈ $1
+
+  //- help / docs link
+  .mt-196.bottom-6.flex.justify-between
+    .h-80.p-12.bg-indigo-800.rounded-full
+      a.flex.items-center.text-violet-650.h-56.pl-4.pr-6.rounded-full.notouch_hover_ring.notouch_hover_ring-violet-650.transition.duration-150.notouch_hover_text-white(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
+        //- .w-56.h-56.flex.items-center.justify-center.bg-indigo-900.rounded-full.text-xl 🌱
+        .ml-16.flex.mt-2.text-base.font-semiboldff
+          span.opacity-75 by
+          //- &nbsp;#[b radicle.xyz]
+          svg-logo-radicle.ml-12.h-16.block(style="transform:translateY(0.03em)")
+
+        .ml-3.-mr-1.w-56.h-56.flex.items-center.justify-center.bg-indigo-900ff.rounded-full.text-xl.mb-2 🌱
+
+    .flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.px-12
+      a.mr-5.text-lg.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://gallant-shaw-eaf02b.netlify.app/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Help
+
+      .text-md.font-semibold.h-56.px-24.rounded-full.flex.items-center.justify-center.bg-indigo-950
+        svg-dai.h-16
+        | 1 ≈ $1
+    //-
+      .h-56.bg-indigo-900.border-2ff.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center
+        svg-dai.h-16
+        | 1 ≈ $1
+      .h-56.bg-indigo-900.border-2.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center Help
 </template>
 
 <style>

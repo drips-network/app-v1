@@ -40,7 +40,7 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-article.explore.pb-144.pt-16
+article.explore.pt-16
   //- header.flex.mt-12
     h1.h-80.rounded-full.flex.border.border-violet-600.ffbg-indigo-700.text-2xl.font-semibold.items-center.px-28.text-violet-650 Explore
   //- featured

@@ -641,7 +641,8 @@ module.exports = {
     placeholderColor: (theme) => theme('colors'),
     placeholderOpacity: (theme) => theme('opacity'),
     ringColor: (theme) => ({
-      DEFAULT: theme('colors.blue.500', '#3b82f6'),
+      // DEFAULT: theme('colors.blue.500', '#3b82f6'),
+      DEFAULT: theme('white', 'white'),
       ...theme('colors')
     }),
     ringOffsetColor: (theme) => theme('colors'),
@@ -653,11 +654,11 @@ module.exports = {
       8: '8px'
     },
     ringOpacity: (theme) => ({
-      DEFAULT: '0.5',
+      DEFAULT: '1',
       ...theme('opacity')
     }),
     ringWidth: {
-      DEFAULT: '3px',
+      DEFAULT: '2px',
       0: '0px',
       1: '1px',
       2: '2px',
@@ -976,11 +977,11 @@ module.exports = {
     pointerEvents: ['responsive'],
     position: ['responsive'],
     resize: ['responsive'],
-    ringColor: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringOffsetWidth: ['responsive', 'focus-within', 'focus'],
-    ringOpacity: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringWidth: ['responsive', 'focus-within', 'focus'],
+    ringColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
+    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
+    ringOffsetWidth: ['responsive', 'focus-within', 'focus', 'hover'],
+    ringOpacity: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
+    ringWidth: ['responsive', 'focus-within', 'focus', 'hover'],
     rotate: ['responsive', 'hover', 'focus'],
     saturate: ['responsive'],
     scale: ['responsive', 'hover', 'focus', 'group-hover'],
