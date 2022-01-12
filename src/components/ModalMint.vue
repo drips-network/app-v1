@@ -116,11 +116,10 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed.text-violet-650
-        .mx-auto.px-24(v-if="isStreaming", style="max-width:30em")
-          | Drip funds to this community <b>every month</b> and receive a unique <b>Member Token</b> 🧩. #[b Prepay] some months to ensure your membership doesn't become inactive!
-          //- | Add funds to your token's balance periodically to ensure your membership doesn't become inactive!
-        .mx-auto(v-else, style="max-width:25em")
-          | Join this community by purchasing a unique <b>Membership Token</b> 🧩 with a one-time payment.
+        .mx-auto.px-24(v-if="isStreaming", style="max-width:28em")
+          | Drip funds <b>every month</b> and receive a unique <b>Membership NFT</b> 🧩. #[b Top-up periodically] to ensure your membership doesn't become inactive. You can #[b withdraw] excess funds at any time.
+        .mx-auto(v-else, style="max-width:24em")
+          | Join this community by purchasing a unique<br><b>NFT Membership</b> 🧩 with a one-time payment.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
     form(@submit.prevent, validate)
@@ -131,7 +130,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
           input(v-model="rate", type="number", :placeholder="`min ${minDAI}`", :min="minDAI", step="0.01", required)
 
         //- input months prepay
-        input-body.my-10(label="Number of months to prepay*", :isFilled="typeof prePayMonths === 'number'", symbol="months")
+        input-body.my-10(label="Months*", :isFilled="typeof prePayMonths === 'number'", symbol="months")
           input(v-model="prePayMonths", type="number", placeholder="6", min="1", step="1", required)
 
         //- total due

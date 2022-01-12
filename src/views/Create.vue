@@ -50,15 +50,15 @@ section.py-72
             div.pb-24
               div.text-2xl.mb-20 💧
               .text-xl.font-semibold.mb-16 Drip Monthly
-              p.text-violet-600.px-10.leading-tight Stream DAI #[span.font-bold every month]<br>to anyone.
+              p.text-violet-600.px-10.leading-tight Stream DAI #[span.font-bold every month]<br>to any Ethereum address.
 
       .w-1x2.px-10
         .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-splits' }")
             div.pb-24
               div.text-3xl.mb-20 💦
-              .text-xl.font-semibold.mb-16 Share your drips
-              p.text-violet-600.px-10.leading-tight(style="max-width:15em") Share a #[b percent] of your incoming drips with anyone.
+              .text-xl.font-semibold.mb-16 Split your drips
+              p.text-violet-600.px-10.leading-tight(style="max-widthff:15em") Split a #[b percent] of your incoming drips with any Ethereum address.
 
       .w-full.px-10.mt-20
         .aspect-w-2.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
@@ -66,7 +66,7 @@ section.py-72
             div.pb-24
               div.text-3xl.mb-20 ✨
               .text-xl.font-semibold.mb-16 Create a Community
-              p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:23em") Fund your community or project by selling #[b member tokens] or #[b subscriptions] and optionally #[b drip to others].
+              p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:26em") Fund your community by issuing #[b memberships] and optionally #[b drip to others] every time you get paid.
 
   section.pt-24(ref="childRoute")
     router-view(:key="$route.path")

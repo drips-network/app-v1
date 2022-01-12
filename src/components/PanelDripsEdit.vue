@@ -240,7 +240,7 @@ panel(icon="💧")
       .mt-72
         div.mb-24.text-3xl 🔋
         h6.text-2xl.font-semibold.leading-snug Add Funds
-        p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drip recipients have funds to collect every month.
+        p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
 
         .relative
           input-body.mb-10(label="Add DAI to Balance", symbol="dai")

@@ -132,12 +132,14 @@ panel(icon="💦")
   template(v-slot:header)
     //- dialog-title.leading-snug
       slot(name="header")
-    h2.leading-snug Share your Drips
+    h2.leading-snug Split your Drips
 
   template(v-slot:description)
     //- dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
       slot(name="description")
-    p.text-violet-650.mx-auto(style="max-width:26em") Who do you want to #[b share] your incoming drips with? Anytime funds are dripped to you, they will be shared with these recipients automatically!
+    p.text-violet-650.mx-auto(style="max-width:22em")
+      //- | Who do you want to #[b share] your incoming drips with? Anytime funds are dripped to you, they will be shared with these recipients automatically!
+      | Anytime you receive drips, they will be #[b split] with the addresses below:
 
   //- (loading...)
   template(v-if="loading")
@@ -155,7 +157,7 @@ panel(icon="💦")
             //- TODO: validate ethereum address
             input(:ref="el => { receiverInputEls[i] = el }", v-model="splits[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
           //- amount
-          input-body.mt-10(label="Percent to share", :isFilled="typeof splits[i].percent === 'number'", theme="dark", symbol="percent")
+          input-body.mt-10(label="Percent", :isFilled="typeof splits[i].percent === 'number'", theme="dark", symbol="percent")
             input(v-model="splits[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
           //- rmv btn
           .absolute.top-0.right-0.h-full.flex.items-center

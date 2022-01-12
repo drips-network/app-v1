@@ -250,7 +250,7 @@ projectAddress.value = isDev ? route.query.project : null
 
       template(v-slot:description)
         template(v-if="!review")
-          p.text-violet-650.mx-auto(style="max-width:23em") Register your #[span.font-bold community] and start raising funds with #[span.font-bold member tokens] 🧩.
+          p.text-violet-650.mx-auto(style="max-width:23em") Register your #[span.font-bold community] and start raising funds with #[span.font-bold NFT memberships] 🧩.
         template(v-else)
           p Some fields you #[b cannot edit later].
 
@@ -272,7 +272,8 @@ projectAddress.value = isDev ? route.query.project : null
       //- TODO description/text about how some can't be edited later !!!
       //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
       template(v-slot:description)
-        p.text-violet-650 Decide on how to <b>fund your community</b>.<br>For now, you can only have <b>one membership type</b>.
+        p.text-violet-650 Decide on how to <b>fund your community</b>.
+        //- <br>For now, you can only have <b>one membership type</b>.
         //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
 
       //- funding options as tiles
@@ -283,7 +284,7 @@ projectAddress.value = isDev ? route.query.project : null
             button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = true")
               div.pt-16
                 .text-xl.font-semibold.mb-16 Subscriptions
-                p.text-violet-600 Recurring income from<br>your community.
+                p.text-violet-600 Recurring monthly income from<br>your community.
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
               .rounded-full.w-full(:class="{'bg-violet-700': isSubscription}")
@@ -292,8 +293,8 @@ projectAddress.value = isDev ? route.query.project : null
           .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': isSubscription, 'border border-violet-700': !isSubscription}")
             button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
               div.pt-16
-                .text-xl.font-semibold.mb-16 One-time Payment
-                p.text-violet-600 Create a limited edition membership.
+                .text-xl.font-semibold.mb-16 One-time Fundraiser
+                p.text-violet-600 Create limited-edition memberships.
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
               .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
@@ -310,7 +311,7 @@ projectAddress.value = isDev ? route.query.project : null
           input-body.my-10(label="Minimum Price*", symbol="dai", warning="⚠️ You cannot edit this later!")
             input(v-model="minDAIPrice", type="number", placeholder="100", required)
           //- token limit
-          input-body.my-10(label="Token Limit*", warning="⚠️ You cannot edit this later!")
+          input-body.my-10(label="Maximum Memberships*", warning="⚠️ You cannot edit this later!")
             input(v-model="tokenLimit", type="number", min="1", step="1", :max="tokenLimitCeiling" placeholder="1000", required)
 
         //- input goal
@@ -318,14 +319,14 @@ projectAddress.value = isDev ? route.query.project : null
           input(v-model="meta.goal", type="number", placeholder="1000")
 
         //- token symbol
-        input-body.my-10(label="Token Ticker Symbol*", warning="⚠️ You cannot edit this later!")
+        input-body.my-10(label="NFT Ticker Symbol*", warning="⚠️ You cannot edit this later!")
           input(v-model="meta.symbol", placeholder="CC", required)
 
         //- custom image ipfs hash
         //- input-body.my-10(label="Custom Token Image IPFS Hash (optional)", format="code", warning="⚠️ You cannot edit this later!")
           input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
 
-        input-body.my-10(label="Token Image", format="code", warning="⚠️ Max 500KB. You cannot change the image later.")
+        input-body.my-10(label="NFT Image", format="code", warning="⚠️ Max 500KB. You cannot change the image later.")
           .mx-auto.w-1x2.py-56
             //- TODO - get contract default
             img.block.w-full(:src="ipfsUrl(previewNftImageHash)")
@@ -410,7 +411,7 @@ projectAddress.value = isDev ? route.query.project : null
 
       //- TODO allow ENS names...
       template(v-slot:description)
-        p.text-violet-650 Share a <b>precent</b> of incoming funds with others, <br>like your contributors or dependencies.
+        p.text-violet-650 Split a <b>precent</b> of incoming funds with others, <br>like your contributors or dependencies.
 
       //- drips list
       //- form.mt-60(@submit.prevent="submit", autocomplete="off")
@@ -418,13 +419,13 @@ projectAddress.value = isDev ? route.query.project : null
         //- drips...
         template(v-for="(drip, i) in drips")
           section.my-10.input-group.relative
-            input-body(label="% of Revenue*", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
+            input-body(label="Recipient's Ethereum Address or ENS name*", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
+              //- TODO: validate ethereum address
+              input(v-model="drips[i].address", placeholder="name.eth", autocomplete="new-password", required)
+
+            input-body.mt-10(label="Percent*", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
               input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
-            //- input address
-            .mt-10
-              input-body(label="Ethereum/ENS Address*", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
-                //- TODO: validate ethereum address
-                input(v-model="drips[i].address", placeholder="name.eth", autocomplete="new-password", required)
+
             //- rmv btn
             .absolute.top-0.right-0.h-full.flex.items-center
               button.w-32.h-32.flex.items-center.justify-center.-mr-12.bg-indigo-900.rounded-full.border-violet-700.border-2.notouch_hover_border-white(@click="removeDrip(i)")

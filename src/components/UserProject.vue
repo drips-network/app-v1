@@ -75,9 +75,9 @@ onBeforeMount(() => {
   //- (funds)
   template(v-if="isUsersProject")
     available-funds-bar.bg-indigo-800(:amts="collectableAmts", @collect="collect", :tx="tx", :dripPct="dripsPct")
-      template(v-slot:allfunds) Available Funds
+      template(v-slot:allfunds) Collectable Funds
       template(v-slot:toyou)
-        span.text-white Your Funds
+        span.text-white You Receive
 
   //- stats
   project-stats.mt-20(v-if="project", :project="project", :meta="meta", :drips="drips")
