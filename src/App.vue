@@ -29,12 +29,13 @@ store.dispatch('init')
     header.flex.items-center.justify-between
       //- left side
       .flex.items-center.h-80.rounded-full.bg-indigo-700.pr-32
-        router-link.flex.items-center.-mt-px(to="/")
+        //- home / landing site link
+        a.flex.items-center.-mt-px(to="http://www.drips.network")
           .w-80.flex.justify-center.items-center.pb-px
             svg-logo-drop
           svg-logo.text-violet-650
         //- (test network name)
-        //- .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
+        .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
 
       //- right side
       nav.app__nav.flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.pr-16.pl-12
