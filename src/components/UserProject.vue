@@ -89,7 +89,27 @@ onBeforeMount(() => {
   //- (funds)
   template(v-if="isUsersProject")
     .panel.mt-20.bg-indigo-800.rounded-2xlb.p-10
-      .grid.grid-cols-1.gap-5
+
+      div
+        .h-80.mt-5.px-32.rounded-full.bg-indigo-850.grid.grid-cols-2.gap-64.font-semibold
+
+            .w-full.flex.items-center.justify-between
+              .flex-1.text-xl.text-violet-650 Monthly Drips In
+              .flex.items-center.text-white
+                .text-xl(:class="{'animate-pulse': currentFundingAmt < 0 }")
+                  | {{ currentFundingAmt < 0 ? '...' : round(toDAI(currentFundingAmt)) }}
+                svg-dai.h-20.ml-12
+                .text-lgg.tracking-tight /MO
+                //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
+
+            .w-full.flex.items-center.justify-between
+              .flex-1.text-xl.text-violet-650 Fully Collectable
+              .flex.items-center.text-white
+                .text-xl 26 days
+
+        //- .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
+
+      .mt-5.grid.grid-cols-1.gap-5
         //- .h-80.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
             .flex-1.text-xl.text-violet-650 Members
             .flex.items-center.text-white
@@ -99,7 +119,7 @@ onBeforeMount(() => {
           .flex-1
             .h-80.pl-32.pr-12.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
                 .flex-1.text-xl.text-violet-650.flex.items-center
-                  | Collectable Funds
+                  | Collectable Today
                   //- svg-question-mark-encircled.ml-18
 
                 .flex.items-center.text-white
@@ -113,20 +133,6 @@ onBeforeMount(() => {
             button.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
           //- button.ml-6.h-80.rounded-full.bg-violet-600.flex.items-center.px-36.font-semibold.text-lgg Collect
 
-      .grid.grid-cols-2.gap-5
-        .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
-          .flex-1.text-xl.text-violet-650 Monthly Drips In
-          .flex.items-center.text-white
-            .text-xl(:class="{'animate-pulse': currentFundingAmt < 0 }")
-              | {{ currentFundingAmt < 0 ? '...' : round(toDAI(currentFundingAmt)) }}
-            svg-dai.h-20.ml-12
-            .text-lgg.tracking-tight /MO
-            //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
-
-        .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
-          .flex-1.text-xl.text-violet-650 Next Collectable
-          .flex.items-center.text-white
-            .text-xl 26 days
             //- svg-dai.h-20.ml-12
     //- available-funds-bar.bg-indigo-800(:amts="collectableAmts", @collect="collect", :tx="tx", :dripPct="dripsPct")
       template(v-slot:allfunds) Collectable Funds

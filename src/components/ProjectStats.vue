@@ -104,7 +104,22 @@ section.project-stats.flex.w-full_10.-mx-5
   project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
     //- TODO Dai/mo vs DAI
     template(v-slot:header)
-      h6 🌈&nbsp; Funding Goal
+      h6 🌈&nbsp; Drips In
+    template(v-if="props.meta")
+      .flex.items-end
+        | 1
+        //- | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
+        span.ml-2(v-if="props.meta.goal >= 1000", style="font-size:0.75em") K
+      .absolute.bottom-0.right-0.p-22.flex.items-center
+        svg-dai.h-16.text-violet-650
+        span.font-semibold.font-sans.text-base(v-if="isMonthly") /MO
+    template(v-else) ...
+
+  //- Goal
+  //- project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
+    //- TODO Dai/mo vs DAI
+    template(v-slot:header)
+      h6 🌈&nbsp; Goal
     template(v-if="props.meta")
       .flex.items-end
         | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
@@ -117,7 +132,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- Total Revenue
   project-stat.flex-1.mx-5
     template(v-slot:header)
-      h6 🧮&nbsp; Cumulative Revenue
+      h6 🧮&nbsp; Total Collected
       //- alt: 💰🥞🔋📈
     template(v-if="props.project")
       .flex.items-end
