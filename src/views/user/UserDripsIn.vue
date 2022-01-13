@@ -113,7 +113,8 @@ section.user-drips-in
   template(v-else)
     info-bar.mb-20.justify-center.px-32
       div
-        | <b>{{ allDripsIn.length }} address</b>{{ allDripsIn.length === 1 ? ' is ' : 'es are ' }}
+        | <b>{{ allDripsIn.length }} address{{ allDripsIn.length === 1 ? '' : 'es' }}</b>
+        | {{ allDripsIn.length === 1 ? ' is ' : ' are ' }}
         | <b>dripping funds</b> to&nbsp;
         b(v-if="$store.getters.isWalletAddr($route.params.address)") you
         addr.font-bold(v-else, :address="$route.params.address")

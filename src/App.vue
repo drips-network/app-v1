@@ -16,7 +16,7 @@ store.dispatch('init')
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.p-10.text-base.font-sans.leading-normal
+#app.max-w-screen-2xl.mx-auto.py-10.px-12.text-base.font-sans.leading-normal
   .flex.flex-col.min-h-screen
     //- (wrong network banner)
     template(v-if="$store.getters.isWrongNetwork")
@@ -67,15 +67,15 @@ store.dispatch('init')
 
   //- help / docs link
   .mt-196.bottom-6.flex.justify-between
-    .h-80.p-12.bg-indigo-800.rounded-full
-      a.flex.items-center.text-violet-650.h-56.pl-4.pr-6.rounded-full.notouch_hover_ring.notouch_hover_ring-violet-650.transition.duration-150.notouch_hover_text-white(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
-        //- .w-56.h-56.flex.items-center.justify-center.bg-indigo-900.rounded-full.text-xl 🌱
-        .ml-16.flex.mt-2.text-base.font-semiboldff
-          span.opacity-75 by
-          //- &nbsp;#[b radicle.xyz]
-          svg-logo-radicle.ml-12.h-16.block(style="transform:translateY(0.03em)")
+    //- radicle link
+    a.h-80.pl-18.pr-16.flex.items-center.bg-indigo-800.text-violet-650.rounded-full.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
+      //- .w-56.h-56.flex.items-center.justify-center.bg-indigo-900.rounded-full.text-xl 🌱
+      .ml-16.flex.mt-2.text-base.font-semiboldff
+        span.opacity-75 by
+        //- &nbsp;#[b radicle.xyz]
+        svg-logo-radicle.ml-12.h-16.block(style="transform:translateY(0.03em)")
 
-        .ml-3.-mr-1.w-56.h-56.flex.items-center.justify-center.bg-indigo-900ff.rounded-full.text-xl.mb-2 🌱
+      .ml-3.-mr-1.w-56.h-56.flex.items-center.justify-center.bg-indigo-900ff.rounded-full.text-xl.mb-2 🌱
 
     .flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.px-12
       a.mr-5.text-lg.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://gallant-shaw-eaf02b.netlify.app/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Help

@@ -91,7 +91,7 @@ onBeforeMount(() => {
     .panel.mt-20.bg-indigo-800.rounded-2xlb.p-10
 
       div
-        .h-80.mt-5.px-32.rounded-full.bg-indigo-850.grid.grid-cols-2.gap-64.font-semibold
+        .h-80.mt-5.px-32.rounded-full.bg-indigo-850.grid.grid-cols-2.gap-72.font-semibold
 
             .w-full.flex.items-center.justify-between
               .flex-1.text-xl.text-violet-650 Monthly Drips In
@@ -109,7 +109,7 @@ onBeforeMount(() => {
 
         //- .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
 
-      .mt-5.grid.grid-cols-1.gap-5
+      .mt-8.grid.grid-cols-1.gap-5
         //- .h-80.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
             .flex-1.text-xl.text-violet-650 Members
             .flex.items-center.text-white

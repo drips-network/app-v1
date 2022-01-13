@@ -74,10 +74,10 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     template(v-slot:header)
       dialog-title.leading-snug
-        | Drip to #[addr.text-violet-650(:address="props.address", @ens="ens => { dripToReceiver = ens }")]
+        | Drip to #[addr.text-violet-650ff(:address="props.address", @ens="ens => { dripToReceiver = ens }")]
 
     template(v-slot:description)
-      dialog-description.text-violet-650ff How much would you like to drip?
+      dialog-description.text-violet-650 How much would you like to drip?
       //- dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
         template(v-if="dripType === 'monthly'")
           | Send DAI #[b.text-violet-650 every month.]

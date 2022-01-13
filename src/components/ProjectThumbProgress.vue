@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, onBeforeMount } from 'vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
+import UserAvatar from '@/components/UserAvatar'
+import Addr from '@/components/Addr'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import store from '@/store'
 import { ipfsUrl } from '@/utils'
@@ -10,6 +12,10 @@ const props = defineProps({
 })
 
 const meta = ref()
+// const members = computed(() => {
+//   const owners = props.project.tokens.map(token => token.owner)
+//   return [...new Set(owners)]
+// })
 
 onBeforeMount(async () => {
   meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })

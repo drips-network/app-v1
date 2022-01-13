@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import store from '@/store'
 import DripRow from '@/components/DripRow'
 import LoadingBar from '@/components/LoadingBar'
+import InfoBar from '@/components/InfoBar'
 import { round } from '@/utils'
 
 const splits = ref()
@@ -46,6 +47,9 @@ section
   template(v-if="!splits")
     loading-bar
   template(v-else)
+    info-bar.mb-20.text-md
+      .w-full.text-center.px-32
+        | #[b {{ splits.length }} address] are 💧 #[b dripping funds] to others.
     ul
       li(v-for="drip in splits")
         drip-row.my-4(:drip="drip")

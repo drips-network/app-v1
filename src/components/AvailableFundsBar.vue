@@ -14,7 +14,7 @@ const totalFunds = computed(() => props.amts ? num(props.amts[0].add(props.amts[
 // const dripPct = computed(() => getDripPctFromAmts(props.amts))
 
 // const hasFunds = computed(() => Number(totalFunds.value) > 0)
-const hasFunds = computed(() => true || props.amts && props.amts[0].add(props.amts[1]).gt(0))
+const hasFunds = computed(() => props.amts && props.amts[0].add(props.amts[1]).gt(0))
 </script>
 
 <template lang="pug">
@@ -22,7 +22,7 @@ const hasFunds = computed(() => true || props.amts && props.amts[0].add(props.am
   .w-full.h-80.rounded-full.flex.justify-between.items-center.px-12(:class="{'border border-violet-700': hasFunds}")
     h4.ml-16.text-xl.font-semibold.text-white
       slot(name="allfunds")
-      
+
     .flex.items-center.mr-16
       .text-2xl.font-semibold.flex.items-center(:class="{'text-white': hasFunds}")
         | {{ totalFunds > -1 ? totalFunds : '...' }}
@@ -32,11 +32,11 @@ const hasFunds = computed(() => true || props.amts && props.amts[0].add(props.am
     .mt-10(:class="{'flex-1 pr-2': !isModalSummary, 'w-full': isModalSummary}")
       .w-full.h-80.rounded-full.border.border-violet-700.flex.justify-between.items-center.px-12
         .flex-1.flex.justify-between.items-center
-          h4.ml-16.text-xl.font-semibold 💧 Drip {{ props.dripPct }}%
+          h4.ml-16.text-xl.font-semibold 💦 &nbsp;Splitting {{ props.dripPct }}%
           .flex.items-center.mr-16
             .text-2xl.font-semibold.flex.items-center(:class="{'.text-white': !isModalSummary}")
               template(v-if="props.amts && props.amts[1].gt(0) && Number(toSplits) < 0.01") >
-              | {{ toSplits > -1 ? toSplits : '...' }}
+              | -{{ toSplits > -1 ? toSplits : '...' }}
               svg-dai.ml-12(size="xl")
 
     .mt-10(:class="{'flex-1 pl-2': !isModalSummary, 'w-full': isModalSummary}")
@@ -44,7 +44,7 @@ const hasFunds = computed(() => true || props.amts && props.amts[0].add(props.am
         .flex-1.flex.justify-between.items-center
           h4.ml-16.text-xl.font-semibold
             slot(name="toyou")
-          
+
           .flex.items-center
             .text-2xl.font-semibold.mr-16.flex.items-center(:class="{'text-white': isModalSummary}")
               | {{ toOwner > -1 ? toOwner : '...' }}

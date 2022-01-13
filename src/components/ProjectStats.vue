@@ -132,7 +132,7 @@ section.project-stats.flex.w-full_10.-mx-5
   //- Total Revenue
   project-stat.flex-1.mx-5
     template(v-slot:header)
-      h6 🧮&nbsp; Total Collected
+      h6 🧮&nbsp; Total Drips Collected
       //- alt: 💰🥞🔋📈
     template(v-if="props.project")
       .flex.items-end

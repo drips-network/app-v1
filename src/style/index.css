@@ -91,9 +91,9 @@ html {
   }
 }
 .btn-violet{
-  @apply bg-violet-600 border-2 border-transparent text-white;
+  @apply bg-violet-600 text-white;
   &:not([disabled]) {
-    @apply notouch_hover_border-white
+    @apply notouch_hover_ring
   }
 }
 .btn-active-white {

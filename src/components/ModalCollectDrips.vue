@@ -35,7 +35,7 @@ const collect = async () => {
 //     if (isNaN(dripPct.value)) {
 //       const percents = (await store.dispatch('getSplitsReceivers', store.state.address)).percents
 //       dripPct.value = percents.reduce((acc, curr) => acc + curr.percent, 0)
-//     }  
+//     }
 //   } catch (e) {
 //     console.error(e)
 //   }
@@ -54,21 +54,21 @@ modal(v-bind="$attrs", @close="emit('close')")
           template(v-if="!hasFunds")
             | You don't have any funds to collect.
           template(v-else)
-            | You have funds available to collect!
+            //- | You have funds available to collect!
             template(v-if="amts[1].gt(0)")
-              br
-              | #[b.text-violet-650 {{ dripPct }}% will be shared] with your #[b.text-violet-650 drip %] recipients. The&nbsp;rest will be transferred to your wallet.
+              //- br
+              | #[b.text-violet-650 {{ dripPct }}%] will be sent to the addresses you split drips with. The&nbsp;rest will be transferred to your wallet.
 
     div(v-if="hasFunds")
       available-funds-bar.bg-indigo-700(:amts="props.amts", :tx="tx", :isModalSummary="true", :dripPct="dripPct")
-        template(v-slot:allfunds) Current Funds
+        template(v-slot:allfunds) Collectable Today
         template(v-slot:toyou)
           span.text-white You Receive
 
     .mt-40.flex.justify-center.mb-6
       button.btn.btn-lg.btn-outline.px-40.mr-6(@click="$emit('close')")
         | {{ tx || txReceipt || !hasFunds ? 'Close' : 'Cancel' }}
-      
+
       button.btn.btn-lg.btn-violet.px-40(v-if="hasFunds", @click="collect", :disabled="tx")
         template(v-if="txReceipt") Collected
         template(v-else-if="tx") Collecting...
