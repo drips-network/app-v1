@@ -4,8 +4,9 @@ import SvgDai from '@/components/SvgDai'
 import { toDAI, toWei } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 import api from '@/api'
-
 const props = defineProps(['meta', 'project', 'rightSide'])
+const emit = defineEmits(['currentFundingAmt'])
+
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
 const pct = ref(-1)
@@ -55,11 +56,13 @@ const getPercent = async () => {
       // streaming
       sum = await getProjectStreamingTotalWei()
     } else {
-      // one-time payment = total collect + split
       // TODO - progress excludes splits(?
+      // one-time payment = total collect + split
       await new Promise((resolve, reject) => setTimeout(resolve, 200))
       sum = bn.from(props.project.daiCollected).add(props.project.daiSplit)
     }
+    emit('currentFundingAmt', sum)
+    // calc percent (sum / goal)
     percent = sum.toString() / toWei(props.meta.goal).toString() * 100
   }
   pct.value = percent

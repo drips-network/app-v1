@@ -77,6 +77,7 @@ module.exports = {
       indigo: {
         700: '#17164B',
         800: '#12123C',
+        850: '#0E0E30',
         900: '#0a0930', // #090928', // dark: rgb(9 14 24)', // softer: #0e1522', // figma: #101828', > deeper/saturated: #090928
         950: '#070621' // equiv of black 30% opacity over 900
       },
