@@ -6,13 +6,7 @@ const routes = [
   {
     path: '/',
     name: 'landing',
-    beforeEnter: (to, from, next) => {
-      if (process.env.NODE_ENV === 'development') {
-        return next('/explore')
-      }
-      // else redirect to landing page site
-      window.location.href = 'https://drips.radicle.network/'
-    }
+    redirect: { name: 'explore' }
   },
   {
     path: '/explore',
