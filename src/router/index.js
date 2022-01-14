@@ -31,7 +31,7 @@ const routes = [
         component: () => import(/* webpackChunkName: "create-drips" */ '../views/CreateDrips.vue')
       },
       {
-        path: 'share',
+        path: 'splits',
         name: 'create-splits',
         component: () => import(/* webpackChunkName: "create-drips" */ '../views/CreateSplits.vue')
       },
