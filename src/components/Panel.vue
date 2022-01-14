@@ -37,13 +37,16 @@ section.panel.panel-dark.w-full.max-w-6xl.text-center
         svg-pen.h-28.text-white.opacity-30.notouch_group-hover_opacity-100
 
   //- (open body)
-  .pt-44.px-24.pb-24(v-show="!isCollapsed")
+  .pt-48.px-24.pb-24(v-show="!isCollapsed")
     header.mb-40.text-center
+      //- icon
       .mb-20.text-3xl(v-if="icon") {{ icon }}
-
-      .text-2xl.font-semibold.mb-24.leading-tight
+      
+      //- header
+      .text-2xl.font-semibold.mb-28.leading-tight
         slot(name="header")
 
+      //- description
       .text-md.leading-snug
         slot(name="description")
 

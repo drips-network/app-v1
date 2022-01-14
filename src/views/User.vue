@@ -148,7 +148,7 @@ export default {
 
 <template lang="pug">
 article.profile.pb-80
-  header.mt-52.px-36
+  header.mt-56.px-36
     .flex.items-endff.items-center.justify-between.w-full
       //- user tag
       user-tag(:address="$route.params.address")
@@ -173,21 +173,21 @@ article.profile.pb-80
       template(v-else)
         button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true") Drip to {{ ensName || '0x...' }} 💧
 
-    nav.mt-52.mb-20
-      .flex.items-start.justify-between.text-violet-650
+    nav.mt-56.mb-20
+      .flex.items-start.justify-between.text-violet-650.text-lg
         .flex.tracking-wide
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-drips') }")
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-drips') }")
             span.mr-14.-ml-5(style="font-size:1.18em") 💧
             | Drips
-          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.text-lg.pl-28.pr-36.mr-2(:to="{ name: 'user-communities', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-communities') }")
+          router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.pl-28.pr-36.mr-2(:to="{ name: 'user-communities', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-communities') }")
             span.mr-14.-ml-4(style="font-size:1.23em") 🙂
             | Communities
 
         //- (communities submenu)
         template(v-if="$route.name.includes('user-communities')")
           .h-80.rounded-full.flex.items-center.px-16.bg-indigo-700
-            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24.mr-2(:to="{ name: 'user-communities', params: $route.params }") Created
-            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24.mr-2(:to="{ name: 'user-communities-joined', params: $route.params }") Joined
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24.mr-4(:to="{ name: 'user-communities', params: $route.params }") Created
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24(:to="{ name: 'user-communities-joined', params: $route.params }") Joined
 
         //- (drips submenu)
         template(v-if="$route.name.includes('user-drips')")
@@ -195,17 +195,18 @@ article.profile.pb-80
           //- .w-40.h-40.border-b-2.border-indigo-700
           //- submenu body
           .h-80.rounded-full.flex.items-center.px-16.bg-indigo-700
-            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-in', params: $route.params }", ) In
-            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32.mr-2(:to="{ name: 'user-drips-out', params: $route.params }", ) Out
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32.mr-4(:to="{ name: 'user-drips-in', params: $route.params }", ) In
+            router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32(:to="{ name: 'user-drips-out', params: $route.params }", ) Out
 
   main#main.px-36.min-h-screen
 
     router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'")
 
-  //- MY USER
+  //- (MY USER)
   template(v-if="isMyUser")
     //- COLLECT
-    modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="getMyCollectable", dripPct="1")
+    modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="getMyCollectable")
+      template(v-slot:header) Collect your Drips
 
     //- EDIT
     //- select drip type to edit...
@@ -230,7 +231,7 @@ article.profile.pb-80
           template(v-else)
             | Add addresses that you will #[b.text-violet-650 share]<br>your incoming funds with.
 
-  //- OTHER USER
+  //- (OTHER USER)
   template(v-else)
     template(v-if="dripModalOpen")
       //- drip to this user

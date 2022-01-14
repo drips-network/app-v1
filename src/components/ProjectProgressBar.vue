@@ -4,6 +4,7 @@ import SvgDai from '@/components/SvgDai'
 import { toDAI, toWei } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 import api from '@/api'
+import store from '@/store'
 const props = defineProps(['meta', 'project', 'rightSide'])
 const emit = defineEmits(['currentFundingAmt'])
 
@@ -18,53 +19,19 @@ const pctPretty = computed(() => {
       : parseInt(pct.value) + '%'
 })
 
-const getProjectStreamingTotalWei = async () => {
-  // TODO - api doesn't consider active/inactive...
-  try {
-    const resp = await api({
-      variables: { tokenRegistryAddress: props.project.id },
-      query: `
-        query ($tokenRegistryAddress: Bytes!) {
-          tokens (where: {tokenRegistryAddress: $tokenRegistryAddress}) {
-            tokenId
-            amount: amtPerSec
-            tokenType {
-              streaming
-            }
-          }
-        }
-      `
-    })
-    let tokens = resp.data?.tokens || []
-    // filter for streaming tokens, map to just BN amounts
-    tokens = tokens.filter(tkn => tkn.tokenType.streaming).map(tkn => bn.from(tkn.amount))
-    // add up BN amounts
-    const totalWeiPerSec = tokens.reduce((acc, curr) => acc.add(curr), bn.from(0))
-    // return monthly wei
-    return totalWeiPerSec.mul(60 * 60 * 24 * 30)
-  } catch (e) {
-    console.error(e)
-    throw e
-  }
-}
-
 const getPercent = async () => {
   let percent = 0
   if (props.meta.goal > 0) {
-    let sum = bn.from(0)
+    // let sum = bn.from(0)
 
-    if (isStreaming) {
-      // streaming
-      sum = await getProjectStreamingTotalWei()
-    } else {
-      // TODO - progress excludes splits(?
-      // one-time payment = total collect + split
-      await new Promise((resolve, reject) => setTimeout(resolve, 200))
-      sum = bn.from(props.project.daiCollected).add(props.project.daiSplit)
-    }
-    emit('currentFundingAmt', sum)
+    let raisedWei = await store.dispatch('getFundingTotal', {
+      projectAddress: props.project.id,
+      isStreaming
+    })
+
+    emit('currentFundingAmt', raisedWei)
     // calc percent (sum / goal)
-    percent = sum.toString() / toWei(props.meta.goal).toString() * 100
+    percent = raisedWei.toString() / toWei(props.meta.goal).toString() * 100
   }
   pct.value = percent
 }

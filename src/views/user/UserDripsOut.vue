@@ -32,49 +32,57 @@ section.user-splits
 
   //- (drips list)
   template(v-else)
-    //- info bar
-    info-bar.mb-20.justify-center.px-32
-      div
-        template(v-if="canEdit") You are
-        template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>
+    //- info-bar.mb-20.justify-center.px-32
+    //-   div
+    //-     template(v-if="canEdit") You are
+    //-     template(v-else) #[addr.font-bold(:address="$route.params.address")] is
+    //-     | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b> 
 
     //- (balance)
     template(v-if="canEdit && dripsOut.length")
-      section.mb-20.panel.panel-indigo.p-16.text-violet-650
-        header.mb-20.flex.justify-between.items-center
+      section.mb-20.panel.panel-indigoff.border.border-violet-800.rounded-2xlb.p-16.text-violet-650
+        //- header
+        header.mb-12.flex.justify-between.items-center
           .flex.items-center
-            .w-80.h-80.flex.items-center.justify-center.bg-indigo-800.text-3xl.rounded-full 💧
-            h2.ml-24.text-2xl.font-semibold.text-white Your Monthly Drips
-          button.ml-24.mr-12.btn.btn-md.btn-violet.px-32.font-semibold.text-lg(@click="$emit('editDrips')") Edit
+            .w-72.h-72.flex.items-center.justify-center.bg-indigo-800.text-3xl.rounded-full 💧
+            h2.ml-24.text-xll.font-semibold.text-white Your Monthly Drips
+          button.ml-24.mr-12.btn.btn-md.btn-violet.px-28.font-semibold.text-lg(@click="$emit('editDrips')") Add Funds
 
         .grid.grid-cols-2.gap-5
 
-          .h-80.px-32.rounded-full.bg-indigo-800.flex.items-center.justify-between.font-semibold
-            .flex-1.text-xl Monthly Total
+          .h-80.px-32.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
+            .flex-1.text-xl Monthly Drips
             .flex.items-center.text-white
               .text-xl 2.00
               svg-dai.h-22.ml-14
               .text-xl.tracking-tight /MO   
 
-          .h-80.mt-2.px-12.rounded-full.bg-indigo-800.flex.items-center.justify-between.font-semibold
-            .pl-20.flex-1.text-xl Balance
+          .h-80.mt-2.px-12.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
+            .pl-20.flex-1.text-xl Your Balance
             .flex.items-center.text-white
               .text-xl {{ balance }}
-              svg-dai.h-24.ml-12.mr-20
+              svg-dai.h-22.ml-12.mr-20
             //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg(@click="$emit('addFunds')") Add Funds
 
-          .h-80.mt-2.px-32.rounded-full.bg-indigo-800.flex.items-center.justify-between.font-semibold
-            .flex-1.text-xl Recipients
+          //- .h-80.mt-2.px-32.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
+            .flex-1.text-xl Monthly Recipients
             .flex.items-center
               .text-xl.text-white {{ dripsOut.length }}  
 
-          .h-80.mt-2.px-32.rounded-full.bg-indigo-800.flex.items-center.justify-between.font-semibold
+          //- .h-80.mt-2.px-32.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
             .flex-1.text-xl Next Term
             .flex.items-center
               .text-xl.text-white - -       
 
-          
+    //- info bar
+    info-bar.mb-20.justify-center.relative
+      div.text-center.w-full
+        template(v-if="canEdit") You are
+        template(v-else) #[addr.font-bold(:address="$route.params.address")] is
+        | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>   
+      .absolute.top-0.right-12.h-full.flex.items-center
+        button.btn.btn-md.btn-outline.text-md.px-24.font-semibold.notouch_hover_text-white.transition.duration-150(@click="$emit('editDrips')")
+          | {{ allDrips.length ? 'Edit' : 'Add Drips' }}
 
           
 
@@ -85,9 +93,9 @@ section.user-splits
         drip-row.my-2(:drip="drip", :alternateColors="true")
 
     //- edit btn footer
-    template(v-if="canEdit")
+    //- template(v-if="canEdit && !allDrips.length")
       footer.w-full.stickyff.bottom-20.left-0.w-full.mt-40.flex.justify-center.pointer-events-none
         button.btn.btn-lg.btn-violet.pl-36.pr-28.pointer-events-auto(@click="$emit('editDrips')")
-          | {{ allDrips.length ? 'Edit' : 'Add' }} Drips 💧
+          | Add Drips 💧
 
 </template>

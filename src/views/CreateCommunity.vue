@@ -252,7 +252,7 @@ projectAddress.value = isDev ? route.query.project : null
         template(v-if="!review")
           p.text-violet-650.mx-auto(style="max-width:23em") Register your #[span.font-bold community] and start raising funds with #[span.font-bold NFT memberships] 🧩.
         template(v-else)
-          p Some fields you #[b cannot edit later].
+          p.text-violet-650 Some fields you #[b cannot edit later].
 
       section
         form(@submit.prevent="openFundingPanel", validate)
@@ -294,7 +294,7 @@ projectAddress.value = isDev ? route.query.project : null
             button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
               div.pt-16
                 .text-xl.font-semibold.mb-16 One-time Fundraiser
-                p.text-violet-600 Create limited-edition memberships.
+                p.text-violet-600 Sell limited-edition memberships.<br>&nbsp;
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
               .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
@@ -302,7 +302,7 @@ projectAddress.value = isDev ? route.query.project : null
       form.mt-40(@submit.prevent="openBenefitsPanel", validate)
         //- (input monthly rate)
         template(v-if="isSubscription")
-          input-body.my-10(label="Minimum Subscription*", symbol="daipermo", warning="⚠️ You cannot edit this later!")
+          input-body.my-10(label="Minimum Monthly Subscription*", symbol="daipermo", warning="⚠️ You cannot edit this later!")
             input(v-model="minDAIPerMonth", type="number", placeholder="10", required)
 
         //- (one-time payment inputs)
@@ -311,7 +311,7 @@ projectAddress.value = isDev ? route.query.project : null
           input-body.my-10(label="Minimum Price*", symbol="dai", warning="⚠️ You cannot edit this later!")
             input(v-model="minDAIPrice", type="number", placeholder="100", required)
           //- token limit
-          input-body.my-10(label="Maximum Memberships*", warning="⚠️ You cannot edit this later!")
+          input-body.my-10(label="Maximum Number of Memberships*", warning="⚠️ You cannot edit this later!")
             input(v-model="tokenLimit", type="number", min="1", step="1", :max="tokenLimitCeiling" placeholder="1000", required)
 
         //- input goal
@@ -442,7 +442,7 @@ projectAddress.value = isDev ? route.query.project : null
           button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
 
     //- (create btn)
-    .sticky.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
+    .sticky.z-20.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
       .text-center
         button.btn.btn-xl.btn-white.min-w-md(@click="submitProject", :disabled="tx")
           template(v-if="projectAddress") Created!

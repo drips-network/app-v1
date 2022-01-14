@@ -1,11 +1,12 @@
 <script setup>
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import api from '@/api'
 import ProjectStat from '@/components/ProjectStat'
 import SvgDai from '@/components/SvgDai'
 import IconSplit from '@/components/IconSplit'
 import { toDAI } from '@/utils'
 import { BigNumber as bn } from 'ethers'
+import store from '@/store'
 
 const props = defineProps({
   project: Object,
@@ -31,18 +32,6 @@ const isMonthly = computed(() => {
   return props.project?.tokenTypes && props.project.tokenTypes[0]?.streaming
 })
 
-onBeforeMount(async () => {
-  // get nfts by project address...
-  try {
-    const variables = { tokenRegistryAddress: props.project.id }
-    const resp = await api({ query, variables })
-    nfts.value = resp.data.tokens
-  } catch (e) {
-    console.error(e)
-    nfts.value = []
-  }
-})
-
 const supporters = computed(() => {
   if (nfts.value) {
     // get all owners from nfts
@@ -64,11 +53,38 @@ const currency = (num) => {
 }
 
 // sum of daiCollected and daiSplit
-const totalRevenue = computed(() => props.project && Number(toDAI(bn.from(props.project.daiCollected).add(props.project.daiSplit))))
+const totalRevenue = computed(() => props.project && Number(toDAI(bn.from(props.project.daiCollected).add(props.project.daiSplit), 'exact')))
+
+const getNFTS = async () => {
+  // get nfts by project address...
+  try {
+    const variables = { tokenRegistryAddress: props.project.id }
+    const resp = await api({ query, variables })
+    nfts.value = resp.data.tokens
+  } catch (e) {
+    console.error(e)
+    nfts.value = []
+  }
+}
+
+const dripsIn = ref()
+const getDripsIn = async () => {
+  try {
+    const wei = await store.dispatch('getFundingTotal', { projectAddress: props.project.id, isStreaming: isMonthly.value })
+    dripsIn.value = toDAI(wei, null, 0)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+onMounted(async () => {
+  getNFTS()
+  getDripsIn()
+})
 </script>
 
 <template lang="pug">
-section.project-stats.flex.w-full_10.-mx-5
+section.project-stats.grid.grid-cols-4.gap-10
   //- supporters
   //- project-stat.flex-1.mx-5(:class="{'animate-pulse': !supporters}")
     template(v-slot:header)
@@ -83,7 +99,7 @@ section.project-stats.flex.w-full_10.-mx-5
     template(v-else) ...
 
   //- drips from
-  project-stat.flex-1.mx-5(:class="{'animate-pulse': !nfts}")
+  project-stat(:class="{'animate-pulse': !nfts}")
     template(v-slot:header)
       h6 🧩&nbsp; Memberships
     template(v-if="nfts")
@@ -96,27 +112,29 @@ section.project-stats.flex.w-full_10.-mx-5
         </span>
     template(v-else) ...
     //- (limit)
-    .absolute.bottom-0.right-0.p-22.flex.items-center
+    .absolute.bottom-22.right-24.flex.items-center
       span.font-semibold.font-sans.text-base(v-if="!isMonthly")
         | of max {{ props.project.tokenTypes[0].limit }}
 
-  //- Goal
-  project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
-    //- TODO Dai/mo vs DAI
+  //- Drips In
+  project-stat
     template(v-slot:header)
-      h6 🌈&nbsp; Drips In
-    template(v-if="props.meta")
+      h6 💧&nbsp; Drips In
+    //- (drips in value)
+    template(v-if="dripsIn !== undefined")
       .flex.items-end
-        | 1
-        //- | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
-        span.ml-2(v-if="props.meta.goal >= 1000", style="font-size:0.75em") K
-      .absolute.bottom-0.right-0.p-22.flex.items-center
-        svg-dai.h-16.text-violet-650
+        | {{ dripsIn }}
+        span.ml-2(v-if="dripsIn >= 1000", style="font-size:0.75em") K
+      //- dai | dai/mo
+      .absolute.bottom-22.right-24.flex.items-center
+        svg-dai.h-18.text-violet-650
         span.font-semibold.font-sans.text-base(v-if="isMonthly") /MO
-    template(v-else) ...
+    //- (loading...)
+    template(v-else)
+      .animate-pulse ...
 
   //- Goal
-  //- project-stat.flex-1.mx-5(:class="{'animate-pulse': !props.meta}")
+  //- project-stat(:class="{'animate-pulse': !props.meta}")
     //- TODO Dai/mo vs DAI
     template(v-slot:header)
       h6 🌈&nbsp; Goal
@@ -124,34 +142,51 @@ section.project-stats.flex.w-full_10.-mx-5
       .flex.items-end
         | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
         span.ml-2(v-if="props.meta.goal >= 1000", style="font-size:0.75em") K
-      .absolute.bottom-0.right-0.p-22.flex.items-center
-        svg-dai.h-16.text-violet-650
+      .absolute.bottom-22.right-24.flex.items-center
+        svg-dai.h-18.text-violet-650
         span.font-semibold.font-sans.text-base(v-if="isMonthly") /MO
     template(v-else) ...
 
-  //- Total Revenue
-  project-stat.flex-1.mx-5
-    template(v-slot:header)
-      h6 🧮&nbsp; Total Drips Collected
-      //- alt: 💰🥞🔋📈
-    template(v-if="props.project")
-      .flex.items-end
-        | {{ currency(totalRevenue) }}
-        span.ml-2(v-if="totalRevenue >= 1000", style="font-size:0.75em") K
-      .absolute.bottom-0.right-0.p-22
-        svg-dai.h-16.text-violet-650
-    template(v-else) ...
+  //- (total drips collected)
+  template(v-if="isMonthly")
+    project-stat
+      template(v-slot:header)
+        h6 🧮&nbsp; Total Drips Collected
+        //- alt: 💰🥞🔋📈
+      template(v-if="props.project")
+        .flex.items-end
+          | {{ currency(totalRevenue) }}
+          span.ml-2(v-if="totalRevenue >= 1000", style="font-size:0.75em") K
+        .absolute.bottom-22.right-24
+          svg-dai.h-18.text-violet-650
+      template(v-else) ...
+
+  //- (goal)
+  template(v-if="!isMonthly")
+    project-stat
+      template(v-slot:header)
+        h6 🌈&nbsp; Goal
+      //- (goal)
+      template(v-if="props.meta")
+        .flex.items-end
+          | {{ props.meta.goal ? currency(props.meta.goal) : '?' }}
+          span.ml-2(v-if="props.meta.goal >= 1000", style="font-size:0.75em") K
+        .absolute.bottom-22.right-24.flex.items-center
+          svg-dai.h-18.text-violet-650
+          //- span.font-semibold.font-sans.text-base(v-if="isMonthly") /MO
+      //- (loading)
+      template(v-else)
+        .animate-pulse ...
 
   //- drips
-  router-link.flex-1.mx-5.block(:to="{ name: 'project', params: { address: props.project.id }, hash: '#drips' }")
-    project-stat.w-full(:class="{'animate-pulse': !drips}")
-      template(v-slot:header)
-        h6 💧&nbsp; Drips to
-        //- h6.flex.items-center
-          div
-            <icon-split/>
-          | Splits
-      template(v-if="drips") {{ drips.length }}
-      template(v-else) ...
+  project-stat.w-full(:class="{'animate-pulse': !drips}")
+    template(v-slot:header)
+      h6 💧&nbsp; Drips to
+      //- h6.flex.items-center
+        div
+          <icon-split/>
+        | Splits
+    template(v-if="drips") {{ drips.length }}
+    template(v-else) ...
     //- .flex.items-center 0 <span class="hiddenff ml-3" style="font-size:0.65em">💦</span>
 </template>

@@ -6,7 +6,9 @@ import ProjectStats from '@/components/ProjectStats'
 import SvgDai from '@/components/SvgDai'
 import SvgQuestionMarkEncircled from '@/components/SvgQuestionMarkEncircled'
 import AvailableFundsBar from '@/components/AvailableFundsBar'
+import ModalCollectDrips from '@/components/ModalCollectDrips'
 import { ipfsUrl, toDAI, round } from '@/utils'
+import { BigNumber as bn } from 'ethers'
 
 const props = defineProps({
   project: Object
@@ -18,16 +20,22 @@ const drips = ref()
 const dripsPct = computed(() => drips.value?.reduce((acc, curr) => acc + curr.percent, 0))
 const projectRt = { name: 'project', params: { address: props.project.id } }
 
-const isUsersProject = computed(() => props.project.projectOwner === store._state.data.address)
+const isAdmin = computed(() => props.project.projectOwner === store._state.data.address)
+const isStreaming = props.project.tokenTypes[0].streaming
 
-// collectable: [drips, splits]
+const collectModalOpen = ref(false)
+
+// collectable ([dripsWei, splitsWei])
 const collectableAmts = ref()
-// add drips + splits together
-const totalCollectableDAI = computed(() => collectableAmts.value && toDAI(collectableAmts.value[0].add(collectableAmts.value[1])))
+
+// total collectable (add drips + splits together)
+const totalCollectable = computed(() => collectableAmts.value && collectableAmts.value[0].add(collectableAmts.value[1]))
+
 // format for UI
-const totalCollectableDAIFrmttd = computed(() => !collectableAmts.value ? -1
-  : totalCollectableDAI.value > 0 && totalCollectableDAI.value < 0.01 ? '<0.01'
-    : round(totalCollectableDAI.value))
+const totalCollectableDAI = computed(() => {
+  if (!collectableAmts.value) return -1
+  return toDAI(totalCollectable.value)
+})
 
 // current funding (received from progress bar)
 const currentFundingAmt = ref(-1)
@@ -52,10 +60,18 @@ const getCollectable = () => {
     .then(amounts => { collectableAmts.value = amounts })
 }
 
-onBeforeMount(() => {
-  // get meta
+const getProject = () => {
   store.dispatch('getProjectMeta', { projectAddress: props.project.id })
     .then(data => { meta.value = data })
+}
+
+const onCollected = () => {
+  getProject()
+  getCollectable()
+}
+
+onBeforeMount(() => {
+  getProject()
   // get drips
   store.dispatch('getSplitsReceivers', props.project.id)
     .then(receivers => { drips.value = receivers.percents })
@@ -79,67 +95,56 @@ onBeforeMount(() => {
           | {{ meta ? meta.name : $store.getters.addrShort(props.project.id) }}
 
     //- (join btn)
-    template(v-if="!isUsersProject")
-      router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt")
-        | View
+    router-link.btn.btn-mdd.btn-violet.px-40.text-lg.font-semibold(:to="projectRt")
+      | View
 
   //- progress bar
-  project-progress-bar.mt-20.mb-20.bg-indigo-800(v-if="meta && project", :meta="meta", :project="project", rightSide="percent", @currentFundingAmt="amt => { currentFundingAmt = amt }")
+  project-progress-bar.mt-20.mb-20.bg-indigo-800(v-if="meta && project", :meta="meta", :project="project", @currentFundingAmt="amt => { currentFundingAmt = amt }")
 
   //- (funds)
-  template(v-if="isUsersProject")
-    .panel.mt-20.bg-indigo-800.rounded-2xlb.p-10
+  template(v-if="isAdmin")
+    .panel.mt-20.bg-indigo-800.rounded-2xlb(:class="{'p-10': isStreaming}")
 
-      div
-        .h-80.mt-5.px-32.rounded-full.bg-indigo-850.grid.grid-cols-2.gap-72.font-semibold
+      //- (monthly drips in)
+      template(v-if="isStreaming")
+        div
+          .h-80.mb-10.px-32.rounded-full.bg-indigo-850.font-semibold
 
-            .w-full.flex.items-center.justify-between
-              .flex-1.text-xl.text-violet-650 Monthly Drips In
-              .flex.items-center.text-white
-                .text-xl(:class="{'animate-pulse': currentFundingAmt < 0 }")
-                  | {{ currentFundingAmt < 0 ? '...' : round(toDAI(currentFundingAmt)) }}
-                svg-dai.h-20.ml-12
-                .text-lgg.tracking-tight /MO
-                //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
-
-            .w-full.flex.items-center.justify-between
-              .flex-1.text-xl.text-violet-650 Fully Collectable
-              .flex.items-center.text-white
-                .text-xl 26 days
-
-        //- .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
-
-      .mt-8.grid.grid-cols-1.gap-5
-        //- .h-80.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
-            .flex-1.text-xl.text-violet-650 Members
-            .flex.items-center.text-white
-              .text-xl 3
-
-        .flex.w-full.items-center
-          .flex-1
-            .h-80.pl-32.pr-12.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
-                .flex-1.text-xl.text-violet-650.flex.items-center
-                  | Collectable Today
-                  //- svg-question-mark-encircled.ml-18
-
+              .h-80.w-full.flex.items-center.justify-between
+                .flex-1.text-xl.text-violet-650 Monthly Drips-In
                 .flex.items-center.text-white
-                  .text-xl(:class="{'animate-pulse': totalCollectableDAIFrmttd < 0}")
-                    | {{ totalCollectableDAIFrmttd < 0 ? '...' : totalCollectableDAIFrmttd }}
-                  svg-dai.h-20.ml-12.mr-20
-                  //- .text-xl.tracking-tight.text-violet-650 /MO
-                  button.btn.btn-md.btn-violet.px-20.font-semibold.text-lg.notouch_hover_ring
-                    | Collect
-          //- .h-80.flex.items-center.justify-center.p-12.bg-indigo-850.rounded-full
-            button.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
-          //- button.ml-6.h-80.rounded-full.bg-violet-600.flex.items-center.px-36.font-semibold.text-lgg Collect
+                  .text-xl(:class="{'animate-pulse': currentFundingAmt === -1 }")
+                    | {{ currentFundingAmt === -1 ? '...' : toDAI(currentFundingAmt) }}
+                  svg-dai.h-20.ml-12
+                  .text-lgg.tracking-tight /MO
+                  //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
 
-            //- svg-dai.h-20.ml-12
-    //- available-funds-bar.bg-indigo-800(:amts="collectableAmts", @collect="collect", :tx="tx", :dripPct="dripsPct")
-      template(v-slot:allfunds) Collectable Funds
-      template(v-slot:toyou)
-        span.text-white You Receive
+              //- .w-full.flex.items-center.justify-between
+                .flex-1.text-xl.text-violet-650 Fully Collectable
+                .flex.items-center.text-white
+                  .text-xl 26 days
+
+          //- .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
+
+      .h-80.pl-32.pr-12.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
+          .flex-1.text-xl.text-violet-650.flex.items-center
+            template(v-if="isStreaming") Collectable Today
+            template(v-else) Collectable Funds
+            //- svg-question-mark-encircled.ml-18
+
+          .flex.items-center.text-white
+            .text-xl(:class="{'animate-pulse': totalCollectableDAI < 0}")
+              | {{ totalCollectableDAI < 0 ? '...' : totalCollectableDAI }}
+            svg-dai.h-20.ml-12.mr-20
+            //- (collect btn)
+            template(v-if="totalCollectable")
+              button.btn.btn-md.btn-violet.px-24.font-semibold.text-lg.notouch_hover_ring(, @click="collectModalOpen = true", :disabled="!totalCollectable.gt(0)")
+                | Collect
 
   //- stats
   project-stats.mt-20(v-if="project", :project="project", :meta="meta", :drips="drips")
 
+  //- collect modal
+  modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")
+    template(v-slot:header) Collect Drips for<br>"{{ meta.name }}"
 </template>

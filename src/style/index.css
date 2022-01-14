@@ -81,7 +81,7 @@ html {
 .btn-outline {
   @apply border border-violet-700;
   &:not([disabled]) {
-    @apply notouch_hover_border-white notouch_hover_bg-violet-600;
+    @apply notouch_hover_ring;
   }
 }
 .btn-outline-orange{

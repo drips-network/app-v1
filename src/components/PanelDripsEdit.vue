@@ -253,7 +253,7 @@ panel(icon="💧")
         .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
           .pl-32.text-xl.font-semibold
             | Balance
-          .pr-20.flex.items-center(:class="{'text-red-500': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
+          .pr-20.flex.items-center(:class="{'text-red-500ff': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
             span.text-2xl.font-semibold {{ newBalance }}
             svg-dai.ml-12(size="xl")
 

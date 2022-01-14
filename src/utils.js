@@ -1,11 +1,12 @@
 import { BigNumber as bn, constants, utils } from 'ethers'
 import store from '@/store'
 
-const oneMonth = 30 * 24 * 60 * 60
+export const oneMonth = 30 * 24 * 60 * 60
 
 export const ipfsUrl = hash => process.env.VUE_APP_IPFS_GATEWAY + '/ipfs/' + hash
 
-export const round = num => (Math.floor(num * 100) / 100).toFixed(2)
+// clip to nearest hundredth (dont round up)
+export const round = (num, dec = 2) => (Math.floor(num * 100) / 100).toFixed(dec)
 
 export const fromWei = (wei) => {
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
@@ -16,13 +17,17 @@ export const toWei = (dai) => {
   return utils.parseUnits(dai.toString())
 }
 
-export const toDAI = (wei, frmt) => {
+export const toDAI = (wei, frmt = 'pretty', roundTo) => {
   let dai = utils.formatEther(wei)
-  if (frmt === 'financial') {
-    // 1.00 - clip to nearest hundredth before toFixed (so no rounding)
-    dai = round(dai)
+  if (frmt === 'exact') {
+    return dai
   }
-  return dai
+  // tiny amount
+  if (dai > 0 && dai < 0.01) {
+    return '<0.01'
+  }
+  // rounding
+  return round(dai, roundTo)
 }
 
 export const toDAIPerMo = (wei) => {

@@ -1,10 +1,10 @@
 import { createStore } from 'vuex'
 import { toRaw } from 'vue'
-import { ethers as Ethers } from 'ethers'
+import { ethers as Ethers, BigNumber as bn } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import api, { queryProjectMeta, queryProject } from '@/api'
-import { validateSplits, getDripsWithdrawable } from '@/utils'
+import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 // contracts
 import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
 
@@ -350,6 +350,29 @@ export default createStore({
       return contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
     },
 
+    async getFundingTotal (_, { projectAddress, isStreaming }) {
+      try {
+        const contract = getProjectContract(projectAddress)
+        const event = isStreaming ? ['NewStreamingToken', 4] : ['NewToken', 3]
+        
+        // get events...
+        const events = await contract.queryFilter(event[0])
+        
+        // add it up
+        let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0)) 
+
+        if (isStreaming) {
+          // convert to monthly streaming rate
+          totalWei = totalWei.mul(oneMonth)
+        }
+
+        return totalWei 
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
     // async waitForMint ({ state }, { projectAddress, isStreaming, typeId }) {
     //   const contract = getProjectContract(projectAddress)
     //   const eventName = isStreaming ? 'NewStreamingToken' : 'NewToken'
@@ -669,10 +692,14 @@ export default createStore({
 
     async collectFunds ({ dispatch }, { projectAddress, address }) {
       try {
+        // get splits
         const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
-        // project or hubs contract?
+        
+        // from project or hubs contract?
         const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
         const contractSigner = contract.connect(signer)
+        
+        // sign...
         let tx
         if (projectAddress) {
           tx = await contractSigner.collect(currSplits)

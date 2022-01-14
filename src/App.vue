@@ -7,6 +7,8 @@ import SvgLogoDrop from './components/SvgLogoDrop.vue'
 import UserAvatar from '@/components/UserAvatar'
 import SvgX from './components/SvgX.vue'
 import SvgDai from './components/SvgDai.vue'
+import SvgDiscord from './components/SvgDiscord.vue'
+import SvgTwitter from './components/SvgTwitter.vue'
 import SvgLogoRadicle from './components/SvgLogoRadicle.vue'
 import Addr from '@/components/Addr'
 
@@ -30,7 +32,7 @@ store.dispatch('init')
       //- left side
       .flex.items-center.h-80.rounded-full.bg-indigo-700.pr-32
         //- home / landing site link
-        a.flex.items-center.-mt-px(to="http://www.drips.network")
+        a.flex.items-center.-mt-px(href="http://www.drips.network")
           .w-80.flex.justify-center.items-center.pb-px
             svg-logo-drop
           svg-logo.text-violet-650
@@ -48,7 +50,7 @@ store.dispatch('init')
             .btn-darker.pl-8.text-violet-650.font-semibold.rounded-full
               router-link.flex.items-center.text-base.font-semibold(:to="{name: 'user', params: {address: $store.state.address}}")
                 //- avi
-                user-avatar.w-36.h-36.mr-10(:address="$store.state.address", blockieSize="28")
+                user-avatar.w-40.h-40.mr-10(:address="$store.state.address", blockieSize="40")
                 //- address
                 //- | {{ $store.getters.addrShort($store.state.address) }}
                 addr(:address="store.state.address", :key="store.state.address")
@@ -69,7 +71,7 @@ store.dispatch('init')
   //- help / docs link
   .mt-196.bottom-6.flex.justify-between
     //- radicle link
-    a.h-80.pl-18.pr-16.flex.items-center.bg-indigo-800.text-violet-650.rounded-full.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
+    a.h-80.pl-18.pr-16.flex.items-center.bg-indigo-700.text-violet-650.rounded-full.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
       //- .w-56.h-56.flex.items-center.justify-center.bg-indigo-900.rounded-full.text-xl 🌱
       .ml-16.flex.mt-2.text-base.font-semiboldff
         span.opacity-75 by
@@ -79,13 +81,20 @@ store.dispatch('init')
       .ml-3.-mr-1.w-56.h-56.flex.items-center.justify-center.bg-indigo-900ff.rounded-full.text-xl.mb-2 🌱
 
     .flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.px-12
-      a.mr-5.text-lg.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://gallant-shaw-eaf02b.netlify.app/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Help
-
-      .text-md.font-semibold.h-56.px-24.rounded-full.flex.items-center.justify-center.bg-indigo-950
+      //- twitter link
+      a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.w-54.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://twitter.com/dripsnetwork", target="_blank", rel="noopener noreferrer")
+        svg-twitter.w-36
+      //- discord channel link
+      a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.w-54.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://discord.gg/zCjkTT4MnZ", target="_blank", rel="noopener noreferrer")
+        svg-discord.h-36
+      //- docs link
+      a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.px-20.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://docs.drips.network/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Docs
+      //- dai/usd conversion tip
+      a.text-md.font-semibold.h-54.px-24.rounded-full.flex.items-center.justify-center.bg-indigo-950.notouch_hover_ring(href="https://www.coinbase.com/price/dai", target="_blank", rel="noopener noreferrer")
         svg-dai.h-16
         | 1 ≈ $1
     //-
-      .h-56.bg-indigo-900.border-2ff.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center
+      .h-52.bg-indigo-900.border-2ff.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center
         svg-dai.h-16
         | 1 ≈ $1
       .h-56.bg-indigo-900.border-2.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center Help

@@ -5,6 +5,7 @@ import store from '@/store'
 import UserAvatar from '@/components/UserAvatar'
 import InputBody from '@/components/InputBody'
 import ModalMint from '@/components/ModalMint'
+import ModalCollectDrips from '@/components/ModalCollectDrips'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
@@ -35,6 +36,7 @@ const editProject = ref(false)
 
 const canEdit = computed(() => project.value?.projectOwner === store.state.address)
 const editMenuOpen = ref(false)
+const collectModalOpen = ref(false)
 
 const getProjectMeta = async (ipfsHash) => {
   meta.value = await store.dispatch('getProjectMeta', { ipfsHash })
@@ -46,6 +48,7 @@ const getProject = async () => {
     // get project...
     project.value = await store.dispatch('getProject', projectAddress)
 
+    // !! not found
     if (!project.value) {
       status.value = 'Not Found :('
       return false
@@ -54,6 +57,7 @@ const getProject = async () => {
     // get meta...
     await getProjectMeta(project.value.ipfsHash)
 
+    // !! no info
     if (!meta.value) {
       status.value = 'Info Missing :/'
       return false
@@ -62,6 +66,7 @@ const getProject = async () => {
     // get drips
     store.dispatch('getSplitsReceivers', projectAddress)
       .then(receivers => { drips.value = receivers.percents })
+      .catch(console.error)
 
     // missing project info?
     if (!project.value.projectOwner) {
@@ -75,7 +80,7 @@ const getProject = async () => {
     tokenType.value = project.value.tokenTypes[0]
     // set min
     minDAI.value = tokenType.value.streaming ? toDAIPerMo(tokenType.value.minAmt)
-      : Number(toDAI(tokenType.value.minAmt)).toFixed(0)
+      : Number(toDAI(tokenType.value.minAmt), 'exact').toFixed(0)
 
     return true
   } catch (e) {
@@ -83,6 +88,17 @@ const getProject = async () => {
     status.value = e.message ? 'Error: ' + e.message : 'Error'
   }
 }
+
+const onMintModalClose = () => {
+  mintModal.value = false
+  getProject() // fetch in case new mints
+}
+
+// const collectableAmts = ref()
+// const getCollectable = () => {
+//   store.dispatch('getCollectable', { projectAddress: props.project.id })
+//     .then(amounts => { collectableAmts.value = amounts })
+// }
 
 onBeforeMount(() => getProject())
 
@@ -92,6 +108,7 @@ provide('projectMeta', meta)
 <template lang="pug">
 article.project.pb-96
 
+  //- (loading/status...)
   template(v-if="!meta")
     .panel-indigo.my-10.py-12.px-10(:class="{'animate-pulse': !status}")
       .h-80.rounded-full.bg-indigo-800.px-28.flex.items-center.text-md.font-medium
@@ -99,21 +116,31 @@ article.project.pb-96
       .h-160
       .h-160
 
+  //- 
   template(v-else)
     //- main project panel
     section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
       project-progress-bar.mx-10.bg-indigo-800(v-if="project && meta", :meta="meta", :project="project")
 
+      //- header
       header.text-center.relative.pt-44
         //- owner
-        .absolute.top-0.left-0.pt-10.pl-12
-          //- profile link
-          router-link.flex.items-center.notouch_hover_bg-indigo-800.p-8.rounded-full(:to="{name: 'user', params: {address: project.projectOwner}}")
-            //- avatar
-            user-avatar.w-36.h-36.mr-12(:address="project.projectOwner", blockieSize="36")
-            .text-violet-600.font-semibold.pr-6
-              addr(:address="project.projectOwner")
+        .absolute.top-0.left-0.w-full.pt-10.flex.justify-between
+          //- left side
+          div.pl-12
+            //- profile link
+            router-link.flex.items-center.bg-indigo-800.p-8.rounded-full.notouch_hover_ring(:to="{name: 'user', params: {address: project.projectOwner}}")
+              //- avatar
+              user-avatar.w-36.h-36.mr-12(:address="project.projectOwner", blockieSize="36")
+              .text-violet-600.font-semibold.pr-6
+                addr(:address="project.projectOwner", :youOn="true")
+          //- right side
+          //- template(v-if="canEdit")
+            .pr-16
+              button.btn.btn-md.btn-violet.text-md.px-28.notouch_hover_ring.font-semibold(@click="collectModalOpen = true")
+                | Collect
+
 
         //- project image
         figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative.overflow-hidden
@@ -214,8 +241,10 @@ article.project.pb-96
                 | Close
                 svg-x-circle.h-32.ml-12.text-white.opacity-30
 
-    modal-mint(v-if="tokenType", :open="mintModal", @close="mintModal = false", :projectAddress="projectAddress", :tokenType="tokenType")
+    modal-mint(v-if="tokenType", :open="mintModal", @close="onMintModalClose", @minted="getProject", :projectAddress="projectAddress", :tokenType="tokenType")
 
     modal-edit-project-info(v-if="editProject", :open="editProject", @updated="getProjectMeta", @close="editProject = editMenuOpen = false", :meta="meta", :projectAddress="projectAddress")
 
+    modal-collect-drips(v-if="meta && collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", @collected="getProjectMeta", :projectAddress="projectAddress")
+      template(v-slot:header) Collect drips for<br>"{{ meta.name }}"
 </template>

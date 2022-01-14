@@ -14,7 +14,8 @@ const props = defineProps({
   projectAddress: String,
   tokenType: Object
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'minted'])
+
 const meta = inject('projectMeta')
 
 // token attributes
@@ -78,6 +79,7 @@ const mint = async () => {
 
     await state.mintTx.wait()
 
+    emit('minted')
     state.nft = true
   } catch (e) {
     console.error(e)

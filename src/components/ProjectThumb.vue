@@ -25,7 +25,7 @@ onBeforeMount(async () => {
 <template lang="pug">
 .project-thumb-progress.block.panel.bg-indigo-700.rounded-2xlb.p-16.text-violet-650
   //- header row
-  header.-mt-4.flex.justify-between.items-center
+  header.-mt-8.flex.justify-between.items-center
     .flex.items-center
       //- left side
       router-link.h-80.flex.items-center.notouch_hover_text-white.transition.duration-150(:to="{name: 'project', params: { address: props.project.id }}")
@@ -41,7 +41,7 @@ onBeforeMount(async () => {
     router-link.btn.btn-md.btn-violet.px-28.font-semibold.text-md.mr-10(:to="{name: 'project', params: { address: props.project.id }}") View
 
   //- progress bar row
-  .mt-4.mx-1.h-80.rounded-full.bg-indigo-800(:class="{'animate-pulse': !meta}")
+  .mt-6.mx-1.h-80.rounded-full.bg-indigo-800(:class="{'animate-pulse': !meta}")
     project-progress-bar.text-white(v-if="meta", :meta="meta", :project="props.project")
 
   //- info row
@@ -49,7 +49,7 @@ onBeforeMount(async () => {
     //- descrip
     .flex.rounded-full.bg-indigo-800ff.borderff.border-violet-800.items-center
       //- truncate wrapper
-      .flex-1.min-w-0.truncate.inline.mx-20.text-base.font-normal
+      .flex-1.min-w-0.truncate.inline.mx-20.text-md
          .inline
             | {{ meta ? meta.descrip : '...' }}
 

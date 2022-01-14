@@ -55,7 +55,7 @@ section.user-projects
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;raising funds in <b>{{ projects.length }} {{ projects.length === 1 ? 'community' : 'communities' }}</b>.
+        | &nbsp;#[b raising funds] in <b>{{ projects.length }} {{ projects.length === 1 ? 'community' : 'communities' }}</b>.
 
     ul
       //- projects...
@@ -64,6 +64,6 @@ section.user-projects
 
     footer(v-if="!projects.length")
       .mt-40.flex.justify-center
-        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/create") Create ✨
+        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/create") Create a Community ✨
 
 </template>
