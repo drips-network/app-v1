@@ -81,7 +81,7 @@ article.explore.pt-16.px-24
         section.px-12ff
           info-bar.mb-16.text-md
             .w-full.text-center.px-32
-              | #[b {{ projects.length }} communities] are #[b raising funds] with #[b NFT memberships] 🧩
+              | These #[b communities] are #[b raising funds] with #[b NFT memberships] 🧩
 
           //- .my-40.text-base.text-violet-650.text-center
             | #[b {{ projects.length }} communities] are #[b raising funds] with #[b NFT memberships] 🧩
