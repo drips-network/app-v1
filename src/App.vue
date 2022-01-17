@@ -32,7 +32,7 @@ store.dispatch('init')
       //- left side
       .flex.items-center.h-80.rounded-full.bg-indigo-700.pr-32
         //- home / landing site link
-        a.flex.items-center.-mt-px(href="http://www.drips.network")
+        router-link.flex.items-center.-mt-px(to="/")
           .w-80.flex.justify-center.items-center.pb-px
             svg-logo-drop
           svg-logo.text-violet-650
