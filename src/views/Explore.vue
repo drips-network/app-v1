@@ -9,6 +9,8 @@ import UserAvatar from '@/components/UserAvatar'
 import DripsAll from '@/components/DripsAll'
 import InfoBar from '@/components/InfoBar'
 import HeaderLarge from '@/components/HeaderLarge'
+import SpotlightRecipient from '@/components/SpotlightRecipient'
+import store from '@/store'
 
 const projects = ref()
 
@@ -39,8 +41,29 @@ const getProjects = async () => {
   }
 }
 
+const splits = ref()
+const getSplits = async () => {
+  try {
+    const events = await store.dispatch('getSplitsReceivers')
+    // reduce by address (current state)
+    const currentEvents = []
+    events.reverse()
+      .filter(event => event.args[1].length)
+      .forEach(event => {
+        if (!currentEvents.find(e => e.args[0] === event.args[0])) {
+          currentEvents.push(event)
+        }
+      })
+
+    splits.value = currentEvents
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 onBeforeMount(() => {
   getProjects()
+  getSplits()
 })
 </script>
 
@@ -60,7 +83,24 @@ article.explore.pt-16.px-24
 
       template(v-else)
         ul
+          //- info-bar.mb-16.text-md
+            .w-full.text-center.px-32
+              | Some #[b notable drips] 💧 on the #[b network]
           li
+            //- ricmoo.eth
+            spotlight-recipient.my-48ff(recipient="0x5555763613a12d8f3e73be831dff8598089d3dca", :allSplits="splits")
+
+            //- walletconnect.eth
+            spotlight-recipient.my-48ff(recipient="0xcbec15583a21c3ddad5fab658be5b4fe85df730b", :allSplits="splits")
+
+            //- soliditylang.eth
+            spotlight-recipient.my-48ff(recipient="0x151ef20a3ade1cc1161391594f8a32461389a54e", :allSplits="splits")
+
+            //- dapptools.eth
+            //- INCORRECT?
+            //- spotlight-recipient.my-20(recipient="0x36de990133d36d7e3df9a820aa3ede5a2320de71")
+
+          //- li
             drip-row.mb-4(:drip="{ sender: '0x8b1A1aF63bb9b3730f62c56bDa272BCC69dF4CC7'.toLowerCase(), receiver: 10, percent: 100 }")
 
           //- template(v-if="projects")
