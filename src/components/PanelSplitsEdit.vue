@@ -82,11 +82,14 @@ const update = async () => {
     if (props.projectAddress) {
       params.projectAddress = props.projectAddress
     }
+
     // submit...
+    txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('updateAddressSplits', params)
     console.log('update splits tx', tx.value)
 
     // wait for tx...
+    txMsg.value = { message: 'Waiting for transaction confirmation...' }
     txReceipt.value = await tx.value.wait()
 
     // success

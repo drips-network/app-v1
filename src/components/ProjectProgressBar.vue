@@ -28,7 +28,7 @@ const pctPretty = computed(() => {
 <template lang="pug">
 .h-80.rounded-full.relative.flex(v-if="props.meta.goal")
   //- bar
-  .relative.z-10.max-w-full.min-w-80.rounded-full.flex.justify-end.items-center.px-24.bg-gradient-to-r.from-turquoise-500.to-greenbright-500.overflow-hidden(:style="{width: Math.max(0, pct) + '%', transition: 'width 1000ms 100ms, opacity 500ms'}", :class="{'opacity-0': !pct}")
+  .relative.z-10.max-w-full.min-w-80.rounded-full.flex.justify-end.items-center.px-24.bg-gradient-to-r.from-turquoise-500.to-greenbright-500.overflow-hidden(:style="{width: Math.max(0, pct) + '%', transition: 'width 1000ms 100ms, opacity 500ms'}", :class="{'opacity-0': pct === -1}")
     //- (percent internal)
     template(v-if="rightSide !== 'percent'")
       div.transition.duration-500.delay-200.font-semibold(:class="{'opacity-0': pct < 0}")

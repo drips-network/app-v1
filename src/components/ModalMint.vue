@@ -82,6 +82,8 @@ const mint = async () => {
       return
     }
 
+    // begin tx
+    state.mintTxMsg = { message: 'Confirm the transaction in your wallet.' }
     if (isStreaming) {
       // convert to wei
       const topUpAmt = toWei(payTotalDAI.value)
@@ -105,6 +107,7 @@ const mint = async () => {
     console.log('mint tx', state.mintTx)
 
     // wait for tx...
+    state.mintTxMsg = { message: 'Waiting for transaction confirmation...' }
     await state.mintTx.wait()
 
     emit('minted')
