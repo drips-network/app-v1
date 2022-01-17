@@ -5,7 +5,7 @@ import store from '@/store'
 import Addr from '@/components/Addr'
 import UserAvatar from '@/components/UserAvatar'
 
-const props = defineProps(['recipient', 'allSplits'])
+const props = defineProps(['recipient', 'allSplits', 'sender'])
 
 const supporters = computed(() => {
   if (!props.allSplits) {
@@ -16,18 +16,27 @@ const supporters = computed(() => {
   // map to senders
   return events.map(e => e.args[0])
 })
+
+// const receivers = computed(() => {
+//   if (!props.allSplits || !props.sender) {
+//     return []
+//   }
+//   // get last update by sender
+//   const lastUpdate = props.allSplits.find(e => e.args[0].toLowerCase() === props.sender.toLowerCase())
+//   return lastUpdate.args[0]
+// })
 </script>
 
 <template lang="pug">
 div.mb-80
   .flex.justify-start
     .h-80.bg-indigo-950.flex.items-center.rounded-full
-      .px-24.text-base.text-greenbright-400.text-violet-650ff.flex.items-center
+      .pl-24.pr-36.text-md.text-greenbright-400.text-violet-650ff.flex.items-center
         user-avatar.w-24.h-24(:address="props.recipient")
         .inline.flex-shrink-0.leading-none
           | #[addr.ml-12.font-bold(:address="props.recipient")] receives drips from #[b {{ supporters.length }} addresses].
 
-  .mt-12.flex.h-80.justify-center.px-24.rounded-full.text-violet-650.text-md.relative
+  .mt-12.flex.h-80.justify-end.px-24ff.rounded-full.text-violet-650.text-md.relative
 
     .h-80.flex.items-center.rounded-full.bg-indigo-700.py-10.px-6.w-260ff.mr-2
       template(v-if="supporters")
