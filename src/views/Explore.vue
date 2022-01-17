@@ -11,15 +11,18 @@ import HeaderLarge from '@/components/HeaderLarge'
 import SpotlightRecipient from '@/components/SpotlightRecipient'
 import store from '@/store'
 import { formatSplitsEvents } from '@/utils'
+import spotlightJSON from '../../content/spotlight.json'
 
-const spotlights = [
+const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const spotlights = spotlightJSON[networkName] || []
+/* const spotlights = [
   // soliditylang.eth
   { address: '0x151ef20a3ade1cc1161391594f8a32461389a54e', highlight: 'sender' },
   // ricmoo.eth
   { address: '0x5555763613a12d8f3e73be831dff8598089d3dca', highlight: 'receiver' },
   // walletconnect.eth
   { address: '0xcbec15583a21c3ddad5fab658be5b4fe85df730b', highlight: 'receiver' }
-]
+] */
 
 const projects = ref()
 

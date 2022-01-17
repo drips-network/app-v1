@@ -288,7 +288,7 @@ export default createStore({
         }
 
         if (!ipfsHash || ipfsHash.length !== 46) {
-          console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
+          // console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
           return null
         }
 
