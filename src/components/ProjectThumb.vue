@@ -3,6 +3,7 @@ import { ref, computed, onBeforeMount } from 'vue'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
+import FlexTruncate from '@/components/FlexTruncate'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import store from '@/store'
 import { ipfsUrl } from '@/utils'
@@ -44,7 +45,7 @@ onBeforeMount(() => getMeta())
       //- left side
       router-link.h-80.flex.items-center.notouch_hover_text-white.transition.duration-150(:to="{name: 'project', params: { address: props.project.id }}")
         //- avatar
-        .w-64.h-64.relative.rounded-full.overflow-hidden
+        .w-60.h-60.ml-4.relative.rounded-full.overflow-hidden
           img.absolute.overlay.object-cover.object-center(v-if="meta && meta.image", :src="ipfsUrl(meta.image)", alt="avatar")
           img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
         //- name
@@ -59,17 +60,14 @@ onBeforeMount(() => getMeta())
     project-progress-bar.text-white(v-if="meta", :meta="meta", :project="props.project", :currentFundingWei="currentFundingWei")
 
   //- info row
-  .h-56.mt-10.flex.w-full.justify-between.font-semibold.text-base
+  .h-56.mt-10.flex.w-full.items-center.justify-between.font-semibold.text-base
     //- descrip
-    .flex.rounded-full.bg-indigo-800ff.borderff.border-violet-800.items-center
-      //- truncate wrapper
-      .flex-1.min-w-0.truncate.inline.mx-20.text-md
-         .inline
-            | {{ meta ? meta.descrip : '...' }}
+    flex-truncate.flex-1.mx-20.text-md
+      | {{ meta ? meta.descrip : '...' }}
 
     .flex
       //- creator
-      router-link.ml-6.flex-shrink-0.flex.rounded-full.bg-indigo-800.items-center.justify-between.pl-24.pr-8.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: props.project.owner }}")
+      router-link.ml-6.flex-shrink-0.flex.rounded-full.bg-indigo-800.items-center.justify-between.pl-24.p-8.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: props.project.owner }}")
         | Creator
         .ml-24
           user-avatar.w-40.h-40(:address="props.project.owner", blockieSize="40")
@@ -77,17 +75,18 @@ onBeforeMount(() => getMeta())
             user-avatar.w-40.h-40(:address="props.project.owner", blockieSize="40")
             addr.mx-12(:address="props.project.owner")
 
-      //- members
-      .ml-6.flex-shrink-0.flex.rounded-full.bg-indigo-800.items-center.justify-between.pl-24.pr-10
-        | Members
-        ul.ml-24.flex.flex-row-reverse
-          //- final count
-          template(v-if="members.length - 3 > 0")
-            .min-w-40.px-12.h-40.-ml-8.flex.items-center.justify-center.rounded-2xlb.bg-indigo-950 +{{ members.length - 1 }}
-          //- avatars...
-          li(v-for="(address, i) in members.slice(0, 3)", :class="{'-mr-8': i > 0}")
-            router-link.relative.notouch_hover_ring.w-40.h-40.rounded-full.block(:to="{ name: 'user', params: { address }}")
-              user-avatar.w-40.h-40(:address="address", blockieSize="40")
+      //- (members)
+      template(v-if="members.length")
+        .ml-6.flex-shrink-0.flex.rounded-full.bg-indigo-800.items-center.justify-between.pl-24.pr-10
+          | Members
+          ul.ml-24.flex.flex-row-reverse
+            //- final count
+            template(v-if="members.length - 3 > 0")
+              .min-w-40.px-12.h-40.-ml-8.flex.items-center.justify-center.rounded-2xlb.bg-indigo-950 +{{ members.length - 1 }}
+            //- avatars...
+            li(v-for="(address, i) in members.slice(0, 3)", :class="{'-mr-8': i > 0}")
+              router-link.relative.notouch_hover_ring.w-40.h-40.rounded-full.block(:to="{ name: 'user', params: { address }}")
+                user-avatar.w-40.h-40(:address="address", blockieSize="40")
 
   //- project-progress-bar.mt-16.bg-indigo-800(v-if="meta", :meta="meta", :project="props.project")
 

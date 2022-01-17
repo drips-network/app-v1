@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
 import SvgDai from '@/components/SvgDai'
+import FlexTruncate from '@/components/FlexTruncate'
 const props = defineProps(['drip', 'alternateColors'])
 const isSummary = typeof props.drip.receiver === 'number'
 const altBg = drip => drip.percent && props.alternateColors
@@ -25,9 +26,8 @@ const receiverRt = computed(() => {
     //- sender avatar / blockie
     user-avatar.w-54.h-54.flex-shrink-0(:address="props.drip.sender", blockieSize="44", :key="props.drip.sender")
 
-    .flex-1.min-w-0.truncate.inline.mx-12.text-center
-      .inline
-        addr.font-bold.inline(:address="props.drip.sender", :youOn="true", :key="props.drip.sender")
+    flex-truncate.flex-1.mx-12.text-center
+      addr.font-bold.inline(:address="props.drip.sender", :youOn="true", :key="props.drip.sender")
 
   //- drip icon
   .w-80.h-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
