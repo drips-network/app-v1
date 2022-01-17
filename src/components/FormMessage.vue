@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from 'vue'
 const props = defineProps({
-  body: { type: Object, default: () => ({ message: '(Missing Info)' }) }
+  body: { type: Object, default: () => ({ message: '(Missing Info)' }) },
+  border: Boolean
 })
 const color = computed(() => {
   return props.body.status === -1 ? 'text-red-600' // error
@@ -22,7 +23,7 @@ const color = computed(() => {
 //- outer
 .px-40.flex.justify-center.text-center.text-ms.leading-normal(:class="[color]")
   //- box
-  .borderff.border-current.py-16.px-24.rounded-lg.bg-indigo-950
+  .py-16.px-24.rounded-lg.bg-indigo-950(:class="{'border border-current': props.border}")
     //- (success)
     //- template(v-if="props.body.status > 0")
       div Success!

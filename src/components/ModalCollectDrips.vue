@@ -30,14 +30,17 @@ const collect = async () => {
   try {
     tx.value = null
     txMsg.value = null
-    
+
     // collecting from hub or project?
     const params = props.projectAddress ? { projectAddress: props.projectAddress }
       : { address: store.state.address }
 
     // submit...
+    txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('collectFunds', params)
+
     // wait for tx...
+    txMsg.value = { message: 'Waiting for transaction confirmation...' }
     txReceipt.value = await tx.value.wait()
     tx.value = null
 
@@ -71,9 +74,9 @@ modal(v-bind="$attrs", @close="emit('close')")
     template(v-slot:header)
       dialog-title
         slot(name="header")
-    
+
     template(v-slot:description)
-      dialog-description 
+      dialog-description
         p.mx-auto.leading-snug.text-violet-650(style="max-width:25em")
           template(v-if="!hasFunds")
             | There are no funds to collect.
@@ -116,7 +119,7 @@ modal(v-bind="$attrs", @close="emit('close')")
                   template(v-if="toSplits > 0") -
                   //- amount
                   | {{ toSplits !== -1 ? toSplits : '...' }}
-                  //- 
+                  //-
                   svg-dai.ml-12(size="xl")
 
           //- to owner row

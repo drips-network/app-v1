@@ -54,12 +54,15 @@ const approve = async () => {
     state.approveTxMsg = null
 
     // send...
+    state.approveTxMsg = { message: 'Confirm the transaction in your wallet.' }
     state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
 
     // wait for confirmation...
+    state.approveTxMsg = { message: 'Waiting for transaction confirmation...' }
     const receipt = await state.approveTx.wait() // receipt
 
     state.approved = true
+    state.approveTxMsg = null
   } catch (e) {
     state.approveTxMsg = { status: -1, message: e.message || e }
   }
@@ -169,7 +172,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
           p.text-base.leading-normal Before you can join, you must first #[b allow] the community to #[b withdraw your DAI]{{ isStreaming ? ' periodically to continue your membership' : '' }}.
 
           //- (tx message)
-          form-message.my-28(v-if="state.approveTxMsg", :body="state.approveTxMsg")
+          form-message.my-28(v-if="state.approveTxMsg", :body="state.approveTxMsg", :border="true")
 
           //- allow btn
           .mt-24.flex.justify-center.-mb-4
@@ -201,7 +204,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
           //- (view btn)
           template(v-else)
             router-link.btn.btn-lg.btn-violet.px-48(:to="{name: 'user-communities-joined', params: {address: $store.state.address}}")
-              | View Token
+              | View Membership
 
         tx-link(v-if="state.mintTx && !state.nft", :tx="state.mintTx")
 

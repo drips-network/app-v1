@@ -26,15 +26,17 @@ const update = async () => {
     tx.value = txMsg.value = txReceipt.value = null
 
     // upload to ipfs...
-    txMsg.value = { message: 'Preparing...' }
+    txMsg.value = { message: 'Uploading to IPFS...' }
     const ipfsHash = await pinJSONToIPFS(toRaw(newMeta.value))
     txMsg.value = null
 
     // submit...
+    txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('updateProjectMeta', { address: props.projectAddress, ipfsHash })
     console.log('update community info tx...', tx.value)
 
     // wait for tx...
+    txMsg.value = { message: 'Waiting for transaction confirmation...' }
     txReceipt.value = await tx.value.wait()
 
     // success!

@@ -84,12 +84,12 @@ const approve = async () => {
     approveTxMsg.value = null
 
     // send...
-    state.approveTxMsg = { message: 'Confirm the transaction in your wallet.' }
+    approveTxMsg.value = { message: 'Confirm the transaction in your wallet.' }
     approveTx.value = await store.dispatch('approveDAIContract')
     console.log('approve tx...', approveTx.value)
 
     // wait for confirmation...
-    state.approveTxMsg = { message: 'Waiting for transaction confirmation...' }
+    approveTxMsg.value = { message: 'Waiting for transaction confirmation...' }
     await approveTx.value.wait() // receipt
 
     approved.value = true // topUpWei.value.toString()
@@ -150,7 +150,7 @@ const update = async () => {
     newReceivers = newReceivers.sort((a, b) => (a[0] - b[0]))
 
     // submit...
-    state.txMsg = { message: 'Confirm the transaction in your wallet.' }
+    txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('updateUserDrips', {
       // account: store.state.address,
       lastUpdate: lastUpdate.timestamp, // 0, // block.timestamp,
@@ -162,7 +162,7 @@ const update = async () => {
     console.log('update drips tx', tx.value)
 
     // wait for tx...
-    state.txMsg = { message: 'Waiting for transaction confirmation...' }
+    txMsg.value = { message: 'Waiting for transaction confirmation...' }
     txReceipt.value = await tx.value.wait()
 
     // confirmation
