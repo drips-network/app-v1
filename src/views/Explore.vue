@@ -109,8 +109,8 @@ article.explore.pt-16.px-24
               project-thumb.mb-24(:project="project")
 
   //- communities
-  section.mt-80
-    header-large(icon="🙂")
+  section.mt-196
+    //- header-large(icon="🙂")
       h2 Communities
 
     section.mt-48
