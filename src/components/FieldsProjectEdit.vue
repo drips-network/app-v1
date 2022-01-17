@@ -66,7 +66,7 @@ section.mt-40
     input-body(label="Discord Invite URL", :isFilled="modelValue.discord.length", format="code")
       input(v-model="modelValue.discord", placeholder="https://discord.com/...")
   .my-10
-    input-body(label="Radicle ID", :isFilled="modelValue.radicleID.length", format="code")
+    input-body(label="Radicle Project ID", :isFilled="modelValue.radicleID.length", format="code")
       input(v-model="modelValue.radicleID", placeholder="rad:git:hnrkq4w6pnnzpurokehxs69rbcqt6n4ipdfwy")
   .my-10
     input-body(label="GitHub Project URL", :isFilled="modelValue.githubProject.length", format="code")
