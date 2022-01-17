@@ -202,20 +202,14 @@ export default createStore({
       })
     },
 
-    async createProject ({ state, dispatch }, { project, meta }) {
+    getProvider () {
+      return provider
+    },
+
+    async createProject ({ state, dispatch }, { project }) {
       try {
-        // validate...
-        project.drips = await validateSplits(project.drips, provider)
-
-        // save full data to IPFS/pinata...
-        const ipfsHash = await pinJSONToIPFS(meta)
-        console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
-        project.ipfsHash = ipfsHash
-
-        // create project on chain
         const tx = await newProject({ owner: state.address, ...project })
         console.log('new project tx:', tx)
-
         return tx
       } catch (e) {
         console.error('@createProject', e)
@@ -229,8 +223,8 @@ export default createStore({
       // listen for project created by owner and return prj address
       return new Promise((resolve) => {
         // listener
-        const onNewProject = async (projectAddress, projectOwner) => {
-          console.log('@NewProject', projectAddress, projectOwner)
+        const onNewProject = async (dripTokenTemplate, projectAddress, projectOwner) => {
+          console.log('@NewProject', { dripTokenTemplate, projectAddress, projectOwner, tx })
 
           // if owner matches tx sender...
           if (projectOwner.toLowerCase() === tx.from.toLowerCase()) {

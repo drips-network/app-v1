@@ -9,8 +9,8 @@ import { useRoute, useRouter } from 'vue-router'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import store from '@/store'
-import { toWei, toWeiPerSec, formatSplits, ipfsUrl } from '@/utils'
+import store, { pinJSONToIPFS } from '@/store'
+import { toWei, toWeiPerSec, formatSplits, ipfsUrl, validateSplits } from '@/utils'
 import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 import SvgX from '@/components/SvgX'
 import { constants } from 'ethers'
@@ -18,6 +18,8 @@ import showdown from 'showdown'
 import SvgPen from '@/components/SvgPen'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 import FormMessage from '@/components/FormMessage'
+import TxLink from '@/components/TxLink'
+
 const route = useRoute()
 const router = useRouter()
 
@@ -177,27 +179,40 @@ const openPanelsForReview = () => {
 
 async function submitProject () {
   try {
+    // reset
     tx.value = null
     txMsg.value = null
 
-    // TODO - better UX to break ipfs and create into separate actions with error handling inside this component
-    tx.value = await store.dispatch('createProject', {
-      project: toRaw(project.value),
-      meta: toRaw({
-        ...meta.value,
-        benefits: benefitsInputHtml.value
-      })
+    // prep
+    const myProject = toRaw(project.value)
+    const myMeta = toRaw({
+      ...meta.value,
+      benefits: benefitsInputHtml.value
     })
+
+    // validate...
+    txMsg.value = { message: 'Validating...' }
+    const provider = store.dispatch('getProvider')
+    myProject.drips = await validateSplits(myProject.drips, provider)
+
+    // save full data to IPFS/pinata...
+    txMsg.value = { message: 'Uploading metadata to IPFS...' }
+    const ipfsHash = await pinJSONToIPFS(myMeta)
+    console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+    myProject.ipfsHash = ipfsHash
+
+    // submit...
+    txMsg.value = { message: 'Confirm the transaction in your wallet.' }
+    tx.value = await store.dispatch('createProject', { project: myProject })
     console.log('tx', tx.value)
 
     // wait for tx...
-    projectAddress.value = (await store.dispatch('waitForProjectCreate', tx.value))?.toLowerCase()
+    txMsg.value = { message: 'Waiting for transaction confirmation...' }
+    projectAddress.value = (await store.dispatch('waitForProjectCreate', tx.value))
 
     // success!
     txMsg.value = { status: 1, message: 'Created! View your community!' }
     tx.value = null
-    // go to project
-    // router.push({ name: 'project', params: { address: projectAddress.value.toLowerCase() } })
   } catch (e) {
     // console.error(e)
     // alert('Error creating project: ' + e.message)
@@ -453,25 +468,24 @@ projectAddress.value = isDev ? route.query.project : null
     //- (tx message)
     form-message.my-40(v-if="txMsg", :body="txMsg")
 
-    //- (create btn)
-    .sticky.z-20.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
+    //- (confirm btn)
+    .stickyff.z-20.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
       .text-center
-        button.btn.btn-xl.btn-white.min-w-md(@click="submitProject", :disabled="tx")
-          template(v-if="projectAddress") Created!
-          template(v-else-if="tx") Creating...
-          template(v-else) Create ✨
+        //- (view link)
+        template(v-if="projectAddress")
+          router-link.btn.btn-xl.btn-violet.px-48(:to="{name: 'project', params: { address: projectAddress }}")
+            | View Community
+
+        //- (create btn)
+        template(v-else)
+          button.btn.btn-xl.btn-white.px-48(@click="submitProject", :disabled="tx")
+            //- template(v-if="projectAddress") Created!
+            template(v-if="tx") Creating...
+            template(v-else) Create ✨
 
     //- (tx link)
-    .mt-16.text-violet-600.py-8.px-16.rounded-full.bg-indigo-900(v-if="tx")
-      a(:href="`https://etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+    tx-link.w-full(v-if="tx", :tx="tx")
 
-    //- post-create
-    //- section
-      //- (view link)
-      .mt-40.flex.justify-center(v-show="viewBtnVisible")
-        router-link.btn.btn-lg.btn-white.min-w-xs(:to="{name: 'project', params: { address: projectAddress }}") View Project
-
-    //- button.absolute.bottom-0.left-0.p-8.text-violet-600.text-sm(v-show="isDev", @click="$store.dispatch('getEventLog')") Log project events...
 </template>
 
 <style>
