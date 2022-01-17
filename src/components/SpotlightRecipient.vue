@@ -25,7 +25,7 @@ div.mb-80
       .px-24.text-base.text-greenbright-400.text-violet-650ff.flex.items-center
         user-avatar.w-24.h-24(:address="props.recipient")
         .inline.flex-shrink-0.leading-none
-          | #[addr.ml-12.font-bold(:address="props.recipient")] is receiving drips from #[b {{ supporters.length }} addresses].
+          | #[addr.ml-12.font-bold(:address="props.recipient")] receives drips from #[b {{ supporters.length }} addresses].
 
   .mt-12.flex.h-80.justify-center.px-24.rounded-full.text-violet-650.text-md.relative
 
