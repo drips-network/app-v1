@@ -12,6 +12,15 @@ import HeaderLarge from '@/components/HeaderLarge'
 import SpotlightRecipient from '@/components/SpotlightRecipient'
 import store from '@/store'
 
+const spotlights = [
+  // soliditylang.eth
+  { address: '0x151ef20a3ade1cc1161391594f8a32461389a54e', highlight: 'sender' }, 
+  // ricmoo.eth
+  { address: '0x5555763613a12d8f3e73be831dff8598089d3dca', highlight: 'receiver' },
+  // walletconnect.eth 
+  { address: '0xcbec15583a21c3ddad5fab658be5b4fe85df730b', highlight: 'receiver' }, 
+]
+
 const projects = ref()
 
 const getProjects = async () => {
@@ -74,39 +83,15 @@ article.explore.pt-48.px-24
   //- featured
   section
     header
-      header-large.mb-48(icon="✨")
+      h2.sr-only Highlights
+      //- header-large.mb-48(icon="✨")
         h2 Spotlight
 
-    section.mt-48
-      template(v-if="!projects")
-        loading-bar
-
-      template(v-else)
-        ul
-          //- info-bar.mb-16.text-md
-            .w-full.text-center.px-32
-              | Some #[b notable drips] 💧 on the #[b network]
-          li
-            //- ricmoo.eth
-            spotlight-recipient(recipient="0x5555763613a12d8f3e73be831dff8598089d3dca", :allSplits="splits")
-
-            //- walletconnect.eth
-            spotlight-recipient(recipient="0xcbec15583a21c3ddad5fab658be5b4fe85df730b", :allSplits="splits")
-
-            //- soliditylang.eth
-            spotlight-recipient(recipient="0x151ef20a3ade1cc1161391594f8a32461389a54e", :allSplits="splits")
-
-            //- dapptools.eth
-            //- INCORRECT?
-            //- spotlight-recipient.my-20(recipient="0x36de990133d36d7e3df9a820aa3ede5a2320de71")
-
-          //- li
-            drip-row.mb-4(:drip="{ sender: '0x8b1A1aF63bb9b3730f62c56bDa272BCC69dF4CC7'.toLowerCase(), receiver: 10, percent: 100 }")
-
-          //- template(v-if="projects")
-            //- projects...
-            li(v-for="project in projects")
-              project-thumb.mb-24(:project="project")
+    section.mt-60
+      //- spotlights...
+      spotlight-recipient(v-for="spotlight in spotlights", :spotlight="spotlight", :allSplits="splits")
+          
+          
 
   //- communities
   section.mt-104
@@ -121,7 +106,7 @@ article.explore.pt-48.px-24
         section.px-12ff
           info-bar.mb-16.text-md
             .w-full.text-center.px-32
-              | These #[b communities] are #[b raising funds] with #[b NFT memberships] 🧩
+              | #[b Communities] raising funds with #[b NFT memberships] 🧩
 
           //- .my-40.text-base.text-violet-650.text-center
             | #[b {{ projects.length }} communities] are #[b raising funds] with #[b NFT memberships] 🧩
@@ -135,10 +120,10 @@ article.explore.pt-48.px-24
             router-link.btn.btn-xl.btn-dark.px-60(to="/create") Create ✨
 
   //- drips
-  section.mt-80
-    header-large(icon="💧")
+  section.mt-180
+    //- header-large(icon="💧")
       h2 Drips
 
     section.mt-48.pb-40
-      drips-all.text-lg
+      drips-all.text-lg(:splits="splits")
 </template>

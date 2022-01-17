@@ -13,7 +13,7 @@ import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import SvgDai from '@/components/SvgDai'
 import store from '@/store'
 import { utils } from 'ethers'
-import { toDAI, toDAIPerMo } from '@/utils'
+import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -46,7 +46,7 @@ const drips = ref()
 const splitsOut = computed(() => {
   return splits.value?.map(split => ({
     sender: route.params.address,
-    receiver: split.address,
+    receiver: [split.address],
     percent: split.percent
   }))
 })
@@ -54,7 +54,7 @@ const splitsOut = computed(() => {
 const dripsOut = computed(() => {
   return drips.value?.map(drip => ({
     sender: route.params.address,
-    receiver: drip[0],
+    receiver: [drip[0]],
     amount: toDAIPerMo(drip[1])
   }))
 })

@@ -4,13 +4,13 @@ import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
 import SvgDai from '@/components/SvgDai'
 const props = defineProps(['drip', 'alternateColors'])
-const isSummary = typeof props.drip.receiver === 'number'
+const isMultiple = props.drip.receiver.length > 1
 const altBg = drip => drip.percent && props.alternateColors
 const receiverRt = computed(() => {
-  if (isSummary) {
+  if (isMultiple) {
     return { name: 'user-drips-out', params: { address: props.drip.sender } }
   }
-  return { name: 'user', params: { address: props.drip.receiver } }
+  return { name: 'user', params: { address: props.drip.receiver[0] } }
 })
 </script>
 
@@ -101,12 +101,12 @@ const receiverRt = computed(() => {
   //- receiver(s)
   router-link.h-80.flex.items-center.justify-end.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
     //- (summary - "10 addresses")
-    template(v-if="isSummary")
-      .w-full.text-center.font-bold {{ props.drip.receiver }} addresses
+    template(v-if="isMultiple")
+      .w-full.text-center.font-bold {{ props.drip.receiver.length }} addresses
     //- (single receiver)
     template(v-else)
       .flex-1.min-w-0.truncate.inline.mx-12.text-center
         .inline
-          addr.font-bold.inline(:address="props.drip.receiver", :youOn="true", :key="props.drip.receiver")
-      user-avatar.w-54.h-54(:address="props.drip.receiver", blockieSize="44", :key="props.drip.receiver")
+          addr.font-bold.inline(:address="props.drip.receiver[0]", :youOn="true", :key="props.drip.receiver[0]")
+      user-avatar.w-54.h-54(:address="props.drip.receiver[0]", blockieSize="44", :key="props.drip.receiver[0]")
 </template>

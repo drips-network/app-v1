@@ -197,3 +197,17 @@ export const getDripsWithdrawable = async (event) => {
     return null
   }
 }
+
+// format split events for DripRow.vue
+export const formatSplitsEvents = events => {
+  return events.map(e => {
+    let percent = e.args[1].reduce((acc, cur) => acc + cur[1], 0) / store.state.splitsFractionMax * 100
+    percent = percent > 0 && !parseInt(percent) ? '<1%' : parseInt(percent) // parseFloat(percent.toFixed(2))
+    return {
+      blockNumber: e.blockNumber,
+      sender: e.args[0],
+      receiver: e.args[1].length >= 2 ? e.args[1].map(rec => rec[0]) : [e.args[1][0][0]],
+      percent
+    }
+  })
+}
