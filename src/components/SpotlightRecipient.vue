@@ -28,15 +28,15 @@ const supporters = computed(() => {
 </script>
 
 <template lang="pug">
-div.mb-80
+div.mb-96
   .flex.justify-start
     .h-80.bg-indigo-950.flex.items-center.rounded-full
       .pl-24.pr-36.text-md.text-greenbright-400.text-violet-650ff.flex.items-center
         user-avatar.w-24.h-24(:address="props.recipient")
         .inline.flex-shrink-0.leading-none
-          | #[addr.ml-12.font-bold(:address="props.recipient")] receives drips from #[b {{ supporters.length }} addresses].
+          | #[addr.ml-12.font-bold(:address="props.recipient")] #[span.opacity-90 receives drips from] #[b {{ supporters.length }} addresses].
 
-  .mt-12.flex.h-80.justify-end.px-24ff.rounded-full.text-violet-650.text-md.relative
+  .mt-10.pr-8.flex.h-80.justify-end.rounded-full.text-violet-650.text-md.relative
 
     .h-80.flex.items-center.rounded-full.bg-indigo-700.py-10.px-6.w-260ff.mr-2
       template(v-if="supporters")

@@ -68,13 +68,13 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-article.explore.pt-16.px-24
+article.explore.pt-48.px-24
   //- header.flex.mt-12
     h1.h-80.rounded-full.flex.border.border-violet-600.ffbg-indigo-700.text-2xl.font-semibold.items-center.px-28.text-violet-650 Explore
   //- featured
   section
     header
-      header-large(icon="✨")
+      header-large.mb-48(icon="✨")
         h2 Spotlight
 
     section.mt-48
@@ -88,13 +88,13 @@ article.explore.pt-16.px-24
               | Some #[b notable drips] 💧 on the #[b network]
           li
             //- ricmoo.eth
-            spotlight-recipient.my-24(recipient="0x5555763613a12d8f3e73be831dff8598089d3dca", :allSplits="splits")
+            spotlight-recipient(recipient="0x5555763613a12d8f3e73be831dff8598089d3dca", :allSplits="splits")
 
             //- walletconnect.eth
-            spotlight-recipient.my-24(recipient="0xcbec15583a21c3ddad5fab658be5b4fe85df730b", :allSplits="splits")
+            spotlight-recipient(recipient="0xcbec15583a21c3ddad5fab658be5b4fe85df730b", :allSplits="splits")
 
             //- soliditylang.eth
-            spotlight-recipient.my-24(recipient="0x151ef20a3ade1cc1161391594f8a32461389a54e", :allSplits="splits")
+            spotlight-recipient(recipient="0x151ef20a3ade1cc1161391594f8a32461389a54e", :allSplits="splits")
 
             //- dapptools.eth
             //- INCORRECT?
@@ -109,11 +109,11 @@ article.explore.pt-16.px-24
               project-thumb.mb-24(:project="project")
 
   //- communities
-  section.mt-196
+  section.mt-104
     //- header-large(icon="🙂")
       h2 Communities
 
-    section.mt-48
+    section
       template(v-if="!projects")
         loading-bar
 
