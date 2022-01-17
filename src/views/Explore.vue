@@ -82,7 +82,7 @@ article.explore.pt-56.px-24
   section
     header-large.mb-96(icon="✨")
       header
-        h2 Spotlight
+        h2.font-semibold Spotlight
 
     section
       //- spotlights...
@@ -96,9 +96,9 @@ article.explore.pt-56.px-24
 
     //- (list)
     template(v-else)
-      header-large.mb-56(icon="🙂")
+      header-large.mb-56(icon="⛲️")
         header
-          h2 #[b Communities] raising funds with #[b NFT memberships] 🧩
+          h2 #[b Communities] are raising funds with #[b NFT memberships] 🧩
 
       ul
         //- projects...

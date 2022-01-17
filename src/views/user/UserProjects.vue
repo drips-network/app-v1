@@ -64,6 +64,6 @@ section.user-projects
 
     footer(v-if="!projects.length")
       .mt-40.flex.justify-center
-        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/create") Create a Community ✨
+        router-link.btn.btn-lg.btn-outline.pl-36.pr-28(to="/create") Create a Community ⛲️
 
 </template>

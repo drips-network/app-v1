@@ -266,7 +266,7 @@ projectAddress.value = isDev ? route.query.project : null
   //- (create community flow)
   template(v-else)
     //- 1. PROJECT
-    panel.mx-auto(ref="projectPanel", label="Community", icon="✨")
+    panel.mx-auto(ref="projectPanel", label="Community", icon="⛲️")
       template(v-slot:header)
         h2
           template(v-if="!review") Create a Community
@@ -481,7 +481,7 @@ projectAddress.value = isDev ? route.query.project : null
           button.btn.btn-xl.btn-white.px-48(@click="submitProject", :disabled="tx")
             //- template(v-if="projectAddress") Created!
             template(v-if="tx") Creating...
-            template(v-else) Create ✨
+            template(v-else) Create
 
     //- (tx link)
     tx-link.w-full(v-if="tx", :tx="tx")
