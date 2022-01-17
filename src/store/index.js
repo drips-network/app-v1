@@ -289,8 +289,8 @@ export default createStore({
       try {
         if (!ipfsHash) {
           // fetch project...
-          const resp = await api({ query: queryProjectMeta, variables: { id: projectAddress } })
-          ipfsHash = resp.data.fundingProject.ipfsHash
+          const resp = await api({ query: queryProjectMeta, variables: { id: projectAddress.toLowerCase() } })
+          ipfsHash = resp.data.fundingProject?.ipfsHash
         }
 
         if (!ipfsHash || ipfsHash.length !== 46) {
@@ -322,7 +322,7 @@ export default createStore({
         return tx
       } catch (e) {
         console.error('@approveDAIContract', e)
-        if (e.message) alert(e.message)
+        // if (e.message) alert(e.message)
         throw e
       }
     },
@@ -354,19 +354,19 @@ export default createStore({
       try {
         const contract = getProjectContract(projectAddress)
         const event = isStreaming ? ['NewStreamingToken', 4] : ['NewToken', 3]
-        
+
         // get events...
         const events = await contract.queryFilter(event[0])
-        
+
         // add it up
-        let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0)) 
+        let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0))
 
         if (isStreaming) {
           // convert to monthly streaming rate
           totalWei = totalWei.mul(oneMonth)
         }
 
-        return totalWei 
+        return totalWei
       } catch (e) {
         console.error(e)
         throw e
@@ -701,11 +701,11 @@ export default createStore({
       try {
         // get splits
         const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
-        
+
         // from project or hubs contract?
         const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
         const contractSigner = contract.connect(signer)
-        
+
         // sign...
         let tx
         if (projectAddress) {

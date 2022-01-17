@@ -5,44 +5,30 @@ import { toDAI, toWei } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 import api from '@/api'
 import store from '@/store'
-const props = defineProps(['meta', 'project', 'rightSide'])
-const emit = defineEmits(['currentFundingAmt'])
+
+const props = defineProps(['meta', 'project', 'rightSide', 'currentFundingWei'])
 
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
-const pct = ref(-1)
+// raw percent
+const pct = computed(() => (!props.currentFundingWei || !props.meta.goal) ? -1
+  : (props.currentFundingWei.toString() / toWei(props.meta.goal).toString() * 100))
+
+// pretty percent
 const pctPretty = computed(() => {
-  return pct.value < 0 ? ''
+  return pct.value < 0 ? '...' // loading
     : pct.value > 0 && pct.value < 1 ? '<1%'
       // : pct.value > 99 && pct.value < 100 ? '<99'
       // : parseFloat(pct.value.toFixed(0)) + '%'
       : parseInt(pct.value) + '%'
 })
 
-const getPercent = async () => {
-  let percent = 0
-  if (props.meta.goal > 0) {
-    // let sum = bn.from(0)
-
-    let raisedWei = await store.dispatch('getFundingTotal', {
-      projectAddress: props.project.id,
-      isStreaming
-    })
-
-    emit('currentFundingAmt', raisedWei)
-    // calc percent (sum / goal)
-    percent = raisedWei.toString() / toWei(props.meta.goal).toString() * 100
-  }
-  pct.value = percent
-}
-
-onMounted(() => getPercent())
 </script>
 
 <template lang="pug">
 .h-80.rounded-full.relative.flex(v-if="props.meta.goal")
   //- bar
-  .relative.z-10.max-w-full.min-w-80.rounded-full.flex.justify-end.items-center.px-24.bg-gradient-to-r.from-turquoise-500.to-greenbright-500.overflow-hidden(:style="{width: Math.max(0, pct) + '%', transition: 'width 1000ms 100ms, opacity 500ms'}", :class="{'opacity-0': pct < 0}")
+  .relative.z-10.max-w-full.min-w-80.rounded-full.flex.justify-end.items-center.px-24.bg-gradient-to-r.from-turquoise-500.to-greenbright-500.overflow-hidden(:style="{width: Math.max(0, pct) + '%', transition: 'width 1000ms 100ms, opacity 500ms'}", :class="{'opacity-0': !pct}")
     //- (percent internal)
     template(v-if="rightSide !== 'percent'")
       div.transition.duration-500.delay-200.font-semibold(:class="{'opacity-0': pct < 0}")

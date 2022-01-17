@@ -26,9 +26,9 @@ const isMyUser = computed(() => store.state.address === route.params.address)
 const editDripsSelect = ref(false)
 const edit = ref(null) // 'drips' : 'splits'
 const collectableAmts = ref()
-const num = wei => Number(toDAI(wei)).toFixed(2)
 const totalFunds = computed(() => {
-  return collectableAmts.value ? num(collectableAmts.value[0].add(collectableAmts.value[1])) : -1
+  return !collectableAmts.value ? -1
+    : toDAI(collectableAmts.value[0].add(collectableAmts.value[1]))
 })
 
 watch(isMyUser, (val) => val && getMyCollectable())
@@ -109,24 +109,11 @@ const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
   try {
     const address = to.params.address.toLowerCase()
     
-    // enforce lowercase
+    // redirect to lowercase
     if (address !== to.params.address) {
-      next({name: 'user', params: { address }})
+      return next({name: 'user', params: { address }})
     }
 
-    // timeout for slow API prj lookup... (6s?)
-    // const projectTimeout = setTimeout(() => {
-    //   console.warn('project lookup timeout. skipping...')
-    //   resolveRouteAddress(to, next, true)
-    // }, 6000)
-    
-    // check if project? redirect...
-    // if (!skipProjectLookup && await store.dispatch('getProject', to.params.address)) {
-    //   return next({ name: 'project', params: { address: to.params.address }})
-    // }
-
-    // clearTimeout(projectTimeout)
-    
     // non-address? check if ENS name, redirect to 0x...
     if (!utils.isAddress(to.params.address)) {
       const address = await store.dispatch('resolveENS', to.params.address)
@@ -135,7 +122,27 @@ const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
         return next({ name: 'user', params: { address }})
       }
     }
-    // else
+
+    // redirect to project?
+    if (!skipProjectLookup) {
+      // project look up timeout... (6s?)
+      const projectTimeout = setTimeout(() => {
+        console.warn('project lookup timed-out. skipping...')
+        // rerun but skip project lookup
+        return resolveRouteAddress(to, next, true)
+      }, 6000)
+
+      // lookup...
+      const projectMeta = await store.dispatch('getProjectMeta', { projectAddress: address })
+      clearTimeout(projectTimeout)
+      console.log('user is project. redirecting...')
+      if (projectMeta?.name) {
+        // redirect to project
+        return next({ name: 'project', params: { address }})
+      }
+    }
+    
+    // else load this user page
     next()
   } catch (e) {
     console.error(e)
@@ -145,7 +152,7 @@ const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
 
 export default {
   beforeRouteEnter: (to, from, next) => resolveRouteAddress(to, next),
-  beforeRouteUpdate: (to, from, next) => resolveRouteAddress(to, next)
+  beforeRouteUpdate: (to, from, next) => resolveRouteAddress(to, next) // skip project lookup
 }
 </script>
 
@@ -160,10 +167,10 @@ article.profile.pb-80
       template(v-if="isMyUser")
         .flex.items-center
           //- template(v-if="totalFunds > -1")
-          .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-32(:class="{'text-violet-650': totalFunds <= 0}", :key="$route.params.address")
-            template(v-if="totalFunds > -1")
-              svg-dai.mr-6(size="lg")
+          .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-32(:class="{'text-violet-650': totalFunds === -1}", :key="$route.params.address")
+            template(v-if="totalFunds !== -1")
               | {{ totalFunds }}
+              svg-dai.ml-6(size="lg")
             template(v-else)
               .animate-pulse ...
             
@@ -208,7 +215,7 @@ article.profile.pb-80
   //- (MY USER)
   template(v-if="isMyUser")
     //- COLLECT
-    modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="getMyCollectable")
+    modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false; getMyCollectable()", :amts="collectableAmts", @collected="getMyCollectable")
       template(v-slot:header) Collect your Drips
 
     //- EDIT

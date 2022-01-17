@@ -9,6 +9,7 @@ import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import { getDripPctFromAmts, round, toDAI } from '@/utils'
 import store from '@/store'
 import { utils } from 'ethers'
+import FormMessage from '@/components/FormMessage'
 
 const props = defineProps(['projectAddress', 'amts', 'tx'])
 const emit = defineEmits(['close', 'collected'])
@@ -24,8 +25,12 @@ const toOwner = computed(() => props.amts ? Number(utils.formatEther(props.amts[
 
 const tx = ref()
 const txReceipt = ref()
+const txMsg = ref()
 const collect = async () => {
   try {
+    tx.value = null
+    txMsg.value = null
+    
     // collecting from hub or project?
     const params = props.projectAddress ? { projectAddress: props.projectAddress }
       : { address: store.state.address }
@@ -36,11 +41,13 @@ const collect = async () => {
     txReceipt.value = await tx.value.wait()
     tx.value = null
 
+    // success!
     emit('collected')
-    // after success
-    setTimeout(() => emit('close'), 2000)
+    txMsg.value = { status: 1, message: 'Your funds have been collected!' }
+    // setTimeout(() => emit('close'), 2000)
   } catch (e) {
-    alert('Error collecting drips: ' + e.message)
+    // alert('Error collecting drips: ' + e.message)
+    txMsg.value = { status: -1, message: e.message || e }
     tx.value = null
   }
 }
@@ -77,7 +84,7 @@ modal(v-bind="$attrs", @close="emit('close')")
               | You have #[b funds to collect].
             template(v-if="hasSplits")
               br
-              | #[b {{ dripPct }}] will be sent to the addresses you're #[b splitting incoming drips] with. The&nbsp;rest will be transferred to your wallet.
+              | #[b {{ dripPct }}]% will be sent to the addresses you're #[b splitting incoming drips] with. The&nbsp;rest will be transferred to your wallet.
             template(v-else)
               br
               | These funds can be transferred to your wallet.
@@ -108,7 +115,7 @@ modal(v-bind="$attrs", @close="emit('close')")
                   //- (negative sign)
                   template(v-if="toSplits > 0") -
                   //- amount
-                  | {{ toSplits > -1 ? toSplits : '...' }}
+                  | {{ toSplits !== -1 ? toSplits : '...' }}
                   //- 
                   svg-dai.ml-12(size="xl")
 
@@ -123,16 +130,21 @@ modal(v-bind="$attrs", @close="emit('close')")
                   | {{ toOwner > -1 ? toOwner : '...' }}
                   svg-dai.ml-12(size="xl")
 
-    .mt-40.flex.justify-center.mb-6
-      //- close btn
-      button.btn.btn-lg.btn-outline.px-40.mr-6(@click="$emit('close')")
-        | {{ tx || txReceipt || !hasFunds ? 'Close' : 'Cancel' }}
+    .mt-40
+      //- (tx message)
+      form-message.my-40(v-if="txMsg", :body="txMsg")
 
-      //- (collect btn)
-      button.btn.btn-lg.btn-violet.px-40(v-if="hasFunds", @click="collect", :disabled="tx")
-        template(v-if="txReceipt") Collected
-        template(v-else-if="tx") Collecting...
-        template(v-else) Collect
+      //- btns
+      .flex.justify-center.mb-6
+        //- close btn
+        button.btn.btn-lg.btn-outline.px-40.mr-6(@click="$emit('close')")
+          | {{ tx || txReceipt || !hasFunds ? 'Close' : 'Cancel' }}
 
-    tx-link(v-if="tx", :tx="tx")
+        //- (collect btn)
+        button.btn.btn-lg.btn-violet.px-40(v-if="hasFunds", @click="collect", :disabled="tx")
+          template(v-if="txReceipt") Collected
+          template(v-else-if="tx") Collecting...
+          template(v-else) Collect
+
+      tx-link(v-if="tx", :tx="tx")
 </template>

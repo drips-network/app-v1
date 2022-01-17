@@ -1,7 +1,7 @@
 <script setup>
 const props = defineProps({
   tx: Object,
-  clss: { type: String, default: 'text-violet-600 text-base' }
+  clss: { type: String, default: 'text-violet-600 text-ms' }
 })
 </script>
 

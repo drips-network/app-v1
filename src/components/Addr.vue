@@ -10,17 +10,27 @@ const props = defineProps({
 
 const profile = ref()
 const isYou = computed(() => props.address.toLowerCase() === store.state.address)
+const projectName = ref()
 
 const addr = computed(() => {
-  return props.youOn && isYou.value ? 'You'
-    : profile.value?.ens ? profile.value.ens
-      : props.short ? store.getters.addrShort(props.address)
-        : props.address
+  return props.youOn && isYou.value ? 'You' // "You"
+    : projectName.value ? projectName.value // project name
+      : profile.value?.ens ? profile.value.ens // ens name
+        : props.short ? store.getters.addrShort(props.address) // shortened address
+          : props.address // full address
 })
 
-const getProfile = async () => {
+const getName = async () => {
   try {
     profile.value = await store.dispatch('resolveAddress', { address: props.address })
+    // 
+    if (!profile.value?.ens) {
+      // maybe it's a project? get name...
+      const meta = await store.dispatch('getProjectMeta', { projectAddress: props.address })
+      if (meta.name) {
+        projectName.value = meta.name
+      }
+    }
   } catch (e) {
     profile.value = null
   }
@@ -30,10 +40,10 @@ const getProfile = async () => {
 // can't be a prop apparently?
 // watch(props.address, () => {
 //   profile.value = null
-//   getProfile()
+//   getName()
 // })
 
-onMounted(() => getProfile())
+onMounted(() => getName())
 </script>
 
 <template lang="pug">

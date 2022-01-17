@@ -8,10 +8,11 @@ import SvgX from '@/components/SvgX'
 import SvgDai from '@/components/SvgDai'
 import LoadingBar from '@/components/LoadingBar'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
+import FormMessage from '@/components/FormMessage'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
-import store from '@/store'
 import { utils, constants, BigNumber as bn } from 'ethers'
 import { round, toDAI, toWei, toWeiPerSec, toDAIPerMo, validateAddressInput } from '@/utils'
+import store from '@/store'
 
 const props = defineProps(['newRecipient', 'cancelBtn'])
 const emit = defineEmits(['close', 'updated'])
@@ -73,11 +74,15 @@ const getDrips = async () => {
   }
 }
 
-const approvedDAI = ref(true) // assume true to start
+const approved = ref(true) // assume true to start
 const approveTx = ref()
+const approveVisible = ref(false)
+const approveTxMsg = ref()
 
-const approveDAI = async () => {
+const approve = async () => {
   try {
+    approveTxMsg.value = null
+
     // send...
     approveTx.value = await store.dispatch('approveDAIContract')
     console.log('approve tx...', approveTx.value)
@@ -85,21 +90,24 @@ const approveDAI = async () => {
     // wait for confirmation...
     await approveTx.value.wait() // receipt
 
-    approvedDAI.value = true // topUpWei.value.toString()
+    approved.value = true // topUpWei.value.toString()
     approveTx.value = null
   } catch (e) {
-    console.error(e)
-    approvedDAI.value = false
+    // console.error(e)
+    approveTxMsg.value = { status: -1, message: e.message || e }
   }
 }
 
 const tx = ref()
 const txReceipt = ref()
+const txMsg = ref()
 
 const update = async () => {
   try {
     tx.value = null
     txReceipt.value = null
+    txMsg.value = null
+
     const topUpWei = toWei(topUpDAI.value) // .toString()
 
     // check allowance if top-up
@@ -108,8 +116,9 @@ const update = async () => {
 
       // !! below allowance
       if (allowance.lt(topUpWei)) {
-        alert('You must first approve the contract to be able to withdraw your DAI.')
-        approvedDAI.value = false
+        // alert('You must first approve the contract to be able to withdraw your DAI.')
+        approved.value = false
+        approveVisible.value = true
         return false
       }
     }
@@ -117,8 +126,10 @@ const update = async () => {
     // check max if withdraw
     if (topUpWei.lt(0)) {
       withdrawable.value = await getWithdrawable()
+      // !! can't withdraw that much
       if (topUpWei.lt(withdrawable)) {
-        alert(`You can only withdraw ${balance.value} DAI.`)
+        // alert(`You can only withdraw ${balance.value} DAI.`)
+        approveTxMsg.value = { message: `You can only withdraw ${balance.value} DAI.` }
         return
       }
     }
@@ -147,12 +158,14 @@ const update = async () => {
     })
     console.log('update drips tx', tx.value)
 
+    // wait for tx...
     txReceipt.value = await tx.value.wait()
 
-    setTimeout(() => { tx.value = null }, 3000)
+    // confirmation
+    txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile.' }
+    tx.value = null
   } catch (e) {
-    console.error(e)
-    alert('Error updating Drips: \n' + (e.message || e))
+    txMsg.value = { status: -1, message: e.message || e }
   }
 }
 
@@ -257,30 +270,51 @@ panel(icon="💧")
             span.text-2xl.font-semibold {{ newBalance }}
             svg-dai.ml-12(size="xl")
 
+      //- (not approved message)
+      template(v-if="approveVisible")
+        //- fades when approved
+        .mt-40.rounded-2xlb.bg-indigo-950.p-24.mx-40.text-violet-650.transition.duration-500.delay-1000(:class="{'pointer-events-none opacity-50': approved}")
+          p.text-base.leading-normal You must first #[b allow] the Drips contract to be able to #[b withdraw&nbsp;your&nbsp;DAI].
+
+          //- (tx message)
+          form-message.my-28(v-if="approveTxMsg", :body="approveTxMsg")
+
+          //- allow btn
+          .mt-24.flex.justify-center.-mb-4
+            button.btn.btn-md.btn-violet.px-32.text-md.font-semibold.tracking-wide(@click.prevent="approve", :disabled="approved")
+              template(v-if="approved") Allowed!
+              template(v-else-if="approveTx") Allowing...
+              template(v-else) Allow
+          //- (tx link)
+          tx-link(v-if="approveTx && !approved", :tx="approveTx", clss="text-sm")
+
       //- btns
-      .mt-40.flex.justify-center
-        //- (close btn)
-        template(v-if="props.cancelBtn")
-          button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')") Cancel
+      .mt-40
+        //- (tx message)
+        form-message.my-40(v-if="txMsg", :body="txMsg")
 
-        //- (view btn)
-        template(v-if="txReceipt")
-          button.btn.btn-violet.btn-lg.px-36(@click.prevent="viewMyDrips") View your Drips
+        .flex.justify-center
+          //- (close btn)
+          template(v-if="props.cancelBtn")
+            button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')") Cancel
 
-        //- (approve btn)
-        template(v-else-if="!approvedDAI")
-          button.btn.btn-lg.btn-violet.px-36.mr-8(@click.prevent="approveDAI")
-            template(v-if="approveTx") Approving...
-            template(v-else) Approve
+          //- (view btn)
+          template(v-if="txReceipt")
+            button.btn.btn-violet.btn-lg.px-36(@click.prevent="viewMyDrips") View your Drips
 
-        //- (submit btn)
-        template(v-else)
-          button.btn.btn-lg.px-40.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
-            template(v-if="txReceipt") Success!
-            template(v-else-if="tx") Waiting...
-            template(v-else) Submit
+          //- (approve btn)
+          //- template(v-else-if="!approved")
+            button.btn.btn-lg.btn-violet.px-36.mr-8(@click.prevent="approveDAI")
+              template(v-if="approveTx") Approving...
+              template(v-else) Approve
 
-      tx-link(v-if="approveTx", :tx="approveTx")
-      tx-link(v-if="tx", :tx="tx")
+          //- (submit btn)
+          template(v-else)
+            button.btn.btn-lg.px-40.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
+              template(v-if="txReceipt") Success!
+              template(v-else-if="tx") Submitting...
+              template(v-else) Submit
+
+        tx-link(v-if="tx", :tx="tx")
 
 </template>

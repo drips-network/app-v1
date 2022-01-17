@@ -11,7 +11,6 @@ const splits = ref()
 const getSplitsEvents = async () => {
   try {
     const events = await store.dispatch('getSplitsReceivers')
-    console.log(events)
     // reduce by address (current state)
     const currentEvents = []
     events.reverse()

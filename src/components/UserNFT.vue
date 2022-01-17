@@ -134,23 +134,26 @@ onBeforeMount(() => {
 <template lang="pug">
 .user-nft.shadow-md-blue.rounded-2xl.p-28.flex.flex-col
   //- TODO redesign owner actions below tile(?)
-  h6.flex.items-center
-    .h-36.w-36.rounded-full.overflow-hidden.relative.mr-16.bg-indigo-800
-      img.absolute.overlay.object-cover.object-center(v-if="projectMeta.image", :src="ipfsUrl(projectMeta.image)")
-      img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
-    router-link.text-xl.font-semibold.text-violet-600.-mt-3(:to="{name: 'project', params: { address: projectAddress }}")
-      | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
+  h6
+    router-link.flex.items-center(:to="{name: 'project', params: { address: projectAddress }}")
+      //- avatar
+      .h-36.w-36.rounded-full.overflow-hidden.relative.mr-16.bg-indigo-800
+        img.absolute.overlay.object-cover.object-center(v-if="projectMeta.image", :src="ipfsUrl(projectMeta.image)")
+        img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
+      //- title
+      .text-xl.font-semibold.text-violet-600.-mt-3
+        | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
 
-  .flex-1
-    figure.mt-32.mb-32
-      //- (custom nft image)
-      template(v-if="nftMeta.image")
-        .flex.justify-center
-          img.block.max-w-full.rounded-md(:src="ipfsUrl(nftMeta.image)", alt="Member Token Image")
+  .flex-1.mt-36
+    figure.mb-32.mx-40.relative
+      .aspect-w-1.aspect-h-1
+        //- (custom nft image)
+        template(v-if="nftMeta.image")
+          img.absolute.overlay.object-contain.object-center(:src="ipfsUrl(nftMeta.image)", alt="Member Token Image")
 
-      //- inline svg (for exteneral ipfs bg/assets)
-      template(v-else)
-        .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
+        //- inline svg (for exteneral ipfs bg/assets)
+        //- template(v-else)
+          .flex.justify-center.pointer-events-none(v-html="nftArtSvg")
 
       //- svg-nft-test-2.max-w-full.mx-auto
       //- img.max-w-full.mx-auto(src="https://cloudflare-ipfs.com/ipfs/QmXmduqpDqS5aY1ZAf5tSig5UWL2P9Wo31QUuVTq9hJY33")
@@ -172,7 +175,7 @@ onBeforeMount(() => {
       .flex.my-10.-mx-5
         //- balance
         .flex-1.px-5
-          .font-medium.text-center.mb-12 Balance
+          .font-semibold.text-center.mb-12.text-violet-650 Balance
           .h-80.rounded-full.bg-indigo-700.flex.items-center
             svg-dai.w-32.h-32.ml-16.mr-6
             .flex-1
@@ -181,7 +184,7 @@ onBeforeMount(() => {
               svg-plus-minus
         //- valid for
         .w-1x2.px-5(v-show="!adjust")
-          .font-medium.text-center.mb-12 Membership Expires
+          .font-semibold.text-center.mb-12.text-violet-650 Membership Expires
           .h-80.rounded-full.bg-indigo-700.flex.items-center
             .text-2xl.w-full.text-center.font-semibold(:title="nftExpiryDate")
               template(v-if="nftActiveForDays === null") -

@@ -9,6 +9,7 @@ import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import Panel from '@/components/Panel'
 import SvgDai from '@/components/SvgDai'
 import InputBody from '@/components/InputBody'
+import FormMessage from '@/components/FormMessage'
 
 const props = defineProps({
   projectAddress: String,
@@ -39,12 +40,37 @@ const amountDAI = ref(minDAI)
 const state = reactive({
   approved: true, // check allowance on mint...
   nft: null,
+  approveVisible: false,
   approveTx: null,
-  mintTx: null
+  approveTxMsg: null,
+  mintTx: null,
+  mintTxMsg: null
 })
+
+const approve = async () => {
+  try {
+    // reset
+    state.approveTx = null
+    state.approveTxMsg = null
+
+    // send...
+    state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
+
+    // wait for confirmation...
+    const receipt = await state.approveTx.wait() // receipt
+
+    state.approved = true
+  } catch (e) {
+    state.approveTxMsg = { status: -1, message: e.message || e }
+  }
+}
 
 const mint = async () => {
   try {
+    // reset
+    state.mintTxMsg = null
+
+    // connect wallet?
     if (!store.state.address) await store.dispatch('connect')
 
     // check allowance
@@ -52,6 +78,7 @@ const mint = async () => {
     // !! not allowed
     if (allowance.lt(props.tokenType.minAmt)) {
       state.approved = false
+      state.approveVisible = true
       return
     }
 
@@ -77,28 +104,15 @@ const mint = async () => {
     }
     console.log('mint tx', state.mintTx)
 
+    // wait for tx...
     await state.mintTx.wait()
 
     emit('minted')
     state.nft = true
+    state.mintTxMsg = { status: 1, message: 'You joined! View your <b>NFT Membership</b>!' }
   } catch (e) {
     console.error(e)
-    alert('Error minting: ' + (e.message || e))
-  }
-}
-
-const approve = async () => {
-  try {
-    // send...
-    state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
-
-    // wait for confirmation...
-    await state.approveTx.wait() // receipt
-
-    state.approved = true
-  } catch (e) {
-    console.error(e)
-    state.approved = false
+    state.mintTxMsg = { status: -1, message: e.message || e }
   }
 }
 </script>
@@ -110,9 +124,9 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     template(v-slot:header)
       dialog-title
-        | Join
+        | Join Community
         br
-        | {{ meta.name }}
+        | "{{ meta.name }}"
 
     template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed.text-violet-650
@@ -146,33 +160,46 @@ modal(v-bind="$attrs", @close="$emit('close')")
           input(v-model="amountDAI", type="number", :placeholder="minDAI", :min="minDAI", step="0.01", required)
 
       //- (not approved message)
-      template(v-if="!state.approved")
-        .mt-40.text-center.text-orange-600.text-base.mx-auto.leading-normal.border.border-current.p-20.rounded-lg(style="width:calc(100% - 8rem);")
-          p Before you can join, you must first #[b allow] the community to #[b withdraw your DAI]{{ isStreaming ? ' periodically to continue your membership' : '' }}.
-          .mt-20.flex.justify-center
-            button.btn.btn-sm.btn-outline-orange.px-32.border-orange-600.notouch_hover_text-indigo-900(@click.prevent="approve")
-              template(v-if="state.approveTx") Allowing...
+      template(v-if="state.approveVisible")
+        //- fades when approved
+        .rounded-2xlb.bg-indigo-950.p-24.mx-40.mt-40.text-violet-650.transition.duration-500.delay-1000(:class="{'pointer-events-none opacity-50': state.approved}")
+          p.text-base.leading-normal Before you can join, you must first #[b allow] the community to #[b withdraw your DAI]{{ isStreaming ? ' periodically to continue your membership' : '' }}.
+
+          //- (tx message)
+          form-message.my-28(v-if="state.approveTxMsg", :body="state.approveTxMsg")
+
+          //- allow btn
+          .mt-24.flex.justify-center.-mb-4
+            button.btn.btn-md.btn-violet.px-32.text-md.font-semibold.tracking-wide(@click.prevent="approve", :disabled="state.approved")
+              template(v-if="state.approved") Allowed!
+              template(v-else-if="state.approveTx") Allowing...
               template(v-else) Allow
 
-          tx-link(v-if="state.approveTx && !state.approved", :tx="state.approveTx", clss="text-orange-600 text-sm")
+          //- (tx link)
+          tx-link(v-if="state.approveTx && !state.approved", :tx="state.approveTx", clss="text-sm")
 
       //- (btns)
-      .mt-40.flex.justify-center.mb-6
-        button.btn.btn-lg.btn-outline.mr-6.px-48(@click="$emit('close')")
-          | {{ state.nft ? 'Close' : 'Cancel' }}
+      .mt-40
+        //- (tx message)
+        form-message.my-40(v-if="state.mintTxMsg", :body="state.mintTxMsg")
 
-        //- (drip btn)
-        template(v-if="!state.nft")
-          button.btn.btn-lg.btn-violet.px-48(@click="mint", :disabled="!state.approved", :class="{'opacity-40': !state.approved}")
-            template(v-if="state.mintTx") Joining...
-            template(v-else)
-              | Join 💧
+        .flex.justify-center.mb-6
+          //- close/cancel btn
+          button.btn.btn-lg.btn-outline.mr-6.px-48(@click="$emit('close')")
+            | {{ state.nft ? 'Close' : 'Cancel' }}
 
-        //- (view btn)
-        template(v-else)
-          router-link.btn.btn-lg.btn-violet.px-48(:to="{name: 'user-communities-joined', params: {address: $store.state.address}}")
-            | View Token
+          //- (drip btn)
+          template(v-if="!state.nft")
+            button.btn.btn-lg.btn-violet.px-48(@click="mint", :disabled="!state.approved", :class="{'opacity-40': !state.approved}")
+              template(v-if="state.mintTx") Joining...
+              template(v-else)
+                | Join 💧
 
-      tx-link(v-if="state.mintTx && !state.nft", :tx="state.mintTx")
+          //- (view btn)
+          template(v-else)
+            router-link.btn.btn-lg.btn-violet.px-48(:to="{name: 'user-communities-joined', params: {address: $store.state.address}}")
+              | View Token
+
+        tx-link(v-if="state.mintTx && !state.nft", :tx="state.mintTx")
 
 </template>

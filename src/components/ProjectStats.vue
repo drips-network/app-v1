@@ -11,7 +11,8 @@ import store from '@/store'
 const props = defineProps({
   project: Object,
   meta: Object,
-  drips: Array
+  drips: Array,
+  currentFundingWei: Object
 })
 
 const query = `
@@ -67,19 +68,20 @@ const getNFTS = async () => {
   }
 }
 
-const dripsIn = ref()
-const getDripsIn = async () => {
-  try {
-    const wei = await store.dispatch('getFundingTotal', { projectAddress: props.project.id, isStreaming: isMonthly.value })
-    dripsIn.value = toDAI(wei, null, 0)
-  } catch (e) {
-    console.error(e)
-  }
-}
+const dripsIn = computed(() => props.currentFundingWei && toDAI(props.currentFundingWei, null, 0))
+// const dripsIn = ref()
+// const getDripsIn = async () => {
+//   try {
+//     const wei = await store.dispatch('getFundingTotal', { projectAddress: props.project.id, isStreaming: isMonthly.value })
+//     dripsIn.value = toDAI(wei, null, 0)
+//   } catch (e) {
+//     console.error(e)
+//   }
+// }
 
 onMounted(async () => {
   getNFTS()
-  getDripsIn()
+  // getDripsIn()
 })
 </script>
 

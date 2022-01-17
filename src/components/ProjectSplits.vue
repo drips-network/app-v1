@@ -3,7 +3,7 @@ import { ref, computed, onBeforeMount } from 'vue'
 import store from '@/store'
 import Addr from '@/components/Addr'
 import UserAvatar from '@/components/UserAvatar'
-import InfoBar from "@/components/InfoBar"
+import InfoBar from '@/components/InfoBar'
 
 const props = defineProps({
   drips: Array,
@@ -61,7 +61,7 @@ section#drips.project-splits.relative.pt-0
             .absolute.overlay.flex.items-center.justify-center
               div.text-center.text-violet-650
                 //- percent
-                .pt-24.font-cheee.text-8xl.font-normal.notouch_group-hover_text-greenbright-500(style="margin-top:38%")
+                .pt-24.text-6xl.font-bold.font-cheeeff.text-8xlff.font-normal.notouch_group-hover_text-greenbright-500(style="margin-top:38%")
                   | {{ parseInt(drip.percent) }}
                   span(style="font-size: 0.75em") %
                 .mt-20.font-semibold.text-whiteff.text-lg.notouch_group-hover_text-white

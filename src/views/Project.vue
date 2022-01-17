@@ -87,6 +87,9 @@ const getProject = async () => {
     minDAI.value = tokenType.value.streaming ? toDAIPerMo(tokenType.value.minAmt)
       : Number(toDAI(tokenType.value.minAmt), 'exact').toFixed(0)
 
+    // get funding once tokenType is known
+    getCurrentFunding()
+
     return true
   } catch (e) {
     console.error(e)
@@ -102,6 +105,16 @@ const onMintModalClose = () => {
 const dripsList = ref()
 const scrollToDripsList = () => {
   dripsList.value.$el.scrollIntoView({ behavior: 'smooth' })
+}
+
+const currentFundingWei = ref()
+const getCurrentFunding = () => {
+  store.dispatch('getFundingTotal', {
+    projectAddress,
+    isStreaming: tokenType.value.streaming
+  })
+    .then(wei => { currentFundingWei.value = wei })
+    .catch(console.error)
 }
 
 // const collectableAmts = ref()
@@ -126,17 +139,17 @@ article.project.pb-96
       .h-160
       .h-160
 
-  //- 
+  //-
   template(v-else)
     //- main project panel
     section.panel-indigo.mt-10.py-12.pb-48
       //- progress bar
-      project-progress-bar.mx-10.bg-indigo-800(v-if="project && meta", :meta="meta", :project="project")
+      project-progress-bar.mx-10.mb-10.bg-indigo-800(v-if="project && meta && meta.goal", :meta="meta", :project="project", :currentFundingWei="currentFundingWei")
 
       //- header
       header.text-center.relative.pt-44
         //- owner
-        .absolute.top-0.left-0.w-full.pt-10.flex.justify-between
+        .absolute.top-0.left-0.w-full.flex.justify-between
           //- left side
           div.pl-12
             //- profile link
@@ -150,7 +163,6 @@ article.project.pb-96
             .pr-16
               button.btn.btn-md.btn-violet.text-md.px-28.notouch_hover_ring.font-semibold(@click="collectModalOpen = true")
                 | Collect
-
 
         //- project image
         figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative.overflow-hidden
@@ -184,7 +196,7 @@ article.project.pb-96
 
       //- (stats)
       .mt-96.mb-96.px-20
-        project-stats(v-if="project", :project="project", :meta="meta", :drips="drips")
+        project-stats(v-if="project", :project="project", :meta="meta", :drips="drips", :currentFundingWei="currentFundingWei")
 
       nav.flex.justify-center.w-full
         .h-80.rounded-full.flex.items-center.px-16.bg-indigo-800
@@ -195,8 +207,8 @@ article.project.pb-96
 
       section.mt-24.flex.justify-center.px-10.mb-96
         //- (benefits)
-        .w-full.max-w-6xl.rounded-2xlb.text-xl.text-violet-650.font-semibold.bg-indigo-800.child-links-underline(v-show="view === 'benefits'")
-          .min-h-80.p-24.px-36(v-if="meta.benefits && meta.benefits.length", v-html="meta.benefits")
+        .w-full.max-w-6xl.rounded-2xlb.text-xl.text-violet-650.font-semibold.bg-indigo-800.child-links-underline.leading-snug(v-show="view === 'benefits'")
+          .min-h-80.p-24.px-36.children-mt-em(v-if="meta.benefits && meta.benefits.length", v-html="meta.benefits")
           .h-80.flex.items-center.justify-center.text-lg(v-else) ¯\_(ツ)_/¯
 
         //- (proposals)

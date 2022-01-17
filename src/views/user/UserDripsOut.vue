@@ -36,7 +36,7 @@ section.user-splits
     //-   div
     //-     template(v-if="canEdit") You are
     //-     template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-    //-     | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b> 
+    //-     | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>
 
     //- (balance)
     template(v-if="canEdit && dripsOut && dripsOut.length")
@@ -55,7 +55,7 @@ section.user-splits
             .flex.items-center.text-white
               .text-xl 2.00
               svg-dai.h-22.ml-14
-              .text-xl.tracking-tight /MO   
+              .text-xl.tracking-tight /MO
 
           .h-80.mt-2.px-12.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
             .pl-20.flex-1.text-xl Your Balance
@@ -67,22 +67,19 @@ section.user-splits
           //- .h-80.mt-2.px-32.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
             .flex-1.text-xl Monthly Recipients
             .flex.items-center
-              .text-xl.text-white {{ dripsOut.length }}  
+              .text-xl.text-white {{ dripsOut.length }}
 
           //- .h-80.mt-2.px-32.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
             .flex-1.text-xl Next Term
             .flex.items-center
-              .text-xl.text-white - -       
+              .text-xl.text-white - -
 
     //- info bar
-    info-bar.mb-20.justify-center.relative(:btnLabel="allDrips.length ? 'Edit Drips' : 'Add Drips'", @btnClick="$emit('editDripsSelect')")
+    info-bar.mb-20.justify-center.relative(v-if="allDrips", :btnLabel="allDrips.length ? 'Edit Drips' : 'Add Drips'", @btnClick="$emit('editDripsSelect')")
       div.text-center.w-full
         template(v-if="canEdit") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
-        | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>   
-      
-
-          
+        | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>
 
     //- list
     ul

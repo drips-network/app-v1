@@ -48,16 +48,16 @@ section.user-memberships
     loading-bar
 
   template(v-else)
-    info-bar.mb-20.justify-center.px-32
+    info-bar.mb-24.justify-center.px-32
       div
         template(v-if="$store.getters.isWalletAddr($route.params.address)") You
         template(v-else) #[addr.font-bold(:address="$route.params.address")]
         | &nbsp;are a <b>member</b> of <b>{{ nfts.length }} communit{{ nfts.length === 1 ? 'y' : 'ies' }}</b>
 
     section.px-2
-      ul.flex.flex-wrap.w-full_40.-mx-20
+      ul.grid.grid-cols-2.gap-40
         //- nfts...
-        li.px-20.w-1x2.mb-40.flex(v-for="nft in nfts")
+        li.mb-ff.flex(v-for="nft in nfts")
           user-nft.w-full(:nft="nft")
 
     footer(v-if="!nfts.length")

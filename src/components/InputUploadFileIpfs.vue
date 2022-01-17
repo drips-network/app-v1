@@ -27,6 +27,7 @@ const onImgFileChange = (e) => {
       } catch (e) {
         emit('error', e)
         console.error(e)
+        // TODO - use FormMessage.vue
         alert('Image upload error. Perhaps the image is too large (500kb max) or the request timed out and you may try again.')
         // // revert img to current / empty
         // imgSrc.value = imgSrcCurrent

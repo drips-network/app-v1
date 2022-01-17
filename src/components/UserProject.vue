@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount, toRaw } from 'vue'
 import store from '@/store'
 import ProjectProgressBar from '@/components/ProjectProgressBar'
 import ProjectStats from '@/components/ProjectStats'
@@ -21,7 +21,7 @@ const dripsPct = computed(() => drips.value?.reduce((acc, curr) => acc + curr.pe
 const projectRt = { name: 'project', params: { address: props.project.id } }
 
 const isAdmin = computed(() => props.project.projectOwner === store._state.data.address)
-const isStreaming = props.project.tokenTypes[0].streaming
+const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
 const collectModalOpen = ref(false)
 
@@ -37,22 +37,15 @@ const totalCollectableDAI = computed(() => {
   return toDAI(totalCollectable.value)
 })
 
-// current funding (received from progress bar)
-const currentFundingAmt = ref(-1)
-
-// collect action
-const tx = ref()
-const collect = async () => {
-  try {
-    tx.value = await store.dispatch('collectFunds', { projectAddress: props.project.id })
-    await tx.value.wait()
-    emit('collected')
-    getCollectable()
-    tx.value = null
-  } catch (e) {
-    alert('Error collecting: ' + e.message)
-    collecTx.value = null
-  }
+// current funding
+const currentFundingWei = ref()
+const getCurrentFunding = () => {
+  store.dispatch('getFundingTotal', {
+    projectAddress: props.project.id,
+    isStreaming
+  })
+    .then(wei => { currentFundingWei.value = wei })
+    .catch(console.error)
 }
 
 const getCollectable = () => {
@@ -76,6 +69,7 @@ onBeforeMount(() => {
   store.dispatch('getSplitsReceivers', props.project.id)
     .then(receivers => { drips.value = receivers.percents })
   //
+  getCurrentFunding()
   getCollectable()
 })
 </script>
@@ -99,7 +93,7 @@ onBeforeMount(() => {
       | View
 
   //- progress bar
-  project-progress-bar.mt-20.mb-20.bg-indigo-800(v-if="meta && project", :meta="meta", :project="project", @currentFundingAmt="amt => { currentFundingAmt = amt }")
+  project-progress-bar.mt-20.mb-20.bg-indigo-800(v-if="project && meta && meta.goal", :meta="meta", :project="project", :currentFundingWei="currentFundingWei")
 
   //- (funds)
   template(v-if="isAdmin")
@@ -113,8 +107,8 @@ onBeforeMount(() => {
               .h-80.w-full.flex.items-center.justify-between
                 .flex-1.text-xl.text-violet-650 Monthly Drips-In
                 .flex.items-center.text-white
-                  .text-xl(:class="{'animate-pulse': currentFundingAmt === -1 }")
-                    | {{ currentFundingAmt === -1 ? '...' : toDAI(currentFundingAmt) }}
+                  .text-xl(:class="{'animate-pulse': !currentFundingWei }")
+                    | {{ !currentFundingWei ? '...' : toDAI(currentFundingWei) }}
                   svg-dai.h-20.ml-12
                   .text-lgg.tracking-tight /MO
                   //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
@@ -142,7 +136,7 @@ onBeforeMount(() => {
                 | Collect
 
   //- stats
-  project-stats.mt-20(v-if="project", :project="project", :meta="meta", :drips="drips")
+  project-stats.mt-20(v-if="project", :project="project", :meta="meta", :drips="drips", :currentFundingWei="currentFundingWei")
 
   //- collect modal
   modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")

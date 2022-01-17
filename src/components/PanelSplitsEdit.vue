@@ -1,15 +1,16 @@
 <script setup>
 import { ref, computed, toRaw, onBeforeMount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { formatSplits, validateAddressInput } from '@/utils'
+import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import SvgX from '@/components/SvgX'
-import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import store from '@/store'
 import TxLink from '@/components/TxLink'
 import LoadingBar from '@/components/LoadingBar'
-import { formatSplits, validateAddressInput } from '@/utils'
+import FormMessage from '@/components/FormMessage'
 
 const props = defineProps(['newRecipient', 'cancelBtn', 'projectAddress'])
 const emit = defineEmits(['close', 'updated', 'viewSplits'])
@@ -58,10 +59,12 @@ const getSplits = async () => {
 
 const tx = ref()
 const txReceipt = ref()
+const txMsg = ref()
 
 const update = async () => {
   try {
     tx.value = null
+    txMsg.value = null
     txReceipt.value = null
 
     // resolve receiver inputs
@@ -86,11 +89,13 @@ const update = async () => {
     // wait for tx...
     txReceipt.value = await tx.value.wait()
 
+    // success
     emit('updated')
-    setTimeout(() => { tx.value = null }, 3000)
+    txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile!' }
   } catch (e) {
-    console.error(e)
-    alert('Error: \n' + e.message || e)
+    // console.error(e)
+    // alert('Error: \n' + e.message || e)
+    txMsg.value = { status: -1, message: e.message || e }
   }
 }
 
@@ -170,23 +175,27 @@ panel(icon="💦")
         svg-plus-minus-radicle
 
       //- btns
-      .mt-40.flex.justify-center
-        //- close btn
-        template(v-if="props.cancelBtn")
-          button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')")
-            | {{ txReceipt ? 'Close' : 'Cancel' }}
+      .mt-40
+        //- (tx message)
+        form-message.my-40(v-if="txMsg", :body="txMsg")
 
-        //- (view btn)
-        template(v-if="txReceipt")
-          button.btn.btn-violet.btn-lg.px-36(@click.prevent="viewMySplits") View your Drips
+        .flex.justify-center
+          //- close btn
+          template(v-if="props.cancelBtn")
+            button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')")
+              | {{ txReceipt ? 'Close' : 'Cancel' }}
 
-        //- (update btn)
-        template(v-else)
-          button.btn.btn-lg.px-36.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
-            template(v-if="txReceipt") Updated
-            template(v-else-if="tx") Updating...
-            template(v-else) Update
+          //- (view btn)
+          template(v-if="txReceipt")
+            button.btn.btn-violet.btn-lg.px-36(@click.prevent="viewMySplits") View your Drips
 
-      tx-link(v-if="tx", :tx="tx")
+          //- (update btn)
+          template(v-else)
+            button.btn.btn-lg.px-36.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
+              template(v-if="txReceipt") Updated
+              template(v-else-if="tx") Updating...
+              template(v-else) Update
+
+        tx-link(v-if="tx", :tx="tx")
 
 </template>

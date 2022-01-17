@@ -17,12 +17,14 @@ import { constants } from 'ethers'
 import showdown from 'showdown'
 import SvgPen from '@/components/SvgPen'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
+import FormMessage from '@/components/FormMessage'
 const route = useRoute()
 const router = useRouter()
 
 const step = ref(0)
 const review = ref(false)
 const tx = ref()
+const txMsg = ref()
 const owner = computed(() => store.state.address)
 const projectAddress = ref(null)
 
@@ -175,6 +177,9 @@ const openPanelsForReview = () => {
 
 async function submitProject () {
   try {
+    tx.value = null
+    txMsg.value = null
+
     // TODO - better UX to break ipfs and create into separate actions with error handling inside this component
     tx.value = await store.dispatch('createProject', {
       project: toRaw(project.value),
@@ -185,15 +190,19 @@ async function submitProject () {
     })
     console.log('tx', tx.value)
 
-    // on project created...
-    projectAddress.value = await store.dispatch('waitForProjectCreate', tx.value)
+    // wait for tx...
+    projectAddress.value = (await store.dispatch('waitForProjectCreate', tx.value))?.toLowerCase()
 
-    // go to project
-    router.push({ name: 'project', params: { address: projectAddress.value.toLowerCase() } })
-  } catch (e) {
-    console.error(e)
-    alert('Error creating project: ' + e.message)
+    // success!
+    txMsg.value = { status: 1, message: 'Created! View your community!' }
     tx.value = null
+    // go to project
+    // router.push({ name: 'project', params: { address: projectAddress.value.toLowerCase() } })
+  } catch (e) {
+    // console.error(e)
+    // alert('Error creating project: ' + e.message)
+    // TODO scroll to error?
+    txMsg.value = { status: -1, message: e.message || e }
   }
 }
 
@@ -441,6 +450,9 @@ projectAddress.value = isDev ? route.query.project : null
 
           button.btn.btn-lg.btn-violet.mx-auto.min-w-xs(@click.prevent="openPanelsForReview") Review
 
+    //- (tx message)
+    form-message.my-40(v-if="txMsg", :body="txMsg")
+
     //- (create btn)
     .sticky.z-20.bottom-20.left-0.w-full.mt-40.flex.justify-center(v-show="step > 3")
       .text-center
@@ -449,9 +461,9 @@ projectAddress.value = isDev ? route.query.project : null
           template(v-else-if="tx") Creating...
           template(v-else) Create ✨
 
-        //- (tx link)
-        .mt-16.text-violet-600.py-8.px-16.rounded-full.bg-indigo-900(v-if="tx")
-          a(:href="`https://etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+    //- (tx link)
+    .mt-16.text-violet-600.py-8.px-16.rounded-full.bg-indigo-900(v-if="tx")
+      a(:href="`https://etherscan.io/tx/${tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 
     //- post-create
     //- section

@@ -9,6 +9,7 @@ import Panel from '@/components/Panel'
 import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 import store, { pinJSONToIPFS } from '@/store'
 import TxLink from '@/components/TxLink'
+import FormMessage from '@/components/FormMessage'
 
 const props = defineProps(['meta', 'projectAddress'])
 const emit = defineEmits(['close', 'updated'])
@@ -18,30 +19,34 @@ const status = ref()
 
 const tx = ref()
 const txReceipt = ref()
+const txMsg = ref()
 
 const update = async () => {
   try {
-    status.value = 'Preparing...'
+    tx.value = txMsg.value = txReceipt.value = null
+
+    // upload to ipfs...
+    txMsg.value = { message: 'Preparing...' }
     const ipfsHash = await pinJSONToIPFS(toRaw(newMeta.value))
+    txMsg.value = null
 
+    // submit...
     tx.value = await store.dispatch('updateProjectMeta', { address: props.projectAddress, ipfsHash })
-    console.log('new tx...', tx.value)
+    console.log('update community info tx...', tx.value)
 
-    status.value = 'Waiting...'
+    // wait for tx...
     txReceipt.value = await tx.value.wait()
 
-    if (!txReceipt.value) {
-      throw new Error('Transcation was not confirmed')
-    }
-
     // success!
-    status.value = 'Updated!'
     emit('updated', ipfsHash)
-    setTimeout(() => emit('close'), 3000)
+    txMsg.value = { status: 1, message: 'Info updated!' }
+    tx.value = null
+    // setTimeout(() => emit('close'), 3000)
   } catch (e) {
-    console.error(e)
-    alert('An error occured: ' + e.message)
-    status.value = null
+    // console.error(e)
+    // alert('An error occured: ' + e.message)
+    // status.value = null
+    txMsg.value = { status: -1, message: e.message || e }
   }
 }
 </script>
@@ -57,11 +62,19 @@ modal(v-bind="$attrs", @close="$emit('close')")
     form(@submit.prevent="update")
       fields-project-edit(v-model="newMeta")
 
+      //- (tx message)
+      form-message.my-40(v-if="txMsg", :body="txMsg")
+
       .mt-40.flex.justify-center
+        //- cancel/close btn
         button.btn.btn-lg.btn-outline.px-36.mr-4(@click="$emit('close')")
           | {{ tx || txReceipt ? 'Close' : 'Cancel' }}
-        button.btn.btn-lg.btn-violet.px-36(type="submit", :disabled="status")
-          | {{ status || 'Update' }}
+
+        //- submit btn
+        button.btn.btn-lg.btn-violet.px-36(type="submit")
+          //- template(v-if="txReceipt") Updated!
+          template(v-if="tx") Updating...
+          template(v-else) Update
 
     tx-link(v-if="tx", :tx="tx")
 

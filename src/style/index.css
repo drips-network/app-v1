@@ -73,9 +73,9 @@ html {
   @apply bg-indigo-900 notouch_hover_text-white transition duration-150;
 }
 .btn-white{
-  @apply bg-white text-black border-2 border-transparent;
+  @apply bg-white text-black;
   &:not([disabled]) {
-    /* @apply notouch_hover_border-gray-300; */
+    @apply notouch_hover_ring notouch_hover_ring-violet-650;
   }
 }
 .btn-outline {
@@ -85,9 +85,9 @@ html {
   }
 }
 .btn-outline-orange{
-  @apply border border-orange-600;
+  @apply border border-orange-500;
   &:not([disabled]) {
-    @apply notouch_hover_bg-orange-600;
+    @apply notouch_hover_bg-orange-500;
   }
 }
 .btn-violet{
@@ -150,4 +150,8 @@ input[type=number] {
 .child-lists-list{
   & ul { @apply list-disc pl-20 },
   & ol { @apply list-decimal pl-20 }
+}
+
+.children-mt-em > * + *{
+  margin-top: 1.15em;
 }
