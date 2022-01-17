@@ -75,7 +75,7 @@ section.user-splits
               .text-xl.text-white - -
 
     //- info bar
-    info-bar.mb-20.justify-center.relative(v-if="allDrips", :btnLabel="allDrips.length ? 'Edit Drips' : 'Add Drips'", @btnClick="$emit('editDripsSelect')")
+    info-bar.mb-20.justify-center.relative(v-if="allDrips", :btnLabel="!canEdit ? undefined : allDrips.length ? 'Edit Drips' : 'Add Drips'", @btnClick="$emit('editDripsSelect')")
       div.text-center.w-full
         template(v-if="canEdit") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
