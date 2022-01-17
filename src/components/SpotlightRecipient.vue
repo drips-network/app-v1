@@ -27,7 +27,7 @@ div.mb-80
         .inline.flex-shrink-0.leading-none
           | #[addr.ml-12.font-bold(:address="props.recipient")] is receiving drips from #[b {{ supporters.length }} addresses].
 
-  .mt-16.flex.h-80.justify-center.px-24.rounded-full.text-violet-650.text-md.relative
+  .mt-12.flex.h-80.justify-center.px-24.rounded-full.text-violet-650.text-md.relative
 
     .h-80.flex.items-center.rounded-full.bg-indigo-700.py-10.px-6.w-260ff.mr-2
       template(v-if="supporters")
