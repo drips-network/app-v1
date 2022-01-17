@@ -88,13 +88,13 @@ article.explore.pt-16.px-24
               | Some #[b notable drips] 💧 on the #[b network]
           li
             //- ricmoo.eth
-            spotlight-recipient.my-48ff(recipient="0x5555763613a12d8f3e73be831dff8598089d3dca", :allSplits="splits")
+            spotlight-recipient.my-24(recipient="0x5555763613a12d8f3e73be831dff8598089d3dca", :allSplits="splits")
 
             //- walletconnect.eth
-            spotlight-recipient.my-48ff(recipient="0xcbec15583a21c3ddad5fab658be5b4fe85df730b", :allSplits="splits")
+            spotlight-recipient.my-24(recipient="0xcbec15583a21c3ddad5fab658be5b4fe85df730b", :allSplits="splits")
 
             //- soliditylang.eth
-            spotlight-recipient.my-48ff(recipient="0x151ef20a3ade1cc1161391594f8a32461389a54e", :allSplits="splits")
+            spotlight-recipient.my-24(recipient="0x151ef20a3ade1cc1161391594f8a32461389a54e", :allSplits="splits")
 
             //- dapptools.eth
             //- INCORRECT?
