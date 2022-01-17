@@ -22,8 +22,8 @@ const meta = inject('projectMeta')
 const isStreaming = toRaw(props.tokenType.streaming)
 const typeId = toRaw(props.tokenType.tokenTypeId)
 const minAmt = toRaw(props.tokenType.minAmt)
-let minDAI = isStreaming ? toDAI(bn.from(minAmt).mul(30 * 24 * 60 * 60)) // bn
-  : toDAI(minAmt)
+let minDAI = isStreaming ? toDAI(bn.from(minAmt).mul(30 * 24 * 60 * 60), 'exact') // bn
+  : toDAI(minAmt, 'exact')
 // rounding
 minDAI = Number(minDAI) % parseInt(minDAI) === 0 ? parseInt(minDAI) : Number(minDAI).toFixed(2)
 
@@ -91,8 +91,6 @@ const approve = async () => {
   try {
     // send...
     state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
-    console.log('approve tx', state.approveTx)
-    debugger
 
     // wait for confirmation...
     await state.approveTx.wait() // receipt

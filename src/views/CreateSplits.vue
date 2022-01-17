@@ -2,6 +2,7 @@
 import Panel from '@/components/Panel'
 import PanelSplitsEdit from '@/components/PanelSplitsEdit'
 import store from '@/store'
+import { useRouter } from 'vue-router'
 
 const connect = async () => {
   try {
@@ -11,6 +12,9 @@ const connect = async () => {
     console.error(e)
   }
 }
+
+const router = useRouter()
+const goToMySplits = () => router.push({ name: 'user-drips-out', params: { address: store.state.address } })
 </script>
 
 <template lang="pug">
@@ -25,6 +29,11 @@ template(v-if="!$store.state.address")
 
 //- (edit splits panel)
 template(v-else)
-  panel-splits-edit.mx-auto
+  panel-splits-edit.mx-auto(@viewSplits="goToMySplits")
+    template(v-slot:header)
+      h2 Split your Drips
+    template(v-slot:description)
+      p.mx-auto(style="max-width:22em")
+        | Anytime you receive drips, they will be #[b split] with the addresses below:
 
 </template>

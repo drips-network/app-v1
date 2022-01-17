@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, provide, toRaw } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import UserTag from '@/components/UserTag'
 import AvatarBlockie from '@/components/AvatarBlockie'
 import Addr from '@/components/Addr'
@@ -16,6 +16,7 @@ import { utils } from 'ethers'
 import { toDAI, toDAIPerMo } from '@/utils'
 
 const route = useRoute()
+const router = useRouter()
 const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
@@ -86,6 +87,8 @@ const getDrips = async () => {
     console.error(e)
   }
 }
+
+const goToMySplits = () => router.push({ name: 'user-drips-out', params: { address: store.state.address } })
 
 onMounted(() => {
   if (isMyUser.value) {
@@ -222,14 +225,17 @@ article.profile.pb-80
 
     //- edit splits...
     template(v-if="edit==='splits'")
-      modal-splits-edit(:open="edit === 'splits'", @close="edit = null; getSplits()", @updated="getSplits")
+      modal-splits-edit(:open="edit === 'splits'", @close="edit = null; getSplits()", @updated="getSplits", @viewSplits="goToMySplits")
         template(v-slot:header)
-          h6 Share your drips
+          h6 Split your Drips
         template(v-slot:description)
-          template(v-if="splitsOut && splitsOut.length")
-            | Edit the addresses you #[b.text-violet-650 share]<br>your incoming funds with.
-          template(v-else)
-            | Add addresses that you will #[b.text-violet-650 share]<br>your incoming funds with.
+          p.mx-auto(style="max-width:22em")
+            | Anytime you receive drips, they will be #[b split] with the addresses below:
+          //- 
+            template(v-if="splitsOut && splitsOut.length")
+              | Edit the addresses you #[b.text-violet-650 share]<br>your incoming funds with.
+            template(v-else)
+              | Add addresses that you will #[b.text-violet-650 share]<br>your incoming funds with.
 
   //- (OTHER USER)
   template(v-else)

@@ -6,6 +6,7 @@ import UserAvatar from '@/components/UserAvatar'
 import InputBody from '@/components/InputBody'
 import ModalMint from '@/components/ModalMint'
 import ModalCollectDrips from '@/components/ModalCollectDrips'
+import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo'
 import SvgGlobe from '@/components/SvgGlobe'
 import SvgTwitter from '@/components/SvgTwitter'
@@ -32,7 +33,7 @@ const drips = ref()
 
 const status = ref()
 const mintModal = ref(false)
-const editProject = ref(false)
+const edit = ref()
 
 const canEdit = computed(() => project.value?.projectOwner === store.state.address)
 const editMenuOpen = ref(false)
@@ -41,6 +42,12 @@ const collectModalOpen = ref(false)
 const getProjectMeta = async (ipfsHash) => {
   meta.value = await store.dispatch('getProjectMeta', { ipfsHash })
   // TODO handle error for updating/editing meta?
+}
+
+const getDrips = () => {
+  store.dispatch('getSplitsReceivers', projectAddress)
+    .then(receivers => { drips.value = receivers.percents })
+    .catch(console.error)
 }
 
 const getProject = async () => {
@@ -64,9 +71,7 @@ const getProject = async () => {
     }
 
     // get drips
-    store.dispatch('getSplitsReceivers', projectAddress)
-      .then(receivers => { drips.value = receivers.percents })
-      .catch(console.error)
+    getDrips()
 
     // missing project info?
     if (!project.value.projectOwner) {
@@ -92,6 +97,11 @@ const getProject = async () => {
 const onMintModalClose = () => {
   mintModal.value = false
   getProject() // fetch in case new mints
+}
+
+const dripsList = ref()
+const scrollToDripsList = () => {
+  dripsList.value.$el.scrollIntoView({ behavior: 'smooth' })
 }
 
 // const collectableAmts = ref()
@@ -214,8 +224,9 @@ article.project.pb-96
                   //- TODO: join click
                   button.border.border-white.rounded-full.h-48.flex.items-center.justify-center.text-md.min-w-132.notouch_hover_bg-white.notouch_hover_text-violet-800.transition.duration-100(disabled) Join
 
-    //- splits list
-    project-splits(v-if="drips", :drips="drips")
+    //- (splits list)
+    template(v-if="drips")
+      project-splits(ref="dripsList", :drips="drips", :canEdit="canEdit", @editSplits="edit = 'splits'")
 
     //- (owner actions)
     template(v-if="canEdit")
@@ -223,27 +234,35 @@ article.project.pb-96
         .flex.flex-col.items-center
           //- (options)
           .flex.flex-wrap.my-5.items-center.justify-center(v-show="editMenuOpen")
-            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(@click="editProject = true")
+            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(@click="edit = 'project'")
               | Edit Info
               span.transform.-scale-x-100.ml-12 ✏️
 
             //- TODO edit project splits
-            //- button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(disabled) Edit Drips 💧
+            button.mx-5.btn.btn-lg.btn-violet.shadow-md.px-32.font-semibold.tracking-wide(@click.prevent="edit = 'splits'") Edit Drips 💧
 
           //- toggle menu btn
           .my-3
-            button.btn.btn-lg.shadow-md.pl-36.pr-28.font-semibold.tracking-wide(:class="{'btn-violet': !editMenuOpen, 'btn-darker': editMenuOpen}", @click="editProject = true")
-              //- , @click="editMenuOpen = !editMenuOpen")
+            button.btn.btn-lg.shadow-md.pl-36.pr-28.font-semibold.tracking-wide(:class="{'btn-violet': !editMenuOpen, 'btn-darker': editMenuOpen}", @click="editMenuOpen = !editMenuOpen")
+              //- (edit icon)
               .flex.items-center(v-show="!editMenuOpen")
                 | Edit
                 svg-pen.h-28.ml-12.text-white.opacity-30
+              //- (close icon)
               .flex.items-center(v-show="editMenuOpen")
                 | Close
                 svg-x-circle.h-32.ml-12.text-white.opacity-30
 
     modal-mint(v-if="tokenType", :open="mintModal", @close="onMintModalClose", @minted="getProject", :projectAddress="projectAddress", :tokenType="tokenType")
 
-    modal-edit-project-info(v-if="editProject", :open="editProject", @updated="getProjectMeta", @close="editProject = editMenuOpen = false", :meta="meta", :projectAddress="projectAddress")
+    modal-edit-project-info(v-if="edit === 'project'", :open="edit === 'project'", @updated="getProjectMeta", @close="edit = editMenuOpen = false", :meta="meta", :projectAddress="projectAddress")
+
+    modal-splits-edit(v-if="edit === 'splits'", :open="edit === 'splits'", @close="edit = editMenuOpen = false; getDrips()", :projectAddress="projectAddress", @updated="getDrips", @viewSplits="scrollToDripsList")
+      template(v-slot:header)
+        h6 Drip to Others
+      template(v-slot:description)
+        p.mx-auto(style="max-width:22em")
+          | Anytime your community receive drips, they will be #[b split] with the addresses below:
 
     modal-collect-drips(v-if="meta && collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false", @collected="getProjectMeta", :projectAddress="projectAddress")
       template(v-slot:header) Collect drips for<br>"{{ meta.name }}"

@@ -7,5 +7,5 @@ const props = defineProps({
 
 <template lang="pug">
 .mt-16.text-center(:class="props.clss")
-  a(:href="`https://etherscan.io/tx/${props.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
+  a(:key="props.tx.hash", :href="`https://etherscan.io/tx/${props.tx.hash}`", target="_blank", rel="noopener noreferrer") View Tx on Etherscan ↗
 </template>

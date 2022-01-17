@@ -20,7 +20,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     .mt-40.flex.justify-center
       button.btn.btn-lg.btn-violet.mx-3.px-40(@click="$emit('select', 'drips')") Monthly Drips 🗓
-      button.btn.btn-lg.btn-violet.mx-3.px-40(@click="$emit('select', 'splits')") Drip Sharing 💦
+      button.btn.btn-lg.btn-violet.mx-3.px-40(@click="$emit('select', 'splits')") Drip Splitting 💦
 
     .mt-40.flex.justify-center
       button.btn.btn-lg.btn-outline.px-40(@click="$emit('close')") Cancel

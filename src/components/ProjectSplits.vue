@@ -3,21 +3,19 @@ import { ref, computed, onBeforeMount } from 'vue'
 import store from '@/store'
 import Addr from '@/components/Addr'
 import UserAvatar from '@/components/UserAvatar'
+import InfoBar from "@/components/InfoBar"
 
 const props = defineProps({
-  drips: Array
+  drips: Array,
+  canEdit: Boolean
 })
 
-const myDrips = ref(props.drips)
+const emit = defineEmits(['editSplits'])
 
-// TODO remove demo
-// if (!myDrips.value.length) {
-//   myDrips.value = Array(16).fill(0).map(() => ({ address: '0x87f3834fd4fce5781b4c12500de8b90b73342861', percent: 12 }))
-// }
 </script>
 
 <template lang="pug">
-section#drips.project-splits.relative
+section#drips.project-splits.relative.pt-0
   header.absolute.top-40.left-36
     .relative
       //- drip svg
@@ -40,31 +38,39 @@ section#drips.project-splits.relative
           <path fill-rule="evenodd" clip-rule="evenodd" d="M77.1763 50.4594C76.3884 49.6333 75.0699 49.6333 74.282 50.4594L59.2851 66.1813C59.039 66.4393 58.8799 66.7315 58.7972 67.0335C56.4004 70.4161 54.9917 74.5482 54.9917 79.0093C54.9917 90.4625 64.2763 99.747 75.7294 99.747C87.1825 99.747 96.4671 90.4625 96.4671 79.0093C96.4671 74.5477 95.0581 70.4152 92.6608 67.0324C92.578 66.7308 92.419 66.439 92.1732 66.1813L77.1763 50.4594Z" fill="#17164B"/>
         </svg>
 
-  section
-    ul.flex.flex-wrap.pl-52.pr-60
-      //- TODO - mobile use :nth-child for m-l/r
-      li.project-drips__drip(v-for="(drip, i) in myDrips", :class="{'ml-auto': i % 6 === 0, 'mr-auto': i % 6 === 5}")
-        //- (drip head)
-        .block.-mt-px.mb-32(v-if="i < 3")
-          img.mx-auto(src="../assets/icons/drip-off-point.svg")
-        //- drip
-        router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20.group(:to="{name: 'user', params: { address: drip.address }}")
-          //- drip graphic
-          img.w-full.block(src="../assets/icons/drip-big.svg", alt="blue raindrop")
-          //- text
-          .absolute.overlay.flex.items-center.justify-center
-            div.text-center.text-violet-650
-              //- percent
-              .pt-24.font-cheee.text-8xl.font-normal.notouch_group-hover_text-greenbright-500(style="margin-top:38%")
-                | {{ parseInt(drip.percent) }}
-                span(style="font-size: 0.75em") %
-              .mt-20.font-semibold.text-whiteff.text-lg.notouch_group-hover_text-white
-                addr(:address="drip.address")
-              .mt-10.mb-2.flex.justify-center.w-full
-                user-avatar(:address="drip.address", blockieSize="16", :key="drip.address")
-              //- TODO calc amount
-              //- .mt-8.font-mono.text-ms.text-violet-650 XXX Ð/mo
-              //- .mb-20
+  section.pt-px
+    //- (no drips)
+    template(v-if="props.drips && !props.drips.length")
+      info-bar.mt-112(:btnLabel="props.canEdit && 'Add Drips'", @btnClick="$emit('editSplits')")
+        div.w-full.text-center {{ props.canEdit ? 'Your community ' : 'This community ' }} is not #[b dripping funds] to others.
+
+    //- (drips)
+    template(v-else-if="props.drips")
+      ul.flex.flex-wrap.pl-52.pr-60.-mt-px
+        //- TODO - mobile use :nth-child for m-l/r
+        //- drips...
+        li.project-drips__drip(v-for="(drip, i) in props.drips", :class="{'ml-auto': i % 6 === 0, 'mr-auto': i % 6 === 5}")
+          //- (drip head)
+          .block.-mt-px.mb-32(v-if="i < 3")
+            img.mx-auto(src="../assets/icons/drip-off-point.svg")
+          //- drip
+          router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20.group(:to="{name: 'user', params: { address: drip.address }}")
+            //- drip graphic
+            img.w-full.block(src="../assets/icons/drip-big.svg", alt="blue raindrop")
+            //- text
+            .absolute.overlay.flex.items-center.justify-center
+              div.text-center.text-violet-650
+                //- percent
+                .pt-24.font-cheee.text-8xl.font-normal.notouch_group-hover_text-greenbright-500(style="margin-top:38%")
+                  | {{ parseInt(drip.percent) }}
+                  span(style="font-size: 0.75em") %
+                .mt-20.font-semibold.text-whiteff.text-lg.notouch_group-hover_text-white
+                  addr(:address="drip.address", :key="drip.address")
+                .mt-10.mb-2.flex.justify-center.w-full
+                  user-avatar(:address="drip.address", blockieSize="16", :key="drip.address")
+                //- TODO calc amount
+                //- .mt-8.font-mono.text-ms.text-violet-650 XXX Ð/mo
+                //- .mb-20
 
 </template>
 

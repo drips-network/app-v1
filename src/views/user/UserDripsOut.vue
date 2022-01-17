@@ -39,7 +39,7 @@ section.user-splits
     //-     | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b> 
 
     //- (balance)
-    template(v-if="canEdit && dripsOut.length")
+    template(v-if="canEdit && dripsOut && dripsOut.length")
       section.mb-20.panel.panel-indigoff.border.border-violet-800.rounded-2xlb.p-16.text-violet-650
         //- header
         header.mb-12.flex.justify-between.items-center
@@ -75,14 +75,12 @@ section.user-splits
               .text-xl.text-white - -       
 
     //- info bar
-    info-bar.mb-20.justify-center.relative
+    info-bar.mb-20.justify-center.relative(:btnLabel="allDrips.length ? 'Edit Drips' : 'Add Drips'", @btnClick="$emit('editDripsSelect')")
       div.text-center.w-full
         template(v-if="canEdit") You are
         template(v-else) #[addr.font-bold(:address="$route.params.address")] is
         | &nbsp;<b>dripping funds</b> to <b>{{ allDrips.length }} address{{ allDrips.length === 1 ? '' : 'es' }}</b>   
-      .absolute.top-0.right-12.h-full.flex.items-center
-        button.btn.btn-md.btn-outline.text-md.px-24.font-semibold.notouch_hover_text-white.transition.duration-150(@click="$emit('editDrips')")
-          | {{ allDrips.length ? 'Edit' : 'Add Drips' }}
+      
 
           
 

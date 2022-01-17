@@ -586,16 +586,23 @@ export default createStore({
       }
     },
 
-    async updateAddressSplits (_, { currentReceivers, newReceivers }) {
+    async updateAddressSplits (_, { currentReceivers, newReceivers, projectAddress }) {
       try {
         // validate...
         newReceivers = await validateSplits(newReceivers, provider)
 
-        const contract = getHubContract()
+        let contract, method
+
+        if (projectAddress) {
+          contract = getProjectContract(projectAddress)
+          method = 'changeSplitsReceivers'
+        } else {
+          contract = getHubContract()
+          method = 'setSplits'
+        }
         const contractSigner = contract.connect(signer)
-        // tx...
-        console.log('update splits:', { currentReceivers, newReceivers })
-        return contractSigner.setSplits(currentReceivers, newReceivers)
+        // submit
+        return contractSigner[method](currentReceivers, newReceivers)
       } catch (e) {
         console.error(e)
         throw e

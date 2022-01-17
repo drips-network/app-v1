@@ -9,6 +9,6 @@ const attrs = useAttrs()
 <template lang="pug">
 modal(v-bind="$attrs", @close="$emit('close')")
 
-  panel-drips-edit.z-10.m-auto(v-bind="$attrs", :cancelBtn="true", @close="$emit('close')")
+  panel-drips-edit.z-10.m-auto(v-bind="$attrs", :cancelBtn="true", @close="$emit('close')", @updated="$emit('updated')")
 
 </template>

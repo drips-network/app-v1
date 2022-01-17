@@ -8,11 +8,14 @@ import SvgX from '@/components/SvgX'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import store from '@/store'
 import TxLink from '@/components/TxLink'
+import LoadingBar from '@/components/LoadingBar'
 import { formatSplits, validateAddressInput } from '@/utils'
 
-const props = defineProps(['newRecipient', 'cancelBtn'])
-const emit = defineEmits(['close', 'updated'])
+const props = defineProps(['newRecipient', 'cancelBtn', 'projectAddress'])
+const emit = defineEmits(['close', 'updated', 'viewSplits'])
 const router = useRouter()
+
+const owner = computed(() => props.projectAddress || store.state.address)
 
 const loading = ref(false)
 
@@ -32,11 +35,9 @@ const getSplits = async () => {
   try {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
-    // get...
-    const receivers = await store.dispatch('getSplitsReceivers', store.state.address)
+    // get... (from project if not-empty)
+    const receivers = await store.dispatch('getSplitsReceivers', owner.value)
     currentReceivers = receivers.weights
-    // console.log('curr', currentReceivers)
-    // debugger
 
     // set splits
     const splits = toRaw(receivers.percents)
@@ -73,12 +74,19 @@ const update = async () => {
     // format newReceivers param
     const newReceivers = formatSplits(splitsResolved)
 
+    // params
+    const params = { currentReceivers, newReceivers }
+    if (props.projectAddress) {
+      params.projectAddress = props.projectAddress
+    }
     // submit...
-    tx.value = await store.dispatch('updateAddressSplits', { currentReceivers, newReceivers })
+    tx.value = await store.dispatch('updateAddressSplits', params)
     console.log('update splits tx', tx.value)
 
+    // wait for tx...
     txReceipt.value = await tx.value.wait()
 
+    emit('updated')
     setTimeout(() => { tx.value = null }, 3000)
   } catch (e) {
     console.error(e)
@@ -87,9 +95,8 @@ const update = async () => {
 }
 
 const viewMySplits = () => {
-  emit('updated')
   emit('close')
-  router.push({ name: 'user-drips-out', params: { address: store.state.address } })
+  emit('viewSplits')
 }
 
 onBeforeMount(async () => {
@@ -130,20 +137,15 @@ onBeforeMount(async () => {
 panel(icon="💦")
 
   template(v-slot:header)
-    //- dialog-title.leading-snug
-      slot(name="header")
-    h2.leading-snug Split your Drips
+    slot(name="header")
 
   template(v-slot:description)
-    //- dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
+    .text-violet-650
       slot(name="description")
-    p.text-violet-650.mx-auto(style="max-width:22em")
-      //- | Who do you want to #[b share] your incoming drips with? Anytime funds are dripped to you, they will be shared with these recipients automatically!
-      | Anytime you receive drips, they will be #[b split] with the addresses below:
 
   //- (loading...)
   template(v-if="loading")
-    .h-80.animate-pulse.btn.btn-lg.btn-outline.pointer-events-none.text-violet-650.w-full Loading...
+    loading-bar.w-full
 
   //- (edit)
   template(v-else)
@@ -171,7 +173,8 @@ panel(icon="💦")
       .mt-40.flex.justify-center
         //- close btn
         template(v-if="props.cancelBtn")
-          button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')") Cancel
+          button.btn.btn-outline.btn-lg.px-36.mr-8(@click.prevent="$emit('close')")
+            | {{ txReceipt ? 'Close' : 'Cancel' }}
 
         //- (view btn)
         template(v-if="txReceipt")
