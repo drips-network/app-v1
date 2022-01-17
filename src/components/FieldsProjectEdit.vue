@@ -38,7 +38,7 @@ const onIpfsHash = (hash) => {
   //- (image)
   img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
 
-.mt-8.text-sm.text-violet-650 Avatar
+.mt-8.text-sm.text-violet-650 Avatar Image
 
 //- form(@submit.prevent="save", validate)
 section.mt-40
