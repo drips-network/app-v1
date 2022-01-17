@@ -165,13 +165,13 @@ article.project.pb-96
                 | Collect
 
         //- project image
-        figure.h-144.w-144.bg-indigo-800.rounded-full.mb-36.mx-auto.relative.overflow-hidden
+        figure.h-144.w-144.mb-40.bg-indigo-800.rounded-full.mx-auto.relative.overflow-hidden
           img.absolute.overlay.object-cover.object-center(v-if="meta.image", :src="ipfsUrl(meta.image)")
           img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
         //- title
-        h1.text-3xl.mb-36.font-semibold {{ meta.name }}
+        h1.text-3xl.mb-40.font-semibold {{ meta.name }}
         //- descrip
-        p.text-lg {{ meta.descrip }}
+        p.text-lg.mx-auto.font-semibold(style="max-width:34em") {{ meta.descrip }}
         //- links
         ul.flex.items-center.justify-center.mt-32
           li(v-if="meta.website")
