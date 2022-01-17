@@ -14,11 +14,11 @@ import store from '@/store'
 
 const spotlights = [
   // soliditylang.eth
-  { address: '0x151ef20a3ade1cc1161391594f8a32461389a54e', highlight: 'sender' }, 
+  { address: '0x151ef20a3ade1cc1161391594f8a32461389a54e', highlight: 'sender' },
   // ricmoo.eth
   { address: '0x5555763613a12d8f3e73be831dff8598089d3dca', highlight: 'receiver' },
-  // walletconnect.eth 
-  { address: '0xcbec15583a21c3ddad5fab658be5b4fe85df730b', highlight: 'receiver' }, 
+  // walletconnect.eth
+  { address: '0xcbec15583a21c3ddad5fab658be5b4fe85df730b', highlight: 'receiver' }
 ]
 
 const projects = ref()
@@ -90,8 +90,6 @@ article.explore.pt-56.px-24
     section
       //- spotlights...
       spotlight-recipient(v-for="spotlight in spotlights", :spotlight="spotlight", :allSplits="splits")
-          
-          
 
   //- communities
   section.mt-240
@@ -108,7 +106,7 @@ article.explore.pt-56.px-24
 
       template(v-else)
         section.px-12ff
-          .w-full.mb-60.flex.justify-center.stickyff.z-20.top-6
+          .w-full.mb-56.flex.justify-center.stickyff.z-20.top-6
             .flex.bg-indigo-950.borderff.border-violet-700.rounded-full.items-center
               .h-44.w-44.flex.items-center.justify-center.text-base 🙂
               .-ml-6.text-base.font-semibolffd.pr-20.text-violet-650

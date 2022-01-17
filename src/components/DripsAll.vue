@@ -15,7 +15,7 @@ section
   template(v-if="!dripRows")
     loading-bar
   template(v-else)
-    .w-full.mb-60.flex.justify-center.stickyff.z-20.top-6
+    .w-full.mb-56.flex.justify-center.stickyff.z-20.top-6
       .flex.bg-indigo-950.borderff.border-violet-700.rounded-full.items-center
         .h-44.w-44.flex.items-center.justify-center.text-base 💧
         .-ml-6.text-base.font-semibolffd.pr-20.text-violet-650
