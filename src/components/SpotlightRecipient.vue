@@ -25,7 +25,7 @@ const senderRow = computed(() => {
 </script>
 
 <template lang="pug">
-div.mb-180
+div.mb-196
   //- commentary row
   //- .flex.justify-start
     .h-80.bg-indigo-950.flex.items-center.rounded-full

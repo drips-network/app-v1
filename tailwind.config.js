@@ -48,6 +48,7 @@ module.exports = {
       64: '6.4rem',
       72: '7.2rem',
       80: '8.0rem',
+      88: '8.8rem',
       96: '9.6rem',
       104: '10.4rem',
       112: '11.2rem',
@@ -57,6 +58,8 @@ module.exports = {
       160: '16rem',
       180: '18rem',
       196: '19.6rem',
+      220: '22rem',
+      240: '24rem',
       260: '26rem'
     },
     colors: {

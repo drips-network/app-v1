@@ -77,36 +77,45 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-article.explore.pt-48.px-24
+article.explore.pt-56.px-24
   //- header.flex.mt-12
     h1.h-80.rounded-full.flex.border.border-violet-600.ffbg-indigo-700.text-2xl.font-semibold.items-center.px-28.text-violet-650 Explore
   //- featured
   section
-    header
-      h2.sr-only Highlights
-      //- header-large.mb-48(icon="✨")
+    //- h2.sr-only Highlights
+    header-large(icon="✨")
+      header
         h2 Spotlight
 
-    section.mt-60
+    section
       //- spotlights...
       spotlight-recipient(v-for="spotlight in spotlights", :spotlight="spotlight", :allSplits="splits")
           
           
 
   //- communities
-  section.mt-104
-    //- header-large(icon="🙂")
+  section.mt-240
+    //- header-large.mb-96(icon="🙂")
       h2 Communities
+    //- .flex.justify-center
+      .h-80.bg-indigo-950.borderff.border-violet-800.pr-40.text-xl.rounded-full.flex.items-center.text-violet-650.font-semibold
+        .ml-32.mr-16 🙂
+        | Communities
 
-    section
+    section.mt-56
       template(v-if="!projects")
         loading-bar
 
       template(v-else)
         section.px-12ff
-          info-bar.mb-16.text-md
+          .w-full.mb-60.flex.justify-center.stickyff.z-20.top-6
+            .flex.bg-indigo-950.borderff.border-violet-700.rounded-full.items-center
+              .h-44.w-44.flex.items-center.justify-center.text-base 🙂
+              .-ml-6.text-base.font-semibolffd.pr-20.text-violet-650
+                | #[b Communities] raising funds with #[b NFT memberships] 🧩
+          //- info-bar.mb-16.text-md
             .w-full.text-center.px-32
-              | #[b Communities] raising funds with #[b NFT memberships] 🧩
+              | These #[b communities] are raising funds with #[b NFT memberships] 🧩
 
           //- .my-40.text-base.text-violet-650.text-center
             | #[b {{ projects.length }} communities] are #[b raising funds] with #[b NFT memberships] 🧩
@@ -120,8 +129,8 @@ article.explore.pt-48.px-24
             router-link.btn.btn-xl.btn-dark.px-60(to="/create") Create ✨
 
   //- drips
-  section.mt-180
-    //- header-large(icon="💧")
+  section.mt-220
+    //- header-large.mb-96(icon="💧")
       h2 Drips
 
     section.mt-48.pb-40

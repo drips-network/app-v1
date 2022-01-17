@@ -181,7 +181,9 @@ article.profile.pb-80
       
       //- (drip to btn)
       template(v-else)
-        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true") Drip to {{ ensName || '0x...' }} 💧
+        button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true")
+          | Drip to {{ ensName ? ensName.slice(0, 7) : '0x' }}... 💧
+          //- | Send Drips 💧
 
     nav.mt-56.mb-20
       .flex.items-start.justify-between.text-violet-650.text-lg
