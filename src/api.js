@@ -38,7 +38,6 @@ export default async function ({ query, variables }) {
       throw Error(resp.statusText)
     }
   } catch (e) {
-    console.log('api err', e, e.message, e.status)
     console.error('@graphAPI', e)
     sessionStorage.removeItem(id)
     throw e

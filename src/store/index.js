@@ -13,7 +13,8 @@ let provider, signer, walletProvider
 const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }
+  rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
+  'polygon-mumbai': { id: 80001, infura: 'wss://rpc-mumbai.maticvigil.com/ws/v1/86798487e616e7f8a582965f8e5350aa7e3e050b' }
 }
 
 // setup web3 modal
