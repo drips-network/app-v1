@@ -11,10 +11,10 @@ import HeaderLarge from '@/components/HeaderLarge'
 import SpotlightRecipient from '@/components/SpotlightRecipient'
 import store from '@/store'
 import { formatSplitsEvents, formatDripsEvents, filterForCurrentEvents } from '@/utils'
-import spotlightJSON from '../../content/spotlight.json'
+import content from '../../content/spotlight.js'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
-const spotlights = spotlightJSON[networkName] || []
+const spotlights = content[networkName] || []
 
 const projects = ref()
 
