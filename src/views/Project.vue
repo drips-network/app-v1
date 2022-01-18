@@ -52,10 +52,11 @@ const getDrips = () => {
 }
 
 let projectRequests = 0
-const getProject = async () => {
+const getProject = async (showLoading) => {
   try {
-    projectRequests++
-    status.value = 'Loading...'
+    if (showLoading) {
+      status.value = 'Loading...'
+    }
 
     // get project...
     project.value = await store.dispatch('getProject', projectAddress)
@@ -85,6 +86,7 @@ const getProject = async () => {
 
       if (projectRequests < 22) {
         console.log('project not found in API yet, refetching in 1s...')
+        projectRequests++
         return setTimeout(() => getProject(), 1000)
       }
 
@@ -133,7 +135,7 @@ const getCurrentFunding = () => {
 //     .then(amounts => { collectableAmts.value = amounts })
 // }
 
-onBeforeMount(() => getProject())
+onBeforeMount(() => getProject(true))
 
 provide('projectMeta', meta)
 </script>

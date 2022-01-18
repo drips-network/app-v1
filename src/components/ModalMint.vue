@@ -2,7 +2,7 @@
 import { ref, reactive, computed, inject, toRaw } from 'vue'
 import store from '@/store'
 import { BigNumber as bn, constants } from 'ethers'
-import { fromWei, toDAI, toWei, toWeiPerSec } from '@/utils'
+import { ipfsUrl, fromWei, toDAI, toWei, toWeiPerSec } from '@/utils'
 import Modal from '@/components/Modal'
 import TxLink from '@/components/TxLink'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
@@ -20,7 +20,7 @@ const emit = defineEmits(['close', 'minted'])
 const meta = inject('projectMeta')
 
 // token attributes
-const isStreaming = toRaw(props.tokenType.streaming)
+const isStreaming = toRaw(props.tokenType?.streaming)
 const typeId = toRaw(props.tokenType.tokenTypeId)
 const minAmt = toRaw(props.tokenType.minAmt)
 let minDAI = isStreaming ? toDAI(bn.from(minAmt).mul(30 * 24 * 60 * 60), 'exact') // bn
@@ -137,11 +137,22 @@ modal(v-bind="$attrs", @close="$emit('close')")
     template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed.text-violet-650
         .mx-auto.px-24(v-if="isStreaming", style="max-width:28em")
-          | Drip funds <b>every month</b> and receive a unique <b>Membership NFT</b> 🧩. #[b Top-up periodically] to ensure your membership doesn't become inactive. You can #[b withdraw] excess funds at any time.
+          | Drip funds <b>every month</b> and receive a unique <b>Membership NFT</b> 🧩. #[b Top-up periodically] to ensure your membership doesn't become #[b inactive]. You can #[b withdraw] excess funds at any time.
         .mx-auto(v-else, style="max-width:24em")
           | Join this community by purchasing a unique<br><b>NFT Membership</b> 🧩 with a one-time payment.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
+    //- image
+    figure.bg-indigo-950.rounded-xl.relative.mb-48.flex.p-56.relative
+      //- label
+      .absolute.top-0.left-0.w-full.text-center.text-sm.pt-4.font-normal.text-violet-600.opacity-90
+        | Membership NFT
+      //- wrapper
+      .w-full.relative
+        .aspect-w-8.aspect-h-7
+          img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(props.tokenType.ipfsHash)", alt="NFT Membership Image")
+
+    //- inputs
     form(@submit.prevent, validate)
       //- (subscription fields)
       template(v-if="isStreaming")
@@ -185,7 +196,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
           tx-link(v-if="state.approveTx && !state.approved", :tx="state.approveTx", clss="text-sm")
 
       //- (btns)
-      .mt-40
+      .mt-48
         //- (tx message)
         form-message.my-40(v-if="state.mintTxMsg", :body="state.mintTxMsg")
 
@@ -209,3 +220,30 @@ modal(v-bind="$attrs", @close="$emit('close')")
         tx-link(v-if="state.mintTx && !state.nft", :tx="state.mintTx")
 
 </template>
+
+<style lang="postcss">
+.mint-modal__nft-image {
+  /* animation:  levitate 3s infinite; */
+}
+
+@keyframes levitate {
+  /* 0% {
+    transform: translateY(-0.5rem);
+  }
+  50%{
+    transform: translateY(0.5rem);
+  }
+  100%{
+    transform: translateY(-0.5rem);
+  } */
+  0%, 100% {
+      transform: translateY(-1%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      /* animation-timing-function: cubic-bezier(0, 0, 0.2, 1); */
+      animation-timing-function: cubic-bezier(0, 0, 1, 1);
+    }
+}
+</style>
