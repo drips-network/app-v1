@@ -5,10 +5,10 @@ import Addr from '@/components/Addr'
 import SvgDai from '@/components/SvgDai'
 import FlexTruncate from '@/components/FlexTruncate'
 const props = defineProps(['drip', 'alternateColors'])
-const isMultiple = props.drip.receiver.length > 1
+const isMultiple = computed(() => props.drip.receiver.length > 1)
 const altBg = drip => drip.percent && props.alternateColors
 const receiverRt = computed(() => {
-  if (isMultiple) {
+  if (isMultiple.value) {
     return { name: 'user-drips-out', params: { address: props.drip.sender } }
   }
   return { name: 'user', params: { address: props.drip.receiver[0] } }

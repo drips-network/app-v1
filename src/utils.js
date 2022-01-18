@@ -18,7 +18,7 @@ export const toWei = (dai) => {
 }
 
 export const toDAI = (wei, frmt = 'pretty', roundTo) => {
-  let dai = utils.formatEther(wei)
+  const dai = utils.formatEther(wei)
   if (frmt === 'exact') {
     return dai
   }
@@ -198,6 +198,30 @@ export const getDripsWithdrawable = async (event) => {
   }
 }
 
+export const filterForCurrentEvents = events => {
+  const currentEvents = []
+  events.reverse().forEach(event => {
+    // add event if sender hasn't been added
+    if (!currentEvents.find(e => e.args[0] === event.args[0])) {
+      currentEvents.push(event)
+    }
+  })
+  return currentEvents
+}
+
+// format drip events for DripRow.vue
+export const formatDripsEvents = events => {
+  return events.map(e => {
+    const totalAmtPerSec = e.args[2].reduce((acc, cur) => acc.add(cur[1]), bn.from(0))
+    return {
+      blockNumber: e.blockNumber,
+      sender: e.args[0],
+      receiver: e.args[2].map(rec => rec[0]),
+      amount: toDAIPerMo(totalAmtPerSec)
+    }
+  })
+}
+
 // format split events for DripRow.vue
 export const formatSplitsEvents = events => {
   return events.map(e => {
@@ -206,7 +230,7 @@ export const formatSplitsEvents = events => {
     return {
       blockNumber: e.blockNumber,
       sender: e.args[0],
-      receiver: e.args[1].length >= 2 ? e.args[1].map(rec => rec[0]) : [e.args[1][0][0]],
+      receiver: e.args[1].map(rec => rec[0]),
       percent
     }
   })
