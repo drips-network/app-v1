@@ -129,7 +129,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="💧")
 
     template(v-slot:header)
-      dialog-title
+      dialog-title(tabindex="0")
         | Join Community
         br
         | "{{ meta.name }}"

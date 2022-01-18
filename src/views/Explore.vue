@@ -50,7 +50,6 @@ const getDrips = async () => {
   try {
     const events = await store.dispatch('getDripsReceivers')
     drips.value = filterForCurrentEvents(events).filter(event => event.args[2].length)
-    console.log(drips.value)
   } catch (e) {
     drips.value = []
   }
