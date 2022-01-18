@@ -31,8 +31,8 @@ div.mb-196
       //- (sender)
       template(v-if="highlight === 'sender'")
         router-link.flex.items-center.mx-6.bg-indigo-700.rounded-full.p-12.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user-drips-out', params: { address: props.spotlight.address }}")
-          user-avatar.w-80.h-80(:address="props.spotlight.address")
-          addr.mx-16.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
+          user-avatar.w-80.h-80(:address="props.spotlight.address", blockieSize="80")
+          addr.mx-24.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
 
       //- (supporters)
       template(v-else-if="supporters")
@@ -56,8 +56,8 @@ div.mb-196
       //- (sender)
       template(v-if="highlight === 'receiver'")
         router-link.flex.items-center.mx-6.bg-indigo-700.rounded-full.p-12.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user-drips-in', params: { address: props.spotlight.address }}")
-          user-avatar.w-80.h-80(:address="props.spotlight.address")
-          addr.mx-16.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
+          user-avatar.w-80.h-80(:address="props.spotlight.address", blockieSize="80")
+          addr.mx-24.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
 
       //- (supporters)
       template(v-else-if="senderRow")

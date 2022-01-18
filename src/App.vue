@@ -103,9 +103,7 @@ store.dispatch('init')
   .mt-88.lg_hidden.pointer-events-none
     .fixed.z-50.bottom-10.left-0.w-screen.px-10
       .h-80.rounded-full.bg-gray-300.text-black.flex.items-center.justify-between
-        .w-80.text-center.text-2xl
-        .flex-1.text-center.font-semibold Mobile coming soon #[span(style="font-size:1.5em") 🏗]
-        .w-80
+        .w-full.text-center.font-semibold Mobile coming soon&nbsp;#[span(style="font-size:1.5em") 🏗]
 </template>
 
 <style>
