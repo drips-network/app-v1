@@ -5,6 +5,10 @@ const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC // string
 export default async function ({ query, variables }) {
   const id = btoa(JSON.stringify({ query, variables }))
   try {
+    if (!apiUrl) {
+      throw new Error('API URL missing')
+    }
+
     // cached ?
     let cached = sessionStorage.getItem(id)
     if (cached && cacheAPISec > 0) {
@@ -38,10 +42,9 @@ export default async function ({ query, variables }) {
       throw Error(resp.statusText)
     }
   } catch (e) {
-    console.log('api err', e, e.message, e.status)
-    console.error('@graphAPI', e)
+    console.error(e)
     sessionStorage.removeItem(id)
-    throw e
+    throw new Error('API Error')
   }
 }
 

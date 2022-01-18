@@ -41,6 +41,7 @@ const collectModalOpen = ref(false)
 
 const getProjectMeta = async (ipfsHash) => {
   meta.value = await store.dispatch('getProjectMeta', { ipfsHash })
+  console.log(meta.value)
   // TODO handle error for updating/editing meta?
 }
 
@@ -50,14 +51,18 @@ const getDrips = () => {
     .catch(console.error)
 }
 
+let projectRequests = 0
 const getProject = async () => {
   try {
+    projectRequests++
+    status.value = 'Loading...'
+
     // get project...
     project.value = await store.dispatch('getProject', projectAddress)
 
     // !! not found
     if (!project.value) {
-      status.value = 'Not Found :('
+      status.value = "Community doesn't exist :/"
       return false
     }
 
@@ -66,19 +71,24 @@ const getProject = async () => {
 
     // !! no info
     if (!meta.value) {
-      status.value = 'Info Missing :/'
+      status.value = 'Community info missing :/'
       return false
     }
 
     // get drips
     getDrips()
 
-    // missing project info?
+    // missing info?
     if (!project.value.projectOwner) {
-      console.log('project not found in API yet, refetching...')
-      // project likely just created and not in API yet (came from on-chain / partial data)
-      // retry every 1s...
-      return setTimeout(() => getProject(), 1000)
+      // project likely just created and not in API yet
+      // retry every 1s with max 5 tries
+
+      if (projectRequests < 22) {
+        console.log('project not found in API yet, refetching in 1s...')
+        return setTimeout(() => getProject(), 1000)
+      }
+
+      throw new Error("Couldn't fetch community info. Refresh if recently created.")
     }
 
     // set nft
@@ -90,10 +100,10 @@ const getProject = async () => {
     // get funding once tokenType is known
     getCurrentFunding()
 
-    return true
+    status.value = null
   } catch (e) {
-    console.error(e)
-    status.value = e.message ? 'Error: ' + e.message : 'Error'
+    // console.error(e)
+    status.value = e.message || 'Error'
   }
 }
 
@@ -132,9 +142,9 @@ provide('projectMeta', meta)
 article.project.pb-96
 
   //- (loading/status...)
-  template(v-if="!meta")
-    .panel-indigo.my-10.py-12.px-10(:class="{'animate-pulse': !status}")
-      .h-80.rounded-full.bg-indigo-800.px-28.flex.items-center.text-md.font-medium
+  template(v-if="status")
+    .panel-indigo.my-10.py-12.px-10.text-violet-650(:class="{'animate-pulse': status.includes('...') }")
+      .h-80.rounded-full.bg-indigo-800.px-36.flex.items-center.text-md.font-medium
         | {{ status }}
       .h-160
       .h-160
