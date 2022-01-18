@@ -54,6 +54,9 @@ html {
 .btn-lg {
   @apply h-80 text-xl font-semibold pt-2;
 }
+.btn-lgg {
+  @apply h-96 text-xll font-semibold;
+}
 .btn-xl{
   @apply h-112 text-2xl font-semibold transform transition duration-150;
   &:not([disabled]) {
@@ -71,6 +74,12 @@ html {
 }
 .btn-darker{
   @apply bg-indigo-900 notouch_hover_text-white transition duration-150;
+}
+.btn-darkest{
+  @apply bg-indigo-950;
+  &:not([disabled]) {
+    @apply notouch_hover_ring;
+  }
 }
 .btn-white{
   @apply bg-white text-black;

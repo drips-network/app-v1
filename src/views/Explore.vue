@@ -110,6 +110,9 @@ article.explore.pt-56.px-24
         li(v-for="project in projects")
           project-thumb.mb-32(:project="project")
 
+      footer.mt-56.flex.justify-center
+        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️
+
   //- drips
   section.mt-220
     //- (loading)
@@ -126,4 +129,7 @@ article.explore.pt-56.px-24
         ul
           li(v-for="drip in dripRows")
             drip-row.my-4(:drip="drip")
+
+      footer.mt-56.flex.justify-center
+        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create' }") Create a Drip 💧
 </template>
