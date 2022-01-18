@@ -105,8 +105,7 @@ watch(meta, () => {
 
 // token image preview
 const previewNftImageHash = computed(() => {
-  // TODO use contract default hash...
-  return nftImageIpfsHash.value || 'QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx'
+  return nftImageIpfsHash.value || process.env.VUE_APP_NFT_DEFAULT_IMAGE_HASH
 })
 
 // benefits input
@@ -350,18 +349,26 @@ projectAddress.value = isDev ? route.query.project : null
         //- input-body.my-10(label="Custom Token Image IPFS Hash (optional)", format="code", warning="⚠️ You cannot edit this later!")
           input(v-model="nftImageIpfsHash", placeholder="QmcjdWo3oDYPGdLCdmEpGGpFsFKbfXwCLc5kdTJj9seuLx")
 
-        input-body.my-10(label="NFT Image", format="code", warning="⚠️ Max 500KB. You cannot change the image later.")
-          .mx-auto.w-1x2.py-56
-            //- TODO - get contract default
-            img.block.w-full(:src="ipfsUrl(previewNftImageHash)")
+        input-body.my-10(label="NFT Image", format="code", warning="Max 500KB. ⚠️ You cannot change the image later.")
+          template(v-if="previewNftImageHash")
+            .py-56.px-40.w-full
+              .relative
+                .aspect-w-1.aspect-h-1
+                  //- TODO - get contract default
+                  img.absolute.overlay.object-contain.object-center(:src="ipfsUrl(previewNftImageHash)")
 
-            //- add image btn
-            label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-700.focus_border-violet-600.rounded-2xlb.focus_outline-none.group(tabindex="0", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
-              span.sr-only Token Image
-              //- input(type="file", accept=".png,.jpeg,.jpg,.svg", style="display:none")
-              input-upload-file-ipfs(@hash="hash => { nftImageIpfsHash = hash }", @error="meta.image = null", style="display:none")
-              .absolute.top-0.right-0.h-80.px-24.flex.items-center
-                svg-pen.block.h-32.text-violet-600
+          //- add image btn
+          label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-700.focus_border-violet-600.rounded-2xlb.focus_outline-none.group(tabindex="0", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
+            span.sr-only Token Image
+            //- input(type="file", accept=".png,.jpeg,.jpg,.svg", style="display:none")
+            input-upload-file-ipfs(@hash="hash => { nftImageIpfsHash = hash }", @error="meta.image = null", style="display:none")
+
+            //- (edit icon)
+            .absolute.top-0.right-0.h-80.px-24.flex.items-center(v-if="previewNftImageHash")
+              svg-pen.block.h-32.text-violet-600
+            //- (plus icon)
+            //- .absolute.overlay.flex.items-center.justify-center(v-else)
+              svg-plus-minus-radicle.block.transform.scale-80
 
         .mt-40(v-show="step === 1")
           //- submit btn
