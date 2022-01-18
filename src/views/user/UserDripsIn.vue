@@ -48,7 +48,7 @@ const getDripsIn = async () => {
         myDripsIn.push({
           blockNumber: event.blockNumber,
           sender: event.args[0],
-          receiver: drip[0].toLowerCase(),
+          receiver: [drip[0].toLowerCase()],
           amount: toDAIPerMo(drip[1])
         })
       })
@@ -84,7 +84,7 @@ const getSplitsIn = async () => {
         mySplitsIn.push({
           blockNumber: event.blockNumber,
           sender: event.args[0],
-          receiver: split[0].toLowerCase(),
+          receiver: [split[0].toLowerCase()],
           percent: split[1] / store.state.splitsFractionMax * 100
         })
       })
