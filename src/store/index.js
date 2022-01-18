@@ -254,29 +254,33 @@ export default createStore({
     },
 
     async getProject (_, projectAddress) {
-      // check api
+      // query chain fallback handler
+      const queryChain = async () => {
+        try {
+          console.log('Project not found in API (just created?). Querying chain...', projectAddress)
+          const contract = getProjectContract(projectAddress)
+          const ipfsHash = await contract.contractURI()
+          return { ipfsHash }
+        } catch (e) {
+          console.error(e)
+          // interpret any error as not found
+          return null
+        }
+      }
+
+      // go!
       try {
         // check api...
         const resp = await api({ query: queryProject, variables: { id: projectAddress } })
 
         if (resp.data?.fundingProject) {
-          return resp.data?.fundingProject
+          return resp.data.fundingProject
         }
 
-        console.log('API: project not found (just created?). Querying chain...', projectAddress)
-
-        // check on-chain in case was just created...
-        const contract = getProjectContract(projectAddress)
-        const ipfsHash = await contract.contractURI()
-
-        if (ipfsHash) {
-          return { ipfsHash }
-        }
-
-        return null
+        return queryChain()
       } catch (e) {
         console.error('@getProject', e)
-        return null
+        return queryChain()
       }
     },
 
