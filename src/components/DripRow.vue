@@ -26,7 +26,7 @@ const receiverRt = computed(() => {
     //- sender avatar / blockie
     user-avatar.w-54.h-54.flex-shrink-0(:address="props.drip.sender", blockieSize="44", :key="props.drip.sender")
 
-    flex-truncate.flex-1.mx-12.text-center
+    flex-truncate.flex-1.mx-14.text-center
       addr.font-bold.inline(:address="props.drip.sender", :youOn="true", :key="props.drip.sender")
 
   //- drip icon
@@ -99,14 +99,23 @@ const receiverRt = computed(() => {
     img.h-20(src="~@/assets/icons/arrow-right-violet.svg")
 
   //- receiver(s)
-  router-link.h-80.flex.items-center.justify-end.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
+  router-link.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
     //- (summary - "10 addresses")
     template(v-if="isMultiple")
-      .w-full.text-center.font-bold {{ props.drip.receiver.length }} addresses
+      //- .w-full.text-center.font-bold {{ props.drip.receiver.length }} addresses
+      ul.flex.w-full.justify-start.items-center.flex-row-reverse
+        //- .flex-1
+
+        li(v-for="(address, i) in props.drip.receiver.slice(0, 6)", :class="{'-ml-28': i < 5}")
+          user-avatar.w-54.h-54(:address="address", blockieSize="54", :key="address")
+
+        template(v-if="props.drip.receiver.length - 6 > 0")
+          .-ml-6.order-first.min-w-54.h-54.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold
+            | +{{ props.drip.receiver.length - 6}}
     //- (single receiver)
     template(v-else)
       .flex-1.min-w-0.truncate.inline.mx-12.text-center
         .inline
           addr.font-bold.inline(:address="props.drip.receiver[0]", :youOn="true", :key="props.drip.receiver[0]")
-      user-avatar.w-54.h-54(:address="props.drip.receiver[0]", blockieSize="44", :key="props.drip.receiver[0]")
+      user-avatar.w-54.h-54(:address="props.drip.receiver[0]", blockieSize="54", :key="props.drip.receiver[0]")
 </template>
