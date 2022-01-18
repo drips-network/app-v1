@@ -241,6 +241,7 @@ module.exports = {
       // '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       // inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       none: 'none',
+      'sm-blue': '0px 0px 4px rgba(61, 58, 179, 0.6)',
       'md-blue': '0px 1px 7px rgba(61, 58, 179, 0.75)'
     },
     caretColor: (theme) => theme('colors'),

@@ -109,7 +109,7 @@ const router = createRouter({
       return savedPosition
     } else {
       // don't scroll to top on user tab changes...
-      if (to.params.address === from.params.address) {
+      if (to.params.address && to.params.address === from.params.address) {
         return
       }
       // scroll to top

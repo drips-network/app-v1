@@ -102,16 +102,19 @@ store.dispatch('init')
       .ml-3.-mr-1.w-56.h-56.flex.items-center.justify-center.bg-indigo-900ff.rounded-full.text-xl.mb-2 🌱
 
     .flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.px-12
+
+      //- landing site link
+      a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.px-18.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://www.drips.network") About
+      //- docs link
+      a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.px-18.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://docs.drips.network/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Docs
       //- twitter link
       a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.w-54.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://twitter.com/dripsnetwork", target="_blank", rel="noopener noreferrer")
         svg-twitter.w-36
       //- discord channel link
       a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.w-54.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://discord.gg/zCjkTT4MnZ", target="_blank", rel="noopener noreferrer")
         svg-discord.h-36
-      //- docs link
-      a.mr-6.text-lg.font-semibold.notouch_hover_ring.notouch_hover_ring-violet-650.h-54.px-20.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(href="https://docs.drips.network/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Docs
       //- dai/usd conversion tip
-      a.text-md.font-semibold.h-54.px-24.rounded-full.flex.items-center.justify-center.bg-indigo-950.notouch_hover_ring(href="https://www.coinbase.com/price/dai", target="_blank", rel="noopener noreferrer")
+      a.ml-10.text-md.font-semibold.h-54.px-24.rounded-full.flex.items-center.justify-center.bg-indigo-950.notouch_hover_ring(href="https://www.coinbase.com/price/dai", target="_blank", rel="noopener noreferrer")
         svg-dai.h-16
         | 1 ≈ $1
     //-

@@ -10,19 +10,11 @@ import InfoBar from '@/components/InfoBar'
 import HeaderLarge from '@/components/HeaderLarge'
 import SpotlightRecipient from '@/components/SpotlightRecipient'
 import store from '@/store'
-import { formatSplitsEvents } from '@/utils'
-import spotlightJSON from '../../content/spotlight.json'
+import { formatSplitsEvents, formatDripsEvents, filterForCurrentEvents } from '@/utils'
+import content from '../../content/spotlight.js'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
-const spotlights = spotlightJSON[networkName] || []
-/* const spotlights = [
-  // soliditylang.eth
-  { address: '0x151ef20a3ade1cc1161391594f8a32461389a54e', highlight: 'sender' },
-  // ricmoo.eth
-  { address: '0x5555763613a12d8f3e73be831dff8598089d3dca', highlight: 'receiver' },
-  // walletconnect.eth
-  { address: '0xcbec15583a21c3ddad5fab658be5b4fe85df730b', highlight: 'receiver' }
-] */
+const spotlights = content[networkName] || []
 
 const projects = ref()
 
@@ -53,30 +45,39 @@ const getProjects = async () => {
   }
 }
 
+const drips = ref()
+const getDrips = async () => {
+  try {
+    const events = await store.dispatch('getDripsReceivers')
+    drips.value = filterForCurrentEvents(events).filter(event => event.args[2].length)
+  } catch (e) {
+    drips.value = []
+  }
+}
+
 const splits = ref()
-const dripRows = computed(() => splits.value && formatSplitsEvents(splits.value))
 const getSplits = async () => {
   try {
     const events = await store.dispatch('getSplitsReceivers')
-    // reduce by address (current state)
-    const currentEvents = []
-    events.reverse()
-      .filter(event => event.args[1].length)
-      .forEach(event => {
-        if (!currentEvents.find(e => e.args[0] === event.args[0])) {
-          currentEvents.push(event)
-        }
-      })
-
-    splits.value = currentEvents
+    splits.value = filterForCurrentEvents(events).filter(event => event.args[1].length)
   } catch (e) {
-    console.error(e)
+    splits.value = []
   }
 }
+
+const dripRows = computed(() => {
+  if (!splits.value && !drips.value) return null
+  const splitsRows = splits.value ? formatSplitsEvents(splits.value) : []
+  const dripsRows = drips.value ? formatDripsEvents(drips.value) : []
+  const rows = [...dripsRows, ...splitsRows]
+  rows.sort((a, b) => b.blockNumber - a.blockNumber)
+  return rows
+})
 
 onBeforeMount(() => {
   getProjects()
   getSplits()
+  getDrips()
 })
 </script>
 
@@ -108,6 +109,9 @@ article.explore.pt-56.px-24
         li(v-for="project in projects")
           project-thumb.mb-32(:project="project")
 
+      footer.mt-56.flex.justify-center
+        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️
+
   //- drips
   section.mt-220
     //- (loading)
@@ -124,4 +128,7 @@ article.explore.pt-56.px-24
         ul
           li(v-for="drip in dripRows")
             drip-row.my-4(:drip="drip")
+
+      footer.mt-56.flex.justify-center
+        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create' }") Create a Drip 💧
 </template>

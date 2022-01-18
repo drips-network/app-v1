@@ -62,6 +62,7 @@ export const queryProject = `
         limit
         minAmt: minAmtPerSec
         streaming
+        ipfsHash
       }
     }
   }
