@@ -36,7 +36,7 @@ let lastUpdate = null
 let getWithdrawable
 const withdrawable = ref('0')
 // balance / max DAI withdrawable
-const balance = computed(() => round(toDAI(withdrawable.value)))
+const balance = computed(() => toDAI(withdrawable.value), 'exact')
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
 
 const getDrips = async () => {
@@ -125,14 +125,13 @@ const update = async () => {
       }
     }
 
-    // check max if withdraw
+    // check max if withdrawing
     if (topUpWei.lt(0)) {
       withdrawable.value = await getWithdrawable()
       // !! can't withdraw that much
-      if (topUpWei.lt(withdrawable)) {
-        // alert(`You can only withdraw ${balance.value} DAI.`)
-        approveTxMsg.value = { message: `You can only withdraw ${balance.value} DAI.` }
-        return
+      if (topUpWei.abs().gt(withdrawable.value)) {
+        txMsg.value = { message: `You can only withdraw ${balance.value} DAI.` }
+        return false
       }
     }
 

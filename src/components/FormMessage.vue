@@ -23,7 +23,7 @@ const color = computed(() => {
 //- outer
 .px-40.flex.justify-center.text-center.text-ms.leading-normal(:class="[color]")
   //- box
-  .py-16.px-24.rounded-lg.bg-indigo-950(:class="{'border border-current': props.border}")
+  .py-16.px-24.rounded-lg.bg-indigo-950(:class="{'border border-current': props.border, 'animate-pulse': props.body.message && props.body.message.endsWith('...')}")
     //- (success)
     //- template(v-if="props.body.status > 0")
       div Success!
