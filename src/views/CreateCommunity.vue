@@ -191,7 +191,7 @@ async function submitProject () {
 
     // validate...
     txMsg.value = { message: 'Validating...' }
-    const provider = store.dispatch('getProvider')
+    const provider = await store.dispatch('getProvider')
     myProject.drips = await validateSplits(myProject.drips, provider)
 
     // save full data to IPFS/pinata...
