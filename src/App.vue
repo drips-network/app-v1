@@ -53,11 +53,12 @@ store.dispatch('init')
             //- ethereum link
             li(v-if="networkName !== 'mainnet'")
               a.inline-block.py-5.px-14.text-greenbright-500.notouch_hover_text-white.transition.duration-150(href="https://app.drips.network")
-                template(v-if="networkName === 'polygon'") ethereum
+                template(v-if="networkName.includes('polygon')") ethereum
                 template(v-else) mainnet
             //- polygon link
             li(v-if="networkName !== 'polygon'")
-              a.inline-block.py-5.px-14.text-violet-650.notouch_hover_text-white.transition.duration-150(href="https://polygon.drips.network") polygon
+              a.inline-block.py-5.px-14.text-violet-650.notouch_hover_text-white.transition.duration-150(href="https://polygon.drips.network")
+                | polygon
 
       //- right side
       nav.app__nav.flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.pr-16.pl-12
