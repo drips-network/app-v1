@@ -18,7 +18,7 @@ store.dispatch('init')
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.py-10.px-12.text-base.font-sans.leading-normal
+#app.max-w-screen-2xl.mx-auto.py-10.px-12.text-base.font-sans.leading-normal(style="min-width:1024px")
   .flex.flex-col.min-h-screen
     //- (wrong network banner)
     template(v-if="$store.getters.isWrongNetwork")
@@ -98,6 +98,14 @@ store.dispatch('init')
         svg-dai.h-16
         | 1 ≈ $1
       .h-56.bg-indigo-900.border-2.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center Help
+
+  //- "view on laptop" mobile banner
+  .mt-88.lg_hidden.pointer-events-none
+    .fixed.z-50.bottom-10.left-0.w-screen.px-10
+      .h-80.rounded-full.bg-gray-300.text-black.flex.items-center.justify-between
+        .w-80.text-center.text-2xl
+        .flex-1.text-center.font-semibold Mobile coming soon #[span(style="font-size:1.5em") 🏗]
+        .w-80
 </template>
 
 <style>
