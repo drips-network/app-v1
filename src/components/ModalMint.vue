@@ -142,15 +142,16 @@ modal(v-bind="$attrs", @close="$emit('close')")
           | Join this community by purchasing a unique<br><b>NFT Membership</b> 🧩 with a one-time payment.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
-    //- image
-    figure.bg-indigo-950.rounded-xl.relative.mb-48.flex.p-56.relative
-      //- label
-      .absolute.top-0.left-0.w-full.text-center.text-sm.pt-4.font-normal.text-violet-600.opacity-90
-        | Membership NFT
-      //- wrapper
-      .w-full.relative
-        .aspect-w-8.aspect-h-7
-          img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(props.tokenType.ipfsHash)", alt="NFT Membership Image")
+    //- (image)
+    template(v-if="props.tokenType.ipfsHash")
+      figure.bg-indigo-950.rounded-xl.relative.mb-48.flex.p-56.relative
+        //- label
+        .absolute.top-0.left-0.w-full.text-center.text-sm.pt-4.font-normal.text-violet-600.opacity-90
+          | Membership NFT
+        //- wrapper
+        .w-full.relative
+          .aspect-w-8.aspect-h-7
+            img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(props.tokenType.ipfsHash)", alt="NFT Membership Image")
 
     //- inputs
     form(@submit.prevent, validate)
