@@ -14,7 +14,8 @@ const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
   mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
   rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  'polygon-mumbai': { id: 80001, infura: 'wss://rpc-mumbai.maticvigil.com/ws/v1/86798487e616e7f8a582965f8e5350aa7e3e050b' }
+  polygon: { id: 137, infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6' },
+  'polygon-mumbai': { id: 80001, infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6' }
 }
 
 // setup web3 modal
@@ -53,7 +54,7 @@ export default createStore({
         : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
-    isWrongNetwork: state => state.networkId && state.networkId !== networks[network].id
+    isWrongNetwork: state => state.networkId && state.networkId !== networks[network]?.id
   },
   mutations: {
     SIGN_IN (state, address) {
