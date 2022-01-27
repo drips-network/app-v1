@@ -31,7 +31,8 @@ const owner = computed(() => store.state.address)
 const projectAddress = ref(null)
 
 // nft types
-const isSubscription = ref(true)
+const tokenType = ref(null) // user selects
+const isSubscription = computed(() => tokenType.value === 'subscription')
 const minDAIPerMonth = ref() // subscription
 const minDAIPrice = ref() // onetime
 const tokenLimit = ref()
@@ -295,7 +296,7 @@ projectAddress.value = isDev ? route.query.project : null
       //- TODO description/text about how some can't be edited later !!!
       //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
       template(v-slot:description)
-        p.text-violet-650 Decide on how to <b>fund your community</b>.
+        p.text-violet-650 How do you want to <b>fund your community</b>?
         //- <br>For now, you can only have <b>one membership type</b>.
         //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
 
@@ -303,26 +304,26 @@ projectAddress.value = isDev ? route.query.project : null
       .flex.-mx-10.mt-40
         //- TODO convert to radio buttons for accessibility
         .w-1x2.px-10
-          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': !isSubscription, 'border border-violet-700': isSubscription}")
-            button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = true")
+          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_opacity-100.transition.duration-150.group(:class="{'opacity-40': tokenType === 'onetime', 'ring ring-violet-650': tokenType === 'subscription'}")
+            button.absolute.overlay.flex.items-center.justify-center(@click="tokenType = 'subscription'")
               div.pt-16
                 .text-xl.font-semibold.mb-16 Subscriptions
                 p.text-violet-600 Recurring monthly income from<br>your community.
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-              .rounded-full.w-full(:class="{'bg-violet-700': isSubscription}")
+              .rounded-full.w-full.group-hover_bg-violet-650(:class="{'bg-violet-650': tokenType === 'subscription'}")
 
         .w-1x2.px-10
-          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': isSubscription, 'border border-violet-700': !isSubscription}")
-            button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
+          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_opacity-100.transition.duration-150.group(:class="{'opacity-40': tokenType === 'subscription', 'ring ring-violet-650': tokenType === 'onetime'}")
+            button.absolute.overlay.flex.items-center.justify-center(@click="tokenType = 'onetime'")
               div.pt-16
                 .text-xl.font-semibold.mb-16 One-time Fundraiser
                 p.text-violet-600 Sell limited-edition memberships.<br>&nbsp;
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-              .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
+              .rounded-full.w-full.group-hover_bg-violet-650(:class="{'bg-violet-650': tokenType === 'onetime'}")
 
-      form.mt-40(@submit.prevent="openBenefitsPanel", validate)
+      form.mt-40(v-show="tokenType", @submit.prevent="openBenefitsPanel", validate)
         //- (input monthly rate)
         template(v-if="isSubscription")
           input-body.my-10(label="Minimum Monthly Subscription*", symbol="daipermo", warning="⚠️ You cannot edit this later!")
