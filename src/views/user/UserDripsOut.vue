@@ -19,7 +19,10 @@ const canEdit = inject('isMyUser')
 const allDrips = inject('allDripsOut') // drips + splits
 const dripsOut = inject('dripsOut') // drips only
 
+const dripsOutRate = computed(() => dripsOut.value && dripsOut.value.reduce((acc, cur) => acc + cur.amount, 0))
+
 const withdrawable = inject('withdrawable')
+// TODO - check balance every second or so
 const balance = computed(() => withdrawable.value === undefined ? '-' : round(toDAI(withdrawable.value)))
 </script>
 
@@ -51,14 +54,14 @@ section.user-splits
         .grid.grid-cols-2.gap-5
 
           .h-80.px-32.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
-            .flex-1.text-xl Monthly Drips
+            .flex-1.text-xl Drip Rate
             .flex.items-center.text-white
-              .text-xl 2.00
+              .text-xl {{ dripsOutRate }}
               svg-dai.h-22.ml-14
               .text-xl.tracking-tight /MO
 
           .h-80.mt-2.px-12.rounded-full.bg-indigo-950.flex.items-center.justify-between.font-semibold
-            .pl-20.flex-1.text-xl Your Balance
+            .pl-20.flex-1.text-xl Current Balance
             .flex.items-center.text-white
               .text-xl {{ balance }}
               svg-dai.h-22.ml-12.mr-20
