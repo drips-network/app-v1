@@ -40,7 +40,7 @@ const receiverRt = computed(() => {
     .w-full.flex.items-center.justify-center
       template(v-if="props.drip.amount")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>#[svg-dai.inline-block.mr-1(style="height:0.8em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month
+        span <b>#[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
       template(v-else-if="props.drip.percent")
