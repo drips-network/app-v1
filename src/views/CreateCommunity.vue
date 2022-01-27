@@ -442,7 +442,7 @@ projectAddress.value = isDev ? route.query.project : null
 
       //- TODO allow ENS names...
       template(v-slot:description)
-        p.text-violet-650 Split a <b>precent</b> of incoming funds with others, <br>like your contributors or dependencies.
+        p.text-violet-650 Split a <b>percent</b> of incoming funds with others, <br>like your contributors or dependencies.
 
       //- drips list
       //- form.mt-60(@submit.prevent="submit", autocomplete="off")
