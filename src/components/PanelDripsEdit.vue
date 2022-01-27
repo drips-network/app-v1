@@ -240,7 +240,7 @@ panel(icon="💧")
             input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
           //- rate
           input-body.mt-10(label="Monthly DAI Amount", :isFilled="typeof drips[i].amount === 'number'", theme="dark", symbol="daipermo")
-            input(v-model="drips[i].amount", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
+            input(v-model="drips[i].amount", type="number", min="0.01", step="0.01", placeholder="5", required)
 
           //- delete row btn (X)
           .absolute.top-0.right-0.h-full.flex.items-center
