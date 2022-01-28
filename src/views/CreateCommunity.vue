@@ -289,9 +289,9 @@ projectAddress.value = isDev ? route.query.project : null
 
     //- 2. FUNDING
 
-    panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="Member Tokens", icon="🧩")
+    panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="NFT Memberships", icon="🧩")
       template(v-slot:header)
-        h2 Member Tokens
+        h2 NFT Memberships
 
       //- TODO description/text about how some can't be edited later !!!
       //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
