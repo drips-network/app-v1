@@ -4,6 +4,7 @@ import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
 import SvgDai from '@/components/SvgDai'
 import FlexTruncate from '@/components/FlexTruncate'
+import AddressesTag from '@/components/AddressesTag'
 const props = defineProps(['drip', 'alternateColors'])
 const isMultiple = computed(() => props.drip.receiver.length > 1)
 const altBg = drip => drip.percent && props.alternateColors
@@ -99,7 +100,9 @@ const receiverRt = computed(() => {
     img.h-20(src="~@/assets/icons/arrow-right-violet.svg")
 
   //- receiver(s)
-  router-link.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
+  router-link(:to="receiverRt")
+    addresses-tag(:addresses="props.drip.receiver")
+  //- router-link.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
     //- (summary - "10 addresses")
     template(v-if="isMultiple")
       //- .w-full.text-center.font-bold {{ props.drip.receiver.length }} addresses
@@ -109,8 +112,9 @@ const receiverRt = computed(() => {
         li(v-for="(address, i) in props.drip.receiver.slice(0, 6)", :class="{'-ml-28': i < 5}")
           user-avatar.w-54.h-54(:address="address", blockieSize="54", :key="address")
 
+        //- (extra count)
         template(v-if="props.drip.receiver.length - 6 > 0")
-          .-ml-6.order-first.min-w-54.h-54.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold
+          .-ml-8.order-first.min-w-54.h-54.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold
             | +{{ props.drip.receiver.length - 6}}
     //- (single receiver)
     template(v-else)

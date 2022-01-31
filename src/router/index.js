@@ -51,7 +51,7 @@ const routes = [
   // user / address
   {
     path: '/:address',
-    component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
+    component: () => import(/* webpackChunkName: "user" */ '../views/User2.vue'),
     children: [
       {
         path: '',

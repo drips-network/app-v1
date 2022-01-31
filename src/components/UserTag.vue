@@ -25,9 +25,9 @@ const getENSSocialUrl = (value, base) => {
 </script>
 
 <template lang="pug">
-.user-tag.h-160.rounded-full.bg-indigo-700.flex.items-center.pr-60
+.user-tag.p-18.rounded-full.bg-indigo-700.flex.items-center.pr-60
   //- avatar
-  router-link.block.rounded-full.mx-24.mr-36(:to="{name: 'user', params: { address: props.address }}")
+  router-link.block.rounded-full.mr-36(:to="{name: 'user', params: { address: props.address }}")
     user-avatar.w-112.h-112(:address="props.address", blockieSize="112")
 
   div
@@ -39,18 +39,18 @@ const getENSSocialUrl = (value, base) => {
       //- (website)
       template(v-if="profile.url")
         a.block.px-4.notouch_hover_text-greenbright-500(:href="profile.url", target="_blank", rel="noopener noreferrer", title="Website")
-          svg-globe.block.h-28.mt-8.-mb-12
+          svg-globe.block.h-30.mt-8.-mb-12
       //- (twitter)
       template(v-if="twitter")
         a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(twitter, 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
-          svg-twitter.block.h-28.mt-8.-mb-12
+          svg-twitter.block.h-30.mt-8.-mb-12
       //- (github)
       template(v-if="github")
         a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(github, 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
-          svg-github.block.h-28.mt-8.-mb-12
+          svg-github.block.h-30.mt-8.-mb-12
       //- (discord)
       template(v-if="discord")
         a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(discord, 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
-          svg-discord.block.h-28.mt-8.-mb-12
+          svg-discord.block.h-30.mt-8.-mb-12
 
 </template>
