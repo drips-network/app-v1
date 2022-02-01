@@ -290,11 +290,11 @@ export default createStore({
         if (!ipfsHash) {
           // fetch project...
           const resp = await api({ query: queryProjectMeta, variables: { id: projectAddress.toLowerCase() } })
-          ipfsHash = resp.data.fundingProject?.ipfsHash
+          ipfsHash = resp.data?.fundingProject?.ipfsHash
         }
 
         if (!ipfsHash || ipfsHash.length !== 46) {
-          // console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
+          if (ipfsHash) console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
           return null
         }
 
@@ -626,6 +626,11 @@ export default createStore({
 
     async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
+        // no ENS on polygon :C
+        if (network.includes('polygon')) {
+          return null
+        }
+
         // sanitize
         address = (address || '').toLowerCase()
         // saved?
