@@ -9,6 +9,7 @@ import SvgDai from '@/components/SvgDai'
 import LoadingBar from '@/components/LoadingBar'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import FormMessage from '@/components/FormMessage'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import { utils, constants, BigNumber as bn } from 'ethers'
 import { round, toDAI, toWei, toWeiPerSec, toDAIPerMo, validateAddressInput } from '@/utils'
@@ -293,6 +294,10 @@ panel(icon="💧")
 
       //- btns
       .mt-40
+        //- (polygon address warning)
+        template(v-if="$store.getters.isPolygon")
+          warning-polygon-addresses.my-40
+
         //- (tx message)
         form-message.my-40(v-if="txMsg", :body="txMsg")
 

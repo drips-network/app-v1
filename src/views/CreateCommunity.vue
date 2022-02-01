@@ -18,6 +18,7 @@ import showdown from 'showdown'
 import SvgPen from '@/components/SvgPen'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 import FormMessage from '@/components/FormMessage'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
 import TxLink from '@/components/TxLink'
 
 const route = useRoute()
@@ -464,6 +465,10 @@ projectAddress.value = isDev ? route.query.project : null
 
         button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
           svg-plus-minus-radicle
+
+        //- (polygon address warning)
+        template(v-if="$store.getters.isPolygon && drips.find(d => d.address && d.address.trim().length)")
+          warning-polygon-addresses.my-40
 
         .mt-40.flex.justify-center(v-show="step === 3")
           //- .mx-5

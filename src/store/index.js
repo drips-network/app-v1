@@ -54,7 +54,8 @@ export default createStore({
         : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
-    isWrongNetwork: state => state.networkId && state.networkId !== networks[network]?.id
+    isWrongNetwork: state => state.networkId && state.networkId !== networks[network]?.id,
+    isPolygon: state => Object.keys(networks).find(name => networks[name].id === state.networkId)?.includes('polygon')
   },
   mutations: {
     SIGN_IN (state, address) {
