@@ -236,9 +236,9 @@ panel(icon="💧")
       template(v-for="(drip, i) in drips")
         section.my-10.input-group.relative
           //- address
-          input-body(label="Recipient's Ethereum Address or ENS name", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
+          input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
             //- TODO: validate ethereum address
-            input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
+            input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
           //- rate
           input-body.mt-10(label="Monthly DAI Amount", :isFilled="typeof drips[i].amount === 'number'", theme="dark", symbol="daipermo")
             input(v-model="drips[i].amount", type="number", min="0.01", step="0.01", placeholder="5", required)

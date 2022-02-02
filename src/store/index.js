@@ -5,22 +5,24 @@ import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import api, { queryProjectMeta, queryProject } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
+import label from '@/labels'
 // contracts
 import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
 
 let provider, signer, walletProvider
 
-const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
-  mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  polygon: { id: 137, infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6' },
-  'polygon-mumbai': { id: 80001, infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6' }
+  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
+  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
+  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6' },
+  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6' }
 }
+const deployNetworkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
+const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
 
 // setup web3 modal
 const web3Modal = new Web3Modal({
-  network, // optional
+  network: deployNetwork.name, // optional
   cacheProvider: true, // optional
   providerOptions: { // required
     walletconnect: {
@@ -54,8 +56,9 @@ export default createStore({
         : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
-    isWrongNetwork: state => state.networkId && state.networkId !== networks[network]?.id,
-    isPolygon: state => Object.keys(networks).find(name => networks[name].id === state.networkId)?.includes('polygon')
+    isWrongNetwork: state => state.networkId && networks[state.networkId]?.name !== deployNetwork.name,
+    isPolygon: state => networks[state.networkId]?.layer === 'polygon',
+    label: state => name => label(name, deployNetwork?.layer)
   },
   mutations: {
     SIGN_IN (state, address) {
@@ -115,11 +118,11 @@ export default createStore({
     async setupFallbackProvider ({ dispatch }) {
       try {
         if (window.ethereum) {
-          // metamask
+          // metamask/browser
           provider = new Ethers.providers.Web3Provider(window.ethereum)
         } else {
-          // infura
-          provider = new Ethers.getDefaultProvider(networks[network].infura)
+          // infura fallback
+          provider = new Ethers.getDefaultProvider(deployNetwork.infura)
         }
         // set network
         dispatch('getNetworkId', provider)
@@ -628,7 +631,7 @@ export default createStore({
     async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
         // no ENS on polygon :C
-        if (network.includes('polygon')) {
+        if (networks[state.networkId].layer !== 'ethereum') {
           return null
         }
 

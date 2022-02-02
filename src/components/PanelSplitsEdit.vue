@@ -164,11 +164,11 @@ panel(icon="💦")
       template(v-for="(split, i) in splits")
         section.my-10.input-group.relative
           //- input address
-          input-body(label="Recipient's Ethereum Address or ENS name", :isFilled="splits[i].receiverInput === 'length'", theme="dark", format="code")
+          input-body(:label="$store.getters.label('inputAddressLabel')", theme="dark", format="code")
             //- TODO: validate ethereum address
-            input(:ref="el => { receiverInputEls[i] = el }", v-model="splits[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
+            input(:ref="el => { receiverInputEls[i] = el }", v-model="splits[i].receiverInput", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
           //- amount
-          input-body.mt-10(label="Percent", :isFilled="typeof splits[i].percent === 'number'", theme="dark", symbol="percent")
+          input-body.mt-10(label="Percent", theme="dark", symbol="percent")
             input(v-model="splits[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
           //- rmv btn
           .absolute.top-0.right-0.h-full.flex.items-center

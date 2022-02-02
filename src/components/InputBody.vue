@@ -4,7 +4,7 @@ import SvgDai from '@/components/SvgDai'
 
 const props = defineProps({
   label: String,
-  isFilled: [Number, Boolean], // input has content
+  // isFilled: [Number, Boolean], // input has content
   format: String,
   symbol: String,
   theme: { type: String, default: 'outline' },
@@ -33,7 +33,7 @@ const slots = useSlots()
 <template lang="pug">
 .input-body.relative.text-violet-600
   //- (label)
-  label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-4(v-if="label", :class="{'opacity-0ff': !isFilled, 'text-red-600': theme === 'red'}") {{ props.label }}
+  label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-4(v-if="label", :class="{'text-red-600': theme === 'red'}") {{ props.label }}
 
   //- field (input, textarea)
   .input-body__wrapper.min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.text-white.group(:class="[styling, themeing]")
