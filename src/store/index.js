@@ -3,7 +3,7 @@ import { toRaw } from 'vue'
 import { ethers as Ethers, BigNumber as bn } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import api, { queryProjectMeta, queryProject } from '@/api'
+import api, { queryProjectMeta, queryProject, queryDripsConfigByID } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
 // contracts
@@ -98,7 +98,7 @@ export default createStore({
 
           // fallback provider
           if (!provider) {
-            dispatch('setupFallbackProvider')
+            await dispatch('setupFallbackProvider')
           }
 
           initializing = false
@@ -125,14 +125,15 @@ export default createStore({
           provider = new Ethers.getDefaultProvider(deployNetwork.infura)
         }
         // set network
-        dispatch('getNetworkId', provider)
+        await dispatch('getNetworkId', provider)
+        return true
       } catch (e) {
         console.error(e)
       }
     },
 
     getNetworkId ({ commit }, provider) {
-      provider.getNetwork()
+      return provider.getNetwork()
         .then(network => commit('SET_NETWORK_ID', network.chainId))
         .catch(console.error)
     },
@@ -150,11 +151,12 @@ export default createStore({
         commit('SIGN_IN', address)
 
         // set network id
-        dispatch('getNetworkId', provider)
+        await dispatch('getNetworkId', provider)
 
         // commit('SET_CONTRACTS', provider)
 
         dispatch('listenToWalletProvider')
+        return
       } catch (e) {
         console.error('@connect', e)
         // clear wallet in case
@@ -493,6 +495,22 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
+    async getDripsReceivers2 ({}, address) {
+      try {
+        const emptyConfig = {
+          balance: '0',
+          timestamp: 0,
+          receivers: [],
+          // withdrawable: () => '0'
+        }
+        // fetch...
+        const resp = await api({ query: queryDripsConfigByID, variables: { id: address } })
+        return resp.data?.dripsConfigs[0] || emptyConfig
+      } catch (e) {
+        throw e
+      }
+    },
+
     async getDripsReceivers ({ state, dispatch }, address) {
       try {
         if (!provider) await dispatch('init')
@@ -630,7 +648,11 @@ export default createStore({
 
     async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
-        // no ENS on polygon :C
+        if (!state.networkId) {
+          await dispatch('init')
+        }
+        
+        // ENS enabled?
         if (networks[state.networkId].layer !== 'ethereum') {
           return null
         }

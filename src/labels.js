@@ -2,7 +2,6 @@ const networks = ['e', 'p']
 
 export default function label (name, network = 'ethereum') {
   const id = networks.includes(network[0]) ? network[0] : 'e'
-  console.log('iddd', { name, network, id })
   return labels[name] && labels[name][id] ? labels[name][id] : '[missing label]'
 }
 

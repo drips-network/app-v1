@@ -26,6 +26,7 @@ const drips = ref([])
 const topUpDAI = ref(0) // DAI
 
 const addDrip = () => {
+  drips.value = drips.value || []
   drips.value.push({ receiverInput: '', amount: null })
   nextTick().then(() => receiverInputEls.value[drips.value.length - 1].focus())
 }
@@ -45,12 +46,13 @@ const getDrips = async () => {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
     // get...
-    lastUpdate = await store.dispatch('getDripsReceivers', store.state.address)
+    lastUpdate = await store.dispatch('getDripsReceivers2', store.state.address)
 
     // set balance
     // balance.value = round(toDAI(lastUpdate.balance))
     // set withdrawable
-    getWithdrawable = () => lastUpdate.withdrawable()
+    // TEMP
+    getWithdrawable = () => '0' // () => lastUpdate.withdrawable()
     withdrawable.value = await getWithdrawable()
 
     // set receivers
@@ -59,18 +61,19 @@ const getDrips = async () => {
     // format receivers for form input
     const receiversFormatted = []
     for (var i = 0; i < receivers.length; i++) {
+      // get profile...
       const profile = await store.dispatch('resolveAddress', { address: receivers[i][0] })
+      // format
       receiversFormatted.push({
-        address: receivers[i][0],
-        amount: toDAIPerMo(receivers[i][1]),
-        receiverInput: profile?.ens || receivers[i][0]
+        address: receivers[i].receiver, // receivers[i][0],
+        amount: toDAIPerMo(receivers[i].amtPerSec), // toDAIPerMo(receivers[i][1]),
+        receiverInput: profile?.ens || receivers[i].receiver, // profile?.ens || receivers[i][0]
       })
     }
 
     return receiversFormatted
   } catch (e) {
     console.error(e)
-    currentReceivers = [] // assume empty ?
     drips.value = []
   }
 }
@@ -95,6 +98,7 @@ const approve = async () => {
 
     approved.value = true // topUpWei.value.toString()
     approveTx.value = null
+    approveTxMsg.value = null
   } catch (e) {
     // console.error(e)
     approveTxMsg.value = { status: -1, message: e.message || e }
@@ -153,9 +157,9 @@ const update = async () => {
     txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('updateUserDrips', {
       // account: store.state.address,
-      lastUpdate: lastUpdate.timestamp, // 0, // block.timestamp,
-      lastBalance: lastUpdate.balance, // 0, //
-      currentReceivers: lastUpdate.receivers,
+      lastUpdate: lastUpdate?.timestamp || 0, // 0, // block.timestamp,
+      lastBalance: lastUpdate?.balance || 0, // 0, //
+      currentReceivers: lastUpdate?.receivers || [],
       balanceDelta: topUpWei,
       newReceivers
     })
@@ -169,7 +173,7 @@ const update = async () => {
     txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile.' }
     tx.value = null
   } catch (e) {
-    txMsg.value = { status: -1, message: e.message || e }
+    txMsg.value = { status: -1, message: e.data?.message || e.message || e }
   }
 }
 
@@ -202,7 +206,7 @@ onMounted(async () => {
     }
 
     // if empty drips, add empty row
-    if (!drips.value.length) {
+    if (!drips.value?.length) {
       addDrip()
     }
 
@@ -252,8 +256,7 @@ panel(icon="💧")
       button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addDrip")
         svg-plus-minus-radicle
 
-      //- TODO topup input
-
+      //- topup section
       .mt-72
         div.mb-24.text-3xl 🔋
         h6.text-2xl.font-semibold.leading-snug Add Funds
@@ -274,6 +277,10 @@ panel(icon="💧")
             span.text-2xl.font-semibold {{ newBalance }}
             svg-dai.ml-12(size="xl")
 
+      //- (polygon address warning)
+      template(v-if="$store.getters.isPolygon")
+        warning-polygon-addresses.my-40
+      
       //- (not approved message)
       template(v-if="approveVisible")
         //- fades when approved
@@ -281,7 +288,7 @@ panel(icon="💧")
           p.text-base.leading-normal You must first #[b allow] the Drips contract to be able to #[b withdraw&nbsp;your&nbsp;DAI].
 
           //- (tx message)
-          form-message.my-28(v-if="approveTxMsg", :body="approveTxMsg")
+          form-message.my-28.border.border-current.rounded-lg(v-if="approveTxMsg", :body="approveTxMsg")
 
           //- allow btn
           .mt-24.flex.justify-center.-mb-4
@@ -294,9 +301,6 @@ panel(icon="💧")
 
       //- btns
       .mt-40
-        //- (polygon address warning)
-        template(v-if="$store.getters.isPolygon")
-          warning-polygon-addresses.my-40
 
         //- (tx message)
         form-message.my-40(v-if="txMsg", :body="txMsg")

@@ -75,3 +75,16 @@ export const queryProjectMeta = `
     }
   }
 `
+
+export const queryDripsConfigByID =  `
+query ($id: ID!) {
+  dripsConfigs (where: {id: $id}, first: 1) {
+    id
+    balance
+    receivers: dripsEntries {
+      receiver
+      amtPerSec
+    }
+  }
+}
+`

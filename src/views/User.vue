@@ -54,8 +54,8 @@ const splitsOut = computed(() => {
 const dripsOut = computed(() => {
   return drips.value?.map(drip => ({
     sender: route.params.address,
-    receiver: [drip[0]],
-    amount: toDAIPerMo(drip[1])
+    receiver: [drip.receiver], // [drip[0]],
+    amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
   }))
 })
 
@@ -80,11 +80,13 @@ const getSplits = async () => {
 const withdrawable = ref()
 const getDrips = async () => {
   try {
-    const lastUpdate = await store.dispatch('getDripsReceivers', route.params.address)
-    drips.value = lastUpdate.receivers
-    withdrawable.value = await lastUpdate.withdrawable()
+    const config = await store.dispatch('getDripsReceivers2', route.params.address)
+    drips.value = config.receivers
+    // TEMP UNTIL API has timestamp on DripsConfig
+    withdrawable.value = '0' // await lastUpdate.withdrawable()
   } catch (e) {
     console.error(e)
+    drips.value = []
   }
 }
 
@@ -96,6 +98,7 @@ onMounted(() => {
   }
   getSplits()
   getDrips()
+  store.dispatch('getDripsReceivers2', route.params.address)
 })
 
 provide('isMyUser', isMyUser)
