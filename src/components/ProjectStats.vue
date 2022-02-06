@@ -12,7 +12,7 @@ const props = defineProps({
   project: Object,
   meta: Object,
   drips: Array,
-  currentFundingWei: Object
+  currentFundingWei: String
 })
 
 const query = `

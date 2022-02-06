@@ -38,15 +38,14 @@ const totalCollectableDAI = computed(() => {
 })
 
 // current funding
-const currentFundingWei = ref()
-const getCurrentFunding = () => {
-  store.dispatch('getFundingTotal', {
-    projectAddress: props.project.id,
-    isStreaming
-  })
-    .then(wei => { currentFundingWei.value = wei })
-    .catch(console.error)
-}
+const currentFundingWei = computed(() => {
+  // based on first token (for now)
+  const tokenType = props.project.tokenTypes[0]
+  if (tokenType) {
+    return tokenType.streaming ? tokenType.currentTotalAmtPerSec : tokenType.currentTotalGiven
+  }
+  return undefined
+})
 
 const getCollectable = () => {
   store.dispatch('getCollectable', { projectAddress: props.project.id })
@@ -66,10 +65,10 @@ const onCollected = () => {
 onBeforeMount(() => {
   getProject()
   // get drips
-  store.dispatch('getSplitsReceivers', props.project.id)
-    .then(receivers => { drips.value = receivers.percents })
+  store.dispatch('getSplitsBySender', props.project.id)
+    .then(splits => { drips.value = splits })
+    .catch(() => { drips.value = [] })
   //
-  getCurrentFunding()
   getCollectable()
 })
 </script>
