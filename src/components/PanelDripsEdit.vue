@@ -46,7 +46,7 @@ const getDrips = async () => {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
     // get...
-    lastUpdate = await store.dispatch('getDripsReceivers2', store.state.address)
+    lastUpdate = await store.dispatch('getDripsBySender', store.state.address)
 
     // set withdrawable
     getWithdrawable = lastUpdate.withdrawable

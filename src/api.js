@@ -54,15 +54,18 @@ export const queryProject = `
       id
       projectOwner
       daiCollected
-      daiSplit
       ipfsHash
       tokenTypes {
-        # id
         tokenTypeId
-        limit
+        id
         minAmt: minAmtPerSec
-        streaming
+        limit
+        currentTotalAmtPerSec
+        currentTotalGiven
         ipfsHash
+      }
+      tokens {
+        owner: tokenReceiver
       }
     }
   }
@@ -76,7 +79,7 @@ export const queryProjectMeta = `
   }
 `
 
-export const queryDripsConfigByID =  `
+export const queryDripsConfigByID = `
 query ($id: ID!) {
   dripsConfigs (where: {id: $id}, first: 1) {
     id
@@ -86,6 +89,17 @@ query ($id: ID!) {
       receiver
       amtPerSec
     }
+  }
+}
+`
+
+export const querySplitsBySender = `
+query ($sender: Bytes!) {
+  splitsEntries (first:100, where: { sender: $sender }) {
+    # id
+    sender
+    receiver
+    weight
   }
 }
 `

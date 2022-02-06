@@ -81,7 +81,7 @@ const withdrawable = ref()
 let getWithdrawable
 const getDrips = async () => {
   try {
-    const config = await store.dispatch('getDripsReceivers2', route.params.address)
+    const config = await store.dispatch('getDripsBySender', route.params.address)
     drips.value = config.receivers
     getWithdrawable = config.withdrawable
     withdrawable.value = getWithdrawable()

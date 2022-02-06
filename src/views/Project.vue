@@ -46,8 +46,8 @@ const getProjectMeta = async (ipfsHash) => {
 }
 
 const getDrips = () => {
-  store.dispatch('getSplitsReceivers', projectAddress)
-    .then(receivers => { drips.value = receivers.percents })
+  store.dispatch('getSplitsBySender', projectAddress)
+    .then(splits => { drips.value = splits })
     .catch(console.error)
 }
 
@@ -100,7 +100,7 @@ const getProject = async (showLoading) => {
       : Number(toDAI(tokenType.value.minAmt), 'exact').toFixed(0)
 
     // get funding once tokenType is known
-    getCurrentFunding()
+    // getCurrentFunding()
 
     status.value = null
   } catch (e) {
@@ -119,21 +119,14 @@ const scrollToDripsList = () => {
   dripsList.value.$el.scrollIntoView({ behavior: 'smooth' })
 }
 
-const currentFundingWei = ref()
-const getCurrentFunding = () => {
-  store.dispatch('getFundingTotal', {
-    projectAddress,
-    isStreaming: tokenType.value.streaming
-  })
-    .then(wei => { currentFundingWei.value = wei })
-    .catch(console.error)
-}
-
-// const collectableAmts = ref()
-// const getCollectable = () => {
-//   store.dispatch('getCollectable', { projectAddress: props.project.id })
-//     .then(amounts => { collectableAmts.value = amounts })
-// }
+// current funding
+const currentFundingWei = computed(() => {
+  // based on first token (for now)
+  if (tokenType.value) {
+    return tokenType.value.streaming ? tokenType.value.currentTotalAmtPerSec : tokenType.value.currentTotalGiven
+  }
+  return undefined
+})
 
 onBeforeMount(() => getProject(true))
 

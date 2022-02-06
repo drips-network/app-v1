@@ -3,7 +3,7 @@ import { toRaw } from 'vue'
 import { ethers as Ethers, BigNumber as bn } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import api, { queryProjectMeta, queryProject, queryDripsConfigByID } from '@/api'
+import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
 // contracts
@@ -12,10 +12,10 @@ import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../con
 let provider, signer, walletProvider
 
 const networks = {
-  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://etherscan.io'} },
-  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://rinkeby.etherscan.io'} },
-  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com'} },
-  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com'} }
+  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://etherscan.io' } },
+  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://rinkeby.etherscan.io' } },
+  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com' } },
+  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com' } }
 }
 const deployNetworkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
 const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
@@ -496,14 +496,14 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
-    async getDripsReceivers2 ({}, address) {
+    async getDripsBySender (_, address) {
+      const emptyConfig = {
+        balance: '0',
+        timestamp: '0',
+        receivers: [],
+        withdrawable: () => '0'
+      }
       try {
-        const emptyConfig = {
-          balance: '0',
-          timestamp: '0',
-          receivers: [],
-          withdrawable: () => '0'
-        }
         // fetch...
         const resp = await api({ query: queryDripsConfigByID, variables: { id: address } })
         const config = resp.data?.dripsConfigs[0]
@@ -513,6 +513,7 @@ export default createStore({
         return config || emptyConfig
       } catch (e) {
         throw e
+        return emptyConfig
       }
     },
 
@@ -564,6 +565,22 @@ export default createStore({
       } catch (e) {
         console.error(e)
         throw e
+      }
+    },
+
+    async getSplitsBySender ({ state }, address) {
+      try {
+        const resp = await api({ query: querySplitsBySender, variables: { sender: address } })
+        let entries = resp.data?.splitsEntries || []
+        // format
+        entries = entries.map(entry => ({
+          ...entry,
+          percent: entry.weight / state.splitsFractionMax * 100
+        }))
+        return entries
+      } catch (e) {
+        throw e
+        return []
       }
     },
 
@@ -656,7 +673,7 @@ export default createStore({
         if (!state.networkId) {
           await dispatch('init')
         }
-        
+
         // ENS enabled?
         if (networks[state.networkId].layer !== 'ethereum') {
           return null
