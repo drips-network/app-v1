@@ -122,7 +122,9 @@ onBeforeMount(() => {
 
 <template lang="pug">
 article.explore.pt-56.px-24
-  section
+
+  //- (spotlight)
+  section.mb-240(v-if="spotlights.length")
     header-large.mb-96(icon="✨")
       header
         h2.font-semibold Spotlight
@@ -131,8 +133,28 @@ article.explore.pt-56.px-24
       //- spotlights...
       spotlight-recipient(v-for="spotlight in spotlights", :spotlight="spotlight", :allSplits="splits")
 
+  //- drips
+  section.mt-24.mb-220
+    //- (loading)
+    template(v-if="!splits")
+      loading-bar
+
+    //- (list)
+    template(v-else)
+      header-large.mb-56(icon="💧")
+        header
+          h2 #[b {{ dripRows.length }} address] are #[b dripping] to others.
+
+      section
+        ul
+          li(v-for="drip in dripRows")
+            drip-row.my-4(:drip="drip")
+
+      footer.mt-56.flex.justify-center
+        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create' }") Create a Drip 💧
+
   //- communities
-  section.mt-240
+  section.mt-24.mb-220
     //- (loading)
     template(v-if="!projects")
       loading-bar
@@ -151,23 +173,4 @@ article.explore.pt-56.px-24
       footer.mt-56.flex.justify-center
         router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️
 
-  //- drips
-  section.mt-220
-    //- (loading)
-    template(v-if="!splits")
-      loading-bar
-
-    //- (list)
-    template(v-else)
-      header-large.mb-56(icon="💧")
-        header
-          h2 #[b {{ dripRows.length }} address] are #[b dripping] to others.
-
-      section
-        ul
-          li(v-for="drip in dripRows")
-            drip-row.my-4(:drip="drip")
-
-      footer.mt-56.flex.justify-center
-        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create' }") Create a Drip 💧
 </template>
