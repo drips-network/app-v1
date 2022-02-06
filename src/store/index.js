@@ -756,8 +756,9 @@ export default createStore({
 
     async collectFunds ({ dispatch }, { projectAddress, address }) {
       try {
-        // get splits
-        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        // get + format splits
+        let currSplits = await dispatch('getSplitsBySender', projectAddress || address)
+        currSplits = currSplits.map(entry => ([entry.receiver, entry.weight]))
 
         // from project or hubs contract?
         const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
