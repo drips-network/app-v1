@@ -38,16 +38,17 @@ const getSplits = async () => {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
     // get... (from project if not-empty)
-    const receivers = await store.dispatch('getSplitsReceivers', owner.value)
-    currentReceivers = receivers.weights
+    const entries = await store.dispatch('getSplitsBySender', owner.value)
+    // format for contract
+    currentReceivers = entries.map(entry => ([entry.receiver, entry.weight]))
 
     // set splits
-    const splits = toRaw(receivers.percents)
+    const splits = entries
 
     // format for input
     for (var i = 0; i < splits.length; i++) {
-      const profile = await store.dispatch('resolveAddress', { address: splits[i].address })
-      splits[i].receiverInput = profile?.ens || splits[i].address
+      const profile = await store.dispatch('resolveAddress', { address: splits[i].receiver })
+      splits[i].receiverInput = profile?.ens || splits[i].receiver
     }
 
     return splits
