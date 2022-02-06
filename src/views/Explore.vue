@@ -97,7 +97,6 @@ const getSplits = async () => {
       `
     })
     const entries = resp.data?.splitsEntries
-    console.log(entries)
     // format for rows
     splits.value = entries.map(entry => ({
       sender: entry.sender,
