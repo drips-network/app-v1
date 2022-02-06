@@ -76,8 +76,29 @@ const getDrips = async () => {
 const splits = ref()
 const getSplits = async () => {
   try {
-    const events = await store.dispatch('getSplitsReceivers')
-    splits.value = filterForCurrentEvents(events).filter(event => event.args[1].length)
+    // const events = await store.dispatch('getSplitsReceivers')
+    // splits.value = filterForCurrentEvents(events).filter(event => event.args[1].length)
+
+    // fetch from api...
+    const resp = await api({
+      query: `
+        query {
+          splitsEntries (first:40) {
+            # id
+            receiver
+            sender
+            weight
+          }
+        }
+      `
+    })
+    const entries = resp.data?.splitsEntries
+    // format for rows
+    splits.value = entries.map(entry => ({
+      sender: entry.sender,
+      receiver: [entry.receiver],
+      percent: entry.weight / store.state.splitsFractionMax * 100
+    }))
   } catch (e) {
     splits.value = []
   }
@@ -85,7 +106,7 @@ const getSplits = async () => {
 
 const dripRows = computed(() => {
   if (!splits.value && !drips.value) return null
-  const splitsRows = splits.value ? formatSplitsEvents(splits.value) : []
+  const splitsRows = splits.value || []
   const dripsRows = drips.value || []
   const rows = [...dripsRows, ...splitsRows]
   rows.sort((a, b) => b.blockNumber - a.blockNumber)
