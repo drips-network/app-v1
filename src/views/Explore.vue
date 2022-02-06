@@ -10,7 +10,7 @@ import InfoBar from '@/components/InfoBar'
 import HeaderLarge from '@/components/HeaderLarge'
 import SpotlightRecipient from '@/components/SpotlightRecipient'
 import store from '@/store'
-import { formatSplitsEvents, formatDripsEvents, filterForCurrentEvents } from '@/utils'
+import { formatSplitsEvents, filterForCurrentEvents, toDAIPerMo } from '@/utils'
 import content from '../../content/spotlight.js'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
@@ -48,8 +48,26 @@ const getProjects = async () => {
 const drips = ref()
 const getDrips = async () => {
   try {
-    const events = await store.dispatch('getDripsReceivers')
-    drips.value = filterForCurrentEvents(events).filter(event => event.args[2].length)
+    // fetch from api...
+    const resp = await api({
+      query: `
+        query {
+          dripsEntries (first:40) {
+            # id
+            receiver
+            sender: user
+            amtPerSec
+          }
+        }
+      `
+    })
+    const entries = resp.data?.dripsEntries
+    // format for rows
+    drips.value = entries.map(entry => ({
+      sender: entry.sender,
+      receiver: [entry.receiver],
+      amount: toDAIPerMo(entry.amtPerSec)
+    }))
   } catch (e) {
     drips.value = []
   }
@@ -68,7 +86,7 @@ const getSplits = async () => {
 const dripRows = computed(() => {
   if (!splits.value && !drips.value) return null
   const splitsRows = splits.value ? formatSplitsEvents(splits.value) : []
-  const dripsRows = drips.value ? formatDripsEvents(drips.value) : []
+  const dripsRows = drips.value || []
   const rows = [...dripsRows, ...splitsRows]
   rows.sort((a, b) => b.blockNumber - a.blockNumber)
   return rows
