@@ -512,8 +512,8 @@ export default createStore({
         }
         return config || emptyConfig
       } catch (e) {
+        console.error(e)
         throw e
-        return emptyConfig
       }
     },
 
@@ -579,8 +579,8 @@ export default createStore({
         }))
         return entries
       } catch (e) {
+        console.error(e)
         throw e
-        return []
       }
     },
 
@@ -739,7 +739,11 @@ export default createStore({
     async getCollectable ({ dispatch }, { projectAddress, address }) {
       try {
         if (!provider) await dispatch('init')
-        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        // get splits...
+        const entries = await dispatch('getSplitsBySender', projectAddress || address)
+        // format for method
+        const currSplits = entries.map(entry => ([entry.receiver, entry.weight]))
+
         const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
         // get...
         return projectAddress ? contract.collectable(currSplits) // from project
