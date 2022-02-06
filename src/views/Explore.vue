@@ -78,9 +78,6 @@ const getDrips = async () => {
 const splits = ref()
 const getSplits = async () => {
   try {
-    // const events = await store.dispatch('getSplitsReceivers')
-    // splits.value = filterForCurrentEvents(events).filter(event => event.args[1].length)
-
     // fetch from api...
     const resp = await api({
       query: `
