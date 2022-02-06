@@ -50,7 +50,7 @@ store.dispatch('init')
             .btn-darker.pl-8.text-violet-650.font-semibold.rounded-full
               router-link.flex.items-center.text-base.font-semibold(:to="{name: 'user', params: {address: $store.state.address}}")
                 //- avi
-                user-avatar.w-40.h-40.mr-10(:address="$store.state.address", blockieSize="40")
+                user-avatar.w-40.h-40.mr-10(:address="$store.state.address", blockieSize="40", :key="$store.state.address")
                 //- address
                 //- | {{ $store.getters.addrShort($store.state.address) }}
                 addr(:address="store.state.address", :key="store.state.address")
