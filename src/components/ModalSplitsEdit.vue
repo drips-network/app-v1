@@ -3,14 +3,14 @@ import { useAttrs } from 'vue'
 import Modal from '@/components/Modal'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import PanelSplitsEdit from '@/components/PanelSplitsEdit'
-const emit = defineEmits(['close', 'viewSplits'])
+const emit = defineEmits(['close', 'viewSplits', 'updated'])
 const attrs = useAttrs()
 </script>
 
 <template lang="pug">
 modal(v-bind="$attrs", @close="$emit('close')")
 
-  panel-splits-edit.z-10.m-auto(v-bind="$attrs", :cancelBtn="true", @close="$emit('close')", @viewSplits="$emit('viewSplits')")
+  panel-splits-edit.z-10.m-auto(v-bind="$attrs", :cancelBtn="true", @close="$emit('close')", @viewSplits="$emit('viewSplits')", @updated="$emit('updated')")
     template(v-slot:header)
       dialog-title
         slot(name="header")

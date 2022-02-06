@@ -29,6 +29,11 @@ const getUsersProjects = async () => {
               currentTotalAmtPerSec
               currentTotalGiven
             }
+            tokens {
+              owner: tokenReceiver
+              giveAmt
+              amtPerSec
+            }
           }
         }
       `

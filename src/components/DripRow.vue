@@ -45,7 +45,7 @@ const receiverRt = computed(() => {
 
       template(v-else-if="props.drip.percent")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>{{ props.drip.percent }}%</b> of incoming drips
+        span <b>{{ parseFloat(props.drip.percent.toFixed(1)) }}%</b> of incoming drips
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
     //- .w-full.flex.items-center.justify-between.text-violet-650.px-24

@@ -54,6 +54,7 @@ export const queryProject = `
       id
       projectOwner
       daiCollected
+      daiSplit
       ipfsHash
       tokenTypes {
         tokenTypeId
@@ -63,9 +64,12 @@ export const queryProject = `
         currentTotalAmtPerSec
         currentTotalGiven
         ipfsHash
+        streaming
       }
       tokens {
         owner: tokenReceiver
+        giveAmt
+        amtPerSec
       }
     }
   }

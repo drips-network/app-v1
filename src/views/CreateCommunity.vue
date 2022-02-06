@@ -452,9 +452,9 @@ projectAddress.value = isDev ? route.query.project : null
         //- drips...
         template(v-for="(drip, i) in drips")
           section.my-10.input-group.relative
-            input-body(label="Recipient's Ethereum Address or ENS name*", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
+            input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
               //- TODO: validate ethereum address
-              input(v-model="drips[i].address", placeholder="name.eth", autocomplete="new-password", required)
+              input(v-model="drips[i].address", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
 
             input-body.mt-10(label="Percent*", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
               input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
