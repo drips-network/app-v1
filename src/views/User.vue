@@ -45,9 +45,8 @@ const drips = ref()
 
 const splitsOut = computed(() => {
   return splits.value?.map(split => ({
-    sender: route.params.address,
-    receiver: [split.address],
-    percent: split.percent
+    ...split,
+    receiver: [split.receiver],
   }))
 })
 
@@ -68,15 +67,16 @@ const allDripsOut = computed(() => {
   return [...dOut, ...sOut]
 })
   
-
+// get splits
 const getSplits = async () => {
   try {
-    splits.value = (await store.dispatch('getSplitsReceivers', route.params.address)).percents
+    splits.value = await store.dispatch('getSplitsBySender', route.params.address)
   } catch (e) {
     console.error(e)
   }
 }
 
+// get drips
 const withdrawable = ref()
 let getWithdrawable
 const getDrips = async () => {
@@ -105,7 +105,6 @@ onMounted(() => {
   }
   getSplits()
   getDrips()
-  store.dispatch('getDripsReceivers2', route.params.address)
 })
 
 provide('isMyUser', isMyUser)
@@ -145,8 +144,8 @@ const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
       // lookup...
       const projectMeta = await store.dispatch('getProjectMeta', { projectAddress: address })
       clearTimeout(projectTimeout)
-      console.log('user is project. redirecting...')
       if (projectMeta?.name) {
+        console.log('user is project. redirecting...')
         // redirect to project
         return next({ name: 'project', params: { address }})
       }
