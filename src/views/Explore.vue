@@ -54,7 +54,7 @@ const getDrips = async () => {
     const resp = await api({
       query: `
         query {
-          dripsEntries (first:40) {
+          dripsEntries {
             # id
             receiver
             sender: user
@@ -63,7 +63,12 @@ const getDrips = async () => {
         }
       `
     })
-    const entries = resp.data?.dripsEntries
+    let entries = resp.data?.dripsEntries || []
+
+    // TEMP filter out sender=receiver
+    // • until resolved: https://github.com/gh0stwheel/drips-subgraph-mainnet-v2/issues/7
+    entries = entries.filter(entry => entry.sender !== entry.receiver)
+
     // format for rows
     drips.value = entries.map(entry => ({
       sender: entry.sender,
@@ -92,6 +97,7 @@ const getSplits = async () => {
       `
     })
     const entries = resp.data?.splitsEntries
+    console.log(entries)
     // format for rows
     splits.value = entries.map(entry => ({
       sender: entry.sender,
