@@ -37,7 +37,7 @@ let lastUpdate = null
 
 let getWithdrawable
 const withdrawable = ref('0')
-// balance / max DAI withdrawable
+// balance (max DAI withdrawable
 const balance = computed(() => toDAI(withdrawable.value), 'exact')
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
 
@@ -48,12 +48,9 @@ const getDrips = async () => {
     // get...
     lastUpdate = await store.dispatch('getDripsReceivers2', store.state.address)
 
-    // set balance
-    // balance.value = round(toDAI(lastUpdate.balance))
     // set withdrawable
-    // TEMP
-    getWithdrawable = () => '0' // () => lastUpdate.withdrawable()
-    withdrawable.value = await getWithdrawable()
+    getWithdrawable = lastUpdate.withdrawable
+    withdrawable.value = getWithdrawable()
 
     // set receivers
     const receivers = toRaw(lastUpdate.receivers)
@@ -156,10 +153,9 @@ const update = async () => {
     // submit...
     txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('updateUserDrips', {
-      // account: store.state.address,
-      lastUpdate: lastUpdate?.timestamp || 0, // 0, // block.timestamp,
-      lastBalance: lastUpdate?.balance || 0, // 0, //
-      currentReceivers: lastUpdate?.receivers || [],
+      lastUpdate: lastUpdate.timestamp,
+      lastBalance: lastUpdate.balance,
+      currentReceivers: lastUpdate.receivers,
       balanceDelta: topUpWei,
       newReceivers
     })
@@ -169,9 +165,13 @@ const update = async () => {
     txMsg.value = { message: 'Waiting for transaction confirmation...' }
     txReceipt.value = await tx.value.wait()
 
-    // confirmation
+    // confirmed!
     txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile.' }
     tx.value = null
+    emit('updated')
+    // update list, balance
+    getDrips()
+    topUpDAI.value = 0
   } catch (e) {
     txMsg.value = { status: -1, message: e.data?.message || e.message || e }
   }
@@ -262,20 +262,22 @@ panel(icon="💧")
         h6.text-2xl.font-semibold.leading-snug Add Funds
         p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
 
-        .relative
-          input-body.mb-10(label="Add DAI to Balance", symbol="dai")
-            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
-          //- (max withdraw note)
-          .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
-            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
-            template(v-else) There are no funds to withdraw
-
+        //- balance
         .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
           .pl-32.text-xl.font-semibold
             | Balance
           .pr-20.flex.items-center(:class="{'text-red-500ff': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
             span.text-2xl.font-semibold {{ newBalance }}
             svg-dai.ml-12(size="xl")
+
+        //- input
+        .relative.my-10
+          input-body(label="Add DAI to Balance", symbol="dai")
+            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
+          //- (max withdraw note)
+          .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
+            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
+            template(v-else) There are no funds to withdraw
 
       //- (polygon address warning)
       template(v-if="$store.getters.isPolygon")

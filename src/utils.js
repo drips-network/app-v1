@@ -175,7 +175,28 @@ export function getDripPctFromAmts (amts) {
   return pct > 0 && pct < 0.01 ? '>0' : parseFloat(pct.toFixed(2))
 }
 
-export const getDripsWithdrawable = async (event) => {
+export const getDripsWithdrawable = (config) => {
+  // https://discord.com/channels/841318878125490186/875668327614255164/918094059732623411
+  // - Look at the latest user's DripsUpdated, it has a timestamp, uint128 balance and DripsReceiver[] receivers
+  // - Add up all the receiers' amtPerSec, it's totalAmtPerSec
+  // - withdrawable = eventBalance - (currTimestamp - eventTimestamp) * totalAmtPerSec
+  // - if withdrawable < 0, withdrawable = eventBalance % totalAmtPerSec
+  try {
+    const currTimestamp = Math.floor(new Date().getTime() / 1000) // sec
+    const totalAmtPerSec = config.receivers.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+    const eventBalance = bn.from(config.balance)
+    let withdrawable = eventBalance.sub(totalAmtPerSec.mul(currTimestamp - config.timestamp))
+    if (withdrawable.lt(0)) {
+      withdrawable = eventBalance.mod(totalAmtPerSec)
+    }
+    return withdrawable
+  } catch (e) {
+    console.error(e)
+    return null
+  }
+}
+
+/*export const getDripsWithdrawableFromEvent = async (event) => {
   // https://discord.com/channels/841318878125490186/875668327614255164/918094059732623411
   // - Look at the latest user's DripsUpdated, it has a timestamp, uint128 balance and DripsReceiver[] receivers
   // - Add up all the receiers' amtPerSec, it's totalAmtPerSec
@@ -196,7 +217,7 @@ export const getDripsWithdrawable = async (event) => {
     console.error(e)
     return null
   }
-}
+}*/
 
 export const filterForCurrentEvents = events => {
   const currentEvents = []

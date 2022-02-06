@@ -12,10 +12,10 @@ import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../con
 let provider, signer, walletProvider
 
 const networks = {
-  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6' },
-  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6' }
+  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://etherscan.io'} },
+  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://rinkeby.etherscan.io'} },
+  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com'} },
+  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com'} }
 }
 const deployNetworkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
 const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
@@ -50,6 +50,7 @@ export default createStore({
     }
   },
   getters: {
+    network: () => deployNetwork,
     addrShort: (state) => (addr) => {
       // return ENS name or shortened 0x8888...8888
       return state.addresses[addr]?.ens ? state.addresses[addr].ens
@@ -499,13 +500,17 @@ export default createStore({
       try {
         const emptyConfig = {
           balance: '0',
-          timestamp: 0,
+          timestamp: '0',
           receivers: [],
-          // withdrawable: () => '0'
+          withdrawable: () => '0'
         }
         // fetch...
         const resp = await api({ query: queryDripsConfigByID, variables: { id: address } })
-        return resp.data?.dripsConfigs[0] || emptyConfig
+        const config = resp.data?.dripsConfigs[0]
+        if (config) {
+          config.withdrawable = () => getDripsWithdrawable(config)
+        }
+        return config || emptyConfig
       } catch (e) {
         throw e
       }

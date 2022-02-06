@@ -78,12 +78,13 @@ const getSplits = async () => {
 }
 
 const withdrawable = ref()
+let getWithdrawable
 const getDrips = async () => {
   try {
     const config = await store.dispatch('getDripsReceivers2', route.params.address)
     drips.value = config.receivers
-    // TEMP UNTIL API has timestamp on DripsConfig
-    withdrawable.value = '0' // await lastUpdate.withdrawable()
+    getWithdrawable = config.withdrawable
+    withdrawable.value = getWithdrawable()
   } catch (e) {
     console.error(e)
     drips.value = []
@@ -91,6 +92,12 @@ const getDrips = async () => {
 }
 
 const goToMySplits = () => router.push({ name: 'user-drips-out', params: { address: store.state.address } })
+
+const updateWithdrawable = () => {
+  if (typeof getWithdrawable === 'function') {
+    withdrawable.value = getWithdrawable()  
+  }
+}
 
 onMounted(() => {
   if (isMyUser.value) {
@@ -215,7 +222,7 @@ article.profile.pb-80
 
   main#main.px-36.min-h-screen
 
-    router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'")
+    router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'", @getWithdrawable="updateWithdrawable")
 
   //- (MY USER)
   template(v-if="isMyUser")
