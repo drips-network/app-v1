@@ -31,6 +31,8 @@ const getProjects = async () => {
             daiSplit
             tokenTypes {
               streaming
+              currentTotalAmtPerSec
+              currentTotalGiven
             }
             tokens (first: 5) {
               owner: tokenReceiver
@@ -151,7 +153,7 @@ article.explore.pt-56.px-24
             drip-row.my-4(:drip="drip")
 
       footer.mt-56.flex.justify-center
-        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create' }") Create a Drip 💧
+        router-link.btn.btn-lgg.btn-outline.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create' }") Create a Drip 💧
 
   //- communities
   section.mt-24.mb-220
@@ -171,6 +173,6 @@ article.explore.pt-56.px-24
           project-thumb.mb-32(:project="project")
 
       footer.mt-56.flex.justify-center
-        router-link.btn.btn-lgg.btn-outline.bg-indigo-950.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️
+        router-link.btn.btn-lgg.btn-outline.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️
 
 </template>
