@@ -357,28 +357,28 @@ export default createStore({
       return contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
     },
 
-    async getFundingTotal (_, { projectAddress, isStreaming }) {
-      try {
-        const contract = getProjectContract(projectAddress)
-        const event = isStreaming ? ['NewStreamingToken', 4] : ['NewToken', 3]
+    // async getFundingTotal (_, { projectAddress, isStreaming }) {
+    //   try {
+    //     const contract = getProjectContract(projectAddress)
+    //     const event = isStreaming ? ['NewStreamingToken', 4] : ['NewToken', 3]
 
-        // get events...
-        const events = await contract.queryFilter(event[0])
+    //     // get events...
+    //     const events = await contract.queryFilter(event[0])
 
-        // add it up
-        let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0))
+    //     // add it up
+    //     let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0))
 
-        if (isStreaming) {
-          // convert to monthly streaming rate
-          totalWei = totalWei.mul(oneMonth)
-        }
+    //     if (isStreaming) {
+    //       // convert to monthly streaming rate
+    //       totalWei = totalWei.mul(oneMonth)
+    //     }
 
-        return totalWei
-      } catch (e) {
-        console.error(e)
-        throw e
-      }
-    },
+    //     return totalWei
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
 
     // async waitForMint ({ state }, { projectAddress, isStreaming, typeId }) {
     //   const contract = getProjectContract(projectAddress)
@@ -517,42 +517,42 @@ export default createStore({
       }
     },
 
-    async getDripsReceivers ({ state, dispatch }, address) {
-      try {
-        if (!provider) await dispatch('init')
+    // async getDripsReceivers ({ state, dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
 
-        const lastUpdate = {
-          receivers: [],
-          timestamp: 0,
-          balance: 0,
-          withdrawable: () => '0'
-        }
+    //     const lastUpdate = {
+    //       receivers: [],
+    //       timestamp: 0,
+    //       balance: 0,
+    //       withdrawable: () => '0'
+    //     }
 
-        const contract = getHubContract()
-        // fetch events...
-        let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
+    //     const contract = getHubContract()
+    //     // fetch events...
+    //     let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
 
-        if (!address) {
-          return events
-        }
+    //     if (!address) {
+    //       return events
+    //     }
 
-        // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+    //     // filter by the address
+    //     events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
-        if (events.length) {
-          const lastEvent = events.pop()
-          lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
-          lastUpdate.balance = lastEvent.args[1]
-          lastUpdate.receivers = lastEvent.args[2]
-          lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
-        }
+    //     if (events.length) {
+    //       const lastEvent = events.pop()
+    //       lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
+    //       lastUpdate.balance = lastEvent.args[1]
+    //       lastUpdate.receivers = lastEvent.args[2]
+    //       lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
+    //     }
 
-        return lastUpdate
-      } catch (e) {
-        console.error(e)
-        throw e
-      }
-    },
+    //     return lastUpdate
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
 
     async updateUserDrips ({ dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
       try {
@@ -584,51 +584,51 @@ export default createStore({
       }
     },
 
-    async getSplitsReceivers ({ state, dispatch }, address) {
-      try {
-        if (!provider) await dispatch('init')
+    // async getSplitsReceivers ({ state, dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
 
-        let splits = []
-        let raw = []
+    //     let splits = []
+    //     let raw = []
 
-        const contract = getHubContract()
-        // fetch events...
-        let events = await contract.queryFilter('SplitsUpdated')
+    //     const contract = getHubContract()
+    //     // fetch events...
+    //     let events = await contract.queryFilter('SplitsUpdated')
 
-        if (!address) {
-          return events
-        }
+    //     if (!address) {
+    //       return events
+    //     }
 
-        // filter by the address?
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+    //     // filter by the address?
+    //     events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
 
-        // has splits?
-        if (events?.length) {
-          const currentReceivers = events.pop().args[1]
-          raw = currentReceivers
+    //     // has splits?
+    //     if (events?.length) {
+    //       const currentReceivers = events.pop().args[1]
+    //       raw = currentReceivers
 
-          // reformat...
-          splits = currentReceivers.map(item => {
-            const address = item[0].toLowerCase()
-            const weight = item[1] // .toNumber()
-            let percent = weight / state.splitsFractionMax * 100
-            percent = Number(percent.toFixed(3))
-            return {
-              address,
-              percent
-            }
-          })
+    //       // reformat...
+    //       splits = currentReceivers.map(item => {
+    //         const address = item[0].toLowerCase()
+    //         const weight = item[1] // .toNumber()
+    //         let percent = weight / state.splitsFractionMax * 100
+    //         percent = Number(percent.toFixed(3))
+    //         return {
+    //           address,
+    //           percent
+    //         }
+    //       })
 
-          // sort by percent descending
-          splits = splits.sort((a, b) => a.percent > b.percent ? -1 : a.percent < b.percent ? 1 : 0)
-        }
+    //       // sort by percent descending
+    //       splits = splits.sort((a, b) => a.percent > b.percent ? -1 : a.percent < b.percent ? 1 : 0)
+    //     }
 
-        return { percents: splits, weights: raw }
-      } catch (e) {
-        console.error(e)
-        return { percents: [], weights: [] }
-      }
-    },
+    //     return { percents: splits, weights: raw }
+    //   } catch (e) {
+    //     console.error(e)
+    //     return { percents: [], weights: [] }
+    //   }
+    // },
 
     async updateAddressSplits (_, { currentReceivers, newReceivers, projectAddress }) {
       try {
