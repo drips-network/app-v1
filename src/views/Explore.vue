@@ -70,22 +70,15 @@ const getDrips = async () => {
     // filter for has drips
     configs = configs.filter(config => config.dripsEntries.length)
 
-    // TEMP filter out sender=receiver
-    // • until resolved: https://github.com/gh0stwheel/drips-subgraph-mainnet-v2/issues/7
-    // configs = configs.filter(entry => entry.sender !== entry.receiver)
-
-    // TEMP
-    drips.value = []
-
     // format for rows
-    // drips.value = configs.map(config => {
-    //   const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
-    //   return {
-    //     sender: config.sender,
-    //     receiver: config.dripsEntries.map(entry => entry.receiver),
-    //     amount: toDAIPerMo(totalAmtPerSec)
-    //   }
-    // })
+    drips.value = configs.map(config => {
+      const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+      return {
+        sender: config.sender,
+        receiver: config.dripsEntries.map(entry => entry.receiver),
+        amount: toDAIPerMo(totalAmtPerSec)
+      }
+    })
   } catch (e) {
     drips.value = []
   }
@@ -109,7 +102,6 @@ const getSplits = async () => {
       `
     })
     const configs = resp.data?.splitsConfigs
-    console.log(configs)
 
     // format for rows
     splits.value = configs
