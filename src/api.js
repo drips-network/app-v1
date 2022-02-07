@@ -32,11 +32,17 @@ export default async function ({ query, variables }) {
     if (resp.status >= 200 && resp.status <= 299) {
       const data = await resp.json()
 
+      // graphql errors?
+      if (data.errors) {
+        throw new Error(JSON.stringify(data.errors))
+      }
+
       // cache resp?
       if (cacheAPISec) {
         sessionStorage.setItem(id, JSON.stringify({ data, time: new Date().getTime() }))
       }
 
+      // success!
       return data
     } else {
       throw Error(resp.statusText)
