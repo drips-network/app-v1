@@ -109,7 +109,6 @@ const getSplits = async () => {
       `
     })
     const configs = resp.data?.splitsConfigs
-    console.log(configs)
 
     // format for rows
     splits.value = configs
