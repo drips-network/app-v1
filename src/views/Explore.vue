@@ -109,16 +109,19 @@ const getSplits = async () => {
       `
     })
     const configs = resp.data?.splitsConfigs
+    console.log(configs)
 
     // format for rows
-    splits.value = configs.map(config => {
-      const totalWeight = config.splitsEntries.reduce((acc, curr) => acc.add(curr.weight), bn.from(0))
-      return {
-        sender: config.sender,
-        receiver: config.splitsEntries.map(entry => entry.receiver),
-        percent: totalWeight / store.state.splitsFractionMax * 100
-      }
-    })
+    splits.value = configs
+      .filter(config => config.splitsEntries.length)
+      .map(config => {
+        const totalWeight = config.splitsEntries.reduce((acc, curr) => acc.add(curr.weight), bn.from(0))
+        return {
+          sender: config.sender,
+          receiver: config.splitsEntries.map(entry => entry.receiver),
+          percent: totalWeight / store.state.splitsFractionMax * 100
+        }
+      })
   } catch (e) {
     splits.value = []
   }
