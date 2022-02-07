@@ -11,16 +11,26 @@ const highlight = computed(() => props.spotlight.highlight)
 
 const supporters = computed(() => {
   if (!props.allSplits) return []
+  return props.allSplits
+    .filter(split => split.receiver.includes(props.spotlight.address?.toLowerCase()))
+    .map(split => split.sender)
   // filter events by recipient
-  const events = props.allSplits.filter(event => event.args[1].find(receiver => receiver[0].toLowerCase() === props.spotlight.address?.toLowerCase()))
+  // const events = props.allSplits.filter(event => event.args[1].find(receiver => receiver[0].toLowerCase() === props.spotlight.address?.toLowerCase()))
   // map to senders
-  return events.map(e => e.args[0])
+  // return events.map(e => e.args[0])
 })
 
 const senderRow = computed(() => {
   // get last update by sender
   const lastUpdate = props.allSplits?.find(e => e.args[0].toLowerCase() === props.spotlight.address?.toLowerCase())
   return lastUpdate && formatSplitsEvents([lastUpdate])[0]
+})
+
+const receivers = computed(() => {
+  if (!props.allSplits) return []
+  return props.allSplits
+    .filter(split => split.sender === props.spotlight.address?.toLowerCase())
+    .reduce((acc, curr) => acc.concat(curr.receiver), [])
 })
 </script>
 
@@ -60,9 +70,9 @@ div.mb-196
           addr.mx-24.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
 
       //- (supporters)
-      template(v-else-if="senderRow")
+      template(v-else-if="receivers && receivers.length")
         ul.flex.flex-wrap.justify-center.mx-auto.text-violet-650
-          li(v-for="(receiver, i) in senderRow.receiver")
+          li(v-for="(receiver, i) in receivers")
             router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.m-2.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: receiver }}")
               //- sender avatar / blockie
               user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-700(:address="receiver", blockieSize="44", :key="receiver")
