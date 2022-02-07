@@ -27,5 +27,12 @@ export default {
       address: '0xb5bb9a125c2f67f1f2cd9d8992955bb209490afe',
       highlight: 'receiver'
     }
+  ],
+  polygon: [
+    {
+      // label: 'human.eth',
+      address: '0xb5bb9a125c2f67f1f2cd9d8992955bb209490afe',
+      highlight: 'sender'
+    }
   ]
 }
