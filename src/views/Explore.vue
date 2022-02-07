@@ -12,6 +12,7 @@ import SpotlightRecipient from '@/components/SpotlightRecipient'
 import store from '@/store'
 import { formatSplitsEvents, filterForCurrentEvents, toDAIPerMo } from '@/utils'
 import content from '../../content/spotlight.js'
+import { BigNumber as bn } from 'ethers'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const spotlights = content[networkName] || []
@@ -54,27 +55,37 @@ const getDrips = async () => {
     const resp = await api({
       query: `
         query {
-          dripsEntries {
-            # id
-            receiver
-            sender: user
-            amtPerSec
+          dripsConfigs {
+            sender: id
+            dripsEntries {
+              receiver
+              amtPerSec
+            }
           }
         }
       `
     })
-    let entries = resp.data?.dripsEntries || []
+    let configs = resp.data?.dripsConfigs || []
+
+    // filter for has drips
+    configs = configs.filter(config => config.dripsEntries.length)
 
     // TEMP filter out sender=receiver
     // • until resolved: https://github.com/gh0stwheel/drips-subgraph-mainnet-v2/issues/7
-    entries = entries.filter(entry => entry.sender !== entry.receiver)
+    // configs = configs.filter(entry => entry.sender !== entry.receiver)
+
+    // TEMP
+    drips.value = []
 
     // format for rows
-    drips.value = entries.map(entry => ({
-      sender: entry.sender,
-      receiver: [entry.receiver],
-      amount: toDAIPerMo(entry.amtPerSec)
-    }))
+    // drips.value = configs.map(config => {
+    //   const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+    //   return {
+    //     sender: config.sender,
+    //     receiver: config.dripsEntries.map(entry => entry.receiver),
+    //     amount: toDAIPerMo(totalAmtPerSec)
+    //   }
+    // })
   } catch (e) {
     drips.value = []
   }
@@ -87,22 +98,28 @@ const getSplits = async () => {
     const resp = await api({
       query: `
         query {
-          splitsEntries (first:40) {
-            # id
-            receiver
-            sender
-            weight
+          splitsConfigs (first:100) {
+            sender: id
+            splitsEntries {
+              receiver
+              weight
+            }
           }
         }
       `
     })
-    const entries = resp.data?.splitsEntries
+    const configs = resp.data?.splitsConfigs
+    console.log(configs)
+
     // format for rows
-    splits.value = entries.map(entry => ({
-      sender: entry.sender,
-      receiver: [entry.receiver],
-      percent: entry.weight / store.state.splitsFractionMax * 100
-    }))
+    splits.value = configs.map(config => {
+      const totalWeight = config.splitsEntries.reduce((acc, curr) => acc.add(curr.weight), bn.from(0))
+      return {
+        sender: config.sender,
+        receiver: config.splitsEntries.map(entry => entry.receiver),
+        percent: totalWeight / store.state.splitsFractionMax * 100
+      }
+    })
   } catch (e) {
     splits.value = []
   }
@@ -128,7 +145,7 @@ onBeforeMount(() => {
 article.explore.pt-56.px-24
 
   //- (spotlight)
-  section.mb-240(v-if="spotlights.length")
+  //- section.mb-240(v-if="spotlights.length")
     header-large.mb-96(icon="✨")
       header
         h2.font-semibold Spotlight
