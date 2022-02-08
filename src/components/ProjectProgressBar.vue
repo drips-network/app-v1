@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, toRaw } from 'vue'
 import SvgDai from '@/components/SvgDai'
-import { toDAI, toWei } from '@/utils'
+import { toDAI, toWei, oneMonth } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 import api from '@/api'
 import store from '@/store'
@@ -11,8 +11,15 @@ const props = defineProps(['meta', 'project', 'rightSide', 'currentFundingWei'])
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
 // raw percent
-const pct = computed(() => (!props.currentFundingWei || !props.meta.goal) ? -1
-  : (props.currentFundingWei.toString() / toWei(props.meta.goal).toString() * 100))
+const pct = computed(() => {
+  if (!props.currentFundingWei || !props.meta.goal) return -1
+  // calc
+  let wei = props.currentFundingWei.toString()
+  if (isStreaming) {
+    wei = wei * oneMonth
+  }
+  return wei / toWei(props.meta.goal).toString() * 100
+})
 
 // pretty percent
 const pctPretty = computed(() => {
