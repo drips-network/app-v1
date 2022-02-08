@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, toRaw } from 'vue'
+import { ref, computed, onMounted, toRaw, watch } from 'vue'
 import SvgDai from '@/components/SvgDai'
 import { toDAI, toWei, oneMonth } from '@/utils'
 import { BigNumber as bn } from 'ethers'
@@ -7,6 +7,7 @@ import api from '@/api'
 import store from '@/store'
 
 const props = defineProps(['meta', 'project', 'rightSide', 'currentFundingWei'])
+const emit = defineEmits(['progress'])
 
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
@@ -30,6 +31,7 @@ const pctPretty = computed(() => {
       : parseInt(pct.value) + '%'
 })
 
+emit('progress', pct.value)
 </script>
 
 <template lang="pug">
