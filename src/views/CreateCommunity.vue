@@ -10,7 +10,7 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import store, { pinJSONToIPFS } from '@/store'
-import { toWei, toWeiPerSec, formatSplits, ipfsUrl, validateSplits } from '@/utils'
+import { toWei, toWeiPerSec, formatSplits, ipfsUrl, validateSplits, validateAddressInput } from '@/utils'
 import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 import SvgX from '@/components/SvgX'
 import { constants } from 'ethers'
@@ -68,7 +68,7 @@ const newDrip = () => ({
 })
 
 const drips = ref([newDrip()])
-const dripsFormatted = computed(() => formatSplits(drips.value))
+// const dripsFormatted = computed(() => formatSplits(drips.value))
 
 // project meta
 const meta = ref({
@@ -94,7 +94,7 @@ const project = computed(() => {
     name: meta.value.name,
     symbol: meta.value.symbol,
     inputNFTTypes: [nftType.value],
-    drips: dripsFormatted.value
+    drips: drips.value // validate during submit
   }
 })
 
@@ -191,10 +191,19 @@ async function submitProject () {
       benefits: benefitsInputHtml.value
     })
 
-    // validate...
+    // validate splits...
     txMsg.value = { message: 'Validating...' }
-    const provider = await store.dispatch('getProvider')
-    myProject.drips = await validateSplits(myProject.drips, provider)
+    // remove any empty rows
+    myProject.drips = myProject.drips.filter(drip => drip.address?.length)
+    // resolve ENS addresses...
+    const splitsResolved = []
+    for (var i = 0; i < myProject.drips.length; i++) {
+      const drip = myProject.drips[i]
+      const address = await validateAddressInput(drip.address)
+      splitsResolved.push({ address, percent: drip.percent })
+    }
+    // format for contract method (sort addresses)
+    myProject.drips = formatSplits(splitsResolved)
 
     // save full data to IPFS/pinata...
     txMsg.value = { message: 'Uploading metadata to IPFS...' }
@@ -215,7 +224,7 @@ async function submitProject () {
     txMsg.value = { status: 1, message: 'Created! View your community!' }
     tx.value = null
   } catch (e) {
-    // console.error(e)
+    console.error(e)
     // alert('Error creating project: ' + e.message)
     // TODO scroll to error?
     txMsg.value = { status: -1, message: e.message || e }
