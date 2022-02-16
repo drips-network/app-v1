@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount, toRaw } from 'vue'
 import api from '@/api'
 import ProjectThumb from '@/components/ProjectThumb'
 import LoadingBar from '@/components/LoadingBar'
@@ -19,14 +19,19 @@ const spotlights = content[networkName] || []
 
 const projects = ref()
 
+const projectsSorted = computed(() => {
+  return projects.value.slice().sort((a, b) => b.progress - a.progress)
+})
+
 const getProjects = async () => {
   try {
     const resp = await api({
       query: `
         query {
-          fundingProjects {
+          fundingProjects (orderBy: blockTimestampCreated, orderDirection: desc) {
             id
             name: projectName
+            created: blockTimestampCreated
             owner: projectOwner
             daiCollected
             daiSplit
@@ -128,6 +133,14 @@ const dripRows = computed(() => {
   return rows
 })
 
+const updateProjectProgress = (val, i) => {
+  if (projects.value[i].progress === undefined) {
+    const prjs = projects.value.slice()
+    prjs[i].progress = val
+    projects.value = prjs
+  }
+}
+
 onBeforeMount(() => {
   getProjects()
   getSplits()
@@ -162,8 +175,8 @@ article.explore.pt-56.px-24
 
       ul
         //- projects...
-        li(v-for="project in projects")
-          project-thumb.mb-32(:project="project")
+        li(v-for="(project, i) in projectsSorted")
+          project-thumb.mb-32(:project="project", @progress="val => updateProjectProgress(val, i)", :key="project.id")
 
       footer.mt-56.flex.justify-center
         router-link.btn.btn-lgg.btn-outline.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️

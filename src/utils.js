@@ -109,8 +109,8 @@ export const validateAddressInput = input => {
 }
 
 /*
- * format drips for contract method input (no dripFraction :)
- * @param drips [{ address, percent }]
+ * format splits for contract method input (no dripFraction :)
+ * @param splits [{ address, percent }]
 */
 export const formatSplits = (splits) => {
   splits = splits || []
@@ -140,29 +140,29 @@ export const formatSplits = (splits) => {
   return receivers
 }
 
-export function validateSplits (drips, provider) {
-  drips = drips || []
+export function validateSplits (splits, provider) {
+  splits = splits || []
   const validate = async () => {
     // validate each address...
-    for (var i = 0; i < drips.length; i++) {
-      if (!utils.isAddress(drips[i][0])) {
+    for (var i = 0; i < splits.length; i++) {
+      if (!utils.isAddress(splits[i][0])) {
         // !! not an ENS
-        if (!drips[i][0].endsWith('.eth')) {
-          throw new Error(`Invalid drip recipient: "${drips[i][0]}" is not an Ethereum address or ENS name (must end in .eth).`)
+        if (!splits[i][0].endsWith('.eth')) {
+          throw new Error(`Invalid recipient: "${splits[i][0]}" is not an Ethereum address or ENS name (must end in .eth).`)
         }
         // resolve ENS name...
-        const address = await provider.resolveName(drips[i][0])
+        const address = await provider.resolveName(splits[i][0])
 
         if (!address) {
-          throw new Error(`Invalid drip recipient: "${drips[i][0]}" does not resolve to an Ethereum address.`)
+          throw new Error(`Invalid recipient: "${splits[i][0]}" does not resolve to an Ethereum address.`)
         }
 
         // replace ens with address
-        drips[i][0] = address
+        splits[i][0] = address
       }
     }
 
-    return drips
+    return splits
   }
 
   return new Promise((resolve, reject) => validate().then(resolve).catch(reject))
@@ -196,7 +196,7 @@ export const getDripsWithdrawable = (config) => {
   }
 }
 
-/*export const getDripsWithdrawableFromEvent = async (event) => {
+/* export const getDripsWithdrawableFromEvent = async (event) => {
   // https://discord.com/channels/841318878125490186/875668327614255164/918094059732623411
   // - Look at the latest user's DripsUpdated, it has a timestamp, uint128 balance and DripsReceiver[] receivers
   // - Add up all the receiers' amtPerSec, it's totalAmtPerSec
@@ -217,7 +217,7 @@ export const getDripsWithdrawable = (config) => {
     console.error(e)
     return null
   }
-}*/
+} */
 
 export const filterForCurrentEvents = events => {
   const currentEvents = []
