@@ -7,6 +7,7 @@ import LoadingBar from '@/components/LoadingBar'
 import Addr from '@/components/Addr'
 import store from '@/store'
 import { toDAIPerMo } from '@/utils'
+import api from '@/api'
 
 const route = useRoute()
 
@@ -22,77 +23,57 @@ const allDripsIn = computed(() => {
 
 const getDripsIn = async () => {
   try {
-    const allDripsEvents = await store.dispatch('getDripsReceivers') || []
-
-    // filter by this user
-    const userDripsInEvents = allDripsEvents.reverse().filter(event => {
-      return event?.args[2].length && event.args[2].find(receiver => receiver[0].toLowerCase() === route.params.address)
+    // fetch...
+    const resp = await api({
+      query: `
+        query ($receiver: Bytes!) {
+          dripsEntries (where: { receiver: $receiver }) {
+            sender: user
+            receiver
+            amtPerSec
+          }
+        }
+        `,
+      variables: { receiver: route.params.address.toLowerCase() }
     })
-
-    // reduce to most recent update
-    const currentUserDripsIn = []
-    userDripsInEvents.forEach(event => {
-      // add if not added already
-      if (!currentUserDripsIn.find(e => e.args[0] === event.args[0])) {
-        currentUserDripsIn.push(event)
-      }
-    })
-
-    // format for UI
-    const myDripsIn = []
-    currentUserDripsIn.forEach(event => {
-      // multiple drips from same sender?
-      const drips = event.args[2].filter(drip => drip[0].toLowerCase() === route.params.address)
-      // add
-      drips.map(drip => {
-        myDripsIn.push({
-          blockNumber: event.blockNumber,
-          sender: event.args[0],
-          receiver: [drip[0].toLowerCase()],
-          amount: toDAIPerMo(drip[1])
-        })
-      })
-    })
-    // set
-    dripsIn.value = myDripsIn
+    console.log(resp)
+    // format
+    dripsIn.value = resp.data?.dripsEntries.map(entry => ({
+      ...entry,
+      receiver: [entry.receiver],
+      amount: toDAIPerMo(entry.amtPerSec)
+    }))
   } catch (e) {
     console.error(e)
+    dripsIn.value = []
   }
 }
 
 const getSplitsIn = async () => {
   try {
-    const allSplitsEvents = await store.dispatch('getSplitsReceivers') || []
-    // filter by user
-    const userSplitsInEvents = allSplitsEvents.reverse().filter(event => {
-      return event?.args[1].length && event.args[1].find(receiver => receiver[0].toLowerCase() === route.params.address)
+    // fetch...
+    const resp = await api({
+      query: `
+        query ($receiver: Bytes!) {
+          splitsEntries (where: { receiver: $receiver }) {
+            sender
+            receiver
+            weight
+          }
+        }
+        `,
+      variables: { receiver: route.params.address.toLowerCase() }
     })
-
-    // reduce to most recent update
-    const currentUserSplitsIn = []
-    userSplitsInEvents.forEach(event => {
-      if (!currentUserSplitsIn.find(e => e.args[0] === event.args[0])) {
-        currentUserSplitsIn.push(event)
-      }
-    })
-
-    // format for UI
-    const mySplitsIn = []
-    currentUserSplitsIn.forEach(event => {
-      const split = event.args[1].filter(row => row[0].toLowerCase() === route.params.address)
-      split.forEach(split => {
-        mySplitsIn.push({
-          blockNumber: event.blockNumber,
-          sender: event.args[0],
-          receiver: [split[0].toLowerCase()],
-          percent: split[1] / store.state.splitsFractionMax * 100
-        })
-      })
-    })
-    // set
-    splitsIn.value = mySplitsIn
+    console.log(resp)
+    // format
+    splitsIn.value = resp.data?.splitsEntries.map(entry => ({
+      ...entry,
+      receiver: [entry.receiver],
+      percent: entry.weight / store.state.splitsFractionMax * 100
+    }))
   } catch (e) {
     console.error(e)
+    splitsIn.value = []
   }
 }
 

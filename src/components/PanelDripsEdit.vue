@@ -9,6 +9,7 @@ import SvgDai from '@/components/SvgDai'
 import LoadingBar from '@/components/LoadingBar'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import FormMessage from '@/components/FormMessage'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import { utils, constants, BigNumber as bn } from 'ethers'
 import { round, toDAI, toWei, toWeiPerSec, toDAIPerMo, validateAddressInput } from '@/utils'
@@ -25,6 +26,7 @@ const drips = ref([])
 const topUpDAI = ref(0) // DAI
 
 const addDrip = () => {
+  drips.value = drips.value || []
   drips.value.push({ receiverInput: '', amount: null })
   nextTick().then(() => receiverInputEls.value[drips.value.length - 1].focus())
 }
@@ -35,7 +37,7 @@ let lastUpdate = null
 
 let getWithdrawable
 const withdrawable = ref('0')
-// balance / max DAI withdrawable
+// balance (max DAI withdrawable
 const balance = computed(() => toDAI(withdrawable.value), 'exact')
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
 
@@ -44,13 +46,11 @@ const getDrips = async () => {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
     // get...
-    lastUpdate = await store.dispatch('getDripsReceivers', store.state.address)
+    lastUpdate = await store.dispatch('getDripsBySender', store.state.address)
 
-    // set balance
-    // balance.value = round(toDAI(lastUpdate.balance))
     // set withdrawable
-    getWithdrawable = () => lastUpdate.withdrawable()
-    withdrawable.value = await getWithdrawable()
+    getWithdrawable = lastUpdate.withdrawable
+    withdrawable.value = getWithdrawable()
 
     // set receivers
     const receivers = toRaw(lastUpdate.receivers)
@@ -58,18 +58,19 @@ const getDrips = async () => {
     // format receivers for form input
     const receiversFormatted = []
     for (var i = 0; i < receivers.length; i++) {
+      // get profile...
       const profile = await store.dispatch('resolveAddress', { address: receivers[i][0] })
+      // format
       receiversFormatted.push({
-        address: receivers[i][0],
-        amount: toDAIPerMo(receivers[i][1]),
-        receiverInput: profile?.ens || receivers[i][0]
+        address: receivers[i].receiver, // receivers[i][0],
+        amount: toDAIPerMo(receivers[i].amtPerSec), // toDAIPerMo(receivers[i][1]),
+        receiverInput: profile?.ens || receivers[i].receiver, // profile?.ens || receivers[i][0]
       })
     }
 
     return receiversFormatted
   } catch (e) {
     console.error(e)
-    currentReceivers = [] // assume empty ?
     drips.value = []
   }
 }
@@ -94,6 +95,7 @@ const approve = async () => {
 
     approved.value = true // topUpWei.value.toString()
     approveTx.value = null
+    approveTxMsg.value = null
   } catch (e) {
     // console.error(e)
     approveTxMsg.value = { status: -1, message: e.message || e }
@@ -151,9 +153,8 @@ const update = async () => {
     // submit...
     txMsg.value = { message: 'Confirm the transaction in your wallet.' }
     tx.value = await store.dispatch('updateUserDrips', {
-      // account: store.state.address,
-      lastUpdate: lastUpdate.timestamp, // 0, // block.timestamp,
-      lastBalance: lastUpdate.balance, // 0, //
+      lastUpdate: lastUpdate.timestamp,
+      lastBalance: lastUpdate.balance,
       currentReceivers: lastUpdate.receivers,
       balanceDelta: topUpWei,
       newReceivers
@@ -164,11 +165,15 @@ const update = async () => {
     txMsg.value = { message: 'Waiting for transaction confirmation...' }
     txReceipt.value = await tx.value.wait()
 
-    // confirmation
+    // confirmed!
     txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile.' }
     tx.value = null
+    emit('updated')
+    // update list, balance
+    getDrips()
+    topUpDAI.value = 0
   } catch (e) {
-    txMsg.value = { status: -1, message: e.message || e }
+    txMsg.value = { status: -1, message: e.data?.message || e.message || e }
   }
 }
 
@@ -201,7 +206,7 @@ onMounted(async () => {
     }
 
     // if empty drips, add empty row
-    if (!drips.value.length) {
+    if (!drips.value?.length) {
       addDrip()
     }
 
@@ -235,9 +240,9 @@ panel(icon="💧")
       template(v-for="(drip, i) in drips")
         section.my-10.input-group.relative
           //- address
-          input-body(label="Recipient's Ethereum Address or ENS name", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
+          input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
             //- TODO: validate ethereum address
-            input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
+            input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
           //- rate
           input-body.mt-10(label="Monthly DAI Amount", :isFilled="typeof drips[i].amount === 'number'", theme="dark", symbol="daipermo")
             input(v-model="drips[i].amount", type="number", min="0.01", step="0.01", placeholder="5", required)
@@ -251,21 +256,13 @@ panel(icon="💧")
       button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addDrip")
         svg-plus-minus-radicle
 
-      //- TODO topup input
-
+      //- topup section
       .mt-72
         div.mb-24.text-3xl 🔋
         h6.text-2xl.font-semibold.leading-snug Add Funds
         p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
 
-        .relative
-          input-body.mb-10(label="Add DAI to Balance", symbol="dai")
-            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
-          //- (max withdraw note)
-          .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
-            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
-            template(v-else) There are no funds to withdraw
-
+        //- balance
         .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
           .pl-32.text-xl.font-semibold
             | Balance
@@ -273,6 +270,19 @@ panel(icon="💧")
             span.text-2xl.font-semibold {{ newBalance }}
             svg-dai.ml-12(size="xl")
 
+        //- input
+        .relative.my-10
+          input-body(label="Add DAI to Balance", symbol="dai")
+            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
+          //- (max withdraw note)
+          .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
+            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
+            template(v-else) There are no funds to withdraw
+
+      //- (polygon address warning)
+      template(v-if="$store.getters.isPolygon")
+        warning-polygon-addresses.my-40
+      
       //- (not approved message)
       template(v-if="approveVisible")
         //- fades when approved
@@ -280,7 +290,7 @@ panel(icon="💧")
           p.text-base.leading-normal You must first #[b allow] the Drips contract to be able to #[b withdraw&nbsp;your&nbsp;DAI].
 
           //- (tx message)
-          form-message.my-28(v-if="approveTxMsg", :body="approveTxMsg")
+          form-message.my-28.border.border-current.rounded-lg(v-if="approveTxMsg", :body="approveTxMsg")
 
           //- allow btn
           .mt-24.flex.justify-center.-mb-4
@@ -293,6 +303,7 @@ panel(icon="💧")
 
       //- btns
       .mt-40
+
         //- (tx message)
         form-message.my-40(v-if="txMsg", :body="txMsg")
 

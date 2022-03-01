@@ -45,17 +45,16 @@ const drips = ref()
 
 const splitsOut = computed(() => {
   return splits.value?.map(split => ({
-    sender: route.params.address,
-    receiver: [split.address],
-    percent: split.percent
+    ...split,
+    receiver: [split.receiver],
   }))
 })
 
 const dripsOut = computed(() => {
   return drips.value?.map(drip => ({
     sender: route.params.address,
-    receiver: [drip[0]],
-    amount: toDAIPerMo(drip[1])
+    receiver: [drip.receiver], // [drip[0]],
+    amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
   }))
 })
 
@@ -68,27 +67,37 @@ const allDripsOut = computed(() => {
   return [...dOut, ...sOut]
 })
   
-
+// get splits
 const getSplits = async () => {
   try {
-    splits.value = (await store.dispatch('getSplitsReceivers', route.params.address)).percents
+    splits.value = await store.dispatch('getSplitsBySender', route.params.address)
   } catch (e) {
     console.error(e)
   }
 }
 
+// get drips
 const withdrawable = ref()
+let getWithdrawable
 const getDrips = async () => {
   try {
-    const lastUpdate = await store.dispatch('getDripsReceivers', route.params.address)
-    drips.value = lastUpdate.receivers
-    withdrawable.value = await lastUpdate.withdrawable()
+    const config = await store.dispatch('getDripsBySender', route.params.address)
+    drips.value = config.receivers
+    getWithdrawable = config.withdrawable
+    withdrawable.value = getWithdrawable()
   } catch (e) {
     console.error(e)
+    drips.value = []
   }
 }
 
 const goToMySplits = () => router.push({ name: 'user-drips-out', params: { address: store.state.address } })
+
+const updateWithdrawable = () => {
+  if (typeof getWithdrawable === 'function') {
+    withdrawable.value = getWithdrawable()  
+  }
+}
 
 onMounted(() => {
   if (isMyUser.value) {
@@ -135,8 +144,8 @@ const resolveRouteAddress = async (to, next, skipProjectLookup = false) => {
       // lookup...
       const projectMeta = await store.dispatch('getProjectMeta', { projectAddress: address })
       clearTimeout(projectTimeout)
-      console.log('user is project. redirecting...')
       if (projectMeta?.name) {
+        console.log('user is project. redirecting...')
         // redirect to project
         return next({ name: 'project', params: { address }})
       }
@@ -212,7 +221,7 @@ article.profile.pb-80
 
   main#main.px-36.min-h-screen
 
-    router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'")
+    router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'", @getWithdrawable="updateWithdrawable")
 
   //- (MY USER)
   template(v-if="isMyUser")

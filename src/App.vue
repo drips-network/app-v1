@@ -1,6 +1,7 @@
 <script setup>
 // This app is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
+import { ref } from 'vue'
 import store from '@/store'
 import SvgLogo from './components/SvgLogo.vue'
 import SvgLogoDrop from './components/SvgLogoDrop.vue'
@@ -13,6 +14,7 @@ import SvgLogoRadicle from './components/SvgLogoRadicle.vue'
 import Addr from '@/components/Addr'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const networkMenu = ref(false)
 
 store.dispatch('init')
 </script>
@@ -36,8 +38,27 @@ store.dispatch('init')
           .w-80.flex.justify-center.items-center.pb-px
             svg-logo-drop
           svg-logo.text-violet-650
-        //- (test network name)
-        .bg-indigo-900.borderf.border-violet-600.rounded-full.px-14.py-8.text-greenbright-500.text-mss.leading-none.ml-24(v-if="networkName.toLowerCase() !== 'mainnet'") {{ networkName }}
+
+        //- network changer
+        .ml-24.relative.text-mss.leading-none
+          //- network menu btn
+          button.relative.z-10.rounded-lg.px-14.py-8.flex.items-center(@click="networkMenu = !networkMenu", :class="{'bg-indigo-900': !networkMenu, 'text-violet-650': networkName.includes('polygon'), 'text-greenbright-400': !networkName.includes('polygon') }")
+            .transform.-translate-y-1 {{ networkName === 'mainnet' ? 'ethereum' : networkName }}
+            //- chevron icon
+            .w-6.h-6.ml-9.border-r.border-b.border-current.opacity-50.transform.origin-center(:class="{'-rotate-135': networkMenu, 'rotate-45 -translate-y-2': !networkMenu}")
+
+          //- (network menu dropdown)
+          ul.absolute.min-w-full.top-0.left-0.py-8.bg-indigo-950.rounded-md(v-show="networkMenu")
+            li.py-2 &nbsp;
+            //- ethereum link
+            li(v-if="networkName !== 'mainnet'")
+              a.inline-block.py-5.px-14.text-greenbright-500.notouch_hover_text-white.transition.duration-150(href="https://app.drips.network")
+                template(v-if="networkName.includes('polygon')") ethereum
+                template(v-else) mainnet
+            //- polygon link
+            li(v-if="networkName !== 'polygon'")
+              a.inline-block.py-5.px-14.text-violet-650.notouch_hover_text-white.transition.duration-150(href="https://polygon.drips.network")
+                | polygon
 
       //- right side (mobile bottom fixed)
       nav.app__nav.fixed.z-30.bottom-0.left-0.w-full.px-10.pb-10.md_static.md_p-0.md_w-auto.flex.justify-center.bg-gradient-to-b.from-transparent.to-indigo-900

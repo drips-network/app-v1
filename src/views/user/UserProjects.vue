@@ -26,6 +26,13 @@ const getUsersProjects = async () => {
               # tokenTypeId
               streaming
               limit
+              currentTotalAmtPerSec
+              currentTotalGiven
+            }
+            tokens {
+              owner: tokenReceiver
+              giveAmt
+              amtPerSec
             }
           }
         }

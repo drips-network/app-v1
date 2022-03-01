@@ -5,6 +5,7 @@ import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 // import { pinImageToIPFS } from '@/store'
 import { ipfsUrl } from '@/utils'
+import store from '@/store'
 
 const props = defineProps(['modelValue', 'isNewProject'])
 const emit = defineEmits(['update:modelValue'])

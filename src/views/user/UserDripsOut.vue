@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, inject, watch } from 'vue'
+import { computed, ref, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import DripRow from '@/components/DripRow'
 import InfoBar from '@/components/InfoBar'
@@ -13,7 +13,7 @@ import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import SvgDai from '@/components/SvgDai'
 
 const route = useRoute()
-const emit = defineEmits(['editDripsSelect', 'editDrips'])
+const emit = defineEmits(['editDripsSelect', 'editDrips', 'getWithdrawable'])
 
 const canEdit = inject('isMyUser')
 const allDrips = inject('allDripsOut') // drips + splits
@@ -22,8 +22,17 @@ const dripsOut = inject('dripsOut') // drips only
 const dripsOutRate = computed(() => dripsOut.value && dripsOut.value.reduce((acc, cur) => acc + cur.amount, 0))
 
 const withdrawable = inject('withdrawable')
-// TODO - check balance every second or so
-const balance = computed(() => withdrawable.value === undefined ? '-' : round(toDAI(withdrawable.value)))
+const balance = computed(() => withdrawable.value === undefined ? '-' : toDAI(withdrawable.value))
+
+let interval
+const getWithdrawableEverySecond = () => {
+  interval = setTimeout(() => {
+    emit('getWithdrawable')
+  }, 1000)
+}
+
+onMounted(() => getWithdrawableEverySecond())
+onUnmounted(() => clearTimeout(interval))
 </script>
 
 <template lang="pug">

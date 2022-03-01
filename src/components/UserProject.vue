@@ -7,7 +7,7 @@ import SvgDai from '@/components/SvgDai'
 import SvgQuestionMarkEncircled from '@/components/SvgQuestionMarkEncircled'
 import AvailableFundsBar from '@/components/AvailableFundsBar'
 import ModalCollectDrips from '@/components/ModalCollectDrips'
-import { ipfsUrl, toDAI, round } from '@/utils'
+import { ipfsUrl, toDAI, round, toDAIPerMo } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 
 const props = defineProps({
@@ -38,15 +38,14 @@ const totalCollectableDAI = computed(() => {
 })
 
 // current funding
-const currentFundingWei = ref()
-const getCurrentFunding = () => {
-  store.dispatch('getFundingTotal', {
-    projectAddress: props.project.id,
-    isStreaming
-  })
-    .then(wei => { currentFundingWei.value = wei })
-    .catch(console.error)
-}
+const currentFundingWei = computed(() => {
+  // based on first token (for now)
+  const tokenType = props.project.tokenTypes[0]
+  if (tokenType) {
+    return tokenType.streaming ? tokenType.currentTotalAmtPerSec : tokenType.currentTotalGiven
+  }
+  return undefined
+})
 
 const getCollectable = () => {
   store.dispatch('getCollectable', { projectAddress: props.project.id })
@@ -66,10 +65,10 @@ const onCollected = () => {
 onBeforeMount(() => {
   getProject()
   // get drips
-  store.dispatch('getSplitsReceivers', props.project.id)
-    .then(receivers => { drips.value = receivers.percents })
+  store.dispatch('getSplitsBySender', props.project.id)
+    .then(splits => { drips.value = splits })
+    .catch(() => { drips.value = [] })
   //
-  getCurrentFunding()
   getCollectable()
 })
 </script>
@@ -108,7 +107,11 @@ onBeforeMount(() => {
                 .flex-1.text-xl.text-violet-650 Monthly Drips-In
                 .flex.items-center.text-white
                   .text-xl(:class="{'animate-pulse': !currentFundingWei }")
-                    | {{ !currentFundingWei ? '...' : toDAI(currentFundingWei) }}
+                    template(v-if="!currentFundingWei") ...
+                    template(v-if="isStreaming")
+                      | {{ toDAIPerMo(currentFundingWei) }}
+                    template(v-else)
+                      | toDAI(currentFundingWei) }}
                   svg-dai.h-20.ml-12
                   .text-lgg.tracking-tight /MO
                   //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect

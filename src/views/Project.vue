@@ -19,7 +19,7 @@ import ProjectStats from '@/components/ProjectStats'
 import Addr from '@/components/Addr'
 import SvgPen from '@/components/SvgPen'
 import SvgXCircle from '@/components/SvgXCircle'
-import { fromWei, toDAI, toDAIPerMo, ipfsUrl } from '@/utils'
+import { fromWei, toDAI, toDAIPerMo, ipfsUrl, oneMonth } from '@/utils'
 
 const route = useRoute()
 const view = ref('benefits')
@@ -41,13 +41,11 @@ const collectModalOpen = ref(false)
 
 const getProjectMeta = async (ipfsHash) => {
   meta.value = await store.dispatch('getProjectMeta', { ipfsHash })
-  console.log(meta.value)
-  // TODO handle error for updating/editing meta?
 }
 
 const getDrips = () => {
-  store.dispatch('getSplitsReceivers', projectAddress)
-    .then(receivers => { drips.value = receivers.percents })
+  store.dispatch('getSplitsBySender', projectAddress)
+    .then(splits => { drips.value = splits })
     .catch(console.error)
 }
 
@@ -100,7 +98,7 @@ const getProject = async (showLoading) => {
       : Number(toDAI(tokenType.value.minAmt), 'exact').toFixed(0)
 
     // get funding once tokenType is known
-    getCurrentFunding()
+    // getCurrentFunding()
 
     status.value = null
   } catch (e) {
@@ -119,21 +117,14 @@ const scrollToDripsList = () => {
   dripsList.value.$el.scrollIntoView({ behavior: 'smooth' })
 }
 
-const currentFundingWei = ref()
-const getCurrentFunding = () => {
-  store.dispatch('getFundingTotal', {
-    projectAddress,
-    isStreaming: tokenType.value.streaming
-  })
-    .then(wei => { currentFundingWei.value = wei })
-    .catch(console.error)
-}
-
-// const collectableAmts = ref()
-// const getCollectable = () => {
-//   store.dispatch('getCollectable', { projectAddress: props.project.id })
-//     .then(amounts => { collectableAmts.value = amounts })
-// }
+// current funding
+const currentFundingWei = computed(() => {
+  // based on first token (for now)
+  if (tokenType.value) {
+    return tokenType.value.streaming ? tokenType.value.currentTotalAmtPerSec : tokenType.value.currentTotalGiven
+  }
+  return undefined
+})
 
 onBeforeMount(() => getProject(true))
 
@@ -208,7 +199,7 @@ article.project.pb-96
 
       //- (stats)
       .mt-96.mb-96.px-20
-        project-stats(v-if="project", :project="project", :meta="meta", :drips="drips", :currentFundingWei="currentFundingWei")
+        project-stats(v-if="project", :project="project", :meta="meta", :drips="drips", :currentFundingWei="currentFundingWei", :tallyTokens="true")
 
       nav.flex.justify-center.w-full
         .h-80.rounded-full.flex.items-center.px-16.bg-indigo-800

@@ -11,6 +11,7 @@ import store from '@/store'
 import TxLink from '@/components/TxLink'
 import LoadingBar from '@/components/LoadingBar'
 import FormMessage from '@/components/FormMessage'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
 
 const props = defineProps(['newRecipient', 'cancelBtn', 'projectAddress'])
 const emit = defineEmits(['close', 'updated', 'viewSplits'])
@@ -37,16 +38,17 @@ const getSplits = async () => {
     // connected?
     if (!store.state.address) await store.dispatch('connect')
     // get... (from project if not-empty)
-    const receivers = await store.dispatch('getSplitsReceivers', owner.value)
-    currentReceivers = receivers.weights
+    const entries = await store.dispatch('getSplitsBySender', owner.value)
+    // format for contract
+    currentReceivers = entries.map(entry => ([entry.receiver, entry.weight]))
 
     // set splits
-    const splits = toRaw(receivers.percents)
+    const splits = entries
 
     // format for input
     for (var i = 0; i < splits.length; i++) {
-      const profile = await store.dispatch('resolveAddress', { address: splits[i].address })
-      splits[i].receiverInput = profile?.ens || splits[i].address
+      const profile = await store.dispatch('resolveAddress', { address: splits[i].receiver })
+      splits[i].receiverInput = profile?.ens || splits[i].receiver
     }
 
     return splits
@@ -163,11 +165,11 @@ panel(icon="💦")
       template(v-for="(split, i) in splits")
         section.my-10.input-group.relative
           //- input address
-          input-body(label="Recipient's Ethereum Address or ENS name", :isFilled="splits[i].receiverInput === 'length'", theme="dark", format="code")
+          input-body(:label="$store.getters.label('inputAddressLabel')", theme="dark", format="code")
             //- TODO: validate ethereum address
-            input(:ref="el => { receiverInputEls[i] = el }", v-model="splits[i].receiverInput", placeholder="name.eth", autocomplete="new-password", required)
+            input(:ref="el => { receiverInputEls[i] = el }", v-model="splits[i].receiverInput", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
           //- amount
-          input-body.mt-10(label="Percent", :isFilled="typeof splits[i].percent === 'number'", theme="dark", symbol="percent")
+          input-body.mt-10(label="Percent", theme="dark", symbol="percent")
             input(v-model="splits[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
           //- rmv btn
           .absolute.top-0.right-0.h-full.flex.items-center
@@ -179,6 +181,10 @@ panel(icon="💦")
 
       //- btns
       .mt-40
+        //- (polygon address warning)
+        template(v-if="$store.getters.isPolygon")
+          warning-polygon-addresses.my-40
+
         //- (tx message)
         form-message.my-40(v-if="txMsg", :body="txMsg")
 

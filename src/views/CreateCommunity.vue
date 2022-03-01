@@ -10,7 +10,7 @@ import Panel from '@/components/Panel'
 import InputBody from '@/components/InputBody'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import store, { pinJSONToIPFS } from '@/store'
-import { toWei, toWeiPerSec, formatSplits, ipfsUrl, validateSplits } from '@/utils'
+import { toWei, toWeiPerSec, formatSplits, ipfsUrl, validateSplits, validateAddressInput } from '@/utils'
 import FieldsProjectEdit from '@/components/FieldsProjectEdit'
 import SvgX from '@/components/SvgX'
 import { constants } from 'ethers'
@@ -18,6 +18,7 @@ import showdown from 'showdown'
 import SvgPen from '@/components/SvgPen'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 import FormMessage from '@/components/FormMessage'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
 import TxLink from '@/components/TxLink'
 
 const route = useRoute()
@@ -31,7 +32,8 @@ const owner = computed(() => store.state.address)
 const projectAddress = ref(null)
 
 // nft types
-const isSubscription = ref(true)
+const tokenType = ref(null) // user selects
+const isSubscription = computed(() => tokenType.value === 'subscription')
 const minDAIPerMonth = ref() // subscription
 const minDAIPrice = ref() // onetime
 const tokenLimit = ref()
@@ -66,7 +68,7 @@ const newDrip = () => ({
 })
 
 const drips = ref([newDrip()])
-const dripsFormatted = computed(() => formatSplits(drips.value))
+// const dripsFormatted = computed(() => formatSplits(drips.value))
 
 // project meta
 const meta = ref({
@@ -92,7 +94,7 @@ const project = computed(() => {
     name: meta.value.name,
     symbol: meta.value.symbol,
     inputNFTTypes: [nftType.value],
-    drips: dripsFormatted.value
+    drips: drips.value // validate during submit
   }
 })
 
@@ -189,10 +191,19 @@ async function submitProject () {
       benefits: benefitsInputHtml.value
     })
 
-    // validate...
+    // validate splits...
     txMsg.value = { message: 'Validating...' }
-    const provider = await store.dispatch('getProvider')
-    myProject.drips = await validateSplits(myProject.drips, provider)
+    // remove any empty rows
+    myProject.drips = myProject.drips.filter(drip => drip.address?.length)
+    // resolve ENS addresses...
+    const splitsResolved = []
+    for (var i = 0; i < myProject.drips.length; i++) {
+      const drip = myProject.drips[i]
+      const address = await validateAddressInput(drip.address)
+      splitsResolved.push({ address, percent: drip.percent })
+    }
+    // format for contract method (sort addresses)
+    myProject.drips = formatSplits(splitsResolved)
 
     // save full data to IPFS/pinata...
     txMsg.value = { message: 'Uploading metadata to IPFS...' }
@@ -213,7 +224,7 @@ async function submitProject () {
     txMsg.value = { status: 1, message: 'Created! View your community!' }
     tx.value = null
   } catch (e) {
-    // console.error(e)
+    console.error(e)
     // alert('Error creating project: ' + e.message)
     // TODO scroll to error?
     txMsg.value = { status: -1, message: e.message || e }
@@ -288,14 +299,14 @@ projectAddress.value = isDev ? route.query.project : null
 
     //- 2. FUNDING
 
-    panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="Member Tokens", icon="🧩")
+    panel.mx-auto.my-24(ref="fundingPanel", v-show="step > 0", label="NFT Memberships", icon="🧩")
       template(v-slot:header)
-        h2 Member Tokens
+        h2 NFT Memberships
 
       //- TODO description/text about how some can't be edited later !!!
       //- p Now, set a monthly goal for your project and a minimum monthly amount for subscriptions.
       template(v-slot:description)
-        p.text-violet-650 Decide on how to <b>fund your community</b>.
+        p.text-violet-650 How do you want to <b>fund your community</b>?
         //- <br>For now, you can only have <b>one membership type</b>.
         //- | <br>Fields in #[span.text-red-500.font-bold red] you cannot change later!
 
@@ -303,26 +314,26 @@ projectAddress.value = isDev ? route.query.project : null
       .flex.-mx-10.mt-40
         //- TODO convert to radio buttons for accessibility
         .w-1x2.px-10
-          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': !isSubscription, 'border border-violet-700': isSubscription}")
-            button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = true")
+          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_opacity-100.transition.duration-150.group(:class="{'opacity-40': tokenType === 'onetime', 'ring ring-violet-650': tokenType === 'subscription'}")
+            button.absolute.overlay.flex.items-center.justify-center(@click="tokenType = 'subscription'")
               div.pt-16
                 .text-xl.font-semibold.mb-16 Subscriptions
                 p.text-violet-600 Recurring monthly income from<br>your community.
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-              .rounded-full.w-full(:class="{'bg-violet-700': isSubscription}")
+              .rounded-full.w-full.group-hover_bg-violet-650(:class="{'bg-violet-650': tokenType === 'subscription'}")
 
         .w-1x2.px-10
-          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue(:class="{'opacity-50': isSubscription, 'border border-violet-700': !isSubscription}")
-            button.absolute.overlay.flex.items-center.justify-center(@click="isSubscription = false")
+          .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_opacity-100.transition.duration-150.group(:class="{'opacity-40': tokenType === 'subscription', 'ring ring-violet-650': tokenType === 'onetime'}")
+            button.absolute.overlay.flex.items-center.justify-center(@click="tokenType = 'onetime'")
               div.pt-16
                 .text-xl.font-semibold.mb-16 One-time Fundraiser
                 p.text-violet-600 Sell limited-edition memberships.<br>&nbsp;
             //- circle
             .m-20.h-32.w-32.border.border-violet-700.rounded-full.p-3.flex
-              .rounded-full.w-full(:class="{'bg-violet-700': !isSubscription}")
+              .rounded-full.w-full.group-hover_bg-violet-650(:class="{'bg-violet-650': tokenType === 'onetime'}")
 
-      form.mt-40(@submit.prevent="openBenefitsPanel", validate)
+      form.mt-40(v-show="tokenType", @submit.prevent="openBenefitsPanel", validate)
         //- (input monthly rate)
         template(v-if="isSubscription")
           input-body.my-10(label="Minimum Monthly Subscription*", symbol="daipermo", warning="⚠️ You cannot edit this later!")
@@ -450,9 +461,9 @@ projectAddress.value = isDev ? route.query.project : null
         //- drips...
         template(v-for="(drip, i) in drips")
           section.my-10.input-group.relative
-            input-body(label="Recipient's Ethereum Address or ENS name*", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
+            input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].address === 'length'", theme="dark", format="code")
               //- TODO: validate ethereum address
-              input(v-model="drips[i].address", placeholder="name.eth", autocomplete="new-password", required)
+              input(v-model="drips[i].address", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
 
             input-body.mt-10(label="Percent*", :isFilled="typeof drips[i].percent === 'number'", theme="dark")
               input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="5", required)
@@ -464,6 +475,10 @@ projectAddress.value = isDev ? route.query.project : null
 
         button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
           svg-plus-minus-radicle
+
+        //- (polygon address warning)
+        template(v-if="$store.getters.isPolygon && drips.find(d => d.address && d.address.trim().length)")
+          warning-polygon-addresses.my-40
 
         .mt-40.flex.justify-center(v-show="step === 3")
           //- .mx-5

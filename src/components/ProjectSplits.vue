@@ -54,7 +54,7 @@ section#drips.project-splits.relative.pt-0
           .block.-mt-px.mb-32(v-if="i < 3")
             img.mx-auto(src="../assets/icons/drip-off-point.svg")
           //- drip
-          router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20.group(:to="{name: 'user', params: { address: drip.address }}")
+          router-link.block.relative.transition.duration-150.transform.notouch_hover_translate-y-20.group(:to="{name: 'user', params: { address: drip.receiver }}")
             //- drip graphic
             img.w-full.block(src="../assets/icons/drip-big.svg", alt="blue raindrop")
             //- text
@@ -65,9 +65,9 @@ section#drips.project-splits.relative.pt-0
                   | {{ parseInt(drip.percent) }}
                   span(style="font-size: 0.75em") %
                 .mt-20.font-semibold.text-whiteff.text-lg.notouch_group-hover_text-white
-                  addr(:address="drip.address", :key="drip.address")
+                  addr(:address="drip.receiver", :key="drip.receiver")
                 .mt-10.mb-2.flex.justify-center.w-full
-                  user-avatar(:address="drip.address", blockieSize="16", :key="drip.address")
+                  user-avatar(:address="drip.receiver", blockieSize="16", :key="drip.receiver")
                 //- TODO calc amount
                 //- .mt-8.font-mono.text-ms.text-violet-650 XXX Ð/mo
                 //- .mb-20

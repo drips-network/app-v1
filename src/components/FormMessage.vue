@@ -5,9 +5,10 @@ const props = defineProps({
   border: Boolean
 })
 const color = computed(() => {
-  return props.body.status === -1 ? 'text-red-600' // error
-    : props.body.status === 1 ? 'text-greenbright-500' // success
-      : 'text-violet-650' // message
+  return props.body.status === -2 ? 'text-yellow-500' // warning
+    : props.body.status === -1 ? 'text-red-600' // error
+      : props.body.status === 1 ? 'text-greenbright-500' // success
+        : 'text-violet-650' // message
 })
 
 // const ignore = computed(() => {
@@ -30,7 +31,9 @@ const color = computed(() => {
 
     //- (error)
     template(v-if="props.body.status < 0")
-      h6.mb-6.font-semibold Transaction Failed
+      h6.mb-6.font-semibold
+        template(v-if="props.body.status === -1") Transaction Failed
+        template(v-if="props.body.status === -2") ⚠️ Warning
 
     template(v-if="props.body.message")
       p(v-html="props.body.message", :class="{'break-all': props.body.status === -1}")

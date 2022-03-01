@@ -13,22 +13,24 @@ const props = defineProps({
 })
 
 const meta = ref()
-const currentFundingWei = ref()
 const members = computed(() => {
   const owners = props.project.tokens.map(token => token.owner)
   return [...new Set(owners)]
 })
 
+// current funding
+const currentFundingWei = computed(() => {
+  // based on first token (for now)
+  const tokenType = props.project.tokenTypes[0]
+  if (tokenType) {
+    return tokenType.streaming ? tokenType.currentTotalAmtPerSec : tokenType.currentTotalGiven
+  }
+  return undefined
+})
+
 const getMeta = async () => {
   try {
     meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })
-    // get funding if goal
-    if (meta.value.goal) {
-      currentFundingWei.value = await store.dispatch('getFundingTotal', {
-        projectAddress: props.project.id,
-        isStreaming: props.project.tokenTypes[0].streaming
-      })
-    }
   } catch (e) {
     console.error(e)
   }
@@ -57,7 +59,7 @@ onBeforeMount(() => getMeta())
 
   //- progress bar row
   .mt-6.mx-1.h-80.rounded-full.bg-indigo-800(:class="{'animate-pulse': !meta}")
-    project-progress-bar.text-white(v-if="meta", :meta="meta", :project="props.project", :currentFundingWei="currentFundingWei")
+    project-progress-bar.text-white(v-if="meta", :meta="meta", :project="props.project", :currentFundingWei="currentFundingWei", @progress="e => $emit('progress', e)")
 
   //- info row
   .h-56.mt-10.flex.w-full.items-center.justify-between.font-semibold.text-base

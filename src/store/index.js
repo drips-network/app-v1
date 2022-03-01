@@ -3,22 +3,26 @@ import { toRaw } from 'vue'
 import { ethers as Ethers, BigNumber as bn } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import api, { queryProjectMeta, queryProject } from '@/api'
+import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
+import label from '@/labels'
 // contracts
 import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
 
 let provider, signer, walletProvider
 
-const network = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networks = {
-  mainnet: { id: 1, infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' },
-  rinkeby: { id: 4, infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6' }
+  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://etherscan.io' } },
+  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://rinkeby.etherscan.io' } },
+  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com' } },
+  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com' } }
 }
+const deployNetworkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
+const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
 
 // setup web3 modal
 const web3Modal = new Web3Modal({
-  network, // optional
+  network: deployNetwork.name, // optional
   cacheProvider: true, // optional
   providerOptions: { // required
     walletconnect: {
@@ -46,13 +50,16 @@ export default createStore({
     }
   },
   getters: {
+    network: () => deployNetwork,
     addrShort: (state) => (addr) => {
       // return ENS name or shortened 0x8888...8888
       return state.addresses[addr]?.ens ? state.addresses[addr].ens
         : addr ? addr.slice(0, 6).toLowerCase() + '...' + addr.slice(-4).toLowerCase() : '...'
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
-    isWrongNetwork: state => state.networkId && state.networkId !== networks[network].id
+    isWrongNetwork: state => state.networkId && networks[state.networkId]?.name !== deployNetwork.name,
+    isPolygon: state => networks[state.networkId]?.layer === 'polygon',
+    label: state => name => label(name, deployNetwork?.layer)
   },
   mutations: {
     SIGN_IN (state, address) {
@@ -92,7 +99,7 @@ export default createStore({
 
           // fallback provider
           if (!provider) {
-            dispatch('setupFallbackProvider')
+            await dispatch('setupFallbackProvider')
           }
 
           initializing = false
@@ -112,21 +119,22 @@ export default createStore({
     async setupFallbackProvider ({ dispatch }) {
       try {
         if (window.ethereum) {
-          // metamask
+          // metamask/browser
           provider = new Ethers.providers.Web3Provider(window.ethereum)
         } else {
-          // infura
-          provider = new Ethers.getDefaultProvider(networks[network].infura)
+          // infura fallback
+          provider = new Ethers.getDefaultProvider(deployNetwork.infura)
         }
         // set network
-        dispatch('getNetworkId', provider)
+        await dispatch('getNetworkId', provider)
+        return true
       } catch (e) {
         console.error(e)
       }
     },
 
     getNetworkId ({ commit }, provider) {
-      provider.getNetwork()
+      return provider.getNetwork()
         .then(network => commit('SET_NETWORK_ID', network.chainId))
         .catch(console.error)
     },
@@ -144,11 +152,12 @@ export default createStore({
         commit('SIGN_IN', address)
 
         // set network id
-        dispatch('getNetworkId', provider)
+        await dispatch('getNetworkId', provider)
 
         // commit('SET_CONTRACTS', provider)
 
         dispatch('listenToWalletProvider')
+        return
       } catch (e) {
         console.error('@connect', e)
         // clear wallet in case
@@ -288,11 +297,11 @@ export default createStore({
         if (!ipfsHash) {
           // fetch project...
           const resp = await api({ query: queryProjectMeta, variables: { id: projectAddress.toLowerCase() } })
-          ipfsHash = resp.data.fundingProject?.ipfsHash
+          ipfsHash = resp.data?.fundingProject?.ipfsHash
         }
 
         if (!ipfsHash || ipfsHash.length !== 46) {
-          // console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
+          if (ipfsHash) console.warn(`Empty or malformed ipfsHash for ${projectAddress}: ${ipfsHash}`)
           return null
         }
 
@@ -348,28 +357,28 @@ export default createStore({
       return contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
     },
 
-    async getFundingTotal (_, { projectAddress, isStreaming }) {
-      try {
-        const contract = getProjectContract(projectAddress)
-        const event = isStreaming ? ['NewStreamingToken', 4] : ['NewToken', 3]
+    // async getFundingTotal (_, { projectAddress, isStreaming }) {
+    //   try {
+    //     const contract = getProjectContract(projectAddress)
+    //     const event = isStreaming ? ['NewStreamingToken', 4] : ['NewToken', 3]
 
-        // get events...
-        const events = await contract.queryFilter(event[0])
+    //     // get events...
+    //     const events = await contract.queryFilter(event[0])
 
-        // add it up
-        let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0))
+    //     // add it up
+    //     let totalWei = events.reduce((acc, curr) => acc.add(curr.args[event[1]]), bn.from(0))
 
-        if (isStreaming) {
-          // convert to monthly streaming rate
-          totalWei = totalWei.mul(oneMonth)
-        }
+    //     if (isStreaming) {
+    //       // convert to monthly streaming rate
+    //       totalWei = totalWei.mul(oneMonth)
+    //     }
 
-        return totalWei
-      } catch (e) {
-        console.error(e)
-        throw e
-      }
-    },
+    //     return totalWei
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
 
     // async waitForMint ({ state }, { projectAddress, isStreaming, typeId }) {
     //   const contract = getProjectContract(projectAddress)
@@ -487,42 +496,63 @@ export default createStore({
       return contractSigner.drip(dripFraction, receiverWeights) // tx
     },
 
-    async getDripsReceivers ({ state, dispatch }, address) {
+    async getDripsBySender (_, address) {
+      const emptyConfig = {
+        balance: '0',
+        timestamp: '0',
+        receivers: [],
+        withdrawable: () => '0'
+      }
       try {
-        if (!provider) await dispatch('init')
-
-        const lastUpdate = {
-          receivers: [],
-          timestamp: 0,
-          balance: 0,
-          withdrawable: () => '0'
+        // fetch...
+        const resp = await api({ query: queryDripsConfigByID, variables: { id: address } })
+        const config = resp.data?.dripsConfigs[0]
+        if (config) {
+          config.withdrawable = () => getDripsWithdrawable(config)
         }
-
-        const contract = getHubContract()
-        // fetch events...
-        let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
-
-        if (!address) {
-          return events
-        }
-
-        // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
-
-        if (events.length) {
-          const lastEvent = events.pop()
-          lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
-          lastUpdate.balance = lastEvent.args[1]
-          lastUpdate.receivers = lastEvent.args[2]
-          lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
-        }
-
-        return lastUpdate
+        return config || emptyConfig
       } catch (e) {
         console.error(e)
         throw e
       }
     },
+
+    // async getDripsReceivers ({ state, dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
+
+    //     const lastUpdate = {
+    //       receivers: [],
+    //       timestamp: 0,
+    //       balance: 0,
+    //       withdrawable: () => '0'
+    //     }
+
+    //     const contract = getHubContract()
+    //     // fetch events...
+    //     let events = await contract.queryFilter('DripsUpdated(address,uint128,(address,uint128)[])')
+
+    //     if (!address) {
+    //       return events
+    //     }
+
+    //     // filter by the address
+    //     events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+
+    //     if (events.length) {
+    //       const lastEvent = events.pop()
+    //       lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
+    //       lastUpdate.balance = lastEvent.args[1]
+    //       lastUpdate.receivers = lastEvent.args[2]
+    //       lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
+    //     }
+
+    //     return lastUpdate
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
 
     async updateUserDrips ({ dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
       try {
@@ -538,51 +568,67 @@ export default createStore({
       }
     },
 
-    async getSplitsReceivers ({ state, dispatch }, address) {
+    async getSplitsBySender ({ state }, address) {
       try {
-        if (!provider) await dispatch('init')
-
-        let splits = []
-        let raw = []
-
-        const contract = getHubContract()
-        // fetch events...
-        let events = await contract.queryFilter('SplitsUpdated')
-
-        if (!address) {
-          return events
-        }
-
-        // filter by the address?
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
-
-        // has splits?
-        if (events?.length) {
-          const currentReceivers = events.pop().args[1]
-          raw = currentReceivers
-
-          // reformat...
-          splits = currentReceivers.map(item => {
-            const address = item[0].toLowerCase()
-            const weight = item[1] // .toNumber()
-            let percent = weight / state.splitsFractionMax * 100
-            percent = Number(percent.toFixed(3))
-            return {
-              address,
-              percent
-            }
-          })
-
-          // sort by percent descending
-          splits = splits.sort((a, b) => a.percent > b.percent ? -1 : a.percent < b.percent ? 1 : 0)
-        }
-
-        return { percents: splits, weights: raw }
+        const resp = await api({ query: querySplitsBySender, variables: { sender: address } })
+        let entries = resp.data?.splitsEntries || []
+        // format
+        entries = entries.map(entry => ({
+          ...entry,
+          percent: entry.weight / state.splitsFractionMax * 100
+        }))
+        return entries
       } catch (e) {
         console.error(e)
-        return { percents: [], weights: [] }
+        throw e
       }
     },
+
+    // async getSplitsReceivers ({ state, dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
+
+    //     let splits = []
+    //     let raw = []
+
+    //     const contract = getHubContract()
+    //     // fetch events...
+    //     let events = await contract.queryFilter('SplitsUpdated')
+
+    //     if (!address) {
+    //       return events
+    //     }
+
+    //     // filter by the address?
+    //     events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+
+    //     // has splits?
+    //     if (events?.length) {
+    //       const currentReceivers = events.pop().args[1]
+    //       raw = currentReceivers
+
+    //       // reformat...
+    //       splits = currentReceivers.map(item => {
+    //         const address = item[0].toLowerCase()
+    //         const weight = item[1] // .toNumber()
+    //         let percent = weight / state.splitsFractionMax * 100
+    //         percent = Number(percent.toFixed(3))
+    //         return {
+    //           address,
+    //           percent
+    //         }
+    //       })
+
+    //       // sort by percent descending
+    //       splits = splits.sort((a, b) => a.percent > b.percent ? -1 : a.percent < b.percent ? 1 : 0)
+    //     }
+
+    //     return { percents: splits, weights: raw }
+    //   } catch (e) {
+    //     console.error(e)
+    //     return { percents: [], weights: [] }
+    //   }
+    // },
 
     async updateAddressSplits (_, { currentReceivers, newReceivers, projectAddress }) {
       try {
@@ -624,6 +670,15 @@ export default createStore({
 
     async resolveAddress ({ state, getters, commit, dispatch }, { address }) {
       try {
+        if (!state.networkId) {
+          await dispatch('init')
+        }
+
+        // ENS enabled?
+        if (networks[state.networkId].layer !== 'ethereum') {
+          return null
+        }
+
         // sanitize
         address = (address || '').toLowerCase()
         // saved?
@@ -684,7 +739,11 @@ export default createStore({
     async getCollectable ({ dispatch }, { projectAddress, address }) {
       try {
         if (!provider) await dispatch('init')
-        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        // get splits...
+        const entries = await dispatch('getSplitsBySender', projectAddress || address)
+        // format for method
+        const currSplits = entries.map(entry => ([entry.receiver, entry.weight]))
+
         const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()
         // get...
         return projectAddress ? contract.collectable(currSplits) // from project
@@ -697,8 +756,9 @@ export default createStore({
 
     async collectFunds ({ dispatch }, { projectAddress, address }) {
       try {
-        // get splits
-        const currSplits = (await dispatch('getSplitsReceivers', projectAddress || address)).weights
+        // get + format splits
+        let currSplits = await dispatch('getSplitsBySender', projectAddress || address)
+        currSplits = currSplits.map(entry => ([entry.receiver, entry.weight]))
 
         // from project or hubs contract?
         const contract = projectAddress ? getProjectContract(projectAddress) : getHubContract()

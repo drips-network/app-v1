@@ -54,18 +54,6 @@ const collect = async () => {
     tx.value = null
   }
 }
-
-// const getDripPctFromReceivers = async () => {
-//   try {
-//     if (isNaN(dripPct.value)) {
-//       const percents = (await store.dispatch('getSplitsReceivers', store.state.address)).percents
-//       dripPct.value = percents.reduce((acc, curr) => acc + curr.percent, 0)
-//     }
-//   } catch (e) {
-//     console.error(e)
-//   }
-// }
-// onMounted(() => getDripPctFromReceivers())
 </script>
 
 <template lang="pug">
