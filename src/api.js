@@ -98,9 +98,20 @@ query ($id: ID!) {
 `
 
 export const querySplitsBySender = `
-query ($sender: Bytes!) {
-  splitsEntries (first:100, where: { sender: $sender }) {
+query ($sender: Bytes!, $first: Int!) {
+  splitsEntries (first: $first, where: { sender: $sender }) {
     # id
+    sender
+    receiver
+    weight
+  }
+}
+`
+
+export const querySplitsByReceiver = `
+query ($receiver: Bytes!, $first: Int!) {
+  splitsEntries (first: $first, where: { receiver: $receiver }) {
+    id
     sender
     receiver
     weight

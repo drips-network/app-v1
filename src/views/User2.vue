@@ -3,9 +3,13 @@ import { ref, computed, watch, onMounted, provide, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import UserTag from '@/components/UserTag'
 import AvatarBlockie from '@/components/AvatarBlockie'
-import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
 import AddressesTag from '@/components/AddressesTag'
+import UserAvatar from '@/components/UserAvatar'
+import SvgChevronDown from '@/components/SvgChevronDown'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
+import UserProject from '@/components/UserProject'
+import UserNft from '@/components/UserNFT'
 import IconSplit from '@/components/IconSplit'
 import ModalDripTo from '@/components/ModalDripTo'
 import ModalCollectDrips from '@/components/ModalCollectDrips'
@@ -13,22 +17,17 @@ import ModalEditDripsSelect from '@/components/ModalEditDripsSelect'
 import ModalDripsEdit from '@/components/ModalDripsEdit'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import SvgDai from '@/components/SvgDai'
-import SvgChevronDown from '@/components/SvgChevronDown'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import SvgPlusMinus from '@/components/SvgPlusMinus'
-import HeaderLarge from '@/components/HeaderLarge'
-import UserProject from '@/components/UserProject'
-import UserNft from '@/components/UserNFT'
 import store from '@/store'
-import api from '@/api'
 import { utils } from 'ethers'
 import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
+import api from '@/api'
 
 const route = useRoute()
 const router = useRouter()
 const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
+const showAllReceivers = ref(false)
 
 // my account
 const isMyUser = computed(() => store.state.address === route.params.address)
@@ -54,17 +53,16 @@ const drips = ref()
 
 const splitsOut = computed(() => {
   return splits.value?.map(split => ({
-    sender: route.params.address,
-    receiver: [split.address],
-    percent: split.percent
+    ...split,
+    receiver: [split.receiver],
   }))
 })
 
 const dripsOut = computed(() => {
   return drips.value?.map(drip => ({
     sender: route.params.address,
-    receiver: [drip[0]],
-    amount: toDAIPerMo(drip[1])
+    receiver: [drip.receiver], // [drip[0]],
+    amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
   }))
 })
 
@@ -78,71 +76,40 @@ const allDripsOut = computed(() => {
 })
 
 const allReceivers = computed(() => {
-  if (allDripsOut.value) {
-    let all = allDripsOut.value.reduce((acc, cur) => acc.concat(cur.receiver), [])
-    all = [...new Set(all)] // de-dupe
-    return all
-  }
-  return undefined
+  return allDripsOut.value?.filter(d => d.receiver.length).map(d => d.receiver[0])
 })
-const showAllReceivers = ref(false)
   
-
+// get splits
 const getSplits = async () => {
   try {
-    splits.value = (await store.dispatch('getSplitsReceivers', route.params.address)).percents
+    splits.value = await store.dispatch('getSplitsBySender', route.params.address)
   } catch (e) {
     console.error(e)
   }
 }
 
+// get drips
 const withdrawable = ref()
+let getWithdrawable
 const getDrips = async () => {
   try {
-    const lastUpdate = await store.dispatch('getDripsReceivers', route.params.address)
-    drips.value = lastUpdate.receivers
-    withdrawable.value = await lastUpdate.withdrawable()
+    const config = await store.dispatch('getDripsBySender', route.params.address)
+    drips.value = config.receivers
+    getWithdrawable = config.withdrawable
+    withdrawable.value = getWithdrawable()
   } catch (e) {
     console.error(e)
+    drips.value = []
   }
 }
 
-const goToMySplits = () => router.push({ name: 'user-drips-out', params: { address: store.state.address } })
-
-// projects
-const projects = ref()
-const getProjects = async () => {
-  try {
-    const resp = await api({
-      variables: { projectOwner: route.params.address },
-      query: `
-        query ($projectOwner: Bytes!) {
-          fundingProjects (where: { projectOwner: $projectOwner }) {
-            id
-            projectOwner
-            daiSplit
-            daiCollected
-            tokenTypes {
-              # tokenTypeId
-              streaming
-              limit
-            }
-          }
-        }
-      `
-    })
-    projects.value = resp.data?.fundingProjects || []
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-// nfts
+// get nfts
 const nfts = ref()
-const getMemberships = async () => {
+const fetchUserNFTs = async () => {
   try {
+    const tokenReceiver = route.params.address
     const resp = await api({
-      variables: { tokenReceiver: route.params.address },
+      variables: { tokenReceiver },
       query: `
         query ($tokenReceiver: Bytes!) {
           tokens (where: {tokenReceiver: $tokenReceiver}) {
@@ -158,6 +125,50 @@ const getMemberships = async () => {
     nfts.value = resp.data?.tokens || []
   } catch (e) {
     console.error(e)
+    nfts.value = []
+  }
+}
+
+const goToMySplits = () => router.push({ name: 'user-drips-out', params: { address: store.state.address } })
+
+const updateWithdrawable = () => {
+  if (typeof getWithdrawable === 'function') {
+    withdrawable.value = getWithdrawable()  
+  }
+}
+
+// projects
+const projects = ref()
+const getUsersProjects = async () => {
+  try {
+    const resp = await api({
+      variables: { projectOwner: route.params.address },
+      query: `
+        query ($projectOwner: Bytes!) {
+          fundingProjects (where: { projectOwner: $projectOwner }) {
+            id
+            projectOwner
+            daiSplit
+            daiCollected
+            tokenTypes {
+              # tokenTypeId
+              streaming
+              limit
+              currentTotalAmtPerSec
+              currentTotalGiven
+            }
+            tokens {
+              owner: tokenReceiver
+              giveAmt
+              amtPerSec
+            }
+          }
+        }
+      `
+    })
+    projects.value = resp.data.fundingProjects
+  } catch (e) {
+    console.error(e)
   }
 }
 
@@ -167,12 +178,11 @@ onMounted(() => {
   }
   getSplits()
   getDrips()
-  getProjects()
-  getMemberships()
+  getUsersProjects()
 })
 
 provide('isMyUser', isMyUser)
-provide('allDripsOut', allDripsOut)
+// provide('allDripsOut', allDripsOut)
 provide('dripsOut', dripsOut)
 provide('withdrawable', withdrawable)
 </script>
