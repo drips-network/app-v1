@@ -27,6 +27,7 @@ const router = useRouter()
 const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
+const showAllSenders = ref(false)
 const showAllReceivers = ref(false)
 
 // my account
@@ -47,24 +48,58 @@ const getMyCollectable = () => {
     .catch(console.error)
 }
 
-// drips
-const splits = ref()
-const drips = ref()
+// drips in
+const splitsIn = ref()
+const dripsIn = ref()
 
-const splitsOut = computed(() => {
-  return splits.value?.map(split => ({
-    ...split,
-    receiver: [split.receiver],
-  }))
+const allDripsIn = computed(() => {
+  if (!dripsIn.value && !splitsIn.value) {
+    return undefined // "loading"
+  }
+  const dIn = dripsIn.value || []
+  const sIn = splitsIn.value || []
+  return [...dIn, ...sIn]
 })
 
-const dripsOut = computed(() => {
-  return drips.value?.map(drip => ({
-    sender: route.params.address,
-    receiver: [drip.receiver], // [drip[0]],
-    amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
-  }))
+const allSenders = computed(() => {
+  return allDripsIn.value?.map(d => d.sender)
 })
+  
+// get splits In
+const getSplitsIn = async () => {
+  try {
+    const splits = await store.dispatch('getSplitsByReceiver', route.params.address)
+    // format + save
+    splitsIn.value = splits.map(split => ({
+      ...split,
+      receiver: [split.receiver]
+    }))
+  } catch (e) {
+    console.error(e)
+    splitsIn.value = []
+  }
+}
+
+// get drips In
+const getDripsIn = async () => {
+  try {
+    const entries = await store.dispatch('getDripsByReceiver', route.params.address)
+    console.log(entries)
+    // format + save
+    dripsIn.value = entries.map(drip => ({
+      ...drip,
+      receiver: [drip.receiver], // [drip[0]],
+      amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
+    }))
+  } catch (e) {
+    console.error(e)
+    dripsIn.value = []
+  }
+}
+
+// drips out
+const splitsOut = ref()
+const dripsOut = ref()
 
 const allDripsOut = computed(() => {
   if (!dripsOut.value && !splitsOut.value) {
@@ -79,33 +114,44 @@ const allReceivers = computed(() => {
   return allDripsOut.value?.filter(d => d.receiver.length).map(d => d.receiver[0])
 })
   
-// get splits
-const getSplits = async () => {
+// get splits out
+const getSplitsOut = async () => {
   try {
-    splits.value = await store.dispatch('getSplitsBySender', route.params.address)
+    const splits = await store.dispatch('getSplitsBySender', route.params.address)
+    // format + save
+    splitsOut.value = splits.map(split => ({
+      ...split,
+      receiver: [split.receiver]
+    }))
   } catch (e) {
     console.error(e)
+    splitsOut.value = []
   }
 }
 
-// get drips
+// get drips out
 const withdrawable = ref()
 let getWithdrawable
-const getDrips = async () => {
+const getDripsOut = async () => {
   try {
     const config = await store.dispatch('getDripsBySender', route.params.address)
-    drips.value = config.receivers
+    // format + save
+    dripsOut.value = config.receivers.map(drip => ({
+      sender: route.params.address,
+      receiver: [drip.receiver], // [drip[0]],
+      amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
+    }))
     getWithdrawable = config.withdrawable
     withdrawable.value = getWithdrawable()
   } catch (e) {
     console.error(e)
-    drips.value = []
+    dripsOut.value = []
   }
 }
 
 // get nfts
 const nfts = ref()
-const fetchUserNFTs = async () => {
+const getUserNFTs = async () => {
   try {
     const tokenReceiver = route.params.address
     const resp = await api({
@@ -176,9 +222,12 @@ onMounted(() => {
   if (isMyUser.value) {
     getMyCollectable()
   }
-  getSplits()
-  getDrips()
+  getSplitsIn()
+  getDripsIn()
+  getSplitsOut()
+  getDripsOut()
   getUsersProjects()
+  getUserNFTs()
 })
 
 provide('isMyUser', isMyUser)
@@ -246,29 +295,29 @@ article.profile.pb-80
     div
       .w-full.flex.justify-center
         //- (loading senders...)
-        template(v-if="!allReceivers")
-          .h-80.w-260.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
+        template(v-if="!allSenders")
+          .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
 
-        //- (view senders toggle)
+        //- (view senders btn)
         template(v-else)
-          button.min-w-160.rounded-full.flex.justify-center.items-center.pointer-events-auto.notouch_hover_ring.notouch_hover_ring-violet-650(@click.stop="showAllReceivers = !showAllReceivers", :class="{'bg-indigo-700': !showAllReceivers, 'bg-indigo-950': showAllReceivers}")
+          button.min-w-160ff.rounded-full.flex.justify-center.items-center.pointer-events-auto.notouch_hover_ring.notouch_hover_ring-violet-650(@click.stop="showAllSenders = !showAllSenders", :class="{'bg-indigo-700': !showAllSenders, 'bg-indigo-950': showAllSenders}")
             //- (addresses)
-            addresses-tag(v-show="!showAllReceivers", v-if="allReceivers", :addresses="allReceivers")
+            addresses-tag(v-show="!showAllSenders", v-if="allSenders", :addresses="allSenders", :avatarsOnly="true")
             //- (collapsed label)
-            .h-72.flex.items-center.font-semibold.text-lg.text-violet-650.pl-36.pr-14(v-show="showAllReceivers") Supporters
+            //- .h-72.flex.items-center.font-semibold.text-lg.text-violet-650.pl-36.pr-14(v-show="showAllReceivers") Supporters
             //- toggle icon
-            .w-54.h-54.flex.items-center.justify-center.-ml-12.mr-8
+            //- .w-54.h-54.flex.items-center.justify-center.-ml-12.mr-8
               svg-chevron-down.text-violet-650.w-40.h-40(:class="{'transform origin-center rotate-180': showAllReceivers}")
       
       //- (senders list)
-      ul.flex.flex-wrap.justify-center.mt-20(v-if="allDripsOut", v-show="showAllReceivers")
+      ul.flex.flex-wrap.justify-center.min-h-80.items-center(v-if="allDripsIn", v-show="showAllSenders")
         //- .w-full.flex.justify-center
           .h-80.w-2.rounded-full.bg-violet-700.my-6
-        li(v-for="drip in allDripsOut")
-          router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.my-4.mx-3.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: drip.receiver[0] }}")
+        li(v-for="drip in allDripsIn")
+          router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.my-4.mx-3.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: drip.sender }}")
             //- sender avatar / blockie
-            user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-800(:address="drip.receiver[0]", blockieSize="44", :key="drip.receiver[0]")
-            addr.mx-16.font-semibold(:address="drip.receiver[0]", :key="drip.receiver[0]")
+            user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-800(:address="drip.sender", blockieSize="44", :key="drip.sender")
+            addr.mx-16.font-semibold(:address="drip.sender", :key="drip.sender")
 
             .h-44.flex.items-center.px-10.bg-indigo-900.rounded-full
               //- drip icon
@@ -281,58 +330,89 @@ article.profile.pb-80
         //- .w-full.flex.justify-center
           .h-80.w-2.rounded-full.bg-violet-700.my-6
 
-  .w-full.flex.justify-center.my-10
-    .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:3em") 💧
+        //- (hide senders btn)
+        .flex.justify-center.my-4.mx-12(:class="{'w-full mt-12': allSenders.length > 2}")
+          button.btn.btn-darkest.w-64.h-64(@click.stop="showAllSenders = false")
+            svg-chevron-down.text-violet-650.w-40.h-40.transform.rotate-180
 
+  .w-full.flex.justify-center.my-10
+    .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em") 💧
+
+  //- user tag row
   .w-full.flex.justify-center
     div
-      //- user bar
-      .bg-indigo-700.rounded-full.flex.items-center
-        user-tag(:address="$route.params.address")
+      user-tag(:address="$route.params.address")
 
-        //- drip-to btn
-        button.-ml-18.mr-40.block.relative.text-violet-650.transform.notouch_hover_scale-110.transition.duration-150(@click="dripModalOpen = true")
-          //- drop bg
-          <svg class="h-80" viewBox="0 0 90 105" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio>
-          <path d="M15.6969 29.619L15.8371 29.4896L15.9503 29.336C16.0314 29.2259 16.1276 29.1159 16.2413 29.0079L43.1004 3.48239C43.9729 2.65328 45.342 2.65328 46.2144 3.48239L47.1669 2.4801L46.2144 3.48239L73.0736 29.0079C73.1863 29.115 73.2818 29.2241 73.3625 29.3333L73.4752 29.4857L73.6145 29.6143C81.9838 37.3374 87.213 48.3569 87.213 60.5902C87.213 83.9234 68.1727 102.861 44.6583 102.861C21.1438 102.861 2.10352 83.9234 2.10352 60.5902C2.10352 48.3594 7.33064 37.3419 15.6969 29.619Z" fill="currentColor" stroke-width="2.125"/>
-          </svg>
-
-          .absolute.overlay.flex.items-center.justify-center.pt-8
-            svg-plus-minus-radicle.text-indigo-900(style="transform:scale(1.25)")
-            //- svg-plus-minus.text-indigo-900(style="transform:scale(1.25)")
-
-      //- communities/memberships
-      section.flex.justify-center.mt-10.mb-4.font-semibold.text-ms.text-violet-650
-        .rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2(v-if="projects && projects.length > 0")
-          .ml-10.mr-12.flex-1 ⛲️ &nbsp;Communities
-          .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center {{ projects.length}}
+      //- memberships/nfts count
+      section.mt-6.flex.justify-center.font-semibold.text-ms.text-violet-650
+        //- (memberships)
+        .rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2
+          .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
+          .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+            span(v-if="projects") {{ projects.length}}
+            span.animate-pulse(v-else) ...
         
-        .rounded-full.min-w-196.p-6.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2(v-if="nfts && nfts.length > 0")
-          .ml-10.mr-12.flex-1 🧩 &nbsp;Memberships
-          .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center {{ nfts.length }}
+        //- (nfts)
+        .rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2
+          .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
+          .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+            span(v-if="nfts") {{ nfts.length}}
+            span.animate-pulse(v-else) ...
 
     //- drip to button
     //- button.w-112.h-112.ml-12.flex.items-center.justify-center.bg-white.rounded-full.pr-4ff
-      //- div.-ml-2.pt-2(style="font-size:3em") 💧
-      div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:3em") +
-
+      //- div.-ml-2.pt-2(style="font-size:2.4em") 💧
+      div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:2.4em") +
+  
+  //- receivers
   .w-full.flex.justify-center.my-10
-    .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:3em") 💧
+    .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em") 💧
 
   .flex.justify-center
-    addresses-tag(v-if="allReceivers", :addresses="allReceivers")
+    //- (loading receivers...)
+    template(v-if="!allReceivers")
+      .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
+    
+    //- (show receivers btn)
+    template(v-else)  
+      button.min-w-160ff.rounded-full.flex.justify-center.items-center.pointer-events-auto.notouch_hover_ring.notouch_hover_ring-violet-650(v-show="!showAllReceivers", @click.stop="showAllReceivers = !showAllReceivers", :class="{'bg-indigo-700': !showAllReceivers, 'bg-indigo-950': showAllReceivers}")
+        addresses-tag(v-if="allReceivers", :addresses="allReceivers", :avatarsOnly="true")
+
+  //- (receivers list)
+  ul.flex.flex-wrap.justify-center.mt-20(v-if="allDripsOut", v-show="showAllReceivers")
+    //- .w-full.flex.justify-center
+      .h-80.w-2.rounded-full.bg-violet-700.my-6
+    li(v-for="drip in allDripsOut")
+      router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.my-4.mx-3.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: drip.receiver[0] }}")
+        //- sender avatar / blockie
+        user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-800(:address="drip.receiver[0]", blockieSize="44", :key="drip.receiver[0]")
+        addr.mx-16.font-semibold(:address="drip.receiver[0]", :key="drip.receiver[0]")
+
+        .h-44.flex.items-center.px-10.bg-indigo-900.rounded-full
+          //- drip icon
+          div(style="font-size:1.25em") 💧
+
+          //- amount
+          div.font-semibold.text-violet-650.mx-6
+            template(v-if="drip.amount") {{ drip.amount }}/mo
+            template(v-else-if="drip.percent") {{ drip.percent }}%
+
+    //- (hide receivers btn)
+    .flex.justify-center.my-4.mx-12(:class="{'w-full mt-12': allReceivers.length > 2}")
+      button.btn.btn-darkest.w-64.h-64(@click.stop="showAllReceivers = false")
+        svg-chevron-down.text-violet-650.w-40.h-40.transform.rotate-180
 
   
   //- communities
   section.mt-144(v-if="projects && projects.length")
     header.flex
       h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-        div #[addr.font-bold(:address="$route.params.address")] is raising funds in #[b {{ projects.length }} communit{{ projects.length > 1 ? 'ies' : 'y'}}] ⛲️
+        div #[addr.font-bold(:address="$route.params.address")] is raising funds in #[b {{ projects.length }} NFT Membership{{ projects.length > 1 ? 's' : ''}}] 🧧
 
     ul.mt-60
       //- projects...
-      li(v-for="project in projects")
-        user-project(:project="project", @collected="getProjects")
+      //- li(v-for="project in projects")
+        user-project(:project="project", @collected="getUsersProjects")
 
 
   //- memberships

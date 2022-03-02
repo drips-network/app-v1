@@ -51,13 +51,9 @@ const routes = [
   // user / address
   {
     path: '/:address',
+    name: 'user',
     component: () => import(/* webpackChunkName: "user" */ '../views/User2.vue'),
     children: [
-      {
-        path: '',
-        name: 'user',
-        redirect: { name: 'user-drips-out' }
-      },
       // projects
       {
         path: 'communities',

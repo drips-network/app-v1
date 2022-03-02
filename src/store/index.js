@@ -3,7 +3,7 @@ import { toRaw } from 'vue'
 import { ethers as Ethers, BigNumber as bn } from 'ethers'
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender } from '@/api'
+import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender, querySplitsByReceiver, queryDripsByReceiver } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
 // contracts
@@ -517,6 +517,16 @@ export default createStore({
       }
     },
 
+    async getDripsByReceiver ({ state }, receiver) {
+      try {
+        const resp = await api({ query: queryDripsByReceiver, variables: { receiver, first: 100 } })
+        return resp.data?.dripsEntries || []
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
     // async getDripsReceivers ({ state, dispatch }, address) {
     //   try {
     //     if (!provider) await dispatch('init')
@@ -568,9 +578,25 @@ export default createStore({
       }
     },
 
-    async getSplitsBySender ({ state }, address) {
+    async getSplitsBySender ({ state }, sender) {
       try {
-        const resp = await api({ query: querySplitsBySender, variables: { sender: address } })
+        const resp = await api({ query: querySplitsBySender, variables: { sender, first: 100 } })
+        let entries = resp.data?.splitsEntries || []
+        // format
+        entries = entries.map(entry => ({
+          ...entry,
+          percent: entry.weight / state.splitsFractionMax * 100
+        }))
+        return entries
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
+    async getSplitsByReceiver ({ state }, receiver) {
+      try {
+        const resp = await api({ query: querySplitsByReceiver, variables: { receiver, first: 100 } })
         let entries = resp.data?.splitsEntries || []
         // format
         entries = entries.map(entry => ({

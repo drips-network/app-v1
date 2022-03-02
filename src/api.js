@@ -97,6 +97,17 @@ query ($id: ID!) {
 }
 `
 
+export const queryDripsByReceiver = `
+query ($receiver: Bytes!) {
+  dripsEntries (where: { receiver: $receiver} ) {
+    # id
+    sender: user
+    receiver
+    amtPerSec
+ }
+}
+`
+
 export const querySplitsBySender = `
 query ($sender: Bytes!, $first: Int!) {
   splitsEntries (first: $first, where: { sender: $sender }) {
@@ -111,7 +122,7 @@ query ($sender: Bytes!, $first: Int!) {
 export const querySplitsByReceiver = `
 query ($receiver: Bytes!, $first: Int!) {
   splitsEntries (first: $first, where: { receiver: $receiver }) {
-    id
+    # id
     sender
     receiver
     weight
