@@ -17,6 +17,7 @@ import ModalEditDripsSelect from '@/components/ModalEditDripsSelect'
 import ModalDripsEdit from '@/components/ModalDripsEdit'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import SvgDai from '@/components/SvgDai'
+import ProjectDetail from '@/components/ProjectDetail'
 import store from '@/store'
 import { utils } from 'ethers'
 import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
@@ -151,7 +152,7 @@ const getDripsOut = async () => {
 
 // get nfts
 const nfts = ref()
-const getUserNFTs = async () => {
+const getNFTs = async () => {
   try {
     const tokenReceiver = route.params.address
     const resp = await api({
@@ -185,7 +186,7 @@ const updateWithdrawable = () => {
 
 // projects
 const projects = ref()
-const getUsersProjects = async () => {
+const getProjects = async () => {
   try {
     const resp = await api({
       variables: { projectOwner: route.params.address },
@@ -193,6 +194,7 @@ const getUsersProjects = async () => {
         query ($projectOwner: Bytes!) {
           fundingProjects (where: { projectOwner: $projectOwner }) {
             id
+            name: projectName
             projectOwner
             daiSplit
             daiCollected
@@ -202,6 +204,8 @@ const getUsersProjects = async () => {
               limit
               currentTotalAmtPerSec
               currentTotalGiven
+              ipfsHash
+              minAmt: minAmtPerSec
             }
             tokens {
               owner: tokenReceiver
@@ -226,8 +230,8 @@ onMounted(() => {
   getDripsIn()
   getSplitsOut()
   getDripsOut()
-  getUsersProjects()
-  getUserNFTs()
+  getProjects()
+  getNFTs()
 })
 
 provide('isMyUser', isMyUser)
@@ -403,19 +407,20 @@ article.profile.pb-80
         svg-chevron-down.text-violet-650.w-40.h-40.transform.rotate-180
 
   
-  //- communities
-  section.mt-144(v-if="projects && projects.length")
+  //- memberships list
+  section.mt-160(v-if="projects && projects.length")
     header.flex
       h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-        div #[addr.font-bold(:address="$route.params.address")] is raising funds in #[b {{ projects.length }} NFT Membership{{ projects.length > 1 ? 's' : ''}}] 🧧
+        div #[addr.font-bold(:address="$route.params.address")] is raising funds with 🧧 #[b NFT Memberships] 
 
-    ul.mt-60
+    .mt-144.flex.flex-wrap.justify-evenly
       //- projects...
-      //- li(v-for="project in projects")
-        user-project(:project="project", @collected="getUsersProjects")
+      template(v-for="project in projects")
+        //- user-project(:project="project", @collected="getProjects")
+        project-detail(:project="project", @collected="getProjects")
 
 
-  //- memberships
+  //- nfts list
   section.mt-144.px-20(v-if="nfts && nfts.length")
     header.flex
       h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms

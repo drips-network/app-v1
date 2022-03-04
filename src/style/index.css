@@ -114,6 +114,7 @@ html {
 }
 
 button{
+  font-weight:inherit;
   &[disabled] {
     @apply cursor-not-allowed;
   }
