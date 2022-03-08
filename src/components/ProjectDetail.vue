@@ -28,13 +28,13 @@ const membersAddrs = toRaw(props.project.tokens.map(tkn => tkn.owner))
 
 // raised = total collected + total split
 let raised
-const totalRaisedWei = bn.from(props.project.daiCollected).add(props.project.daiSplit).toString()
-if (bn.from(totalRaisedWei).lt(currentFundingWei)) {
+const totalCollectedWei = bn.from(props.project.daiCollected).add(props.project.daiSplit).toString() 
+if (bn.from(totalCollectedWei).lt(currentFundingWei)) {
   // use current funding if greater than what's been collected
   raised = isStreaming ? toDAIPerMo(currentFundingWei) : toDAI(currentFundingWei)
 } else {
-  // use total raised
-  raised = toDAI(totalRaisedWei)
+  // use total collected
+  raised = toDAI(totalCollectedWei)
 }
 
 onMounted(async () => {
@@ -86,31 +86,42 @@ onMounted(async () => {
   template(v-if="meta && meta.goal")
     project-progress-bar.bg-indigo-700.mt-5(:project="project", :meta="meta", :currentFundingWei="currentFundingWei")
 
-  //- stats
-  .grid.mt-5.text-md.font-semibold(:class="{'grid-cols-2 gap-4': !showMembers}")
-    //- raised:
-    .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
-      h6.text-violet-650 Raised
-      .flex.items-center
-        svg-dai.mr-2(size="md")
-        | {{ raised }}
-    
+  .text-md.font-semibold
     //- members:
-    button.flex-1.h-80.flex.items-center.justify-between.pl-30.rounded-full.focus_ring.notouch_hover_ring.notouch_hover_ring-white(v-show="!showMembers", @click="showMembers = !showMembers", :class="{'bg-indigo-700 text-violet-650 ring ring-violet-650 focus_ring-white': showMembers, 'bg-indigo-700 text-violet-650 focus_ring-violet-650': !showMembers }")
-      div Members
-      user-avatars-row.mr-10(:addresses="membersAddrs", :limit="1")
+    button.w-full.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.focus_ring.notouch_hover_ring.notouch_hover_ring-white(v-show="!showMembers", @click="showMembers = !showMembers", :class="{'bg-indigo-700 text-violet-650 ring ring-violet-650 focus_ring-white': showMembers, 'bg-indigo-700 text-violet-650 focus_ring-violet-650': !showMembers }")
+      div.text-violet-650.text-md.font-semibold Members
+      user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
 
-  //- (members list)
-  ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xlb.relative.pb-64(v-if="showMembers")
-    .w-full.flex.justify-between.px-32.h-80.items-center.font-semibold
-      h6.text-violet-650 Members
-      div {{ props.project.tokens.length }}
+    //- (members list)
+    ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xlb.relative.pb-64(v-if="showMembers")
+      .w-full.flex.justify-between.px-32.h-80.items-center.font-semibold
+        h6.text-violet-650 Members
+        div {{ props.project.tokens.length }}
 
-    li(v-for="token in props.project.tokens")
-      user-tag-small.bg-indigo-850(:address="token.owner")
+      li(v-for="token in props.project.tokens")
+        user-tag-small.bg-indigo-850(:address="token.owner")
 
-    //- close button
-    .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
-      button.text-violet-650.notouch_hover_text-white(@click="showMembers = false")
-        svg-chevron-down.w-32.h-32.transform.rotate-180
+      //- close button
+      .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
+        button.text-violet-650.notouch_hover_text-white(@click="showMembers = false")
+          svg-chevron-down.w-32.h-32.transform.rotate-180
+
+    //- stats
+    .grid.grid-cols-2.gap-4.mt-5
+      //- raised:
+      .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
+        h6.text-violet-650 Raised
+        .flex.items-center
+          svg-dai.mr-2(size="md")
+          | {{ raised }}
+
+      //- available
+      .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
+        h6.text-violet-650 Available
+        div
+          template(v-if="isStreaming")
+            span(style="font-size:1.5em") ∞
+          template(v-else-if="!props.project.tokens.length") {{ props.project.tokenTypes[0].limit }}
+          template(v-else) {{ props.project.tokenTypes[0].limit - props.project.tokens.length }}/{{ props.project.tokenTypes[0].limit }}
+    
 </template>

@@ -34,7 +34,7 @@ const getENSSocialUrl = (value, base) => {
 
   .ml-36.mr-40
     h1.text-2xl.font-bold
-      addr(:address="props.address", :youOn="true", :key="props.address")
+      addr(:address="props.address", :key="props.address")
 
     //- icons
     .flex.flex-wrap.-ml-8.justify-centerff

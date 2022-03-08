@@ -293,28 +293,45 @@ export default {
 </script>
 
 <template lang="pug">
-article.profile.pb-80
-  //- NEW
-  .flex.w-full.justify-center.mt-60
-    div
-      .w-full.flex.justify-center
-        //- (loading senders...)
-        template(v-if="!allSenders")
-          .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
+article.profile.pt-40.pb-80
+  
+  //- senders
+  section
+    .w-full.flex.justify-center
+      //- (loading senders...)
+      template(v-if="!allSenders")
+        .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
 
-        //- (view senders btn)
-        template(v-else)
-          button.min-w-160ff.rounded-full.flex.justify-center.items-center.pointer-events-auto.notouch_hover_ring.notouch_hover_ring-violet-650(@click.stop="showAllSenders = !showAllSenders", :class="{'bg-indigo-700': !showAllSenders, 'bg-indigo-950': showAllSenders}")
+      //- (no senders)
+      template(v-else-if="!allSenders.length")
+        button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="isMyUser", :class="{'pointer-events-none': isMyUser}")
+          template(v-if="!isMyUser")
+            svg-plus-minus-radicle.transform.scale-105.opacity-0.group-hover_opacity-100
+
+      //- (view senders btn)
+      template(v-else)
+        .relative
+          //- toggle button as overlay for accessibility
+          button.absolute.z-10.overlay.pointer-events-auto.rounded-full.notouch_hover_ring.notouch_hover_ring-violet-650(@click.stop="showAllSenders = !showAllSenders", aria-label="Toggle Senders List")
+
+          //- (avatars row)
+          .rounded-full.flex.justify-center.items-center.bg-indigo-700(v-show="!showAllSenders")
             //- (addresses)
-            addresses-tag(v-show="!showAllSenders", v-if="allSenders", :addresses="allSenders", :avatarsOnly="true")
-            //- (collapsed label)
-            //- .h-72.flex.items-center.font-semibold.text-lg.text-violet-650.pl-36.pr-14(v-show="showAllReceivers") Supporters
+            addresses-tag(:addresses="allSenders", :avatarsOnly="true")
+
+          //- (summary text)
+          .h-44.pl-20.pr-12.rounded-full.bg-indigo-950.flex.items-center.justify-center(v-show="showAllSenders")
+            .font-bold.text-ms.text-violet-650 {{ allSenders.length }} address{{ allSenders.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="$route.params.address")]
             //- toggle icon
-            //- .w-54.h-54.flex.items-center.justify-center.-ml-12.mr-8
-              svg-chevron-down.text-violet-650.w-40.h-40(:class="{'transform origin-center rotate-180': showAllReceivers}")
-      
-      //- (senders list)
-      ul.flex.flex-wrap.justify-center.min-h-80.items-center(v-if="allDripsIn", v-show="showAllSenders")
+            svg-chevron-down.ml-5.text-violet-650.w-28.h-28.transform.origin-center.rotate-180
+          
+    
+    //- (expanded list)
+    template(v-if="allDripsIn && showAllSenders")
+      ul.w-full.flex.flex-wrap.justify-center.mt-24
+        //- .w-full.flex.my-24
+          h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
+            div #[b {{ allSenders.length }} address{{ allSenders.length > 1 ? 'es' : ''}}] {{ allSenders.length > 1 ? 'drip' : 'drips'}} to #[addr.font-bold(:address="$route.params.address")]
         //- .w-full.flex.justify-center
           .h-80.w-2.rounded-full.bg-violet-700.my-6
         li(v-for="drip in allDripsIn")
@@ -331,16 +348,20 @@ article.profile.pb-80
               div.font-semibold.text-violet-650.mx-6
                 template(v-if="drip.amount") {{ drip.amount }}/mo
                 template(v-else-if="drip.percent") {{ drip.percent }}%
-        //- .w-full.flex.justify-center
-          .h-80.w-2.rounded-full.bg-violet-700.my-6
+          //- .w-full.flex.justify-center
+            .h-80.w-2.rounded-full.bg-violet-700.my-6
 
         //- (hide senders btn)
-        .flex.justify-center.my-4.mx-12(:class="{'w-full mt-12': allSenders.length > 2}")
-          button.btn.btn-darkest.w-64.h-64(@click.stop="showAllSenders = false")
-            svg-chevron-down.text-violet-650.w-40.h-40.transform.rotate-180
+        //- .w-full.flex.justify-center.mt-12
+          button.btn.btn-darkest.w-54.h-54(@click.stop="showAllSenders = false")
+            svg-chevron-down.text-violet-650.w-32.h-32.transform.rotate-180
 
-  .w-full.flex.justify-center.my-10
-    .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em") 💧
+    //- drip icon
+    .w-full.flex.justify-center.my-10.opacity-90
+      .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em")
+        | 💧
+        //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="showAllSenders", @click="showAllSenders = false")
+          svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180
 
   //- user tag row
   .w-full.flex.justify-center
@@ -369,13 +390,19 @@ article.profile.pb-80
       div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:2.4em") +
   
   //- receivers
-  .w-full.flex.justify-center.my-10
+  .w-full.flex.justify-center.my-10.opacity-90
     .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em") 💧
 
   .flex.justify-center
     //- (loading receivers...)
     template(v-if="!allReceivers")
       .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
+
+    //- (no receivers)
+    template(v-else-if="!allReceivers.length")
+      button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="!isMyUser", :class="{'pointer-events-none': !isMyUser}")
+        template(v-if="isMyUser")
+          svg-plus-minus-radicle.transform.scale-105
     
     //- (show receivers btn)
     template(v-else)  
