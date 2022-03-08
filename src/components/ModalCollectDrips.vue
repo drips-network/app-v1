@@ -16,7 +16,7 @@ const emit = defineEmits(['close', 'collected'])
 
 const dripPct = ref(getDripPctFromAmts(props.amts))
 
-const hasFunds = computed(() => props.amts && props.amts[0].add(props.amts[0]).gt(0))
+const hasFunds = computed(() => props.amts && props.amts[0].add(props.amts[1]).gt(0))
 const hasSplits = computed(() => props.amts && props.amts[1].gt(0))
 
 const totalFunds = computed(() => props.amts ? toDAI(props.amts[0].add(props.amts[1])) : -1)
