@@ -113,11 +113,9 @@ onMounted(() => {
     //- (members section)
     template(v-if="props.project.tokens.length")
       //- members summary row
-      section.relative
-        //- (summary row)
-        header.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
-          h6.text-violet-650.text-md.font-semibold Members
-          user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
+      header.relative.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
+        h6.text-violet-650.text-md.font-semibold Members
+        user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
 
         //- expand btn as overlay (accessibility)
         button.absolute.overlay.rounded-full.btn-focus-violet(@click="showMembers = !showMembers", aria-label="View Members")

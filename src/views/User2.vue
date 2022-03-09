@@ -330,28 +330,30 @@ article.profile.pt-40.pb-80
 
   
   //- memberships list
-  section#memberships.mt-80.pt-60(v-if="projects && projects.length")
-    header.flex
-      h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-        div #[addr.font-bold(:address="$route.params.address")] is raising funds with 🧧 #[b NFT Memberships] 
+  section#memberships
+    .mt-80.pt-60(v-if="projects && projects.length")
+      header.flex
+        h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
+          div #[addr.font-bold(:address="$route.params.address")] is raising funds with 🧧 #[b NFT Memberships] 
 
-    .mt-120.flex.flex-wrap.justify-evenly
-      //- projects...
-      template(v-for="project in projects")
-        //- user-project(:project="project", @collected="getProjects")
-        project-detail(:project="project", @collected="getProjects")
+      .mt-120.flex.flex-wrap.justify-evenly
+        //- projects...
+        template(v-for="project in projects")
+          //- user-project(:project="project", @collected="getProjects")
+          project-detail(:project="project", @collected="getProjects")
 
 
   //- nfts list
-  section#member-of.mt-80.pt-60.px-20(v-if="nfts && nfts.length")
-    header.flex
-      h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-        div #[addr.font-bold(:address="$route.params.address")] has #[b {{ nfts.length }} NFT Membership{{ nfts.length > 1 ? 's' : ''}}] 🧩
+  section#member-of
+    div.mt-80.pt-60.px-20(v-if="nfts && nfts.length")
+      header.flex
+        h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
+          div #[addr.font-bold(:address="$route.params.address")] has #[b {{ nfts.length }} NFT Membership{{ nfts.length > 1 ? 's' : ''}}] 🧩
 
-    ul.mt-120.grid.grid-cols-3.gap-20
-      //- nfts...
-      li.mb-ff.flex(v-for="nft in nfts")
-        user-nft.w-full(:nft="nft")
+      ul.mt-120.grid.grid-cols-3.gap-20
+        //- nfts...
+        li.mb-ff.flex(v-for="nft in nfts")
+          user-nft.w-full(:nft="nft")
 
 
   //- admin modals

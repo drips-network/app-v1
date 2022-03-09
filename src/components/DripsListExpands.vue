@@ -58,14 +58,14 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
             addresses-tag(:addresses="addresses", :avatarsOnly="true")
 
           //- (summary text)
-          p.h-44.pl-20.pr-12.rounded-full.bg-indigo-950.flex.items-center.justify-center(v-show="expanded")
-            .font-semibold.text-ms.text-violet-650
+          p.h-44.pl-20.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")
+            .font-semibold.text-ms
               template(v-if="props.direction === 'in'")
                 | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address")]
               template(v-else)
                 | #[addr(:address="props.address")] drips to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             //- toggle icon
-            svg-chevron-down.ml-5.text-violet-650.w-28.h-28.transform.origin-center.rotate-180
+            svg-chevron-down.ml-5.w-28.h-28.transform.origin-center.rotate-180
           
     
     //- (expanded list)
