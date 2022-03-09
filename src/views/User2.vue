@@ -18,6 +18,7 @@ import ModalDripsEdit from '@/components/ModalDripsEdit'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit'
 import SvgDai from '@/components/SvgDai'
 import ProjectDetail from '@/components/ProjectDetail'
+import DripsListExpands from '@/components/DripsListExpands'
 import store from '@/store'
 import { utils } from 'ethers'
 import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
@@ -296,72 +297,7 @@ export default {
 article.profile.pt-40.pb-80
   
   //- senders
-  section
-    .w-full.flex.justify-center
-      //- (loading senders...)
-      template(v-if="!allSenders")
-        .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
-
-      //- (no senders)
-      template(v-else-if="!allSenders.length")
-        button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="isMyUser", :class="{'pointer-events-none': isMyUser}")
-          template(v-if="!isMyUser")
-            svg-plus-minus-radicle.transform.scale-105.opacity-0.group-hover_opacity-100
-
-      //- (view senders btn)
-      template(v-else)
-        .relative
-          //- toggle button as overlay for accessibility
-          button.absolute.z-10.overlay.pointer-events-auto.rounded-full.notouch_hover_ring.notouch_hover_ring-violet-650(@click.stop="showAllSenders = !showAllSenders", aria-label="Toggle Senders List")
-
-          //- (avatars row)
-          .rounded-full.flex.justify-center.items-center.bg-indigo-700(v-show="!showAllSenders")
-            //- (addresses)
-            addresses-tag(:addresses="allSenders", :avatarsOnly="true")
-
-          //- (summary text)
-          .h-44.pl-20.pr-12.rounded-full.bg-indigo-950.flex.items-center.justify-center(v-show="showAllSenders")
-            .font-bold.text-ms.text-violet-650 {{ allSenders.length }} address{{ allSenders.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="$route.params.address")]
-            //- toggle icon
-            svg-chevron-down.ml-5.text-violet-650.w-28.h-28.transform.origin-center.rotate-180
-          
-    
-    //- (expanded list)
-    template(v-if="allDripsIn && showAllSenders")
-      ul.w-full.flex.flex-wrap.justify-center.mt-24
-        //- .w-full.flex.my-24
-          h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-            div #[b {{ allSenders.length }} address{{ allSenders.length > 1 ? 'es' : ''}}] {{ allSenders.length > 1 ? 'drip' : 'drips'}} to #[addr.font-bold(:address="$route.params.address")]
-        //- .w-full.flex.justify-center
-          .h-80.w-2.rounded-full.bg-violet-700.my-6
-        li(v-for="drip in allDripsIn")
-          router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.my-4.mx-3.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: drip.sender }}")
-            //- sender avatar / blockie
-            user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-800(:address="drip.sender", blockieSize="44", :key="drip.sender")
-            addr.mx-16.font-semibold(:address="drip.sender", :key="drip.sender")
-
-            .h-44.flex.items-center.px-10.bg-indigo-900.rounded-full
-              //- drip icon
-              div(style="font-size:1.25em") 💧
-
-              //- amount
-              div.font-semibold.text-violet-650.mx-6
-                template(v-if="drip.amount") {{ drip.amount }}/mo
-                template(v-else-if="drip.percent") {{ drip.percent }}%
-          //- .w-full.flex.justify-center
-            .h-80.w-2.rounded-full.bg-violet-700.my-6
-
-        //- (hide senders btn)
-        //- .w-full.flex.justify-center.mt-12
-          button.btn.btn-darkest.w-54.h-54(@click.stop="showAllSenders = false")
-            svg-chevron-down.text-violet-650.w-32.h-32.transform.rotate-180
-
-    //- drip icon
-    .w-full.flex.justify-center.my-10.opacity-90
-      .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em")
-        | 💧
-        //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="showAllSenders", @click="showAllSenders = false")
-          svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180
+  drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in", :canEdit="!isMyUser")
 
   //- user tag row
   .w-full.flex.justify-center
@@ -371,14 +307,14 @@ article.profile.pt-40.pb-80
       //- memberships/nfts count
       section.mt-6.flex.justify-center.font-semibold.text-ms.text-violet-650
         //- (memberships)
-        .rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2
+        router-link.rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
           .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
           .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
             span(v-if="projects") {{ projects.length}}
             span.animate-pulse(v-else) ...
         
         //- (nfts)
-        .rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2
+        router-link.rounded-full.min-w-196.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#member-of", :class="{'opacity-40 pointer-events-none': nfts && !nfts.length}")
           .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
           .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
             span(v-if="nfts") {{ nfts.length}}
@@ -390,57 +326,16 @@ article.profile.pt-40.pb-80
       div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:2.4em") +
   
   //- receivers
-  .w-full.flex.justify-center.my-10.opacity-90
-    .w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em") 💧
-
-  .flex.justify-center
-    //- (loading receivers...)
-    template(v-if="!allReceivers")
-      .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
-
-    //- (no receivers)
-    template(v-else-if="!allReceivers.length")
-      button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="!isMyUser", :class="{'pointer-events-none': !isMyUser}")
-        template(v-if="isMyUser")
-          svg-plus-minus-radicle.transform.scale-105
-    
-    //- (show receivers btn)
-    template(v-else)  
-      button.min-w-160ff.rounded-full.flex.justify-center.items-center.pointer-events-auto.notouch_hover_ring.notouch_hover_ring-violet-650(v-show="!showAllReceivers", @click.stop="showAllReceivers = !showAllReceivers", :class="{'bg-indigo-700': !showAllReceivers, 'bg-indigo-950': showAllReceivers}")
-        addresses-tag(v-if="allReceivers", :addresses="allReceivers", :avatarsOnly="true")
-
-  //- (receivers list)
-  ul.flex.flex-wrap.justify-center.mt-20(v-if="allDripsOut", v-show="showAllReceivers")
-    //- .w-full.flex.justify-center
-      .h-80.w-2.rounded-full.bg-violet-700.my-6
-    li(v-for="drip in allDripsOut")
-      router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.my-4.mx-3.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: drip.receiver[0] }}")
-        //- sender avatar / blockie
-        user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-800(:address="drip.receiver[0]", blockieSize="44", :key="drip.receiver[0]")
-        addr.mx-16.font-semibold(:address="drip.receiver[0]", :key="drip.receiver[0]")
-
-        .h-44.flex.items-center.px-10.bg-indigo-900.rounded-full
-          //- drip icon
-          div(style="font-size:1.25em") 💧
-
-          //- amount
-          div.font-semibold.text-violet-650.mx-6
-            template(v-if="drip.amount") {{ drip.amount }}/mo
-            template(v-else-if="drip.percent") {{ drip.percent }}%
-
-    //- (hide receivers btn)
-    .flex.justify-center.my-4.mx-12(:class="{'w-full mt-12': allReceivers.length > 2}")
-      button.btn.btn-darkest.w-64.h-64(@click.stop="showAllReceivers = false")
-        svg-chevron-down.text-violet-650.w-40.h-40.transform.rotate-180
+  drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser")
 
   
   //- memberships list
-  section.mt-160(v-if="projects && projects.length")
+  section#memberships.mt-80.pt-60(v-if="projects && projects.length")
     header.flex
       h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
         div #[addr.font-bold(:address="$route.params.address")] is raising funds with 🧧 #[b NFT Memberships] 
 
-    .mt-144.flex.flex-wrap.justify-evenly
+    .mt-120.flex.flex-wrap.justify-evenly
       //- projects...
       template(v-for="project in projects")
         //- user-project(:project="project", @collected="getProjects")
@@ -448,75 +343,18 @@ article.profile.pt-40.pb-80
 
 
   //- nfts list
-  section.mt-144.px-20(v-if="nfts && nfts.length")
+  section#member-of.mt-80.pt-60.px-20(v-if="nfts && nfts.length")
     header.flex
       h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
         div #[addr.font-bold(:address="$route.params.address")] has #[b {{ nfts.length }} NFT Membership{{ nfts.length > 1 ? 's' : ''}}] 🧩
 
-    ul.mt-60.grid.grid-cols-2.gap-40
+    ul.mt-120.grid.grid-cols-3.gap-20
       //- nfts...
       li.mb-ff.flex(v-for="nft in nfts")
         user-nft.w-full(:nft="nft")
 
 
-  //- 
-    header.mt-56.px-36
-      .flex.items-endff.items-center.justify-between.w-full
-        //- user tag
-        user-tag(:address="$route.params.address")
-
-        //- (collect btn)
-        template(v-if="isMyUser")
-          .flex.items-center
-            //- template(v-if="totalFunds > -1")
-            .h-80.flex.items-center.border.border-violet-700.rounded-full.text-xl.font-semibold.pl-32(:class="{'text-violet-650': totalFunds === -1}", :key="$route.params.address")
-              template(v-if="totalFunds !== -1")
-                | {{ totalFunds }}
-                svg-dai.ml-6(size="lg")
-              template(v-else)
-                .animate-pulse ...
-              
-              button.ml-24.btn.btn-lg.btn-white.text-xl.font-semibold.pl-36.pr-32(@click="collectModalOpen = true") Collect 💧
-
-            //- (edit drips btn)
-            button.ml-6.btn.btn-lg.btn-violet.text-xl.font-semibold.pl-36.pr-32(@click="editDripsSelect = true") Edit Drips 💧
-        
-        //- (drip to btn)
-        template(v-else)
-          button.btn.btn-lg.btn-white.font-semibold.text-md.pl-36.pr-32.text-xl(@click="dripModalOpen = true")
-            | Drip to {{ ensName ? ensName.slice(0, 7) : '0x' }}... 💧
-            //- | Send Drips 💧
-
-      nav.mt-56.mb-20
-        .flex.items-start.justify-between.text-violet-650.text-lg
-          .flex.tracking-wide
-            router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.pl-28.pr-36.mr-2(:to="{ name: 'user-drips', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-drips') }")
-              span.mr-14.-ml-5(style="font-size:1.18em") 💧
-              | Drips
-            router-link.h-80.btn.btn-indigo.btn-active-violet.font-semibold.pl-28.pr-36.mr-2(:to="{ name: 'user-communities', params: $route.params }", :class="{'btn-violet': $route.name.includes('user-communities') }")
-              span.mr-14.-ml-4(style="font-size:1.23em") 🙂
-              | Communities
-
-          //- (communities submenu)
-          template(v-if="$route.name.includes('user-communities')")
-            .h-80.rounded-full.flex.items-center.px-16.bg-indigo-700
-              router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24.mr-4(:to="{ name: 'user-communities', params: $route.params }") Created
-              router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-24(:to="{ name: 'user-communities-joined', params: $route.params }") Joined
-
-          //- (drips submenu)
-          template(v-if="$route.name.includes('user-drips')")
-            //- horizontal stem
-            //- .w-40.h-40.border-b-2.border-indigo-700
-            //- submenu body
-            .h-80.rounded-full.flex.items-center.px-16.bg-indigo-700
-              router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32.mr-4(:to="{ name: 'user-drips-in', params: $route.params }", ) In
-              router-link.btn.btn-active-violet.btn-md.font-semibold.text-lg.px-32(:to="{ name: 'user-drips-out', params: $route.params }", ) Out
-
-    main#main.px-36.min-h-screen
-
-      router-view(:key="$route.path", @editDripsSelect="editDripsSelect = true", @editDrips="edit = 'drips'")
-
-  //- (MY USER)
+  //- admin modals
   template(v-if="isMyUser")
     //- COLLECT
     modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false; getMyCollectable()", :amts="collectableAmts", @collected="getMyCollectable")

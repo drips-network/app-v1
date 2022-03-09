@@ -56,15 +56,15 @@ const routes = [
     children: [
       // projects
       {
-        path: 'communities',
-        name: 'user-communities',
+        path: 'memberships',
+        name: 'user-memberships',
         component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
       },
       // communities
       {
-        path: 'communities/joined',
-        name: 'user-communities-joined',
-        component: () => import(/* webpackChunkName: "user-communities" */ '../views/user/UserMemberships.vue')
+        path: 'nfts',
+        name: 'user-nfts',
+        component: () => import(/* webpackChunkName: "user-nfts" */ '../views/user/UserNFTs.vue')
       },
       // drips
       {

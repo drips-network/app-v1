@@ -8,6 +8,7 @@ import ProjectProgressBar from '@/components/ProjectProgressBar'
 import UserAvatarsRow from '@/components/UserAvatarsRow'
 import { BigNumber as bn } from 'ethers'
 import UserTagSmall from '@/components/UserTagSmall'
+import DripsListExpands from '@/components/DripsListExpands'
 const props = defineProps(['project'])
 const meta = ref()
 
@@ -37,7 +38,7 @@ if (bn.from(totalCollectedWei).lt(currentFundingWei)) {
   raised = toDAI(totalCollectedWei)
 }
 
-onMounted(async () => {
+const getMeta = async () => {
   try {
     meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })
     await nextTick()
@@ -45,11 +46,32 @@ onMounted(async () => {
   } catch (e) {
     console.error(e)
   }
+}
+
+// splits
+const splitsOut = ref()
+const getSplitsOut = async () => {
+  try {
+    const splits = await store.dispatch('getSplitsBySender', props.project.id)
+    // format + save
+    splitsOut.value = splits.map(split => ({
+      ...split,
+      receiver: [split.receiver]
+    }))
+  } catch (e) {
+    console.error(e)
+    splitsOut.value = []
+  }
+}
+
+onMounted(() => {
+  getMeta()
+  getSplitsOut()
 })
 </script>
 
 <template lang="pug">
-.project-detail.w-full.max-w-4xl
+.project-detail.w-full.max-w-5xl
   //- image
   figure.mx-auto.w-3x4.relative.z-10
     .w-full.relative
@@ -87,24 +109,32 @@ onMounted(async () => {
     project-progress-bar.bg-indigo-700.mt-5(:project="project", :meta="meta", :currentFundingWei="currentFundingWei")
 
   .text-md.font-semibold
-    //- members:
-    button.w-full.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.focus_ring.notouch_hover_ring.notouch_hover_ring-white(v-show="!showMembers", @click="showMembers = !showMembers", :class="{'bg-indigo-700 text-violet-650 ring ring-violet-650 focus_ring-white': showMembers, 'bg-indigo-700 text-violet-650 focus_ring-violet-650': !showMembers }")
-      div.text-violet-650.text-md.font-semibold Members
-      user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
+    
+    //- (members section)
+    template(v-if="props.project.tokens.length")
+      //- members summary row
+      section.relative
+        //- (summary row)
+        header.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
+          h6.text-violet-650.text-md.font-semibold Members
+          user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
 
-    //- (members list)
-    ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xlb.relative.pb-64(v-if="showMembers")
-      .w-full.flex.justify-between.px-32.h-80.items-center.font-semibold
-        h6.text-violet-650 Members
-        div {{ props.project.tokens.length }}
+        //- expand btn as overlay (accessibility)
+        button.absolute.overlay.rounded-full.btn-focus-violet(@click="showMembers = !showMembers", aria-label="View Members")
 
-      li(v-for="token in props.project.tokens")
-        user-tag-small.bg-indigo-850(:address="token.owner")
+      //- (members list expanded)
+      ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xl.relative.pb-64(v-if="showMembers")
+        .w-full.flex.justify-between.h-80.items-center.font-semibold
+          h6.ml-32.text-violet-650 Members
+          .w-54.h-54.mr-6.flex.items-center.justify-center {{ props.project.tokens.length }}
 
-      //- close button
-      .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
-        button.text-violet-650.notouch_hover_text-white(@click="showMembers = false")
-          svg-chevron-down.w-32.h-32.transform.rotate-180
+        li(v-for="token in props.project.tokens")
+          user-tag-small.bg-indigo-850(:address="token.owner")
+
+        //- close button
+        .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
+          button.text-violet-650.notouch_hover_text-white(@click="showMembers = false", aria-label="Hide Members")
+            svg-chevron-down.w-32.h-32.transform.rotate-180
 
     //- stats
     .grid.grid-cols-2.gap-4.mt-5
@@ -123,5 +153,8 @@ onMounted(async () => {
             span(style="font-size:1.5em") ∞
           template(v-else-if="!props.project.tokens.length") {{ props.project.tokenTypes[0].limit }}
           template(v-else) {{ props.project.tokenTypes[0].limit - props.project.tokens.length }}/{{ props.project.tokenTypes[0].limit }}
+
+  //- drips list
+  drips-list-expands(:address="props.project.id", :drips="splitsOut", direction="out")
     
 </template>
