@@ -17,11 +17,11 @@ const newMeta = ref({
   url: '',
   email: '',
   'com.twitter': '',
-  'github': '',
-  'discord': '',
+  github: '',
+  discord: '',
   // 'telegram': '',
   // radicle: '',
-  description: '',
+  description: ''
 })
 // editing?
 if (props.meta) {
@@ -45,7 +45,7 @@ const update = async () => {
 
     // submit...
     txMsg.value = { message: 'Confirm the transaction in your wallet.' }
-    tx.value = await store.dispatch('updateProjectMeta', { address: props.projectAddress, ipfsHash })
+    tx.value = await store.dispatch('updateMetadata', { ipfsHash })
     console.log('update community info tx...', tx.value)
 
     // wait for tx...

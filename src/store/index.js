@@ -6,8 +6,9 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender, querySplitsByReceiver, queryDripsByReceiver } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
+import bs58 from 'bs58'
 // contracts
-import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
+import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub, Metadata } from '../../contracts'
 
 let provider, signer, walletProvider
 
@@ -812,6 +813,20 @@ export default createStore({
       } catch (e) {
         console.error(e)
       }
+    },
+
+    async updateMetadata ({ dispatch }, { ipfsHash }) {
+      try {
+        if (!signer) await dispatch('connect')
+        const contract = getMetadataContract()
+        const contractSigner = contract.connect(signer)
+        // convert ipfs hash to bytes array for contract method (cheaper gas)
+        const decoded = bs58.decode(ipfsHash)
+        // tx
+        return contractSigner.publish(decoded)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 })
@@ -832,6 +847,10 @@ function getDAIContract () {
 
 function getHubContract () {
   return new Ethers.Contract(DaiDripsHub.address, DaiDripsHub.abi, provider)
+}
+
+function getMetadataContract () {
+  return new Ethers.Contract(Metadata.address, Metadata.abi, provider)
 }
 
 function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes, drips }) {
