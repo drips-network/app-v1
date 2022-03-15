@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import Addr from '@/components/Addr'
 import UserAvatar from '@/components/UserAvatar'
-import AddressesTag from '@/components/AddressesTag'
+import UserAvatarsRow from '@/components/UserAvatarsRow'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import SvgChevronDown from '@/components/SvgChevronDown'
 import UserTagSmall from '@/components/UserTagSmall'
@@ -27,8 +27,8 @@ const expanded = ref(false)
 <template lang="pug">
 section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
-  .w-full.flex.justify-center.my-10.opacity-90
-    .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.4em")
+  .w-full.flex.justify-center.my-4.opacity-80
+    .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.2em")
       | 💧
       //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="expanded", @click="expanded = false")
         svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180
@@ -53,9 +53,10 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
           button.absolute.z-10.overlay.pointer-events-auto.rounded-full.btn-focus-violet(@click.stop="expanded = !expanded", aria-label="Toggle List")
 
           //- (avatars row)
-          .rounded-full.flex.justify-center.items-center.bg-indigo-700(v-show="!expanded")
+          .rounded-full.flex.justify-center.items-center.bg-indigo-700.p-10(v-show="!expanded")
             //- (addresses)
-            addresses-tag(:addresses="addresses", :avatarsOnly="true")
+            //- addresses-tag(:addresses="addresses", :avatarsOnly="true")
+            user-avatars-row(:addresses="addresses", :limit="6", height="44")
 
           //- (summary text)
           p.h-44.pl-20.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")

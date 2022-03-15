@@ -64,9 +64,10 @@ store.dispatch('init')
       nav.app__nav.fixed.z-30.bottom-0.left-0.w-full.px-10.pb-10.md_static.md_p-0.md_w-auto.flex.justify-center.bg-gradient-to-b.from-transparent.to-indigo-900
         //- bubble
         .flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.pr-16.pl-12
-          //- links
-          router-link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'explore'}") Explore
-          router-link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Create
+          //- explore link
+          router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'explore'}") Explore
+          //- create link
+          router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Create
           //- (profile btn)
           template(v-if="$store.state.address")
             .btn.btn-md.bg-indigo-900
@@ -143,7 +144,7 @@ store.dispatch('init')
   /* font-feature-settings: "ss01", "ss02", "cv01", "cv03"; */
 }
 
-.app__nav .router-link-active{
+.app__nav__link.router-link-active{
   @apply text-white bg-violet-600;
 }
 

@@ -295,7 +295,7 @@ export default {
 
 <template lang="pug">
 article.profile.pt-40.pb-80
-  
+  //- 
   //- senders
   drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in", :canEdit="!isMyUser")
 
@@ -350,9 +350,9 @@ article.profile.pt-40.pb-80
         h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
           div #[addr.font-bold(:address="$route.params.address")] has #[b {{ nfts.length }} NFT Membership{{ nfts.length > 1 ? 's' : ''}}] 🧩
 
-      ul.mt-120.grid.grid-cols-3.gap-20
+      ul.mt-120.flex.flex-wrap.justify-center
         //- nfts...
-        li.mb-ff.flex(v-for="nft in nfts")
+        li.px-10.w-1x3(v-for="nft in nfts")
           user-nft.w-full(:nft="nft")
 
 
