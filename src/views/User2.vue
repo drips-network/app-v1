@@ -16,7 +16,9 @@ import ModalCollectDrips from '@/components/ModalCollectDrips'
 import ModalEditDripsSelect from '@/components/ModalEditDripsSelect'
 import ModalDripsEdit from '@/components/ModalDripsEdit'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit'
+import ModalEditProfile from '@/components/ModalEditProfile'
 import SvgDai from '@/components/SvgDai'
+import SvgPen from '@/components/SvgPen'
 import ProjectDetail from '@/components/ProjectDetail'
 import DripsListExpands from '@/components/DripsListExpands'
 import store from '@/store'
@@ -27,6 +29,7 @@ import api from '@/api'
 const route = useRoute()
 const router = useRouter()
 const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
+const profileMeta = ref(null)
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
 const showAllSenders = ref(false)
@@ -35,7 +38,7 @@ const showAllReceivers = ref(false)
 // my account
 const isMyUser = computed(() => store.state.address === route.params.address)
 const editDripsSelect = ref(false)
-const edit = ref(null) // 'drips' : 'splits'
+const edit = ref(null) // 'drips' | 'splits' | 'profile'
 const collectableAmts = ref()
 const totalFunds = computed(() => {
   return !collectableAmts.value ? -1
@@ -86,7 +89,6 @@ const getSplitsIn = async () => {
 const getDripsIn = async () => {
   try {
     const entries = await store.dispatch('getDripsByReceiver', route.params.address)
-    console.log(entries)
     // format + save
     dripsIn.value = entries.map(drip => ({
       ...drip,
@@ -295,6 +297,16 @@ export default {
 
 <template lang="pug">
 article.profile.pt-40.pb-80
+
+  //- (your profile...)
+  template(v-if="isMyUser")
+    .flex.justify-center.mb-40
+      .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-12.h-44.font-semiboldff.text-greenbright-400.text-ms
+        | This is your profile!
+        button.ml-20.py-4.pl-12.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green(@click="edit = 'profile'")
+          | Edit
+          svg-pen.mx-6.h-16.w-16
+
   //- 
   //- senders
   drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in", :canEdit="!isMyUser")
@@ -302,7 +314,7 @@ article.profile.pt-40.pb-80
   //- user tag row
   .w-full.flex.justify-center
     div
-      user-tag(:address="$route.params.address")
+      user-tag(:address="$route.params.address", :isEditable="isMyUser")
 
       //- memberships/nfts count
       section.mt-6.flex.justify-center.font-semibold.text-ms.text-violet-650
@@ -358,6 +370,9 @@ article.profile.pt-40.pb-80
 
   //- admin modals
   template(v-if="isMyUser")
+    //- EDIT PROFILE
+    modal-edit-profile(v-if="edit === 'profile'", :open="edit === 'profile'", @close="edit = null", :meta="profileMeta")
+
     //- COLLECT
     modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false; getMyCollectable()", :amts="collectableAmts", @collected="getMyCollectable")
       template(v-slot:header) Collect your Drips

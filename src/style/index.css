@@ -99,6 +99,12 @@ html {
     @apply notouch_hover_bg-orange-500;
   }
 }
+.btn-outline-green{
+  @apply border border-greenbright-500 text-greenbright-500;
+  &:not([disabled]) {
+    @apply notouch_hover_ring-1 notouch_hover_ring-greenbright-500 focus_ring-1;
+  }
+}
 .btn-violet{
   @apply bg-violet-600 text-white;
   &:not([disabled]) {
