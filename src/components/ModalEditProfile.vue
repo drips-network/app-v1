@@ -45,8 +45,8 @@ const update = async () => {
 
     // submit...
     txMsg.value = { message: 'Confirm the transaction in your wallet.' }
-    tx.value = await store.dispatch('updateMetadata', { ipfsHash })
-    console.log('update community info tx...', tx.value)
+    tx.value = await store.dispatch('profiles/updateSignerMetadata', { ipfsHash })
+    console.log('update profile meta tx...', tx.value)
 
     // wait for tx...
     txMsg.value = { message: 'Waiting for transaction confirmation...' }
@@ -54,7 +54,7 @@ const update = async () => {
 
     // success!
     emit('updated', ipfsHash)
-    txMsg.value = { status: 1, message: 'Info updated!' }
+    txMsg.value = { status: 1, message: 'Profile updated!' }
     tx.value = null
     // setTimeout(() => emit('close'), 3000)
   } catch (e) {
@@ -74,7 +74,11 @@ modal(v-bind="$attrs", @close="$emit('close')")
     template(v-slot:header)
       dialog-title Edit Your Profile
 
-    form(@submit.prevent="update")
+    template(v-slot:description)
+      dialog-description
+        p.mx-auto.leading-snug.text-violet-650ff(style="max-width:24em") Add some information to your profile. Or to your ENS name if you have one.
+
+    form.mt-40(@submit.prevent="update")
       fields-profile-edit(v-model="newMeta")
 
       //- (tx message)

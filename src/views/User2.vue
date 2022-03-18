@@ -225,6 +225,9 @@ const getProjects = async () => {
   }
 }
 
+// profile
+const bio = computed(() => store.getters['profiles/record'](route.params.address, 'description'))
+
 onMounted(() => {
   if (isMyUser.value) {
     getMyCollectable()
@@ -235,6 +238,7 @@ onMounted(() => {
   getDripsOut()
   getProjects()
   getNFTs()
+  store.dispatch('profiles/getProfile', { address: route.params.address })
 })
 
 provide('isMyUser', isMyUser)
@@ -303,9 +307,9 @@ article.profile.pt-40.pb-80
     .flex.justify-center.mb-40
       .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-12.h-44.font-semiboldff.text-greenbright-400.text-ms
         | This is your profile!
-        button.ml-20.py-4.pl-12.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green(@click="edit = 'profile'")
+        button.ml-20.py-4.pl-11.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green(@click="edit = 'profile'")
           | Edit
-          svg-pen.mx-6.h-16.w-16
+          svg-pen.mx-5.h-16.w-16
 
   //- 
   //- senders
@@ -340,6 +344,12 @@ article.profile.pt-40.pb-80
   //- receivers
   drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser")
 
+
+  //- bio/description
+  template(v-if="bio")
+    section#bio.my-120.flex.justify-center
+      p.rounded-2xlb.bg-indigo-950.p-28.text-center.text-xl.font-semibold.bg-violet-650.text-white.leading-normal(v-html="bio", style="max-width:30em")
+
   
   //- memberships list
   section#memberships
@@ -352,7 +362,7 @@ article.profile.pt-40.pb-80
         //- projects...
         template(v-for="project in projects")
           //- user-project(:project="project", @collected="getProjects")
-          project-detail(:project="project", @collected="getProjects")
+          project-detail.mb-160(:project="project", @collected="getProjects")
 
 
   //- nfts list

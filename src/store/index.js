@@ -6,9 +6,9 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender, querySplitsByReceiver, queryDripsByReceiver } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
-import bs58 from 'bs58'
 // contracts
-import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub, Metadata } from '../../contracts'
+import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
+import profiles from './profiles'
 
 let provider, signer, walletProvider
 
@@ -39,7 +39,7 @@ const web3Modal = new Web3Modal({
 let initializing = false
 
 export default createStore({
-  // modules: { },
+  modules: { profiles },
   state () {
     return {
       networkId: null,
@@ -59,6 +59,7 @@ export default createStore({
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
     isWrongNetwork: state => state.networkId && networks[state.networkId]?.name !== deployNetwork.name,
+    isEthereum: state => networks[state.networkId]?.layer === 'ethereum', 
     isPolygon: state => networks[state.networkId]?.layer === 'polygon',
     label: state => name => label(name, deployNetwork?.layer)
   },
@@ -134,9 +135,29 @@ export default createStore({
       }
     },
 
+    // for use elsewhere in the app since state.provider is not accessible with vuex proxying... :(
+    async getProvider ({ dispatch }) {
+      if (!provider) await dispatch('init')
+      return provider
+    },
+
+    // for use elsewhere in the app since state.provider is not accessible with vuex proxying... :(
+    async getSigner ({ dispatch }) {
+      try {
+        if (!signer) await dispatch('connect')
+        return signer  
+      } catch (e){
+        console.error(e)
+        throw e
+      }
+    },
+
     getNetworkId ({ commit }, provider) {
       return provider.getNetwork()
-        .then(network => commit('SET_NETWORK_ID', network.chainId))
+        .then(network => {
+          commit('SET_NETWORK_ID', network.chainId)
+          return network.chainId
+        })
         .catch(console.error)
     },
 
@@ -158,7 +179,7 @@ export default createStore({
         // commit('SET_CONTRACTS', provider)
 
         dispatch('listenToWalletProvider')
-        return
+        return true
       } catch (e) {
         console.error('@connect', e)
         // clear wallet in case
@@ -210,10 +231,6 @@ export default createStore({
         console.error('disconnected?', error)
         dispatch('disconnect')
       })
-    },
-
-    getProvider () {
-      return provider
     },
 
     async createProject ({ state, dispatch }, { project }) {
@@ -701,7 +718,7 @@ export default createStore({
           await dispatch('init')
         }
 
-        // ENS enabled?
+        // exit if non-ENS Network
         if (networks[state.networkId].layer !== 'ethereum') {
           return null
         }
@@ -721,6 +738,7 @@ export default createStore({
 
         if (ens) {
           // get records async...
+          // TODO - ens has sdk to get all records at once?
           const resolver = await provider.getResolver(ens)
           const records = ['avatar', 'url', 'com.twitter', 'vnd.twitter', 'com.github', 'vnd.github', 'com.discord', 'vnd.discord']
           // records...
@@ -732,6 +750,27 @@ export default createStore({
         }
 
         return { ens }
+      } catch (e) {
+        console.error(e)
+        return null
+      }
+    },
+
+    // fetch/queue profile info. since ENS records require fetching each one, 
+    // simply start the queuing process and components should expect it eventually
+    async getAddressName ({ state, getters, commit, dispatch }, { address, flush }) {
+      try {
+        // saved?
+        if (!flush) {
+          const saved = state.addresses[address]
+          if (saved !== undefined) return
+        }
+        
+        // fetch ENS
+        dispatch('resolveAddress', { address })
+        // fetch Metadata
+        // dispatch('getMetadataByAddress', { address, flush })
+
       } catch (e) {
         console.error(e)
         return null
@@ -815,19 +854,7 @@ export default createStore({
       }
     },
 
-    async updateMetadata ({ dispatch }, { ipfsHash }) {
-      try {
-        if (!signer) await dispatch('connect')
-        const contract = getMetadataContract()
-        const contractSigner = contract.connect(signer)
-        // convert ipfs hash to bytes array for contract method (cheaper gas)
-        const decoded = bs58.decode(ipfsHash)
-        // tx
-        return contractSigner.publish(decoded)
-      } catch (e) {
-        console.error(e)
-      }
-    }
+    
   }
 })
 
@@ -847,10 +874,6 @@ function getDAIContract () {
 
 function getHubContract () {
   return new Ethers.Contract(DaiDripsHub.address, DaiDripsHub.abi, provider)
-}
-
-function getMetadataContract () {
-  return new Ethers.Contract(Metadata.address, Metadata.abi, provider)
 }
 
 function newProject ({ name, symbol, owner, ipfsHash, inputNFTTypes, drips }) {

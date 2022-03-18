@@ -62,9 +62,9 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
           p.h-44.pl-20.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")
             .font-semibold.text-ms
               template(v-if="props.direction === 'in'")
-                | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address")]
+                | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
-                | #[addr(:address="props.address")] drips to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
+                | #[addr(:address="props.address", :youOn="true")] are dripping to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             //- toggle icon
             svg-chevron-down.ml-5.w-28.h-28.transform.origin-center.rotate-180
           

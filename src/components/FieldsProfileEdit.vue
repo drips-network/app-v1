@@ -65,6 +65,6 @@ section.mt-40
 
   .my-10
     input-body(label="Bio")
-      textarea.text-center.scrollbars-hidden(v-model="modelValue.descrip", placeholder="I make it rain." rows="6")
+      textarea.text-center.scrollbars-hidden(v-model="modelValue.description", placeholder="I make it rain." rows="6")
 
 </template>

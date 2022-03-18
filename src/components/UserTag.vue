@@ -15,6 +15,7 @@ const github = computed(() => profile.value['com.github'] || profile.value['vnd.
 const twitter = computed(() => profile.value['com.twitter'] || profile.value['vnd.twitter'])
 const discord = computed(() => profile.value['com.discord'] || profile.value['vnd.discord'])
 const avatarBroken = ref(false)
+const record = key => store.getters['profiles/record'](props.address, key)
 const getENSSocialUrl = (value, base) => {
   try {
     // user erroneously added full URL into ENS com.XXX structure...
@@ -39,20 +40,20 @@ const getENSSocialUrl = (value, base) => {
     //- icons
     .flex.flex-wrap.-ml-8.justify-centerff
       //- (website)
-      template(v-if="profile.url")
-        a.block.px-4.notouch_hover_text-greenbright-500(:href="profile.url", target="_blank", rel="noopener noreferrer", title="Website")
+      template(v-if="record('url')")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="record('url')", target="_blank", rel="noopener noreferrer", title="Website")
           svg-globe.block.h-30.mt-8.-mb-12
       //- (twitter)
-      template(v-if="twitter")
-        a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(twitter, 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
+      template(v-if="record('twitter')")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('twitter'), 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
           svg-twitter.block.h-30.mt-8.-mb-12
       //- (github)
-      template(v-if="github")
-        a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(github, 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
+      template(v-if="record('github')")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('github'), 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
           svg-github.block.h-30.mt-8.-mb-12
       //- (discord)
-      template(v-if="discord")
-        a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(discord, 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
+      template(v-if="record('discord')")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('discord'), 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
           svg-discord.block.h-30.mt-8.-mb-12
 
   //- drip-to btn

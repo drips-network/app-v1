@@ -71,9 +71,9 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-.project-detail.w-full.max-w-5xl
+.project-detail.w-full.max-w-4xl
   //- image
-  figure.mx-auto.w-3x4.relative.z-10
+  figure.mx-auto.w-8x12.relative.z-10
     .w-full.relative
       .aspect-w-1.aspect-h-1
       img.absolute.block.overlay.object-contain.object-bottom(:src="ipfsUrl(props.project.tokenTypes[0].ipfsHash)")
