@@ -61,7 +61,6 @@ const update = async () => {
     // console.error(e)
     // alert('An error occured: ' + e.message)
     // status.value = null
-
     txMsg.value = { status: -1, message: e.message || e }
   }
 }
