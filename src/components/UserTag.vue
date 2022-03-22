@@ -31,11 +31,12 @@ const getENSSocialUrl = (value, base) => {
 .user-tag.p-18.rounded-full.bg-indigo-700.flex.items-center
   //- avatar
   router-link.block.rounded-full(:to="{name: 'user', params: { address: props.address }}")
-    user-avatar.w-112.h-112(:address="props.address", blockieSize="112")
+    user-avatar.w-112.h-112(:address="props.address", blockieSize="64")
 
   .ml-36.mr-40
-    h1.text-2xl.font-bold
-      addr(:address="props.address", :key="props.address")
+    div
+      h1.text-2xl.font-bold
+        addr(:address="props.address", :key="props.address")
 
     //- icons
     .flex.flex-wrap.-ml-8.justify-centerff

@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* fonts */
-/* @font-face {
-  font-family: 'kaeru-kaeru';
-  src: url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff2') format('woff2'),
-       url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff') format('woff');
-  font-style: normal;
-} */
 
 @font-face {
   font-family: 'cheee';
@@ -18,7 +11,12 @@
 }
 
 html {
-  font-size: 10px; /* 1rem / Tailwind default */
+  font-size: 8px; /* 1rem / Tailwind default */
+}
+@screen md {
+  html {
+    font-size:10px;
+  }
 }
 
 .overlay{
