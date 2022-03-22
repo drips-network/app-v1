@@ -316,56 +316,51 @@ article.profile.pt-40.pb-80
   drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in", :canEdit="!isMyUser")
 
   //- user tag row
-  .w-full.flex.justify-center
-    div
-      user-tag(:address="$route.params.address", :isEditable="isMyUser")
-
+  div.mx-auto.flex.flex-col
+    user-tag(:address="$route.params.address", :isEditable="isMyUser")
+    
+    section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650
+      //- (bio link)
       //- template(v-if="bio")
-        router-link.w-full.max-w-2xl.mx-auto.bg-indigo-950ff.bg-indigo-700.rounded-2xlb.flex.items-center.mt-5.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio")
-          .w-full.px-16.py-9
-            p.truncate.font-semibold.text-ms.text-violet-650ff(v-html="bio")
-
-      //- memberships/nfts count
-      section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650
-        //- (bio link)
-        //- template(v-if="bio")
-          .w-full.flex.justify-center.order-last
-            router-link.rounded-full.min-w-196ff.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
-              .ml-4.mr-12.flex-1 ✏️&nbsp;&nbsp;Bio
-            //- .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-              span(v-if="projects") {{ projects.length}}
-              span.animate-pulse(v-else) ...
-
-        //- (memberships)
-        router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
-          .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
-          .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+        .w-full.flex.justify-center.order-last
+          router-link.rounded-full.min-w-196ff.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
+            .ml-4.mr-12.flex-1 ✏️&nbsp;&nbsp;Bio
+          //- .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
             span(v-if="projects") {{ projects.length}}
             span.animate-pulse(v-else) ...
-        
-        //- (nfts)
-        router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#member-of", :class="{'opacity-40 pointer-events-none': nfts && !nfts.length}")
-          .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
-          .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-            span(v-if="nfts") {{ nfts.length}}
-            span.animate-pulse(v-else) ...
 
-      //- template(v-if="bio")
-        router-link.w-full.max-w-md.mx-auto.bg-indigo-950.rounded-2xlb.flex.items-center.mt-5.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio")
-          .w-full.px-16.py-9
-            p.truncate.font-semibold.text-ms.text-violet-650(v-html="bio")
+      //- (memberships)
+      router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
+        .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
+        .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+          span(v-if="projects") {{ projects.length}}
+          span.animate-pulse(v-else) ...
+      
+      //- (nfts)
+      router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#member-of", :class="{'opacity-40 pointer-events-none': nfts && !nfts.length}")
+        .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
+        .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+          span(v-if="nfts") {{ nfts.length}}
+          span.animate-pulse(v-else) ...
 
-    //- drip to button
-    //- button.w-112.h-112.ml-12.flex.items-center.justify-center.bg-white.rounded-full.pr-4ff
-      //- div.-ml-2.pt-2(style="font-size:2.4em") 💧
-      div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:2.4em") +
+
+    //- template(v-if="bio")
+      router-link.w-full.max-w-md.mx-auto.bg-indigo-950.rounded-2xlb.flex.items-center.mt-5.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio")
+        .w-full.px-16.py-9
+          p.truncate.font-semibold.text-ms.text-violet-650(v-html="bio")
+
+  //- drip to button
+  //- button.w-112.h-112.ml-12.flex.items-center.justify-center.bg-white.rounded-full.pr-4ff
+    //- div.-ml-2.pt-2(style="font-size:2.4em") 💧
+    div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:2.4em") +
+
   
   //- receivers
   drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser")
 
 
   //- bio/description
-  template(v-if="bio")
+  //- template(v-if="bio")
     section#bio.my-120.flex.justify-center.relative
       h3.sr-only About
       //- h3.absolute.top-0.left-0.w-full.text-center.text-sm.pt-6.text-violet-650 Bio
