@@ -8,6 +8,7 @@ import SvgTwitter from '@/components/SvgTwitter'
 import SvgDiscord from '@/components/SvgDiscord'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
 import ExpandBlock from '@/components/ExpandBlock'
+import SvgDripOff from '@/components/SvgDripOff'
 import store from '@/store'
 const props = defineProps(['address'])
 const emit = defineEmits(['dripClick'])
@@ -72,13 +73,17 @@ const getENSSocialUrl = (value, base) => {
         .absolute.overlay.flex.items-center.justify-center.pt-8
           svg-plus-minus-radicle.text-indigo-900.lg_transform.lg_scale-125
           //- svg-plus-minus.text-indigo-900(style="transform:scale(1.25)")
-  
 
   //- (bio cell)
   template(v-if="record('description')")
     //- vertical line
-    .w-px.h-24.bg-violet-500.mx-auto
-    //- 
+    //- .w-2.h-24.bg-indigo-700.mx-auto
+
+    //- drip link
+    svg-drip-off.block.h-16.text-indigo-700.mx-auto.mb-px
+    svg-drip-off.block.h-16.text-indigo-700.mx-auto.transform.rotate-180
+
+    //-
     .w-full.flex.justify-center.mb-1
       expand-block.relative.max-w-4xl.bg-indigo-700.rounded-2xl.text-center.px-32.pt-20.pb-24.font-semibold.text-lg.text-violet-650.leading-snug(:html="record('description')", expandedClasses="line-clamp-3", chevronInsetClass="bottom-0")
 

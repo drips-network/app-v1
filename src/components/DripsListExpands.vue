@@ -27,12 +27,12 @@ const expanded = ref(false)
 <template lang="pug">
 section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
-  .w-full.flex.justify-center.my-4.opacity-80
+  .w-full.flex.justify-center.my-4.opacity-90
     .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.15em")
       | 💧
       //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="expanded", @click="expanded = false")
         svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180
-  
+
   div
     .w-full.flex.justify-center
       //- (loading...)
@@ -67,8 +67,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
                 | #[addr(:address="props.address", :youOn="true")] are dripping to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             //- toggle icon
             svg-chevron-down.ml-5.w-28.h-28.transform.origin-center.rotate-180
-          
-    
+
     //- (expanded list)
     template(v-if="props.drips && expanded")
       ul.w-full.flex.flex-wrap.justify-center.mt-24
