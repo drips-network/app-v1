@@ -6,7 +6,7 @@ const el = ref(null)
 
 const props = defineProps({
   address: String,
-  width: String
+  width: { type: String, default: '72' }
 })
 
 const columns = 8

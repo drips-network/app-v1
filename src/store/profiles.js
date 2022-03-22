@@ -23,7 +23,9 @@ export default {
   },
   mutations: {
     SAVE_ADDRESS_ENS_NAME (state, { address, name }) {
-      state.profiles[address.toLowerCase()] = { ens: { name, records: {} }}
+      address = address.toLowerCase()
+      const profile = state.profiles[address] || {}
+      state.profiles[address] = { ...profile, ens: { name, records: {} } }
     },
     SAVE_ADDRESS_ENS_RECORD (state, { address, record }) {
       // should already exist from ens name lookup

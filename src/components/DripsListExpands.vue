@@ -28,7 +28,7 @@ const expanded = ref(false)
 section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
   .w-full.flex.justify-center.my-4.opacity-80
-    .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.2em")
+    .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.15em")
       | 💧
       //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="expanded", @click="expanded = false")
         svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180

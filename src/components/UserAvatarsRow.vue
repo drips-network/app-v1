@@ -13,7 +13,7 @@ const hasNegMargin = i => i < (Math.min(props.limit, props.addresses.length) - 1
 ul.flex.w-full.justify-start.items-center.flex-row-reverse
   //- avatars...
   li(v-for="(address, i) in props.addresses.slice(0, props.limit)", :style="{ marginLeft: hasNegMargin(i) ? `calc(-2.4rem * ${props.height} / 54)` : '' }")
-    user-avatar(:address="address", :blockieSize="props.height", :key="address", :style="{ width: props.height + 'px', height: props.height + 'px' }")
+    user-avatar.w-44.h-44(:address="address", :key="address")
 
   //- "+6" counter
   template(v-if="props.addresses.length - props.limit > 0")
