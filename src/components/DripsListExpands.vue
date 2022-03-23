@@ -22,13 +22,14 @@ const addresses = computed(() => {
 })
 
 const expanded = ref(false)
+const toggle = () => { expanded.value = !expanded.value }
 </script>
 
 <template lang="pug">
 section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
   .w-full.flex.justify-center.my-4.opacity-90
-    .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible(style="font-size:2.15em")
+    .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
       | 💧
       //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="expanded", @click="expanded = false")
         svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180
@@ -50,7 +51,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
       template(v-else)
         .relative
           //- toggle button as overlay for accessibility
-          button.absolute.z-10.overlay.pointer-events-auto.rounded-full.btn-focus-violet(@click.stop="expanded = !expanded", aria-label="Toggle List")
+          button.absolute.z-10.overlay.pointer-events-auto.rounded-full.btn-focus-violet(@click.stop="toggle", aria-label="Toggle List")
 
           //- (avatars row)
           .rounded-full.flex.justify-center.items-center.bg-indigo-700.p-10(v-show="!expanded")
@@ -59,14 +60,14 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
             user-avatars-row(:addresses="addresses", :limit="6", height="44")
 
           //- (summary text)
-          p.h-44.pl-20.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")
+          p.h-64.pl-24.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")
             .font-semibold.text-ms
               template(v-if="props.direction === 'in'")
                 | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
                 | #[addr(:address="props.address", :youOn="true")] are dripping to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             //- toggle icon
-            svg-chevron-down.ml-5.w-28.h-28.transform.origin-center.rotate-180
+            svg-chevron-down.ml-7.w-28.h-28.transform.origin-center.rotate-180
 
     //- (expanded list)
     template(v-if="props.drips && expanded")

@@ -9,7 +9,7 @@ import store from '@/store'
 const props = defineProps(['meta', 'project', 'rightSide', 'currentFundingWei'])
 const emit = defineEmits(['progress'])
 
-const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
+const isStreaming = toRaw(props.project.tokenTypes[0]?.streaming)
 
 // raw percent
 const pct = computed(() => {
