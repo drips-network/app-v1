@@ -50,22 +50,22 @@ const getENSSocialUrl = (value, base) => {
           //- (website)
           template(v-if="record('url')")
             a.block.px-4.notouch_hover_text-greenbright-500(:href="record('url')", target="_blank", rel="noopener noreferrer", title="Website")
-              svg-globe.block.h-30.mt-8.-mb-12
+              svg-globe.block.h-28.mt-8.-mb-12
           //- (twitter)
           template(v-if="record('twitter')")
             a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('twitter'), 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
-              svg-twitter.block.h-30.mt-8.-mb-12
+              svg-twitter.block.h-28.mt-8.-mb-12
           //- (github)
           template(v-if="record('github')")
             a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('github'), 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
-              svg-github.block.h-30.mt-8.-mb-12
+              svg-github.block.h-28.mt-8.-mb-12
           //- (discord)
           template(v-if="record('discord')")
             a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('discord'), 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
-              svg-discord.block.h-30.mt-8.-mb-12
+              svg-discord.block.h-28.mt-8.-mb-12
           //- (ens name)
           template(v-if="ensName")
-            a.block.px-5.mx-7.text-sm.font-semibold.h-24.pt-1.border.border-white-a75.text-greenbright-400ff.rounded.flex.items-center.mt-8.-mb-12.notouch_hover_text-greenbright-500.notouch_hover_border-current.leading-none(:href="`https://app.ens.domains/name/${ensName}`", target="_blank", rel="noopener noreferrer")
+            a.block.px-4.mx-7.text-sm.font-semibold.h-22.pt-1.border.border-white-a60.text-greenbright-400ff.rounded.flex.items-center.mt-8.-mb-12.notouch_hover_text-greenbright-500.notouch_hover_border-current.leading-none(:href="`https://app.ens.domains/name/${ensName}`", target="_blank", rel="noopener noreferrer")
               | ENS
 
       //- drip-to btn

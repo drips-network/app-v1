@@ -8,7 +8,8 @@ const props = defineProps({
   format: String,
   symbol: String,
   theme: { type: String, default: 'outline' },
-  warning: String
+  warning: String,
+  error: String
 })
 
 const styling = computed(() => {
@@ -65,9 +66,9 @@ const slots = useSlots()
           .text-xl.tracking-tight.font-bold %
 
     //- (bottom warning)
-    template(v-if="warning")
-      .input-body__warning.absolute.bottom-0.z-10.left-0.w-full.text-center.text-sm.text-orange-600.pb-3.opacity-0.transition.duration-150.font-normal.pointer-events-none.font-sans
-        | {{ warning }}
+    template(v-if="props.warning || props.error")
+      .absolute.bottom-0.z-10.left-0.w-full.text-center.text-sm.pb-3.transition.duration-150.font-normal.pointer-events-none.font-sans(:class="{'input-body__warning opacity-0 text-orange-600': props.warning && !props.error, 'text-red-500': props.error }")
+        | {{ props.error || props.warning }}
         //- template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
         //- template(v-else) There are no funds to withdraw
 </template>

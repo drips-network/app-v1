@@ -12,13 +12,15 @@ export default {
   getters: {
     name: state => (address = '') => {
       const profile = state.profiles[address.toLowerCase()]
-      return profile?.ens?.name || profile?.meta?.name
+      // meta name w/o ".eth" to deter fraud
+      const metaName = profile?.meta?.name.replace(/(\.eth)+/g, '');
+      return metaName || profile?.ens?.name
     },
     record: state => (address = '', key = '') => {
       const profile = state.profiles[address.toLowerCase()]
       const ensRecords = profile?.ens?.records || {}
       const metaRecords = profile?.meta || {}
-      return ensRecords[key] || metaRecords [key] || ensRecords['vnd.' + key] || ensRecords['com.' + key] || metaRecords['vnd.' + key] || metaRecords['com.' + key]
+      return metaRecords [key] || ensRecords[key] || metaRecords['vnd.' + key] || metaRecords['com.' + key] || ensRecords['vnd.' + key] || ensRecords['com.' + key]
     }
   },
   mutations: {
@@ -75,28 +77,31 @@ export default {
 
     async getAvatar ({ getters, dispatch, commit }, { address = '' }) {
       try {
-        let value = getters.record(address, 'avatar')
+        address = address.toLowerCase()
+        const getAvi = () => getters.record(address, 'avatar')
+        let value = getAvi()
 
         if (value) {
           return value
         }
-          
-        // else fetch...
-        address = address.toLowerCase()
-        const ensName = await dispatch('getENSName', address)
 
-        if (ensName) {
-          const provider = await dispatch('getProvider', null, { root: true })
-          const resolver = await provider.getResolver(ensName)
-          value = resolver.getText('avatar')
-          commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name: 'avatar', value }})
-        }
+        // fetch meta
+        await dispatch('getMetadataByAddress', { address })   
+        value = getAvi()
 
-        if (!value) {
-          await dispatch('getMetadataByAddress', { address })  
-        }
+        // else fetch from ENS...
+        if (!value) {        
+          const ensName = await dispatch('getENSName', address)
 
-        return getters.record(address, 'avatar')
+          if (ensName) {
+            const provider = await dispatch('getProvider', null, { root: true })
+            const resolver = await provider.getResolver(ensName)
+            value = resolver.getText('avatar')
+            commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name: 'avatar', value }})
+          }
+        }        
+
+        return getAvi()
       } catch (e) {
         console.error(e)
       }

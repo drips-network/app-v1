@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw } from 'vue'
+import { ref, computed, toRaw } from 'vue'
 import InputBody from '@/components/InputBody'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
@@ -15,6 +15,10 @@ const imgSrcCurrent = props.modelValue.avatar ? ipfsUrl(props.modelValue.avatar)
 
 const imgSrc = ref(imgSrcCurrent)
 
+const nameInputError = computed(() => {
+  return (props.modelValue.name || '').includes('.eth') ? '".eth" is not allowed' : null
+})
+
 const onImageUploaded = (ipfsHash) => {
   console.log(ipfsHash)
   const clone = toRaw(props.modelValue)
@@ -25,30 +29,30 @@ const onImageUploaded = (ipfsHash) => {
 
 <template lang="pug">
 //- avatar image upload
+div
+  .h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950
+    //- (default image)
+    img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
+    //- add image btn
+    label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Avatar Image", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
+      span.sr-only Avatar Image
+      //- input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
+      input-upload-file-ipfs.hidden(@read="e => { imgSrc = e }", @hash="onImageUploaded", @error="imgSrc = imgSrcCurrent")
+      svg-plus-minus-radicle
 
-.h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950
-  //- (default image)
-  img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
-  //- add image btn
-  label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Avatar Image", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
-    span.sr-only Avatar Image
-    //- input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
-    input-upload-file-ipfs.hidden(@read="e => { imgSrc = e }", @hash="onImageUploaded", @error="imgSrc = imgSrcCurrent")
-    svg-plus-minus-radicle
+      //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB
+    //- (image)
+    img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
 
-    //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB
-  //- (image)
-  img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
-
-.mt-8.text-sm.text-violet-650 Avatar Image
+  .mt-8.text-sm.text-violet-650 Avatar Image
 
 section.mt-40
   .my-10
-    input-body(label="Name", :isFilled="modelValue.name.length")
-      input(v-model="modelValue.name", placeholder="sophie", autocomplete="new-password")
+    input-body(label="Name", :error="nameInputError")
+      input(v-model="modelValue.name", placeholder="My Name", autocomplete="new-password", pattern="[a-zA-Z0-9._/- ]+", max-length="24")
   .my-10
     input-body(label="Website URL", :isFilled="modelValue.url.length")
-      input(v-model="modelValue.url", placeholder="https://sophie.me", type="url")
+      input(v-model="modelValue.url", placeholder="https://mywebsite.com", type="url")
   .my-10
     //- TODO: validate twitter
     input-body(label="Twitter Handle", :isFilled="modelValue['com.twitter'].length")

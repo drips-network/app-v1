@@ -226,19 +226,24 @@ const getProjects = async () => {
 }
 
 // profile
-const bio = computed(() => store.getters['profiles/record'](route.params.address, 'description'))
+const getProfile = () => {
+  store.dispatch('profiles/getProfile', { address: route.params.address })
+    .then(() => {
+      profileMeta.value = toRaw(store.state.profiles.profiles[route.params.address]?.meta)
+    })
+}
 
 onMounted(() => {
   if (isMyUser.value) {
     getMyCollectable()
   }
+  getProfile()
   getSplitsIn()
   getDripsIn()
   getSplitsOut()
   getDripsOut()
   getProjects()
   getNFTs()
-  store.dispatch('profiles/getProfile', { address: route.params.address })
 })
 
 provide('isMyUser', isMyUser)
@@ -397,7 +402,7 @@ article.profile.pt-40.pb-80
   //- admin modals
   template(v-if="isMyUser")
     //- EDIT PROFILE
-    modal-edit-profile(v-if="edit === 'profile'", :open="edit === 'profile'", @close="edit = null", :meta="profileMeta")
+    modal-edit-profile(v-if="edit === 'profile'", :open="edit === 'profile'", @close="edit = null", :meta="profileMeta", @updated="getProfile")
 
     //- COLLECT
     modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false; getMyCollectable()", :amts="collectableAmts", @collected="getMyCollectable")

@@ -110,7 +110,7 @@ module.exports = {
       },
 
       white: 'white',
-      'white-a75': 'rgba(255,255,255,0.75)'
+      'white-a60': 'rgba(255,255,255,0.60)'
     },
     fontSize: {
       '2xs': ['0.8rem', { lineHeight: '1.2rem' }],

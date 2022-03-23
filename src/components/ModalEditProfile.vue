@@ -76,7 +76,8 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     template(v-slot:description)
       dialog-description
-        p.mx-auto.leading-snug.text-violet-650ff(style="max-width:24em") Add some information to your profile. Or to your ENS name if you have one.
+        p.mx-auto.leading-snug.text-violet-650(style="max-width:24em")
+          | Edit the information on your profile<br>(or override any info from your ENS name.)
 
     form.mt-40(@submit.prevent="update")
       fields-profile-edit(v-model="newMeta")
