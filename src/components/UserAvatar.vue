@@ -14,14 +14,19 @@ const onImgError = (e) => {
 }
 
 onMounted(() => {
+  // get avatar image
   store.dispatch('profiles/getAvatar', { address: props.address })
     .then(value => {
       try {
+        // try as normal url
         const url = new URL(value)
         imgSrc.value = url
       } catch (e) {
-        // try ipfs url
-        imgSrc.value = ipfsUrl(value)
+        // invalid url
+        if (value?.length) {
+          // try as ipfs url
+          imgSrc.value = ipfsUrl(value)
+        }
       }
     })
     .catch(e => {

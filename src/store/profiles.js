@@ -13,7 +13,7 @@ export default {
     name: state => (address = '') => {
       const profile = state.profiles[address.toLowerCase()]
       // meta name w/o ".eth" to deter fraud
-      const metaName = profile?.meta?.name.replace(/(\.eth)+/g, '');
+      const metaName = profile?.meta?.name.replace(/(\.eth)+/g, '').trim()
       return metaName || profile?.ens?.name
     },
     record: state => (address = '', key = '') => {
@@ -51,18 +51,19 @@ export default {
           return name
         }
 
-        // ens?
-        name = await dispatch('getENSName', address)
-
-        // try metadata contract...
+        // first, try metadata contract...
         if (!name && state.profiles[address]?.meta === undefined) {
           // fetch from meta contract, and will be available from getter if set
           await dispatch('getMetadataByAddress', { address })
+          name = getters.name(address)
         }
 
-        name = getters.name(address)
+        // next, try ens
+        if (!name) {
+          name = await dispatch('getENSName', address)
+        }
 
-        // is a project address? get name from project meta
+        // then, it might be a project - so get name from project meta
         if (!name) {
           const projectMeta = await dispatch('getProjectMeta', { projectAddress: address }, { root:true })
           name = projectMeta?.name
@@ -119,25 +120,11 @@ export default {
 
         // else, lookup:
 
-        // ENS:
-        const ensName = await dispatch('getENSName', address)
-
-        if (ensName) {
-          // fetch records in the backround...
-          // TODO - ens has sdk to get all records at once?
-          const provider = await dispatch('getProvider', null, { root: true })
-          const resolver = await provider.getResolver(ensName)
-          const records = ['description', 'url', 'com.twitter', 'vnd.twitter', 'com.github', 'vnd.github', 'com.discord', 'vnd.discord']
-          
-          records.forEach(name => {
-            resolver.getText(name)
-              .then(value => commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name, value } }))
-              // .catch(e => console.error(`Error getting ENS text record (${name} from ${ens}): ` + e ))
-          })
-        }
-
         // METADATA CONTRACT:
         await dispatch('getMetadataByAddress', { address })
+
+        // fetch ens records in background/async
+        dispatch('fetchENSProfile', { address })
 
         return state.profiles[address]
       } catch (e) {
@@ -174,6 +161,31 @@ export default {
       }
     },
 
+    async fetchENSProfile ({ dispatch, commit }, { address = '' }) {
+      try {
+        address = address.toLowerCase()
+        const ensName = await dispatch('getENSName', address)
+
+        if (ensName) {
+          // fetch records in the backround...
+          // TODO - ens has sdk to get all records at once?
+          const provider = await dispatch('getProvider', null, { root: true })
+          const resolver = await provider.getResolver(ensName)
+
+          const records = ['description', 'url', 'com.twitter', 'vnd.twitter', 'com.github', 'vnd.github', 'com.discord', 'vnd.discord']
+          
+          // get each record...
+          records.forEach(name => {
+            resolver.getText(name)
+              .then(value => commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name, value } }))
+              // .catch(e => console.error(`Error getting ENS text record (${name} from ${ens}): ` + e ))
+          })
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
     async updateSignerMetadata ({ dispatch }, { ipfsHash }) {
       try {
         const provider = await dispatch('getProvider', null, { root: true })
@@ -200,13 +212,18 @@ export default {
 
         const provider = await dispatch('getProvider', null, { root: true })
         const contract = getMetadataContract(provider)
+        
         // get all events
         const allEvents = await contract.queryFilter('MultiHash')
+        
         // get address's last update's multi-hash
         const myLastUpdateHex = allEvents.reverse().find(event => event.args.addr.toLowerCase() === address.toLowerCase())?.args[1]
+        
+        // get ipfs content if set
         if (myLastUpdateHex) {
           // convert to ipfs hash
           const ipfsHash = hexToBase58(myLastUpdateHex)
+          // fetch...
           const resp = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
           const meta = (await resp.json() || null)
           // save

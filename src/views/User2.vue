@@ -29,7 +29,7 @@ import api from '@/api'
 const route = useRoute()
 const router = useRouter()
 const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
-const profileMeta = ref(null)
+const profileMeta = ref()
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
 const showAllSenders = ref(false)
@@ -227,10 +227,12 @@ const getProjects = async () => {
 
 // profile
 const getProfile = () => {
+  // if empty set to null (undefined is loading state)
   store.dispatch('profiles/getProfile', { address: route.params.address })
     .then(() => {
-      profileMeta.value = toRaw(store.state.profiles.profiles[route.params.address]?.meta)
+      profileMeta.value = toRaw(store.state.profiles.profiles[route.params.address]?.meta) || null
     })
+    .catch(() => { profileMeta.value = null })
 }
 
 onMounted(() => {
@@ -310,11 +312,13 @@ article.profile.pt-40.pb-80
   //- (your profile...)
   template(v-if="isMyUser")
     .flex.justify-center.mb-40
-      .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-12.h-44.font-semiboldff.text-greenbright-400.text-ms
-        | This is your profile!
-        button.ml-20.py-4.pl-11.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green(@click="edit = 'profile'")
-          | Edit
-          svg-pen.mx-5.h-16.w-16
+      .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-44.font-semiboldff.text-greenbright-400.text-ms
+        .px-22 This is your profile!
+        //- (edit btn)
+        template(v-if="profileMeta !== undefined")
+          button.-ml-8.mr-12.py-4.pl-11.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green(@click="edit = 'profile'")
+            | Edit
+            svg-pen.mx-5.h-16.w-16
 
   //- 
   //- senders
