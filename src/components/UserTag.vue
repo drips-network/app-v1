@@ -12,10 +12,11 @@ import SvgDripOff from '@/components/SvgDripOff'
 import store from '@/store'
 const props = defineProps(['address'])
 const emit = defineEmits(['dripClick'])
-const profile = computed(() => store.state.addresses[props.address]?.records || {})
-const github = computed(() => profile.value['com.github'] || profile.value['vnd.github'])
-const twitter = computed(() => profile.value['com.twitter'] || profile.value['vnd.twitter'])
-const discord = computed(() => profile.value['com.discord'] || profile.value['vnd.discord'])
+const profile = computed(() => store.state.profiles.profiles[props.address])
+const ensName = computed(() => profile.value?.ens?.name)
+// const github = computed(() => profile.value['com.github'] || profile.value['vnd.github'])
+// const twitter = computed(() => profile.value['com.twitter'] || profile.value['vnd.twitter'])
+// const discord = computed(() => profile.value['com.discord'] || profile.value['vnd.discord'])
 const avatarBroken = ref(false)
 const record = key => store.getters['profiles/record'](props.address, key)
 const getENSSocialUrl = (value, base) => {
@@ -45,7 +46,7 @@ const getENSSocialUrl = (value, base) => {
             addr(:address="props.address", :key="props.address")
 
         //- icons
-        .mt-4.flex.flex-wrap.-ml-8.justify-centerff
+        .mt-4.flex.flex-wrap.-ml-8.items-center
           //- (website)
           template(v-if="record('url')")
             a.block.px-4.notouch_hover_text-greenbright-500(:href="record('url')", target="_blank", rel="noopener noreferrer", title="Website")
@@ -62,6 +63,10 @@ const getENSSocialUrl = (value, base) => {
           template(v-if="record('discord')")
             a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('discord'), 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
               svg-discord.block.h-30.mt-8.-mb-12
+          //- (ens name)
+          template(v-if="ensName")
+            a.block.px-5.mx-7.text-sm.font-semibold.h-24.pt-1.border.border-white-a75.text-greenbright-400ff.rounded.flex.items-center.mt-8.-mb-12.notouch_hover_text-greenbright-500.notouch_hover_border-current.leading-none(:href="`https://app.ens.domains/name/${ensName}`", target="_blank", rel="noopener noreferrer")
+              | ENS
 
       //- drip-to btn
       button.mr-20.block.relative.text-violet-650.transform.notouch_hover_scale-110.transition.duration-150(@click.stop="$emit('dripClick')")

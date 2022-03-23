@@ -63,6 +63,7 @@ module.exports = {
       260: '26rem'
     },
     colors: {
+      current: 'currentColor',
       transparent: 'transparent',
       black: 'black',
 
@@ -108,7 +109,8 @@ module.exports = {
         500: '#0FA7BC'
       },
 
-      white: 'white'
+      white: 'white',
+      'white-a75': 'rgba(255,255,255,0.75)'
     },
     fontSize: {
       '2xs': ['0.8rem', { lineHeight: '1.2rem' }],
@@ -1024,6 +1026,6 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/aspect-ratio'),
-    require('@tailwindcss/line-clamp'),
+    require('@tailwindcss/line-clamp')
   ]
 }

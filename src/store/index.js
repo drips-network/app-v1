@@ -59,7 +59,7 @@ export default createStore({
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
     isWrongNetwork: state => state.networkId && networks[state.networkId]?.name !== deployNetwork.name,
-    isEthereum: state => networks[state.networkId]?.layer === 'ethereum', 
+    isEthereum: state => networks[state.networkId]?.layer === 'ethereum',
     isPolygon: state => networks[state.networkId]?.layer === 'polygon',
     label: state => name => label(name, deployNetwork?.layer)
   },
@@ -145,8 +145,8 @@ export default createStore({
     async getSigner ({ dispatch }) {
       try {
         if (!signer) await dispatch('connect')
-        return signer  
-      } catch (e){
+        return signer
+      } catch (e) {
         console.error(e)
         throw e
       }
@@ -756,7 +756,7 @@ export default createStore({
       }
     },
 
-    // fetch/queue profile info. since ENS records require fetching each one, 
+    // fetch/queue profile info. since ENS records require fetching each one,
     // simply start the queuing process and components should expect it eventually
     async getAddressName ({ state, getters, commit, dispatch }, { address, flush }) {
       try {
@@ -765,12 +765,11 @@ export default createStore({
           const saved = state.addresses[address]
           if (saved !== undefined) return
         }
-        
+
         // fetch ENS
         dispatch('resolveAddress', { address })
         // fetch Metadata
         // dispatch('getMetadataByAddress', { address, flush })
-
       } catch (e) {
         console.error(e)
         return null
@@ -852,9 +851,8 @@ export default createStore({
       } catch (e) {
         console.error(e)
       }
-    },
+    }
 
-    
   }
 })
 
