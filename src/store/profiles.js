@@ -20,7 +20,7 @@ export default {
       const profile = state.profiles[address.toLowerCase()]
       const ensRecords = profile?.ens?.records || {}
       const metaRecords = profile?.meta || {}
-      return metaRecords [key] || ensRecords[key] || metaRecords['vnd.' + key] || metaRecords['com.' + key] || ensRecords['vnd.' + key] || ensRecords['com.' + key]
+      return metaRecords[key] || ensRecords[key] || metaRecords['vnd.' + key] || metaRecords['com.' + key] || ensRecords['vnd.' + key] || ensRecords['com.' + key]
     }
   },
   mutations: {
@@ -37,7 +37,7 @@ export default {
       address = address.toLowerCase()
       const profile = state.profiles[address] || {}
       state.profiles[address] = { ...profile, meta }
-    },
+    }
   },
   actions: {
     async getName ({ state, getters, commit, dispatch, rootGetters, rootState }, address) {
@@ -65,7 +65,7 @@ export default {
 
         // then, it might be a project - so get name from project meta
         if (!name) {
-          const projectMeta = await dispatch('getProjectMeta', { projectAddress: address }, { root:true })
+          const projectMeta = await dispatch('getProjectMeta', { projectAddress: address }, { root: true })
           name = projectMeta?.name
         }
 
@@ -87,20 +87,20 @@ export default {
         }
 
         // fetch meta
-        await dispatch('getMetadataByAddress', { address })   
+        await dispatch('getMetadataByAddress', { address })
         value = getAvi()
 
         // else fetch from ENS...
-        if (!value) {        
+        if (!value) {
           const ensName = await dispatch('getENSName', address)
 
           if (ensName) {
             const provider = await dispatch('getProvider', null, { root: true })
             const resolver = await provider.getResolver(ensName)
             value = resolver.getText('avatar')
-            commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name: 'avatar', value }})
+            commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name: 'avatar', value } })
           }
-        }        
+        }
 
         return getAvi()
       } catch (e) {
@@ -111,7 +111,7 @@ export default {
     async getProfile ({ state, commit, dispatch }, { address = '', flush = false }) {
       try {
         address = address.toLowerCase()
-        let profile = state.profiles[address]
+        // let profile = state.profiles[address]
 
         // if profile has been looked up, return profile
         // if (profile?.meta !== undefined && !flush) {
@@ -128,7 +128,7 @@ export default {
 
         return state.profiles[address]
       } catch (e) {
-        console.error(e)        
+        console.error(e)
       }
     },
 
@@ -136,7 +136,7 @@ export default {
       try {
         // ensure network is known...
         if (!rootState.networkId) {
-          await dispatch('init', null, {root: true})
+          await dispatch('init', null, { root: true })
         }
 
         let ensName = state.profiles[address]?.ens?.name
@@ -173,7 +173,7 @@ export default {
           const resolver = await provider.getResolver(ensName)
 
           const records = ['description', 'url', 'com.twitter', 'vnd.twitter', 'com.github', 'vnd.github', 'com.discord', 'vnd.discord']
-          
+
           // get each record...
           records.forEach(name => {
             resolver.getText(name)
@@ -212,13 +212,13 @@ export default {
 
         const provider = await dispatch('getProvider', null, { root: true })
         const contract = getMetadataContract(provider)
-        
+
         // get all events
         const allEvents = await contract.queryFilter('MultiHash')
-        
+
         // get address's last update's multi-hash
         const myLastUpdateHex = allEvents.reverse().find(event => event.args.addr.toLowerCase() === address.toLowerCase())?.args[1]
-        
+
         // get ipfs content if set
         if (myLastUpdateHex) {
           // convert to ipfs hash
@@ -245,15 +245,15 @@ function getMetadataContract (provider) {
 }
 
 function toMultiHash (hash) {
-  return bs58.decode(hash) 
+  return bs58.decode(hash)
 }
 
 // for converting identity multihash to ipfshash
 function hexToBase58 (hex) {
   const input = hex.substring(2)
   var array = []
-  for (var i = 0; i < input.length; i=i+2) {
-    array.push(parseInt(input.substring(i, i+2), 16))
+  for (var i = 0; i < input.length; i = i + 2) {
+    array.push(parseInt(input.substring(i, i + 2), 16))
   }
   return bs58.encode(array)
 }

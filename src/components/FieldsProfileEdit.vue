@@ -16,7 +16,7 @@ const imgSrcCurrent = props.modelValue.avatar ? ipfsUrl(props.modelValue.avatar)
 const imgSrc = ref(imgSrcCurrent)
 
 const nameInputError = computed(() => {
-  return (props.modelValue.name || '').includes('.eth') ? '".eth" is not allowed' : null
+  return (props.modelValue.name || '').includes('.eth') ? '".eth" will be omitted' : null
 })
 
 const onImageUploaded = (ipfsHash) => {
@@ -49,7 +49,7 @@ div
 section.mt-40
   .my-10
     input-body(label="Name", :error="nameInputError")
-      input(v-model="modelValue.name", placeholder="My Name", autocomplete="new-password", pattern="[a-zA-Z0-9._/- ]+", max-length="24")
+      input(v-model="modelValue.name", placeholder="My Name", autocomplete="new-password", max-length="20")
   .my-10
     input-body(label="Website URL", :isFilled="modelValue.url.length")
       input(v-model="modelValue.url", placeholder="https://mywebsite.com", type="url")
