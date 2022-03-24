@@ -43,7 +43,7 @@ export default createStore({
   state () {
     return {
       networkId: null,
-      address: null,
+      address: null, // connected address
       addresses: {},
 
       // TODO - get this from the contract?
@@ -181,9 +181,11 @@ export default createStore({
         dispatch('listenToWalletProvider')
         return true
       } catch (e) {
-        console.error('@connect', e)
+        // console.error('@connect', e)
+
         // clear wallet in case
         dispatch('disconnect')
+
         // throw error so stops any flows (closes modal too)
         throw e
       }

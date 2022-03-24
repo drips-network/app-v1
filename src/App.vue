@@ -2,6 +2,7 @@
 // This app is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import store from '@/store'
 import SvgLogo from './components/SvgLogo.vue'
 import SvgLogoDrop from './components/SvgLogoDrop.vue'
@@ -15,8 +16,23 @@ import Addr from '@/components/Addr'
 
 const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
 const networkMenu = ref(false)
+const router = useRouter()
 
 store.dispatch('init')
+
+const connect = async () => {
+  try {
+    await store.dispatch('connect')
+    // redirect to profile
+    router.push({ name: 'user', params: { address: store.state.address } })
+  } catch (e) {
+    // ignore closing web3modal
+    if (e !== 'Modal closed by user') {
+      console.error(e)
+      alert('Error connecting wallet')
+    }
+  }
+}
 </script>
 
 <template lang="pug">
@@ -74,7 +90,7 @@ store.dispatch('init')
               .btn-darker.pl-8.text-violet-650.font-semibold.rounded-full
                 router-link.flex.items-center.text-base.font-semibold(:to="{name: 'user', params: {address: $store.state.address}}")
                   //- avi
-                  user-avatar.w-40.h-40.mr-10(:address="$store.state.address", blockieSize="40")
+                  user-avatar.w-40.h-40.mr-10(:address="$store.state.address", :key="$store.state.address")
                   //- address
                   //- | {{ $store.getters.addrShort($store.state.address) }}
                   addr(:address="store.state.address", :key="store.state.address")
@@ -82,7 +98,7 @@ store.dispatch('init')
                 svg-x.h-12.w-12(strokeWidth="2")
           //- (connect btn)
           template(v-else)
-            button.btn.btn-md.btn-darker.px-24.text-md.font-semibold(@click="$store.dispatch('connect')") Connect
+            button.btn.btn-md.btn-darker.px-24.text-md.font-semibold(@click="connect") Connect
 
     main#main.flex-1.flex
       router-view.w-full(:key="$route.params && JSON.stringify($route.params)")
