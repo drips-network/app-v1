@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import SvgChevronDown from '@/components/SvgChevronDown'
+import SvgChevronDown from '@/components/SvgChevronDown.vue'
 const props = defineProps({
   expandedClasses: { type: String, default: 'line-clamp-4' },
   chevronInsetClass: { type: String, default: 'bottom-7' },

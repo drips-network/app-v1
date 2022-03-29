@@ -1,8 +1,8 @@
 <script setup>
 import { useAttrs } from 'vue'
-import Modal from '@/components/Modal'
+import Modal from '@/components/Modal.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
-import PanelSplitsEdit from '@/components/PanelSplitsEdit'
+import PanelSplitsEdit from '@/components/PanelSplitsEdit.vue'
 const emit = defineEmits(['close', 'viewSplits', 'updated'])
 const attrs = useAttrs()
 </script>

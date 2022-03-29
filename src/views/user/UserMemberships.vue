@@ -2,10 +2,10 @@
 // import { ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 // import api from '@/api'
-import UserNft from '@/components/UserNFT'
-// import InfoBar from '@/components/InfoBar'
-import Addr from '@/components/Addr'
-// import LoadingBar from '@/components/LoadingBar'
+import UserNft from '@/components/UserNFT.vue'
+// import InfoBar from '@/components/InfoBar.vue'
+import Addr from '@/components/Addr.vue'
+// import LoadingBar from '@/components/LoadingBar.vue'
 
 const route = useRoute()
 const props = defineProps(['nfts'])

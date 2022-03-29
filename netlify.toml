@@ -1,11 +1,16 @@
 [build]
+  command = "yarn build"
+  publish = "dist"
+  environment = { NODE_VERSION = "16" }
   functions = "functions"
-
-# [[redirects]]
-#   from = "/v1/metadata/*"
-#   to = "/.netlify/functions/metadata/:splat"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Opting your Website out of Google's FLoC Network
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "interest-cohort=()"

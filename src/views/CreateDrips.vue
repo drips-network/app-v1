@@ -1,6 +1,6 @@
 <script setup>
-import Panel from '@/components/Panel'
-import PanelDripsEdit from '@/components/PanelDripsEdit'
+import Panel from '@/components/Panel.vue'
+import PanelDripsEdit from '@/components/PanelDripsEdit.vue'
 import store from '@/store'
 
 const connect = async () => {

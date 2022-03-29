@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed, onBeforeMount } from 'vue'
 import store from '@/store'
-import Addr from '@/components/Addr'
-import UserAvatar from '@/components/UserAvatar'
-import InfoBar from '@/components/InfoBar'
+import Addr from '@/components/Addr.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import InfoBar from '@/components/InfoBar.vue'
 
 const props = defineProps({
   drips: Array,

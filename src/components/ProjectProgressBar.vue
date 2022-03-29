@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, toRaw, watch } from 'vue'
-import SvgDai from '@/components/SvgDai'
+import SvgDai from '@/components/SvgDai.vue'
 import { toDAI, toWei, oneMonth } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 import api from '@/api'

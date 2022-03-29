@@ -1,6 +1,6 @@
 <script setup>
 import { useSlots, computed } from 'vue'
-import SvgDai from '@/components/SvgDai'
+import SvgDai from '@/components/SvgDai.vue'
 
 const props = defineProps({
   label: String,

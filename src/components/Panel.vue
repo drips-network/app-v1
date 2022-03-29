@@ -1,6 +1,6 @@
 <script setup>
 import { ref, useSlots, useAttrs, watch } from 'vue'
-import SvgPen from '@/components/SvgPen'
+import SvgPen from '@/components/SvgPen.vue'
 
 const slots = useSlots()
 

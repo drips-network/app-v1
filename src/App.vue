@@ -4,17 +4,17 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import store from '@/store'
-import SvgLogo from './components/SvgLogo.vue'
-import SvgLogoDrop from './components/SvgLogoDrop.vue'
-import UserAvatar from '@/components/UserAvatar'
-import SvgX from './components/SvgX.vue'
-import SvgDai from './components/SvgDai.vue'
-import SvgDiscord from './components/SvgDiscord.vue'
-import SvgTwitter from './components/SvgTwitter.vue'
-import SvgLogoRadicle from './components/SvgLogoRadicle.vue'
-import Addr from '@/components/Addr'
+import SvgLogo from '@/components/SvgLogo.vue'
+import SvgLogoDrop from '@/components/SvgLogoDrop.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import SvgX from '@/components/SvgX.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import SvgDiscord from '@/components/SvgDiscord.vue'
+import SvgTwitter from '@/components/SvgTwitter.vue'
+import SvgLogoRadicle from '@/components/SvgLogoRadicle.vue'
+import Addr from '@/components/Addr.vue'
 
-const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const networkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWORK
 const networkMenu = ref(false)
 const router = useRouter()
 

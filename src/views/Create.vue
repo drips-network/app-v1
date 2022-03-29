@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import store from '@/store'
 import { useRoute, useRouter } from 'vue-router'
-import Panel from '@/components/Panel'
+import Panel from '@/components/Panel.vue'
 const route = useRoute()
 const router = useRouter()
 const entryPanel = ref()

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, toRaw } from 'vue'
-import SvgDai from '@/components/SvgDai'
+import SvgDai from '@/components/SvgDai.vue'
 import { toDAI, getDripPctFromAmts } from '@/utils'
 const props = defineProps(['amts', 'tx', 'isModalSummary', 'dripPct'])
 const emit = defineEmits(['collect'])

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import store from '@/store'
-import AvatarBlockie from '@/components/AvatarBlockie'
+import AvatarBlockie from '@/components/AvatarBlockie.vue'
 import { ipfsUrl } from '@/utils'
 const props = defineProps(['address', 'blockieSize'])
 

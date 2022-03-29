@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
-import Addr from '@/components/Addr'
-import UserAvatar from '@/components/UserAvatar'
-import UserAvatarsRow from '@/components/UserAvatarsRow'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import SvgChevronDown from '@/components/SvgChevronDown'
-import UserTagSmall from '@/components/UserTagSmall'
+import Addr from '@/components/Addr.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import UserAvatarsRow from '@/components/UserAvatarsRow.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
+import SvgChevronDown from '@/components/SvgChevronDown.vue'
+import UserTagSmall from '@/components/UserTagSmall.vue'
 
 const props = defineProps({
   address: { type: String, default: undefined },

@@ -1,12 +1,12 @@
 <script setup>
 import { ref, computed, onBeforeMount, toRaw } from 'vue'
 import store from '@/store'
-import ProjectProgressBar from '@/components/ProjectProgressBar'
-import ProjectStats from '@/components/ProjectStats'
-import SvgDai from '@/components/SvgDai'
-import SvgQuestionMarkEncircled from '@/components/SvgQuestionMarkEncircled'
-import AvailableFundsBar from '@/components/AvailableFundsBar'
-import ModalCollectDrips from '@/components/ModalCollectDrips'
+import ProjectProgressBar from '@/components/ProjectProgressBar.vue'
+import ProjectStats from '@/components/ProjectStats.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import SvgQuestionMarkEncircled from '@/components/SvgQuestionMarkEncircled.vue'
+import AvailableFundsBar from '@/components/AvailableFundsBar.vue'
+import ModalCollectDrips from '@/components/ModalCollectDrips.vue'
 import { ipfsUrl, toDAI, round, toDAIPerMo } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 

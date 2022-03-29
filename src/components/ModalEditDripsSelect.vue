@@ -1,6 +1,6 @@
 <script setup>
-import Modal from '@/components/Modal'
-import Panel from '@/components/Panel'
+import Modal from '@/components/Modal.vue'
+import Panel from '@/components/Panel.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 
 const props = defineProps(['edit'])

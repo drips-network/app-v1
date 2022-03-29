@@ -1,14 +1,14 @@
 <script setup>
 import { ref, onMounted, nextTick, computed, toRaw } from 'vue'
-import SvgChevronDown from '@/components/SvgChevronDown'
-import SvgDai from '@/components/SvgDai'
+import SvgChevronDown from '@/components/SvgChevronDown.vue'
+import SvgDai from '@/components/SvgDai.vue'
 import { ipfsUrl, toDAI, toDAIPerMo } from '@/utils'
 import store from '@/store'
-import ProjectProgressBar from '@/components/ProjectProgressBar'
-import UserAvatarsRow from '@/components/UserAvatarsRow'
+import ProjectProgressBar from '@/components/ProjectProgressBar.vue'
+import UserAvatarsRow from '@/components/UserAvatarsRow.vue'
 import { BigNumber as bn } from 'ethers'
-import UserTagSmall from '@/components/UserTagSmall'
-import DripsListExpands from '@/components/DripsListExpands'
+import UserTagSmall from '@/components/UserTagSmall.vue'
+import DripsListExpands from '@/components/DripsListExpands.vue'
 const props = defineProps(['project'])
 const meta = ref()
 

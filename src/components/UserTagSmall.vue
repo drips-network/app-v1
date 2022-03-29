@@ -1,7 +1,7 @@
 <script setup>
-import UserAvatar from '@/components/UserAvatar'
-import Addr from '@/components/Addr'
-import SvgDai from '@/components/SvgDai'
+import UserAvatar from '@/components/UserAvatar.vue'
+import Addr from '@/components/Addr.vue'
+import SvgDai from '@/components/SvgDai.vue'
 const props = defineProps(['address', 'drip'])
 </script>
 

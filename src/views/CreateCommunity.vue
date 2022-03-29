@@ -6,20 +6,20 @@
 
 import { ref, computed, toRaw, onMounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Panel from '@/components/Panel'
-import InputBody from '@/components/InputBody'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
+import Panel from '@/components/Panel.vue'
+import InputBody from '@/components/InputBody.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
 import store, { pinJSONToIPFS } from '@/store'
 import { toWei, toWeiPerSec, formatSplits, ipfsUrl, validateSplits, validateAddressInput } from '@/utils'
-import FieldsProjectEdit from '@/components/FieldsProjectEdit'
-import SvgX from '@/components/SvgX'
+import FieldsProjectEdit from '@/components/FieldsProjectEdit.vue'
+import SvgX from '@/components/SvgX.vue'
 import { constants } from 'ethers'
 import showdown from 'showdown'
-import SvgPen from '@/components/SvgPen'
-import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
-import FormMessage from '@/components/FormMessage'
-import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
-import TxLink from '@/components/TxLink'
+import SvgPen from '@/components/SvgPen.vue'
+import InputUploadFileIpfs from '@/components/InputUploadFileIpfs.vue'
+import FormMessage from '@/components/FormMessage.vue'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses.vue'
+import TxLink from '@/components/TxLink.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -107,7 +107,7 @@ watch(meta, () => {
 
 // token image preview
 const previewNftImageHash = computed(() => {
-  return nftImageIpfsHash.value || process.env.VUE_APP_NFT_DEFAULT_IMAGE_HASH
+  return nftImageIpfsHash.value || import.meta.env.VITE_APP_NFT_DEFAULT_IMAGE_HASH
 })
 
 // benefits input
@@ -208,7 +208,7 @@ async function submitProject () {
     // save full data to IPFS/pinata...
     txMsg.value = { message: 'Uploading metadata to IPFS...' }
     const ipfsHash = await pinJSONToIPFS(myMeta)
-    console.log('project meta:', `${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+    console.log('project meta:', `${import.meta.env.VITE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
     myProject.ipfsHash = ipfsHash
 
     // submit...
@@ -257,7 +257,7 @@ const connect = async () => {
   }
 }
 
-const isDev = process.env.NODE_ENV !== 'production'
+const isDev = import.meta.env.NODE_ENV !== 'production'
 projectAddress.value = isDev ? route.query.project : null
 </script>
 

@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue'
-import UserAvatar from '@/components/UserAvatar'
-import Addr from '@/components/Addr'
-import SvgDai from '@/components/SvgDai'
-import FlexTruncate from '@/components/FlexTruncate'
-import AddressesTag from '@/components/AddressesTag'
+import UserAvatar from '@/components/UserAvatar.vue'
+import Addr from '@/components/Addr.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import FlexTruncate from '@/components/FlexTruncate.vue'
+import AddressesTag from '@/components/AddressesTag.vue'
 const props = defineProps(['drip', 'alternateColors'])
 const isMultiple = computed(() => props.drip.receiver.length > 1)
 const altBg = drip => drip.percent && props.alternateColors

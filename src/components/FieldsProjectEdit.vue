@@ -1,8 +1,8 @@
 <script setup>
 import { ref, toRaw } from 'vue'
-import InputBody from '@/components/InputBody'
-import InputUploadFileIpfs from '@/components/InputUploadFileIpfs'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
+import InputBody from '@/components/InputBody.vue'
+import InputUploadFileIpfs from '@/components/InputUploadFileIpfs.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
 // import { pinImageToIPFS } from '@/store'
 import { ipfsUrl } from '@/utils'
 import store from '@/store'

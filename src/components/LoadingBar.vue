@@ -1,5 +1,5 @@
 <script setup>
-import InfoBar from '@/components/InfoBar'
+import InfoBar from '@/components/InfoBar.vue'
 </script>
 
 <template lang="pug">

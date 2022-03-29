@@ -1,15 +1,15 @@
 <script setup>
 import { ref, toRaw } from 'vue'
-import Modal from '@/components/Modal'
+import Modal from '@/components/Modal.vue'
 import {
   DialogTitle,
   DialogDescription
 } from '@headlessui/vue'
-import Panel from '@/components/Panel'
-import FieldsProjectEdit from '@/components/FieldsProjectEdit'
+import Panel from '@/components/Panel.vue'
+import FieldsProjectEdit from '@/components/FieldsProjectEdit.vue'
 import store, { pinJSONToIPFS } from '@/store'
-import TxLink from '@/components/TxLink'
-import FormMessage from '@/components/FormMessage'
+import TxLink from '@/components/TxLink.vue'
+import FormMessage from '@/components/FormMessage.vue'
 
 const props = defineProps(['meta', 'projectAddress'])
 const emit = defineEmits(['close', 'updated'])

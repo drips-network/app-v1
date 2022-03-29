@@ -5,7 +5,7 @@ import {
   // DialogTitle,
   // DialogDescription
 } from '@headlessui/vue'
-import Panel from '@/components/Panel'
+import Panel from '@/components/Panel.vue'
 
 const props = defineProps({
   isOpen: Boolean,

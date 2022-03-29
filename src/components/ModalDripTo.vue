@@ -1,14 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue'
-import Modal from '@/components/Modal'
-import Panel from '@/components/Panel'
+import Modal from '@/components/Modal.vue'
+import Panel from '@/components/Panel.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
-import Addr from '@/components/Addr'
-import InputBody from '@/components/InputBody'
-import InputRadio from '@/components/InputRadio'
-import SvgDai from '@/components/SvgDai'
-import ModalSplitsEdit from '@/components/ModalSplitsEdit'
-import ModalDripsEdit from '@/components/ModalDripsEdit'
+import Addr from '@/components/Addr.vue'
+import InputBody from '@/components/InputBody.vue'
+import InputRadio from '@/components/InputRadio.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import ModalSplitsEdit from '@/components/ModalSplitsEdit.vue'
+import ModalDripsEdit from '@/components/ModalDripsEdit.vue'
 import { constants } from 'ethers'
 
 const props = defineProps(['address'])

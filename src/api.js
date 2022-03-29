@@ -1,6 +1,6 @@
-const apiUrl = process.env.VUE_APP_GRAPH_API
+const apiUrl = import.meta.env.VITE_APP_GRAPH_API
 
-const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC // string
+const cacheAPISec = import.meta.env.VITE_APP_CACHE_API_SEC // string
 
 export default async function ({ query, variables }) {
   const id = btoa(JSON.stringify({ query, variables }))

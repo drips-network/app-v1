@@ -1,20 +1,20 @@
 <script setup>
 import { ref, computed, onBeforeMount, toRaw } from 'vue'
 import api from '@/api'
-import ProjectThumb from '@/components/ProjectThumb'
-import LoadingBar from '@/components/LoadingBar'
-import DripRow from '@/components/DripRow'
-import Addr from '@/components/Addr'
-import UserAvatar from '@/components/UserAvatar'
-import InfoBar from '@/components/InfoBar'
-import HeaderLarge from '@/components/HeaderLarge'
-import SpotlightRecipient from '@/components/SpotlightRecipient'
+import ProjectThumb from '@/components/ProjectThumb.vue'
+import LoadingBar from '@/components/LoadingBar.vue'
+import DripRow from '@/components/DripRow.vue'
+import Addr from '@/components/Addr.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import InfoBar from '@/components/InfoBar.vue'
+import HeaderLarge from '@/components/HeaderLarge.vue'
+import SpotlightRecipient from '@/components/SpotlightRecipient.vue'
 import store from '@/store'
 import { formatSplitsEvents, filterForCurrentEvents, toDAIPerMo } from '@/utils'
 import content from '../../content/spotlight.js'
 import { BigNumber as bn } from 'ethers'
 
-const networkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK
+const networkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWORK
 const spotlights = content[networkName] || []
 
 const projects = ref()

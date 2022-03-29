@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed, onBeforeMount } from 'vue'
-import AvatarBlockie from '@/components/AvatarBlockie'
-import UserAvatar from '@/components/UserAvatar'
-import Addr from '@/components/Addr'
-import FlexTruncate from '@/components/FlexTruncate'
-import ProjectProgressBar from '@/components/ProjectProgressBar'
+import AvatarBlockie from '@/components/AvatarBlockie.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import Addr from '@/components/Addr.vue'
+import FlexTruncate from '@/components/FlexTruncate.vue'
+import ProjectProgressBar from '@/components/ProjectProgressBar.vue'
 import store from '@/store'
 import { ipfsUrl } from '@/utils'
 

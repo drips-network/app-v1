@@ -1,6 +1,6 @@
 <script setup>
-import UserAvatar from '@/components/UserAvatar'
-import Addr from '@/components/Addr'
+import UserAvatar from '@/components/UserAvatar.vue'
+import Addr from '@/components/Addr.vue'
 const props = defineProps(['addresses', 'avatarsOnly'])
 </script>
 

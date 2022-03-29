@@ -1,7 +1,8 @@
+// const defaultTheme = require('tailwindcss/defaultTheme')
+
+/** @type {import("@types/tailwindcss/tailwind-config").TailwindConfig } */
 module.exports = {
-  purge: ['./public/*.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  presets: [],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   separator: '_',
   theme: {
     screens: {

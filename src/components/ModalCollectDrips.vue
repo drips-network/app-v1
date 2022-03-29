@@ -1,15 +1,15 @@
 <script setup>
 import { ref, computed } from 'vue'
-import Modal from '@/components/Modal'
-import Panel from '@/components/Panel'
-import AvailableFundsBar from '@/components/AvailableFundsBar'
-import TxLink from '@/components/TxLink'
-import SvgDai from '@/components/SvgDai'
+import Modal from '@/components/Modal.vue'
+import Panel from '@/components/Panel.vue'
+import AvailableFundsBar from '@/components/AvailableFundsBar.vue'
+import TxLink from '@/components/TxLink.vue'
+import SvgDai from '@/components/SvgDai.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import { getDripPctFromAmts, round, toDAI } from '@/utils'
 import store from '@/store'
 import { utils } from 'ethers'
-import FormMessage from '@/components/FormMessage'
+import FormMessage from '@/components/FormMessage.vue'
 
 const props = defineProps(['projectAddress', 'amts', 'tx'])
 const emit = defineEmits(['close', 'collected'])

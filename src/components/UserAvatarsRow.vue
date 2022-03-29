@@ -1,5 +1,5 @@
 <script setup>
-import UserAvatar from '@/components/UserAvatar'
+import UserAvatar from '@/components/UserAvatar.vue'
 const props = defineProps({
   addresses: { type: Array, default: () => ([]) },
   limit: { type: Number, default: 6 },

@@ -1,14 +1,14 @@
 <script setup>
 import { computed, ref } from 'vue'
-import Addr from '@/components/Addr'
-import UserAvatar from '@/components/UserAvatar'
-import SvgGlobe from '@/components/SvgGlobe'
-import SvgGithub from '@/components/SvgGithub'
-import SvgTwitter from '@/components/SvgTwitter'
-import SvgDiscord from '@/components/SvgDiscord'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import ExpandBlock from '@/components/ExpandBlock'
-import SvgDripOff from '@/components/SvgDripOff'
+import Addr from '@/components/Addr.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import SvgGlobe from '@/components/SvgGlobe.vue'
+import SvgGithub from '@/components/SvgGithub.vue'
+import SvgTwitter from '@/components/SvgTwitter.vue'
+import SvgDiscord from '@/components/SvgDiscord.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
+import ExpandBlock from '@/components/ExpandBlock.vue'
+import SvgDripOff from '@/components/SvgDripOff.vue'
 import store from '@/store'
 const props = defineProps(['address'])
 const emit = defineEmits(['dripClick'])

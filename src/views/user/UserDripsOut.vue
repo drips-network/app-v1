@@ -1,16 +1,16 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute } from 'vue-router'
-import DripRow from '@/components/DripRow'
-import InfoBar from '@/components/InfoBar'
-import LoadingBar from '@/components/LoadingBar'
-import Addr from '@/components/Addr'
+import DripRow from '@/components/DripRow.vue'
+import InfoBar from '@/components/InfoBar.vue'
+import LoadingBar from '@/components/LoadingBar.vue'
+import Addr from '@/components/Addr.vue'
 import store from '@/store'
 import { toDAI, toDAIPerMo, round } from '@/utils'
-import ModalEditDripsSelect from '@/components/ModalEditDripsSelect'
-import ModalDripsEdit from '@/components/ModalDripsEdit'
-import ModalSplitsEdit from '@/components/ModalSplitsEdit'
-import SvgDai from '@/components/SvgDai'
+import ModalEditDripsSelect from '@/components/ModalEditDripsSelect.vue'
+import ModalDripsEdit from '@/components/ModalDripsEdit.vue'
+import ModalSplitsEdit from '@/components/ModalSplitsEdit.vue'
+import SvgDai from '@/components/SvgDai.vue'
 
 const route = useRoute()
 const emit = defineEmits(['editDripsSelect', 'editDrips', 'getWithdrawable'])

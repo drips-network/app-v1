@@ -3,35 +3,25 @@ The front-end app for the Radicle Drips project, built with [Vue 3](https://v3.v
 - [Contracts repo](https://github.com/radicle-dev/radicle-drips)  
 - [Docs repo](https://github.com/radicle-dev/radicle-drips-docs)  
 
-## Development
+## ⚡ Vite + Vue 3 + Tailwind CSS ✔
 
-#### Environment Variables
-Create a `.env` file in your local folder. Refer to `.env.example` for necessary variables.
+![Vite, Vue, Tailwind CSS](https://user-images.githubusercontent.com/11320080/111277027-a9384c00-8640-11eb-8323-21889bd7c609.png)
 
-#### Install dependencies
-```
-yarn install
-```
+- [Vite](https://vitejs.dev/guide/)
+- [Vue 3](https://vuejs.org/guide/introduction.html)
+- [Tailwind CSS v3](https://tailwindcss.com/docs/configuration)
+- [Vue Router v4](https://github.com/vuejs/router)
 
-#### Compiles and hot-reloads for development
-```
+### Getting Started
+
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/web2033/vite-vue3-tailwind-starter)
+
+
+```sh
+yarn
+yarn dev
+yarn build
 yarn serve
 ```
 
-#### Run Netlify Functions locally
-```
-yarn lambda
-```
-
-#### Compiles and minifies for production
-```
-yarn build
-```
-
-#### Lints and fixes files
-```
-yarn lint
-```
-
-#### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/web2033/vite-vue3-tailwind-starter)

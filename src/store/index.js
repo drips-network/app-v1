@@ -18,7 +18,7 @@ const networks = {
   137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com' } },
   80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com' } }
 }
-const deployNetworkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
+const deployNetworkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
 const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
 
 // setup web3 modal
@@ -326,7 +326,7 @@ export default createStore({
         }
 
         // fetch meta from ipfs...
-        const meta = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+        const meta = await fetch(`${import.meta.env.VITE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         return meta.json()
       } catch (e) {
         console.error('@getProjectMeta', e)

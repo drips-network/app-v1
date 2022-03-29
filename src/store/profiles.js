@@ -224,7 +224,7 @@ export default {
           // convert to ipfs hash
           const ipfsHash = hexToBase58(myLastUpdateHex)
           // fetch...
-          const resp = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+          const resp = await fetch(`${import.meta.env.VITE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
           const meta = (await resp.json() || null)
           // save
           commit('SAVE_ADDRESS_METADATA', { address, meta })

@@ -4,7 +4,7 @@ import DaiABI from './Dai.json'
 import DaiDripsHubABI from './DaiDripsHub.json'
 import MetadataABI from './MetaData.json'
 
-export const deploy = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY)
+export const deploy = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY)
 
 export const RadicleRegistry = {
   address: deploy.CONTRACT_RADICLE_REGISTRY,

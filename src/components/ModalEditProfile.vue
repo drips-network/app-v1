@@ -1,12 +1,12 @@
 <script setup>
 import { ref, toRaw, computed, watch } from 'vue'
-import Modal from '@/components/Modal'
+import Modal from '@/components/Modal.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
-import Panel from '@/components/Panel'
-import FieldsProfileEdit from '@/components/FieldsProfileEdit'
+import Panel from '@/components/Panel.vue'
+import FieldsProfileEdit from '@/components/FieldsProfileEdit.vue'
 import store, { pinJSONToIPFS } from '@/store'
-import TxLink from '@/components/TxLink'
-import FormMessage from '@/components/FormMessage'
+import TxLink from '@/components/TxLink.vue'
+import FormMessage from '@/components/FormMessage.vue'
 
 const props = defineProps(['meta'])
 const emit = defineEmits(['close', 'updated'])
