@@ -1,6 +1,7 @@
 <script setup>
 import UserAvatar from '@/components/UserAvatar'
 import Addr from '@/components/Addr'
+import SvgDai from '@/components/SvgDai'
 const props = defineProps(['address', 'drip'])
 </script>
 
@@ -18,6 +19,9 @@ router-link.my-4.mx-3.user-tag-small.flex.items-center.bg-indigo-700.rounded-ful
 
       //- amount
       div.font-semibold.text-violet-650.mx-6
-        template(v-if="props.drip.amount") {{ props.drip.amount }}/mo
+        template(v-if="props.drip.amount")
+          .flex.items-center.leading-none
+            svg-dai(size="xs", style="margin-right:0.15em")
+            | {{ props.drip.amount }}/mo
         template(v-else-if="props.drip.percent") {{ props.drip.percent }}%
 </template>

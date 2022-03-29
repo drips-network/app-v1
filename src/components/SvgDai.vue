@@ -7,6 +7,7 @@ const usd = ref(false)
 let height
 let fz
 switch (props.size) {
+  case 'xs': height = 'h-14'; break
   case 'sm': height = 'h-16'; break // fz = { fontSize: '1.6mre' }; break
   case 'md': height = 'h-18'; break // fz = { fontSize: '1.8mre' }; break
   case 'lg': height = 'h-20'; break // fz = { fontSize: '1.6mre' }; break
