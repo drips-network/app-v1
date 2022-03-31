@@ -65,7 +65,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
               template(v-if="props.direction === 'in'")
                 | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
-                | #[addr(:address="props.address", :youOn="true")] are dripping to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
+                | #[addr(:address="props.address", :youOn="true")] drips to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             //- toggle icon
             svg-chevron-down.ml-7.w-28.h-28.transform.origin-center.rotate-180
 

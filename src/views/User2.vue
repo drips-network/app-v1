@@ -324,6 +324,18 @@ article.profile.pt-40.pb-80
   //- senders
   drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in", :canEdit="!isMyUser")
 
+  //- (collectable)
+  template(v-if="isMyUser")
+    .flex.justify-center.mb-20
+      .h-64.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-32.pr-12(:class="{'text-violet-650': totalFunds === -1}", :key="$route.params.address")
+        template(v-if="totalFunds !== -1")
+          svg-dai(size="sm", style="margin-right:0.15em")
+          | {{ totalFunds }}
+        template(v-else)
+          .animate-pulse ...
+        
+        button.ml-20.btn.btn-sm.border-2.btn-outline-violet.text-md.font-semibold.px-14(@click="collectModalOpen = true") Collect
+
   //- user tag row
   div.mx-auto.flex.flex-col
     user-tag(:address="$route.params.address", :isEditable="isMyUser")
