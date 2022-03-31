@@ -9,8 +9,11 @@ import UserAvatarsRow from '@/components/UserAvatarsRow.vue'
 import { BigNumber as bn } from 'ethers'
 import UserTagSmall from '@/components/UserTagSmall.vue'
 import DripsListExpands from '@/components/DripsListExpands.vue'
+import ModalCollectDrips from '@/components/ModalCollectDrips.vue'
 const props = defineProps(['project'])
 const meta = ref()
+
+const isMyProject = computed(() => props.project.projectOwner === store.state.address)
 
 const benefitsEl = ref()
 const benefitsLong = ref(false)
@@ -48,6 +51,41 @@ const getMeta = async () => {
   }
 }
 
+// COLLECTABLE
+const collectModalOpen = ref(false)
+
+// collectable ([dripsWei, splitsWei])
+const collectableAmts = ref()
+
+// total collectable (add drips + splits together)
+const totalCollectable = computed(() => collectableAmts.value && collectableAmts.value[0].add(collectableAmts.value[1]))
+
+// format for UI
+const totalCollectableDAI = computed(() => {
+  if (!collectableAmts.value) return -1
+  return toDAI(totalCollectable.value)
+})
+
+// current funding
+// const currentFundingWei = computed(() => {
+//   // based on first token (for now)
+//   const tokenType = props.project.tokenTypes[0]
+//   if (tokenType) {
+//     return tokenType.streaming ? tokenType.currentTotalAmtPerSec : tokenType.currentTotalGiven
+//   }
+//   return undefined
+// })
+
+const getCollectable = () => {
+  store.dispatch('getCollectable', { projectAddress: props.project.id })
+    .then(amounts => { collectableAmts.value = amounts })
+}
+
+const onCollected = () => {
+  getMeta()
+  getCollectable()
+}
+
 // splits
 const splitsOut = ref()
 const getSplitsOut = async () => {
@@ -67,6 +105,7 @@ const getSplitsOut = async () => {
 onMounted(() => {
   getMeta()
   getSplitsOut()
+  getCollectable()
 })
 </script>
 
@@ -110,15 +149,17 @@ onMounted(() => {
 
   .text-md.font-semibold
     
-    //- (members section)
-    template(v-if="props.project.tokens.length")
-      //- members summary row
-      header.relative.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
-        h6.text-violet-650.text-md.font-semibold Members
-        user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
+    //- members summary row
+    header.relative.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
+      .text-violet-650.text-md.font-semibold Members
 
-        //- expand btn as overlay (accessibility)
-        button.absolute.overlay.rounded-full.btn-focus-violet(@click="showMembers = !showMembers", aria-label="View Members")
+      template(v-if="props.project.tokens.length")
+        user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
+      template(v-else)
+        div.pr-32 0
+
+      //- expand btn as overlay (accessibility)
+      button.absolute.overlay.rounded-full.btn-focus-violet(@click="showMembers = !showMembers", aria-label="View Members")
 
       //- (members list expanded)
       ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xl.relative.pb-64(v-if="showMembers")
@@ -138,21 +179,70 @@ onMounted(() => {
     .grid.grid-cols-2.gap-4.mt-5
       //- raised:
       .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
-        h6.text-violet-650 Raised
+        .text-violet-650 Raised
         .flex.items-center
           svg-dai.mr-2(size="md")
           | {{ raised }}
 
       //- available
       .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
-        h6.text-violet-650 Available
+        .text-violet-650 Available
         div
           template(v-if="isStreaming")
             span(style="font-size:1.5em") ∞
           template(v-else-if="!props.project.tokens.length") {{ props.project.tokenTypes[0].limit }}
           template(v-else) {{ props.project.tokenTypes[0].limit - props.project.tokens.length }}/{{ props.project.tokenTypes[0].limit }}
 
+    //- (collectable)
+    template(v-if="isMyProject")
+      .mt-10.p-10.bg-indigo-950.rounded-2xlb
+        //- (monthly drips in)
+        template(v-if="isStreaming")
+          .mb-5.h-80.bg-indigo-700ff.border.border-violet-500.flex.items-center.justify-between.px-32.rounded-full
+            .text-violet-650 Monthly Drips In
+            div(:class="{'animate-pulse': !currentFundingWei }")
+              template(v-if="!currentFundingWei") ...
+              template(v-else)
+                | {{ toDAIPerMo(currentFundingWei) }}
+                //- .h-80.w-full.flex.items-center.justify-between
+                  .flex-1.text-xl.text-violet-650 
+                  .flex.items-center.text-white
+                    .text-xl(:class="{'animate-pulse': !currentFundingWei }")
+                      template(v-if="!currentFundingWei") ...
+                      template(v-else)
+                        | {{ toDAIPerMo(currentFundingWei) }}
+                      
+                    svg-dai.h-20.ml-12
+                    .text-lgg.tracking-tight /MO
+                    //- button.ml-24.btn.btn-md.btn-violet.px-20.font-semibold.text-lg Collect
+
+                //- .w-full.flex.items-center.justify-between
+                  .flex-1.text-xl.text-violet-650 Fully Collectable
+                  .flex.items-center.text-white
+                    .text-xl 26 days
+
+            //- .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
+
+        .h-80.bg-indigo-700ff.border.border-violet-500.flex.items-center.justify-between.px-32.rounded-full
+          .text-violet-650
+            template(v-if="isStreaming") Collectable Today
+            template(v-else) Collectable Funds
+              //- svg-question-mark-encircled.ml-18
+
+          .flex.items-center.text-white
+            svg-dai.mr-2(size="md")
+            div(:class="{'animate-pulse': totalCollectableDAI < 0}")
+              | {{ totalCollectableDAI < 0 ? '...' : totalCollectableDAI }}
+            //- (collect btn)
+            template(v-if="totalCollectable")
+              button.-mr-12.ml-20.btn.btn-sm.border-2.btn-outline-violet.px-16.font-semibold.text-md.notouch_hover_ring(, @click="collectModalOpen = true", :disabled="!totalCollectable.gt(0)")
+                | Collect
+
   //- drips list
   drips-list-expands(:address="props.project.id", :drips="splitsOut", direction="out")
+
+  //- (collect modal)
+  modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")
+    template(v-slot:header) Collect Drips for<br>"{{ meta.name }}"
     
 </template>

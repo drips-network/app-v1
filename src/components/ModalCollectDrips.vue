@@ -70,12 +70,14 @@ modal(v-bind="$attrs", @close="emit('close')")
             | There are no funds to collect.
           template(v-else)
             template(v-if="props.projectAddress")
-              | Your community has #[b collectable funds].
+              | Your membership has #[b collectable funds]!
             template(v-else)
               | You have #[b funds to collect]!
             template(v-if="hasSplits")
               br
-              | You are dripping #[b {{ dripPct }}]% to other addresses. The&nbsp;rest will be transferred to your wallet.
+              | You are dripping #[b {{ dripPct }}]% to other addresses.
+              br
+              | The&nbsp;rest will be transferred to your wallet.
             template(v-else)
               br
               | These funds can be transferred to your wallet.

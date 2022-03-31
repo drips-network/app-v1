@@ -47,7 +47,7 @@ section.panel.panel-dark.w-full.max-w-6xl.text-center
         slot(name="header")
 
       //- description
-      .text-md.leading-snug
+      .text-base.leading-snug
         slot(name="description")
 
     //- body
