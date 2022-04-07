@@ -38,7 +38,7 @@ let lastUpdate = null
 let getWithdrawable
 const withdrawable = ref('0')
 // balance (max DAI withdrawable
-const balance = computed(() => toDAI(withdrawable.value), 'exact')
+const balance = computed(() => toDAI(withdrawable.value, 'exact'))
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
 
 const getDrips = async () => {
@@ -64,7 +64,7 @@ const getDrips = async () => {
       receiversFormatted.push({
         address: receivers[i].receiver, // receivers[i][0],
         amount: toDAIPerMo(receivers[i].amtPerSec), // toDAIPerMo(receivers[i][1]),
-        receiverInput: profile?.ens || receivers[i].receiver, // profile?.ens || receivers[i][0]
+        receiverInput: profile?.ens || receivers[i].receiver // profile?.ens || receivers[i][0]
       })
     }
 
@@ -273,7 +273,7 @@ panel(icon="💧")
         //- input
         .relative.my-10
           input-body(label="Add DAI to Balance", symbol="dai")
-            input(v-model="topUpDAI", type="number", step="0.01", required, :min="-1 * Number(balance)")
+            input(v-model="topUpDAI", type="number", step="0.01", required)
           //- (max withdraw note)
           .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
             template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
@@ -282,7 +282,7 @@ panel(icon="💧")
       //- (polygon address warning)
       template(v-if="$store.getters.isPolygon")
         warning-polygon-addresses.my-40
-      
+
       //- (not approved message)
       template(v-if="approveVisible")
         //- fades when approved
