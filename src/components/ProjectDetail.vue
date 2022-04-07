@@ -10,6 +10,7 @@ import { BigNumber as bn } from 'ethers'
 import UserTagSmall from '@/components/UserTagSmall.vue'
 import DripsListExpands from '@/components/DripsListExpands.vue'
 import ModalCollectDrips from '@/components/ModalCollectDrips.vue'
+import ModalEditProjectInfo from '@/components/ModalEditProjectInfo.vue'
 const props = defineProps(['project'])
 const meta = ref()
 
@@ -19,6 +20,8 @@ const benefitsEl = ref()
 const benefitsLong = ref(false)
 const readMore = ref(false)
 const showMembers = ref(false)
+const extraMenuVisible = ref(false)
+const editModalOpen = ref(false)
 
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
@@ -112,16 +115,21 @@ onMounted(() => {
 <template lang="pug">
 .project-detail.w-full.max-w-4xl
   //- image
-  figure.mx-auto.w-8x12.relative.z-10
+  figure.mx-auto.w-7x12.relative.z-10
     .w-full.relative
       .aspect-w-1.aspect-h-1
       img.absolute.block.overlay.object-contain.object-bottom(:src="ipfsUrl(props.project.tokenTypes[0].ipfsHash)")
       //- caption
       figcaption.absolute.top-full.w-full.left-0.text-center.text-sm.text-violet-650.pt-5
-        | Membership NFT
+        | Member NFT
   
   //- body
   .-mt-40.rounded-2xlb.bg-indigo-700.pt-96.pb-40.relative
+    //- name
+    h3.text-center.text-xll.font-semibold.mb-32
+      | {{ meta && meta.name ? meta.name : props.project.name }}
+
+    //- details
     .flex.justify-center.flex-wrap
       //- min
       .mx-4.h-64.rounded-full.bg-indigo-800.flex.items-center.justify-center.min-w-160.px-32.text-lg.text-violet-650.font-semibold
@@ -130,11 +138,10 @@ onMounted(() => {
         template(v-if="props.project.tokenTypes[0].streaming") /mo
         //- .text-lgg.tracking-tight /MO
           
-          
-      //- join btn
+      //- (join btn)
       button.mx-4.btn.btn-mdd.btn-violet.text-lg.font-semibold.min-w-160.px-40 Join
     
-    //- benefits
+    //- benefits/description
     template(v-if="meta && meta.benefits.length")
       .mt-40.px-36.text-center.font-semibold.text-md.leading-normal(ref="benefitsEl", v-html="meta.benefits", :class="{'line-clamp-4': !readMore}")
       //- readmore/less btn
@@ -142,6 +149,21 @@ onMounted(() => {
         .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
           button.text-violet-650.notouch_hover_text-white(@click="readMore = !readMore")
             svg-chevron-down.w-32.h-32(:class="{'transform rotate-180': readMore}")
+
+    //- "•••" menu
+    template(v-if="isMyProject")
+      .absolute.top-12.right-16.z-10
+        //- toggle btn
+        button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(class="hover_bg-black/20", @click="extraMenuVisible = !extraMenuVisible") •••
+        //- (menu)
+        .absolute.right-0.mt-2.rounded-xl.shadow-xl.bg-indigo-700.whitespace-nowrap.overflow-hidden(v-show="extraMenuVisible")
+          //- (edit membership btn)
+          button.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="editModalOpen = true")
+            | Edit Membership
+          
+          //- open sea link (doesn't work with just contract address...)
+          //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
+            | View on OpenSea ↗
 
   //- (progress bar)
   template(v-if="meta && meta.goal")
@@ -244,5 +266,8 @@ onMounted(() => {
   //- (collect modal)
   modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")
     template(v-slot:header) Collect Drips for<br>"{{ meta.name }}"
+
+  //- (edit project)
+  modal-edit-project-info(v-if="isMyProject && meta && editModalOpen", :open="editModalOpen", @updated="getProjectMeta", @close="editModalOpen = false", :meta="meta", :projectAddress="props.project.id")
     
 </template>
