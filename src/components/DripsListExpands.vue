@@ -28,11 +28,9 @@ const toggle = () => { expanded.value = !expanded.value }
 <template lang="pug">
 section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
-  .w-full.flex.justify-center.my-4.opacity-90
+  .w-full.flex.justify-center.my-3.opacity-90
     .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
       | 💧
-      //- button.absolute.left-full.top-0.h-full.flex.items-center(v-show="expanded", @click="expanded = false")
-        svg-chevron-down.-ml-16.text-violet-650.w-36.h-36.transform.rotate-180
 
   div
     .w-full.flex.justify-center

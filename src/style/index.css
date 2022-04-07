@@ -98,7 +98,8 @@ html {
   }
 }
 .btn-outline-green{
-  @apply border border-greenbright-500 text-greenbright-500;
+  /* set .border class on element for desired thickness */
+  @apply border-greenbright-500 text-greenbright-500;
   &:not([disabled]) {
     @apply notouch_hover_ring-1 notouch_hover_ring-greenbright-500 focus_ring-1;
   }

@@ -316,7 +316,7 @@ article.profile.pt-40.pb-80
         .px-22 This is your profile!
         //- (edit btn)
         template(v-if="profileMeta !== undefined")
-          button.-ml-8.mr-12.py-4.pl-11.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green(@click="edit = 'profile'")
+          button.-ml-8.mr-12.py-4.pl-11.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green.border(@click="edit = 'profile'")
             | Edit
             svg-pen.mx-5.h-16.w-16
 
@@ -338,7 +338,7 @@ article.profile.pt-40.pb-80
 
   //- user tag row
   div.mx-auto.flex.flex-col
-    user-tag(:address="$route.params.address", :isEditable="isMyUser")
+    user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'")
     
     section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650
       //- (bio link)
