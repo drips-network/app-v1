@@ -20,7 +20,6 @@ const benefitsEl = ref()
 const benefitsLong = ref(false)
 const readMore = ref(false)
 const showMembers = ref(false)
-const extraMenuVisible = ref(false)
 const editModalOpen = ref(false)
 
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
@@ -105,6 +104,16 @@ const getSplitsOut = async () => {
   }
 }
 
+// context menu
+const ctxMenuVisible = ref(false)
+const ctxMenuBtn = ref()
+const openExtraMenuItem = callback => {
+  // close menu and focus back to toggle btn for accessibility
+  ctxMenuBtn.value.focus()
+  ctxMenuVisible.value = false
+  callback()
+}
+
 onMounted(() => {
   getMeta()
   getSplitsOut()
@@ -142,8 +151,8 @@ onMounted(() => {
       button.mx-4.btn.btn-mdd.btn-violet.text-lg.font-semibold.min-w-160.px-40 Join
     
     //- benefits/description
-    template(v-if="meta && meta.benefits.length")
-      .mt-40.px-36.text-center.font-semibold.text-md.leading-normal(ref="benefitsEl", v-html="meta.benefits", :class="{'line-clamp-4': !readMore}")
+    template(v-if="meta && meta.descrip.length")
+      .mt-40.px-36.text-center.font-semibold.text-md.leading-normal(ref="benefitsEl", v-html="meta.descrip", :class="{'line-clamp-4': !readMore}")
       //- readmore/less btn
       template(v-if="benefitsLong")
         .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
@@ -154,11 +163,11 @@ onMounted(() => {
     template(v-if="isMyProject")
       .absolute.top-12.right-16.z-10
         //- toggle btn
-        button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(class="hover_bg-black/20", @click="extraMenuVisible = !extraMenuVisible") •••
+        button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(ref="ctxMenuBtn", class="hover_bg-black/20", @click="ctxMenuVisible = !ctxMenuVisible") •••
         //- (menu)
-        .absolute.right-0.mt-2.rounded-xl.shadow-xl.bg-indigo-700.whitespace-nowrap.overflow-hidden(v-show="extraMenuVisible")
+        .absolute.right-0.mt-2.rounded-xl.shadow-xl.bg-indigo-700.whitespace-nowrap.overflow-hidden(v-show="ctxMenuVisible")
           //- (edit membership btn)
-          button.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="editModalOpen = true")
+          button.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editModalOpen = true })")
             | Edit Membership
           
           //- open sea link (doesn't work with just contract address...)
@@ -173,29 +182,33 @@ onMounted(() => {
     
     //- members summary row
     header.relative.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
+      //- label left
       .text-violet-650.text-md.font-semibold Members
 
+      //- count
       template(v-if="props.project.tokens.length")
-        user-avatars-row.mr-10(:addresses="membersAddrs", :limit="3")
+        .flex.items-center
+          user-avatars-row(:addresses="membersAddrs", :limit="3")
+          svg-chevron-down.w-32.h-32.mr-18.ml-8.text-violet-650
       template(v-else)
         div.pr-32 0
 
       //- expand btn as overlay (accessibility)
-      button.absolute.overlay.rounded-full.btn-focus-violet(@click="showMembers = !showMembers", aria-label="View Members")
+      button.absolute.overlay.rounded-full.btn-focus-violet(@click.stop="showMembers = !showMembers", aria-label="View Members")
 
-      //- (members list expanded)
-      ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xl.relative.pb-64(v-if="showMembers")
-        .w-full.flex.justify-between.h-80.items-center.font-semibold
-          h6.ml-32.text-violet-650 Members
-          .w-54.h-54.mr-6.flex.items-center.justify-center {{ props.project.tokens.length }}
+    //- (members list expanded)
+    ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xl.relative.pb-56(v-if="showMembers")
+      .w-full.flex.justify-between.h-80.items-center.font-semibold
+        h6.ml-32.text-violet-650 Members
+        .w-54.h-54.mr-6.flex.items-center.justify-center {{ props.project.tokens.length }}
 
-        li(v-for="token in props.project.tokens")
-          user-tag-small.bg-indigo-850(:address="token.owner")
+      li(v-for="token in props.project.tokens")
+        user-tag-small.bg-indigo-850(:address="token.owner")
 
-        //- close button
-        .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
-          button.text-violet-650.notouch_hover_text-white(@click="showMembers = false", aria-label="Hide Members")
-            svg-chevron-down.w-32.h-32.transform.rotate-180
+      //- close button
+      .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
+        button.text-violet-650.notouch_hover_text-white(@click.stop="showMembers = false", aria-label="Hide Members")
+          svg-chevron-down.w-32.h-32.transform.rotate-180
 
     //- stats
     .grid.grid-cols-2.gap-4.mt-5
@@ -268,6 +281,6 @@ onMounted(() => {
     template(v-slot:header) Collect Drips for<br>"{{ meta.name }}"
 
   //- (edit project)
-  modal-edit-project-info(v-if="isMyProject && meta && editModalOpen", :open="editModalOpen", @updated="getProjectMeta", @close="editModalOpen = false", :meta="meta", :projectAddress="props.project.id")
+  modal-edit-project-info(v-if="isMyProject && meta && editModalOpen", :open="editModalOpen", @updated="getMeta", @close="editModalOpen = false", :meta="meta", :projectAddress="props.project.id")
     
 </template>

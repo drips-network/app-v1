@@ -59,7 +59,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="✏️")
 
     template(v-slot:header)
-      dialog-title Edit Community
+      dialog-title Edit Your Membership
 
     form(@submit.prevent="update")
       fields-project-edit(v-model="newMeta")

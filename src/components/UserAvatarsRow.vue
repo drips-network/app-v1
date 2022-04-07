@@ -10,7 +10,7 @@ const hasNegMargin = i => i < (Math.min(props.limit, props.addresses.length) - 1
 
 <template lang="pug">
 //- list avatars in reverse so left most item is on top (natural z-index)
-ul.flex.w-full.justify-start.items-center.flex-row-reverse
+ul.flex.justify-start.items-center.flex-row-reverse
   //- avatars...
   li(v-for="(address, i) in props.addresses.slice(0, props.limit)", :style="{ marginLeft: hasNegMargin(i) ? `calc(-2.4rem * ${props.height} / 54)` : '' }")
     user-avatar.w-44.h-44(:address="address", :key="address")
