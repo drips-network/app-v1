@@ -45,7 +45,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
         //- empty / add drip btn
         button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="!props.canEdit", :class="{'pointer-events-none': !props.canEdit}", @click="$emit('editDrips')")
           template(v-if="props.canEdit")
-            svg-plus-minus-radicle.transform.scale-105.opacity-0.group-hover_opacity-100
+            svg-plus-minus-radicle.transform.scale-105
 
       //- (view senders btn)
       template(v-else)

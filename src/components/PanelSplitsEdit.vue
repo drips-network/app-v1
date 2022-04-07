@@ -96,7 +96,7 @@ const update = async () => {
 
     // success
     emit('updated')
-    txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile!' }
+    txMsg.value = { status: 1, message: 'Confirmed! View your drips!' }
   } catch (e) {
     // console.error(e)
     // alert('Error: \n' + e.message || e)

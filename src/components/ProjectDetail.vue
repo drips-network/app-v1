@@ -11,6 +11,7 @@ import UserTagSmall from '@/components/UserTagSmall.vue'
 import DripsListExpands from '@/components/DripsListExpands.vue'
 import ModalCollectDrips from '@/components/ModalCollectDrips.vue'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo.vue'
+import ModalSplitsEdit from '@/components/ModalSplitsEdit.vue'
 const props = defineProps(['project'])
 const meta = ref()
 
@@ -21,6 +22,7 @@ const benefitsLong = ref(false)
 const readMore = ref(false)
 const showMembers = ref(false)
 const editModalOpen = ref(false)
+const editSplitsModalOpen = ref(false)
 
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 
@@ -30,9 +32,10 @@ minAmt = isStreaming ? toDAIPerMo(minAmt) : toDAI(minAmt)
 const currentFundingWei = isStreaming ? toRaw(props.project.tokenTypes[0].currentTotalAmtPerSec)
   : toRaw(props.project.tokenTypes[0].currentTotalGiven)
 
+// member addresses array
 const membersAddrs = toRaw(props.project.tokens.map(tkn => tkn.owner))
 
-// raised = total collected + total split
+// raised (total collected + total split)
 let raised
 const totalCollectedWei = bn.from(props.project.daiCollected).add(props.project.daiSplit).toString() 
 if (bn.from(totalCollectedWei).lt(currentFundingWei)) {
@@ -68,16 +71,6 @@ const totalCollectableDAI = computed(() => {
   return toDAI(totalCollectable.value)
 })
 
-// current funding
-// const currentFundingWei = computed(() => {
-//   // based on first token (for now)
-//   const tokenType = props.project.tokenTypes[0]
-//   if (tokenType) {
-//     return tokenType.streaming ? tokenType.currentTotalAmtPerSec : tokenType.currentTotalGiven
-//   }
-//   return undefined
-// })
-
 const getCollectable = () => {
   store.dispatch('getCollectable', { projectAddress: props.project.id })
     .then(amounts => { collectableAmts.value = amounts })
@@ -88,7 +81,7 @@ const onCollected = () => {
   getCollectable()
 }
 
-// splits
+// SPLITS
 const splitsOut = ref()
 const getSplitsOut = async () => {
   try {
@@ -104,7 +97,7 @@ const getSplitsOut = async () => {
   }
 }
 
-// context menu
+// CONTEXT MENU
 const ctxMenuVisible = ref(false)
 const ctxMenuBtn = ref()
 const openExtraMenuItem = callback => {
@@ -143,8 +136,12 @@ onMounted(() => {
         //- (menu panel)
         .absolute.right-0.mt-4.rounded-xl.shadow-xl.bg-indigo-900.border-2ff.border-violet-650.whitespace-nowrap.overflow-hidden(v-show="ctxMenuVisible")
           //- (edit membership btn)
-          button.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editModalOpen = true })")
-            | Edit Membership
+          button.w-full.block.h-72.flex.items-center.justify-left.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editModalOpen = true })")
+            | Edit Info
+
+          //- (edit splits btn)
+          button.w-full.block.h-72.flex.items-center.justify-left.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editSplitsModalOpen = true })")
+            | Edit Drips Receivers
           
           //- open sea link (doesn't work with just contract address...)
           //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
@@ -277,7 +274,7 @@ onMounted(() => {
                 | Collect
 
   //- drips list
-  drips-list-expands(:address="props.project.id", :drips="splitsOut", direction="out")
+  drips-list-expands(:address="props.project.id", :drips="splitsOut", direction="out", :canEdit="isMyProject", @editDrips="editSplitsModalOpen = true")
 
   //- (collect modal)
   modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")
@@ -285,5 +282,13 @@ onMounted(() => {
 
   //- (edit project)
   modal-edit-project-info(v-if="isMyProject && meta && editModalOpen", :open="editModalOpen", @updated="getMeta", @close="editModalOpen = false", :meta="meta", :projectAddress="props.project.id")
+
+  //- (splits edit)
+  modal-splits-edit(v-if="isMyProject && editSplitsModalOpen", :open="editSplitsModalOpen", @close="editSplitsModalOpen = false; getSplitsOut()", :projectAddress="props.project.id", @updated="getSplitsOut")
+    template(v-slot:header)
+      h6 Edit Drips for<br>"{{ meta.name }}"
+    template(v-slot:description)
+      p.mx-auto(style="max-width:24em")
+        | When you <b>collect funds</b> from your membership, they will be #[b split] with the addresses below:
     
 </template>
