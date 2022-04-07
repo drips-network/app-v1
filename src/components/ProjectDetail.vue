@@ -133,7 +133,23 @@ onMounted(() => {
         | Member NFT
   
   //- body
-  .-mt-40.rounded-2xlb.bg-indigo-700.pt-96.pb-40.relative
+  .-mt-40.rounded-2xlb.bg-indigo-700.pt-96.pb-40.relative(@click="ctxMenuVisible = false")
+    //- "•••" menu
+    template(v-if="isMyProject")
+      .absolute.top-12.right-16.z-10
+        //- toggle btn
+        button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(ref="ctxMenuBtn", class="hover_bg-black/20", @click.stop="ctxMenuVisible = !ctxMenuVisible") •••
+        
+        //- (menu panel)
+        .absolute.right-0.mt-4.rounded-xl.shadow-xl.bg-indigo-900.border-2ff.border-violet-650.whitespace-nowrap.overflow-hidden(v-show="ctxMenuVisible")
+          //- (edit membership btn)
+          button.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editModalOpen = true })")
+            | Edit Membership
+          
+          //- open sea link (doesn't work with just contract address...)
+          //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
+            | View on OpenSea ↗
+
     //- name
     h3.text-center.text-xll.font-semibold.mb-32
       | {{ meta && meta.name ? meta.name : props.project.name }}
@@ -158,21 +174,6 @@ onMounted(() => {
         .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
           button.text-violet-650.notouch_hover_text-white(@click="readMore = !readMore")
             svg-chevron-down.w-32.h-32(:class="{'transform rotate-180': readMore}")
-
-    //- "•••" menu
-    template(v-if="isMyProject")
-      .absolute.top-12.right-16.z-10
-        //- toggle btn
-        button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(ref="ctxMenuBtn", class="hover_bg-black/20", @click="ctxMenuVisible = !ctxMenuVisible") •••
-        //- (menu)
-        .absolute.right-0.mt-2.rounded-xl.shadow-xl.bg-indigo-700.whitespace-nowrap.overflow-hidden(v-show="ctxMenuVisible")
-          //- (edit membership btn)
-          button.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editModalOpen = true })")
-            | Edit Membership
-          
-          //- open sea link (doesn't work with just contract address...)
-          //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
-            | View on OpenSea ↗
 
   //- (progress bar)
   template(v-if="meta && meta.goal")
@@ -235,10 +236,12 @@ onMounted(() => {
         template(v-if="isStreaming")
           .mb-5.h-80.bg-indigo-700ff.border.border-violet-500.flex.items-center.justify-between.px-32.rounded-full
             .text-violet-650 Monthly Drips In
-            div(:class="{'animate-pulse': !currentFundingWei }")
+            .flex.items-center(:class="{'animate-pulse': !currentFundingWei }")
               template(v-if="!currentFundingWei") ...
               template(v-else)
+                svg-dai.mr-2(size="sm")
                 | {{ toDAIPerMo(currentFundingWei) }}
+                template(v-if="isStreaming") /mo
                 //- .h-80.w-full.flex.items-center.justify-between
                   .flex-1.text-xl.text-violet-650 
                   .flex.items-center.text-white

@@ -40,17 +40,17 @@ section.panel.panel-dark.w-full.max-w-6xl.text-center
   .pt-48.px-24.pb-24(v-show="!isCollapsed")
     header.mb-40.text-center
       //- icon
-      .mb-20.text-3xl(v-if="icon") {{ icon }}
+      .mb-16.text-3xl(v-if="icon") {{ icon }}
       
       //- header
-      .text-2xl.font-semibold.mb-28.leading-tight
+      .text-2xl.font-semibold.mb-32.leading-tight
         slot(name="header")
 
       //- description
-      .text-base.leading-snug
+      .text-md.leading-normal
         slot(name="description")
 
     //- body
-    .mt-40
+    .mt-48
       slot
 </template>

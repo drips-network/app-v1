@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, toRaw } from 'vue'
+import { ref, computed, toRaw, watch } from 'vue'
 import InputBody from '@/components/InputBody.vue'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs.vue'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
@@ -22,6 +22,14 @@ const onIpfsHash = (hash) => {
   emit('update:modelValue', clone)
 }
 
+const name = computed(() => props.modelValue.name)
+
+const onSymbolFocus = () => {
+  if (!props.modelValue.symbol.length) {
+    props.modelValue.symbol = toRaw(props.modelValue.name).replaceAll(' ', '').toUpperCase()
+  }
+}
+
 // description input
 // const descriptionInputMd = ref('')
 const converter = new showdown.Converter()
@@ -33,9 +41,15 @@ section.mt-40
   //- .my-10
     input-body(label="Owner", :isFilled="owner.length", format="code")
       input(v-model="owner", placeholder="owner", disabled)
-  .my-10(v-if="props.isNewProject")
-    input-body(label="Community Name*", :isFilled="modelValue.name.length", warning="⚠️ You cannot edit this later!")
-      input(v-model="modelValue.name", placeholder="Computer Club", required, autocomplete="new-password")
+  template(v-if="props.isNewProject")
+    .my-10
+      input-body(label="Membership Name*", :isFilled="modelValue.name.length", warning="⚠️ You cannot edit this later!")
+        input(v-model="modelValue.name", placeholder="My Membership", required, autocomplete="new-password")
+
+    .my-10
+      input-body.my-10(label='Membership Token Code*', warning="⚠️ You cannot edit this later!")
+        input(v-model="modelValue.symbol", placeholder="DRIPS", required, @focus="onSymbolFocus")
+  
   //- .my-10(v-if="props.isNewProject")
     //- TODO: format/validate symbol text?
     input-body(label="Member Token Symbol*", :isFilled="modelValue.symbol.length")
@@ -47,7 +61,7 @@ section.mt-40
   
   .mt-10.mb-40
     input-body(label="Description (Markdown/HTML)")
-      textarea.font-mono.text-center.leading-relaxed(v-model="modelValue.descrip", placeholder="Markdown/HTML" rows="7")
+      textarea.font-mono.text-center.leading-relaxed(v-model="modelValue.descrip", placeholder="Benefits include..." rows="7")
 
     .mt-10.min-h-80.bg-indigo-700.rounded-2xlb.relative.leading-tight
       .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Preview
@@ -64,7 +78,7 @@ section.mt-40
   
   .my-10
     input-body(label="Discord Invite URL", :isFilled="modelValue.discord.length", format="code")
-      input(v-model="modelValue.discord", placeholder="https://discord.com/...")
+      input(v-model="modelValue.discord", placeholder="https://discord.com/...", type="url")
   
   //- .my-10
     input-body(label="Project Radicle ID", :isFilled="modelValue.radicleID.length", format="code")

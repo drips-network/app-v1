@@ -64,9 +64,9 @@ section.pt-72.px-10
         .aspect-w-5.aspect-h-4.md_aspect-w-2.md_aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-community' }")
             div.pb-24
-              div.text-3xl.mb-20 ⛲️
-              .text-xl.font-semibold.mb-16 Create a Community
-              p.mx-auto.text-violet-600.px-20.leading-tight(style="max-width:26em") Fund your community by issuing #[b memberships] and optionally #[b drip to others] every time you get paid.
+              div.text-3xl.mb-20 ⛲
+              .text-xl.font-semibold.mb-16 Create a Membership
+              p.mx-auto.text-violet-600.px-20.leading-tight(style="max-width:25em") Raise funds from your community with monthly or single-purchase #[b NFT memberships].
 
   section.pt-24(ref="childRoute")
     router-view(:key="$route.path")
