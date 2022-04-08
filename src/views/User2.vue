@@ -322,7 +322,7 @@ article.profile.pt-40.pb-80
 
   //- 
   //- senders
-  drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in", :canEdit="!isMyUser")
+  drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in")
 
   //- (collectable)
   template(v-if="isMyUser")

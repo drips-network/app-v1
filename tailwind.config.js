@@ -111,7 +111,7 @@ module.exports = {
         500: '#0FA7BC'
       },
 
-      white: 'white',
+      white: 'rgb(250,250,250)',
       'white-a60': 'rgba(255,255,255,0.60)'
     },
     fontSize: {
