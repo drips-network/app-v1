@@ -128,24 +128,27 @@ onMounted(() => {
   //- body
   .-mt-40.rounded-2xlb.bg-indigo-700.pt-96.pb-40.relative(@click="ctxMenuVisible = false")
     //- "•••" menu
-    template(v-if="isMyProject")
-      .absolute.top-12.right-16.z-10
-        //- toggle btn
-        button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(ref="ctxMenuBtn", class="hover_bg-black/20", @click.stop="ctxMenuVisible = !ctxMenuVisible") •••
-        
-        //- (menu panel)
-        .absolute.right-0.mt-4.rounded-xl.shadow-xl.bg-indigo-900.border-2ff.border-violet-650.whitespace-nowrap.overflow-hidden(v-show="ctxMenuVisible")
-          //- (edit membership btn)
-          button.w-full.block.h-72.flex.items-center.justify-left.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editModalOpen = true })")
-            | Edit Info
+    .absolute.top-12.right-16.z-10
+      //- toggle btn
+      button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(ref="ctxMenuBtn", class="hover_bg-black/20", @click.stop="ctxMenuVisible = !ctxMenuVisible") •••
+      
+      //- (menu panel)
+      .absolute.right-0.mt-4.rounded-xl.shadow-xl.bg-indigo-900.border-2ff.border-violet-650.whitespace-nowrap.overflow-hidden(v-show="ctxMenuVisible")
+        //- (edit membership btn)
+        button.w-full.h-64.px-24.flex.items-center.justify-left.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(v-if="isMyProject", @click="openExtraMenuItem(() => { editModalOpen = true })")
+          | Edit Info
 
-          //- (edit splits btn)
-          button.w-full.block.h-72.flex.items-center.justify-left.px-32.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(@click="openExtraMenuItem(() => { editSplitsModalOpen = true })")
-            | Edit Drips Receivers
-          
-          //- open sea link (doesn't work with just contract address...)
-          //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
-            | View on OpenSea ↗
+        //- (edit splits btn)
+        button.w-full.h-64.px-24.flex.items-center.justify-left.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(v-if="isMyProject", @click="openExtraMenuItem(() => { editSplitsModalOpen = true })")
+          | Edit Drips Receivers
+
+        //- View on Etherscan link
+        a.w-full.h-64.px-24.flex.items-center.justify-left.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(:href="`${$store.getters.network.explorer.domain}/address/${props.project.id}`", target="_blank", rel="noopener noreferrer")
+          | View on {{ $store.getters.network.explorer.name }} ↗
+        
+        //- open sea link (doesn't work with just contract address... requires OS API)
+        //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
+          | View on OpenSea ↗
 
     //- name
     h3.text-center.text-xll.font-semibold.mb-32
