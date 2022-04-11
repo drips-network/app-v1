@@ -38,7 +38,7 @@ let lastUpdate = null
 let getWithdrawable
 const withdrawable = ref('0')
 // balance (max DAI withdrawable
-const balance = computed(() => toDAI(withdrawable.value), 'exact')
+const balance = computed(() => toDAI(withdrawable.value, 'exact'))
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
 
 const getDrips = async () => {
