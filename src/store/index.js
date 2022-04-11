@@ -345,16 +345,54 @@ export default createStore({
     },
 
     /* mint non-streaming / one-time payment nft */
-    mintNFT ({ state }, { projectAddress, typeId, giveAmt }) {
-      const contract = getProjectContract(projectAddress)
-      const contractSigner = contract.connect(signer)
-      return contractSigner['mint(address,uint128,uint128)'](state.address, typeId, giveAmt)
+    async mintNFT ({ state, getters, dispatch }, { projectAddress, typeId, giveAmt }) {
+      const actionId = new Date().getTime()
+      try {
+        if (!signer) await dispatch('connect')
+
+        const contract = getProjectContract(projectAddress)
+        const contractSigner = contract.connect(signer)
+
+        // log intent
+        logLocal('mint nft: intent', { arguments: arguments[1], from: state.address, network: getters.network.name }, actionId)
+
+        // sign...
+        const tx = await contractSigner['mint(address,uint128,uint128)'](state.address, typeId, giveAmt)
+
+        // log tx
+        console.log('new tx: mint one-time:', tx)
+        logLocal('mint nft: tx', { tx }, actionId)
+
+        return tx
+      } catch (e) {
+        logLocal('mint nft: error', { error: e }, actionId)
+        throw e
+      }
     },
 
-    async mintStreamingNFT ({ state }, { projectAddress, typeId, topUpAmt, amtPerSec }) {
-      const contract = getProjectContract(projectAddress)
-      const contractSigner = contract.connect(signer)
-      return contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
+    async mintStreamingNFT ({ state, getters }, { projectAddress, typeId, topUpAmt, amtPerSec }) {
+      const actionId = new Date().getTime()
+      try {
+        if (!signer) await dispatch('connect')
+
+        const contract = getProjectContract(projectAddress)
+        const contractSigner = contract.connect(signer)
+
+        // log intent
+        logLocal('mint nft: intent', { arguments: arguments[1], from: state.address, network: getters.network.name }, actionId)
+
+        // sign...
+        const tx = await contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
+
+        // log tx
+        console.log('new tx: mint streaming:', tx)
+        logLocal('mint nft: tx', { tx }, actionId)
+
+        return tx
+      } catch (error) {
+        logLocal('mint nft: error', { error }, actionId)
+        throw error
+      }
     },
 
     // async getFundingTotal (_, { projectAddress, isStreaming }) {
@@ -555,24 +593,27 @@ export default createStore({
     // },
 
     async updateUserDrips ({ state, getters, dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
+      const actionId = new Date().getTime()
       try {
         if (!signer) await dispatch('connect')
 
         const contract = getHubContract()
         const contractSigner = contract.connect(signer)
 
-        logLocal('update drips: intent', { arguments: arguments[1], from: state.address, network: getters.network.name })
+        // log intent
+        logLocal('update drips: intent', { arguments: arguments[1], from: state.address, network: getters.network.name }, actionId)
 
         // sign...
         const tx = await contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
 
+        // log tx
         console.log('new tx: update drips:', tx)
-        logLocal('update drips: tx', { tx })
+        logLocal('update drips: tx', { tx }, actionId)
 
         return tx
       } catch (e) {
         console.error(e)
-        logLocal('update drips: error', { error: e })
+        logLocal('update drips: error', { error: e }, actionId)
         throw e
       }
     },
@@ -841,7 +882,7 @@ export function pinImageToIPFS (imgString) {
 }
 
 // function for saving logs of user actions locally on their computer for debugging
-export function logLocal (label, data) {
+export function logLocal (label, data, group) {
   if (localStorage) {
     // get/set logs array
     let logs = localStorage.getItem('dripsLogs')
@@ -862,7 +903,7 @@ export function logLocal (label, data) {
     logs = logs.filter(log => new Date(log.timestamp).getTime() >= (timestamp.getTime() - 1000 * 60 * 60 * 24 * 7))
 
     // add log
-    logs.push({ timestamp, label, data })
+    logs.push({ timestamp, label, data, group })
 
     // update
     localStorage.setItem('dripsLogs', JSON.stringify(logs))
