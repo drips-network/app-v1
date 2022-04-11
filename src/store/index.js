@@ -354,23 +354,23 @@ export default createStore({
         const contractSigner = contract.connect(signer)
 
         // log intent
-        logLocal('mint nft: intent', { arguments: arguments[1], from: state.address, network: getters.network.name }, actionId)
+        dispatch('logLocal', { label: 'mint nft: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
 
         // sign...
         const tx = await contractSigner['mint(address,uint128,uint128)'](state.address, typeId, giveAmt)
 
         // log tx
-        console.log('new tx: mint one-time:', tx)
-        logLocal('mint nft: tx', { tx }, actionId)
+        console.log('new tx - mint one-time:', tx)
+        dispatch('logLocal', { label: 'mint nft: tx', data: { tx }, actionId })
 
         return tx
-      } catch (e) {
-        logLocal('mint nft: error', { error: e }, actionId)
-        throw e
+      } catch (error) {
+        dispatch('logLocal', { label: 'mint nft: error', data: { error }, actionId })
+        throw error
       }
     },
 
-    async mintStreamingNFT ({ state, getters }, { projectAddress, typeId, topUpAmt, amtPerSec }) {
+    async mintStreamingNFT ({ state, getters, dispatch }, { projectAddress, typeId, topUpAmt, amtPerSec }) {
       const actionId = new Date().getTime()
       try {
         if (!signer) await dispatch('connect')
@@ -379,18 +379,18 @@ export default createStore({
         const contractSigner = contract.connect(signer)
 
         // log intent
-        logLocal('mint nft: intent', { arguments: arguments[1], from: state.address, network: getters.network.name }, actionId)
+        dispatch('logLocal', { label: 'mint nft: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
 
         // sign...
         const tx = await contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
 
         // log tx
-        console.log('new tx: mint streaming:', tx)
-        logLocal('mint nft: tx', { tx }, actionId)
+        console.log('new tx - mint streaming:', tx)
+        dispatch('logLocal', { label: 'mint nft: tx', data: { tx }, actionId })
 
         return tx
       } catch (error) {
-        logLocal('mint nft: error', { error }, actionId)
+        dispatch('logLocal', { label: 'mint nft: error', data: { error }, actionId })
         throw error
       }
     },
@@ -601,19 +601,19 @@ export default createStore({
         const contractSigner = contract.connect(signer)
 
         // log intent
-        logLocal('update drips: intent', { arguments: arguments[1], from: state.address, network: getters.network.name }, actionId)
+        dispatch('logLocal', { label: 'update drips: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
 
         // sign...
         const tx = await contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
 
         // log tx
-        console.log('new tx: update drips:', tx)
-        logLocal('update drips: tx', { tx }, actionId)
+        console.log('new tx - update drips:', tx)
+        dispatch('logLocal', { label: 'update drips: tx', data: { tx }, actionId })
 
         return tx
       } catch (e) {
         console.error(e)
-        logLocal('update drips: error', { error: e }, actionId)
+        dispatch('logLocal', { label: 'update drips: error', data: { error: e }, actionId })
         throw e
       }
     },
@@ -836,6 +836,35 @@ export default createStore({
       } catch (e) {
         console.error(e)
       }
+    },
+
+    // function for saving logs of user actions locally on their computer for debugging
+    logLocal ({ state, getters }, { label, data, actionId }) {
+      if (localStorage) {
+        // get/set logs array
+        let logs = localStorage.getItem('dripsLogs')
+
+        try {
+          logs = JSON.parse(logs)
+          if (typeof logs.push !== 'function') {
+            throw new Error('empty or malformed logs')
+          }
+        } catch (e) {
+          // empty or malformed local log, creating new...
+          logs = []
+        }
+
+        const timestamp = new Date()
+
+        // remove logs older than 1 week
+        logs = logs.filter(log => new Date(log.timestamp).getTime() >= (timestamp.getTime() - 1000 * 60 * 60 * 24 * 7))
+
+        // add log
+        logs.push({ timestamp, label, data, group: actionId, network: getters.network.name, from: state.address })
+
+        // update
+        localStorage.setItem('dripsLogs', JSON.stringify(logs))
+      }
     }
   }
 })
@@ -879,33 +908,4 @@ export function pinImageToIPFS (imgString) {
     method: 'POST',
     body: JSON.stringify(imgString)
   })
-}
-
-// function for saving logs of user actions locally on their computer for debugging
-export function logLocal (label, data, group) {
-  if (localStorage) {
-    // get/set logs array
-    let logs = localStorage.getItem('dripsLogs')
-
-    try {
-      logs = JSON.parse(logs)
-      if (typeof logs.push !== 'function') {
-        throw new Error('empty or malformed logs')
-      }
-    } catch (e) {
-      // empty or malformed local log, creating new...
-      logs = []
-    }
-
-    const timestamp = new Date()
-
-    // remove logs older than 1 week
-    logs = logs.filter(log => new Date(log.timestamp).getTime() >= (timestamp.getTime() - 1000 * 60 * 60 * 24 * 7))
-
-    // add log
-    logs.push({ timestamp, label, data, group })
-
-    // update
-    localStorage.setItem('dripsLogs', JSON.stringify(logs))
-  }
 }
