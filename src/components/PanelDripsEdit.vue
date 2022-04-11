@@ -159,7 +159,6 @@ const update = async () => {
       balanceDelta: topUpWei,
       newReceivers
     })
-    console.log('update drips tx', tx.value)
 
     // wait for tx...
     txMsg.value = { message: 'Waiting for transaction confirmation...' }
