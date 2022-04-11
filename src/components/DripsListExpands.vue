@@ -82,17 +82,19 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
 
           //- (summary text)
           p.h-64.pl-24.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")
+            //- label
             .font-semibold.text-md
               template(v-if="props.direction === 'in'")
-                | Supporters
-                //- | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
+                //- | Senders
+                | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
-                | Receivers
-                //- template(v-if="props.canEdit")
-                //-   | You drip&nbsp;
-                //- template(v-else)
-                //-   | #[addr(:address="props.address", :youOn="true")] drips&nbsp;
-                //- | to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
+                //- | Drips to
+                template(v-if="props.canEdit")
+                  | You drip&nbsp;
+                template(v-else)
+                  | #[addr(:address="props.address", :youOn="true")] drips&nbsp;
+                | to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
+            
             //- toggle icon
             svg-chevron-down.ml-7.w-28.h-28.transform.origin-center.rotate-180
 
@@ -112,12 +114,12 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
             | {{ props.drips.length }} supporters
           
           //- (total monthly)
-          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="totalMonthlyRate")
+          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="totalMonthlyRate && props.drips.length > 1")
             svg-dai.mr-2(size="xs")
             | {{ totalMonthlyRate }}/mo
 
           //- (avg percent)
-          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="avgPct")
+          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="avgPct && props.drips.length > 1")
             template(v-if="props.direction === 'in'")
               | {{ avgPct }}% avg.
             template(v-if="props.direction === 'out'")

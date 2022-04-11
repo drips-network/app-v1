@@ -82,7 +82,7 @@ module.exports = {
         800: 'rgb(31 29 110)' // duller border, match shadow
       },
       indigo: {
-        700: '#17164B',
+        700: 'rgb(25 24 90)', // '#17164B',
         800: '#12123C',
         850: '#0E0E30',
         900: '#0a0930', // #090928', // dark: rgb(9 14 24)', // softer: #0e1522', // figma: #101828', > deeper/saturated: #090928
@@ -111,7 +111,7 @@ module.exports = {
         500: '#0FA7BC'
       },
 
-      white: 'rgb(250,250,250)',
+      white: 'rgb(245,245,245)',
       'white-a60': 'rgba(255,255,255,0.60)'
     },
     fontSize: {

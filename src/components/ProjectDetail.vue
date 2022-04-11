@@ -143,6 +143,10 @@ onMounted(() => {
           | Edit Drips Receivers
 
         //- View on Etherscan link
+        router-link.w-full.h-64.px-24.flex.items-center.justify-left.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(:to="{ name: 'project', params: { address: props.project.id }}")
+          | View Membership Page
+
+        //- View on Etherscan link
         a.w-full.h-64.px-24.flex.items-center.justify-left.focus_outline-none.focus-visible_bg-violet-600.notouch_hover_bg-violet-600(:href="`${$store.getters.network.explorer.domain}/address/${props.project.id}`", target="_blank", rel="noopener noreferrer")
           | View on {{ $store.getters.network.explorer.name }} ↗
         

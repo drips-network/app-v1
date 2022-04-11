@@ -377,7 +377,7 @@ article.profile.pt-40.pb-80
 
   
   //- receivers
-  drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser")
+  drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
 
 
   //- bio/description
@@ -417,20 +417,20 @@ article.profile.pt-40.pb-80
 
   //- admin modals
   template(v-if="isMyUser")
-    //- EDIT PROFILE
+    //- EDIT PROFILE MODAL
     modal-edit-profile(v-if="edit === 'profile'", :open="edit === 'profile'", @close="edit = null", :meta="profileMeta", @updated="getProfile")
 
-    //- COLLECT
+    //- COLLECT MODAL
     modal-collect-drips(v-if="collectModalOpen", :open="collectModalOpen", @close="collectModalOpen = false; getMyCollectable()", :amts="collectableAmts", @collected="getMyCollectable")
       template(v-slot:header) Collect your Drips
 
-    //- EDIT
+    //- EDIT DRIPS/SPLITS
     //- select drip type to edit...
     modal-edit-drips-select(:open="editDripsSelect", @close="editDripsSelect = false", @select="e => { edit = e; editDripsSelect = false }", :edit="allDripsOut && allDripsOut.length")
 
     //- edit drips...
     template(v-if="edit === 'drips'")
-      modal-drips-edit(:open="edit === 'drips'", @close="edit = null; getDrips()", @updated="getDrips", :addFundsOnly="edit === 'funds'")
+      modal-drips-edit(:open="edit === 'drips'", @close="edit = null; getDripsOut()", @updated="getDripsOut", :addFundsOnly="edit === 'funds'")
         template(v-slot:header)
           h6 Drip to Others
         template(v-slot:description)
@@ -438,7 +438,7 @@ article.profile.pt-40.pb-80
 
     //- edit splits...
     template(v-if="edit==='splits'")
-      modal-splits-edit(:open="edit === 'splits'", @close="edit = null; getSplits()", @updated="getSplits", @viewSplits="goToMySplits")
+      modal-splits-edit(:open="edit === 'splits'", @close="edit = null; getSplitsOut()", @updated="getSplitsOut", @viewSplits="goToMySplits")
         template(v-slot:header)
           h6 Split your Drips
         template(v-slot:description)

@@ -42,11 +42,20 @@ const routes = [
       }
     ]
   },
+  
   {
-    path: '/communities/:address',
+    path: '/memberships/:address',
     name: 'project', // TODO rename
     component: () => import(/* webpackChunkName: "project" */ '../views/Project.vue')
   },
+  
+  {
+    path: '/communities/:address',
+    redirect: to => {
+      return { name: 'project', params: { address: to.params.address }}
+    },
+  },
+
 
   // user / address
   {
