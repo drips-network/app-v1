@@ -71,7 +71,7 @@ article.project-2.pt-40.pb-80
       p.flex.justify-center.mt-36ff.mb-72
         .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-6.pr-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold
           router-link.flex.items-center.rounded-full.pl-4.pr-1.py-4.notouch_hover_violet-600.notouch_hover_text-white.mr-5(:to="{name: 'user', params: { address: project.projectOwner }}")
-            user-avatar.w-24.h-24.mr-8(:address="project.projectOwner")
+            user-avatar.w-24.h-24.mr-7(:address="project.projectOwner")
             addr.font-boldff(:address="project.projectOwner")
           div is raising funds in an #[b 🧧 NFT Membership] 
     
