@@ -554,16 +554,25 @@ export default createStore({
     //   }
     // },
 
-    async updateUserDrips ({ dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
+    async updateUserDrips ({ state, getters, dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
       try {
         if (!signer) await dispatch('connect')
 
         const contract = getHubContract()
         const contractSigner = contract.connect(signer)
-        // tx...
-        return contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
+
+        logLocal('update drips: intent', { arguments: arguments[1], from: state.address, network: getters.network.name })
+
+        // sign...
+        const tx = await contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
+
+        console.log('new tx: update drips:', tx)
+        logLocal('update drips: tx', { tx })
+
+        return tx
       } catch (e) {
         console.error(e)
+        logLocal('update drips: error', { error: e })
         throw e
       }
     },
@@ -829,4 +838,33 @@ export function pinImageToIPFS (imgString) {
     method: 'POST',
     body: JSON.stringify(imgString)
   })
+}
+
+// function for saving logs of user actions locally on their computer for debugging
+export function logLocal (label, data) {
+  if (localStorage) {
+    // get/set logs array
+    let logs = localStorage.getItem('dripsLogs')
+
+    try {
+      logs = JSON.parse(logs)
+      if (typeof logs.push !== 'function') {
+        throw new Error('empty or malformed logs')
+      }
+    } catch (e) {
+      // empty or malformed local log, creating new...
+      logs = []
+    }
+
+    const timestamp = new Date()
+
+    // remove logs older than 1 week
+    logs = logs.filter(log => new Date(log.timestamp).getTime() >= (timestamp.getTime() - 1000 * 60 * 60 * 24 * 7))
+
+    // add log
+    logs.push({ timestamp, label, data })
+
+    // update
+    localStorage.setItem('dripsLogs', JSON.stringify(logs))
+  }
 }
