@@ -107,7 +107,6 @@ const mint = async () => {
         giveAmt: toWei(amountDAI.value)
       })
     }
-    console.log('mint tx', state.mintTx)
 
     // wait for tx...
     state.mintTxMsg = { message: 'Waiting for transaction confirmation...' }
@@ -117,7 +116,6 @@ const mint = async () => {
     state.nft = true
     state.mintTxMsg = { status: 1, message: 'You joined! View your <b>NFT Membership</b>!' }
   } catch (e) {
-    console.error(e)
     state.mintTxMsg = { status: -1, message: e.message || e }
   }
 }
