@@ -51,7 +51,7 @@ const toggle = () => { expanded.value = !expanded.value }
 <template lang="pug">
 section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
-  .w-full.flex.justify-center.my-3.opacity-90
+  .w-full.flex.justify-center.opacity-90(:class="expanded && props.direction === 'in' ? 'my-32' : 'my-3'")
     .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
       | 💧
 
@@ -105,7 +105,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
         ul.w-full.flex.flex-wrap.justify-center
           //- drips...
           li(v-for="drip in props.drips")
-            user-tag-small(:address="props.direction === 'in' ? drip.sender : drip.receiver[0]", :drip="drip")
+            user-tag-small.bg-indigo-700.btn-focus-violet(:address="props.direction === 'in' ? drip.sender : drip.receiver[0]", :drip="drip")
         
         //- (stats)
         .flex.flex-wrap.justify-center.mt-12.text-base

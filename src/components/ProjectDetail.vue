@@ -12,28 +12,32 @@ import DripsListExpands from '@/components/DripsListExpands.vue'
 import ModalCollectDrips from '@/components/ModalCollectDrips.vue'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo.vue'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit.vue'
-const props = defineProps(['project'])
-const meta = ref()
+import ModalMint from '@/components/ModalMint.vue'
 
+const props = defineProps(['project', 'ownerVisible'])
+const emit = defineEmits(['refresh'])
+
+// project
+const meta = ref()
+const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 const isMyProject = computed(() => props.project.projectOwner === store.state.address)
 
+// ui
 const benefitsEl = ref()
 const benefitsLong = ref(false)
 const readMore = ref(false)
 const showMembers = ref(false)
 const editModalOpen = ref(false)
 const editSplitsModalOpen = ref(false)
+const mintModalOpen = ref(false)
 
-const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
-
+// min
 let minAmt = toRaw(props.project.tokenTypes[0].minAmt)
 minAmt = isStreaming ? toDAIPerMo(minAmt) : toDAI(minAmt)
 
+// current funding
 const currentFundingWei = isStreaming ? toRaw(props.project.tokenTypes[0].currentTotalAmtPerSec)
   : toRaw(props.project.tokenTypes[0].currentTotalGiven)
-
-// member addresses array
-const membersAddrs = toRaw(props.project.tokens.map(tkn => tkn.owner))
 
 // raised (total collected + total split)
 let raised
@@ -46,15 +50,8 @@ if (bn.from(totalCollectedWei).lt(currentFundingWei)) {
   raised = toDAI(totalCollectedWei)
 }
 
-const getMeta = async () => {
-  try {
-    meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })
-    await nextTick()
-    benefitsLong.value = benefitsEl.value && benefitsEl.value.scrollHeight > benefitsEl.value.offsetHeight
-  } catch (e) {
-    console.error(e)
-  }
-}
+// members
+const membersAddrs = toRaw(props.project.tokens.map(tkn => tkn.owner))
 
 // COLLECTABLE
 const collectModalOpen = ref(false)
@@ -74,6 +71,16 @@ const totalCollectableDAI = computed(() => {
 const getCollectable = () => {
   store.dispatch('getCollectable', { projectAddress: props.project.id })
     .then(amounts => { collectableAmts.value = amounts })
+}
+
+const getMeta = async () => {
+  try {
+    meta.value = await store.dispatch('getProjectMeta', { projectAddress: props.project.id })
+    await nextTick()
+    benefitsLong.value = benefitsEl.value && benefitsEl.value.scrollHeight > benefitsEl.value.offsetHeight
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const onCollected = () => {
@@ -122,13 +129,45 @@ onMounted(() => {
       .aspect-w-1.aspect-h-1
       img.absolute.block.overlay.object-contain.object-bottom(:src="ipfsUrl(props.project.tokenTypes[0].ipfsHash)")
       //- caption
-      figcaption.absolute.top-full.w-full.left-0.text-center.text-sm.text-violet-650.pt-5
+      //- figcaption.absolute.top-full.w-full.left-0.text-center.text-sm.text-violet-650.pt-5
         | Member NFT
   
   //- body
-  .-mt-40.rounded-2xlb.bg-indigo-700.pt-96.pb-40.relative(@click="ctxMenuVisible = false")
+  .-mt-40.rounded-2xlb.bg-indigo-700.pt-40.pb-40.relative(@click="ctxMenuVisible = false")
+    
+    //- (owner link)
+    template(v-if="props.ownerVisible")
+      .flex.justify-center.-mb-4.-mt-16.relative.z-10.pointer-events-none
+        user-tag-small.bg-violet-650.shadow-xl.notouch_hover_ring.focus_ring.pointer-events-auto(:address="props.project.projectOwner")
+    
+    //- title
+    h3.text-center.text-xll.font-semibold.mt-40.mb-36
+      router-link(:to="{name: 'project', params: { address: props.project.id }}")
+        | {{ meta && meta.name ? meta.name : props.project.name }}
+
+    //- details
+    .flex.justify-center.flex-wrap
+      //- min
+      .mx-4.h-64.rounded-full.bg-indigo-800.flex.items-center.justify-center.min-w-144.px-32.text-lg.text-violet-650.font-semibold
+        svg-dai.mr-2(size="md")
+        | {{ minAmt }}
+        template(v-if="props.project.tokenTypes[0].streaming") /mo
+        //- .text-lgg.tracking-tight /MO
+          
+      //- (join btn)
+      button.mx-4.btn.btn-mdd.btn-violet.text-lg.font-semibold.min-w-144.px-32(@click="mintModalOpen = true") Join
+    
+    //- benefits/description
+    template(v-if="meta && meta.descrip.length")
+      .mt-40.px-36.text-center.font-semibold.text-md.leading-normal(ref="benefitsEl", v-html="meta.descrip", :class="{'line-clamp-4': !readMore}")
+      //- readmore/less btn
+      template(v-if="benefitsLong")
+        .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
+          button.text-violet-650.notouch_hover_text-white(@click="readMore = !readMore")
+            svg-chevron-down.w-32.h-32(:class="{'transform rotate-180': readMore}")
+
     //- "•••" menu
-    .absolute.top-12.right-16.z-10
+    .absolute.top-12.right-16.z-20
       //- toggle btn
       button.h-36.rounded-full.px-14.flex.items-center.text-violet-650.focus_ring.focus_outline-none(ref="ctxMenuBtn", class="hover_bg-black/20", @click.stop="ctxMenuVisible = !ctxMenuVisible") •••
       
@@ -154,39 +193,14 @@ onMounted(() => {
         //- a.w-full.block.h-72.flex.items-center.justify-center.px-32.focus_outline-none.focus-visible_bg-violet-600(:href="`https://opensea.io/${props.project.id}`", target="_blank", rel="noopener noreferrer")
           | View on OpenSea ↗
 
-    //- name
-    h3.text-center.text-xll.font-semibold.mb-32
-      | {{ meta && meta.name ? meta.name : props.project.name }}
-
-    //- details
-    .flex.justify-center.flex-wrap
-      //- min
-      .mx-4.h-64.rounded-full.bg-indigo-800.flex.items-center.justify-center.min-w-160.px-32.text-lg.text-violet-650.font-semibold
-        svg-dai.mr-2(size="md")
-        | {{ minAmt }}
-        template(v-if="props.project.tokenTypes[0].streaming") /mo
-        //- .text-lgg.tracking-tight /MO
-          
-      //- (join btn)
-      button.mx-4.btn.btn-mdd.btn-violet.text-lg.font-semibold.min-w-160.px-40 Join
-    
-    //- benefits/description
-    template(v-if="meta && meta.descrip.length")
-      .mt-40.px-36.text-center.font-semibold.text-md.leading-normal(ref="benefitsEl", v-html="meta.descrip", :class="{'line-clamp-4': !readMore}")
-      //- readmore/less btn
-      template(v-if="benefitsLong")
-        .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
-          button.text-violet-650.notouch_hover_text-white(@click="readMore = !readMore")
-            svg-chevron-down.w-32.h-32(:class="{'transform rotate-180': readMore}")
-
   //- (progress bar)
   template(v-if="meta && meta.goal")
-    project-progress-bar.bg-indigo-700.mt-5(:project="project", :meta="meta", :currentFundingWei="currentFundingWei")
+    project-progress-bar.bg-indigo-700.mt-4(:project="project", :meta="meta", :currentFundingWei="currentFundingWei")
 
   .text-md.font-semibold
     
     //- members summary row
-    header.relative.mt-5.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
+    header.relative.mt-4.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
       //- label left
       .text-violet-650.text-md.font-semibold Members
 
@@ -216,7 +230,7 @@ onMounted(() => {
           svg-chevron-down.w-32.h-32.transform.rotate-180
 
     //- stats
-    .grid.grid-cols-2.gap-4.mt-5
+    .grid.grid-cols-2.gap-4.mt-4
       //- raised:
       .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
         .text-violet-650 Raised
@@ -263,7 +277,7 @@ onMounted(() => {
                   .flex.items-center.text-white
                     .text-xl 26 days
 
-            //- .h-80.mt-5.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
+            //- .h-80.mt-4.px-32.rounded-full.bg-indigo-850.flex.items-center.justify-between.font-semibold
 
         .h-80.bg-indigo-700ff.border.border-violet-500.flex.items-center.justify-between.px-32.rounded-full
           .text-violet-650
@@ -283,19 +297,26 @@ onMounted(() => {
   //- drips list
   drips-list-expands(:address="props.project.id", :drips="splitsOut", direction="out", :canEdit="isMyProject", @editDrips="editSplitsModalOpen = true")
 
-  //- (collect modal)
-  modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")
-    template(v-slot:header) Collect Drips for<br>"{{ meta.name }}"
+  
+  //- (mint modal)
+  modal-mint(v-if="meta", :open="mintModalOpen", :project="project", :meta="meta", @close="mintModalOpen = false; $emit('refresh')", @minted="$emit('refresh')")
 
-  //- (edit project)
-  modal-edit-project-info(v-if="isMyProject && meta && editModalOpen", :open="editModalOpen", @updated="getMeta", @close="editModalOpen = false", :meta="meta", :projectAddress="props.project.id")
+  
+  //- (ADMIN MODALS)
+  template(v-if="isMyProject")
+    //- (collect modal)
+    modal-collect-drips(v-if="collectModalOpen && meta", :open="collectModalOpen", @close="collectModalOpen = false", :amts="collectableAmts", @collected="onCollected", :projectAddress="props.project.id")
+      template(v-slot:header) Collect Drips for<br>"{{ meta.name }}"
 
-  //- (splits edit)
-  modal-splits-edit(v-if="isMyProject && editSplitsModalOpen", :open="editSplitsModalOpen", @close="editSplitsModalOpen = false; getSplitsOut()", :projectAddress="props.project.id", @updated="getSplitsOut")
-    template(v-slot:header)
-      h6 Edit Drips for<br>"{{ meta.name }}"
-    template(v-slot:description)
-      p.mx-auto(style="max-width:24em")
-        | When you <b>collect funds</b> from your membership, they will be #[b split] with the addresses below:
+    //- (edit project)
+    modal-edit-project-info(v-if="meta && editModalOpen", :open="editModalOpen", @updated="getMeta", @close="editModalOpen = false", :meta="meta", :projectAddress="props.project.id")
+
+    //- (splits edit)
+    modal-splits-edit(v-if="editSplitsModalOpen", :open="editSplitsModalOpen", @close="editSplitsModalOpen = false; getSplitsOut()", :projectAddress="props.project.id", @updated="getSplitsOut")
+      template(v-slot:header)
+        h6 Edit Drips for<br>"{{ meta.name }}"
+      template(v-slot:description)
+        p.mx-auto(style="max-width:24em")
+          | When you <b>collect funds</b> from your membership, they will be #[b split] with the addresses below:
     
 </template>

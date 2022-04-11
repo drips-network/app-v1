@@ -43,12 +43,14 @@ const routes = [
     ]
   },
   
+  // nft memberships
   {
     path: '/memberships/:address',
     name: 'project', // TODO rename
-    component: () => import(/* webpackChunkName: "project" */ '../views/Project.vue')
+    component: () => import(/* webpackChunkName: "project" */ '../views/Project2.vue')
   },
   
+  // (redirect old communities to nft membership page)
   {
     path: '/communities/:address',
     redirect: to => {
