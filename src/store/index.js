@@ -354,18 +354,18 @@ export default createStore({
         const contractSigner = contract.connect(signer)
 
         // log intent
-        dispatch('logLocal', { label: 'mint nft: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
+        dispatch('log', { label: 'mint nft: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
 
         // sign...
         const tx = await contractSigner['mint(address,uint128,uint128)'](state.address, typeId, giveAmt)
 
         // log tx
         console.log('new tx - mint one-time:', tx)
-        dispatch('logLocal', { label: 'mint nft: tx', data: { tx }, actionId })
+        dispatch('log', { label: 'mint nft: tx', data: { tx }, actionId })
 
         return tx
       } catch (error) {
-        dispatch('logLocal', { label: 'mint nft: error', data: { error }, actionId })
+        dispatch('log', { label: 'mint nft: error', data: { error }, actionId })
         throw error
       }
     },
@@ -379,18 +379,18 @@ export default createStore({
         const contractSigner = contract.connect(signer)
 
         // log intent
-        dispatch('logLocal', { label: 'mint nft: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
+        dispatch('log', { label: 'mint nft: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
 
         // sign...
         const tx = await contractSigner['mintStreaming(address,uint128,uint128,uint128)'](state.address, typeId, topUpAmt.toString(), amtPerSec.toString())
 
         // log tx
         console.log('new tx - mint streaming:', tx)
-        dispatch('logLocal', { label: 'mint nft: tx', data: { tx }, actionId })
+        dispatch('log', { label: 'mint nft: tx', data: { tx }, actionId })
 
         return tx
       } catch (error) {
-        dispatch('logLocal', { label: 'mint nft: error', data: { error }, actionId })
+        dispatch('log', { label: 'mint nft: error', data: { error }, actionId })
         throw error
       }
     },
@@ -601,19 +601,19 @@ export default createStore({
         const contractSigner = contract.connect(signer)
 
         // log intent
-        dispatch('logLocal', { label: 'update drips: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
+        dispatch('log', { label: 'update drips: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
 
         // sign...
         const tx = await contractSigner['setDrips(uint64,uint128,(address,uint128)[],int128,(address,uint128)[])'](lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers)
 
         // log tx
         console.log('new tx - update drips:', tx)
-        dispatch('logLocal', { label: 'update drips: tx', data: { tx }, actionId })
+        dispatch('log', { label: 'update drips: tx', data: { tx }, actionId })
 
         return tx
       } catch (e) {
         console.error(e)
-        dispatch('logLocal', { label: 'update drips: error', data: { error: e }, actionId })
+        dispatch('log', { label: 'update drips: error', data: { error: e }, actionId })
         throw e
       }
     },
@@ -839,7 +839,7 @@ export default createStore({
     },
 
     // function for saving logs of user actions locally on their computer for debugging
-    logLocal ({ state, getters }, { label, data, actionId }) {
+    log ({ state, getters }, { label, data, actionId }) {
       if (localStorage) {
         // get/set logs array
         let logs = localStorage.getItem('dripsLogs')
