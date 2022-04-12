@@ -346,14 +346,14 @@ article.profile.pt-40.pb-80
       router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
         .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
         .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-          span(v-if="projects") {{ projects.length}}
+          span.text-mss(v-if="projects") {{ projects.length}}
           span.animate-pulse(v-else) ...
       
       //- (nfts)
       router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#member-of", :class="{'opacity-40 pointer-events-none': nfts && !nfts.length}")
         .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
         .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-          span(v-if="nfts") {{ nfts.length}}
+          span.text-mss(v-if="nfts") {{ nfts.length}}
           span.animate-pulse(v-else) ...
   
   //- receivers
@@ -390,8 +390,8 @@ article.profile.pt-40.pb-80
           project-detail.mb-132(:project="project", @collected="getProjects")
 
     //- (show all btn)
-    footer.flex.justify-center.-mt-72.mb-120(v-if="projects.length > 2")
-      button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-24.pr-12.font-semibold.text-lg(@click="showAllMemberships = !showAllMemberships")
+    footer.flex.justify-center.-mt-40.mb-120(v-if="projects.length > 2")
+      button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-26.pr-12.font-semibold.text-lg(@click="showAllMemberships = !showAllMemberships")
         .flex.items-center
           div {{ showAllMemberships ? 'View Less' : 'View All' }}
           svg-chevron-down.h-36.w-36.ml-4(:class="{'transform origin-center rotate-180': showAllMemberships}")
@@ -429,7 +429,7 @@ article.profile.pt-40.pb-80
 
     //- (show all btn)
     footer.flex.justify-center.mt-80.mb-120(v-if="nfts.length > 3")
-      button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-24.pr-12.font-semibold.text-lg(@click="showAllNFTs = !showAllNFTs")
+      button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-26.pr-12.font-semibold.text-lg(@click="showAllNFTs = !showAllNFTs")
         .flex.items-center
           div {{ showAllNFTs ? 'View Less' : 'View All' }}
           svg-chevron-down.h-36.w-36.ml-4(:class="{'transform origin-center rotate-180': showAllNFTs}")
