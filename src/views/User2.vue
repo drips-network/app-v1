@@ -32,8 +32,9 @@ const ensName = computed(() => store.state.addresses[route.params.address]?.ens)
 const profileMeta = ref()
 const dripModalOpen = ref(false)
 const collectModalOpen = ref(false)
-const showAllSenders = ref(false)
-const showAllReceivers = ref(false)
+const showAllMemberships = ref(false)
+const showAllNFTs = ref(false)
+const waveBgImgUrl = new URL('../assets/wave-shadow-violet.svg', import.meta.url).href
 
 // my account
 const isMyUser = computed(() => store.state.address === route.params.address)
@@ -338,18 +339,9 @@ article.profile.pt-40.pb-80
 
   //- user tag row
   div.mx-auto.flex.flex-col
-    user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'")
+    user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'", @dripClick="dripModalOpen = true")
     
-    section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650
-      //- (bio link)
-      //- template(v-if="bio")
-        .w-full.flex.justify-center.order-last
-          router-link.rounded-full.min-w-196ff.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
-            .ml-4.mr-12.flex-1 ✏️&nbsp;&nbsp;Bio
-          //- .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-            span(v-if="projects") {{ projects.length}}
-            span.animate-pulse(v-else) ...
-
+    section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650(v-if="(projects && projects.length) || (nfts && nfts.length)")
       //- (memberships)
       router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
         .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
@@ -363,58 +355,86 @@ article.profile.pt-40.pb-80
         .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
           span(v-if="nfts") {{ nfts.length}}
           span.animate-pulse(v-else) ...
-
-
-    //- template(v-if="bio")
-      router-link.w-full.max-w-md.mx-auto.bg-indigo-950.rounded-2xlb.flex.items-center.mt-5.notouch_hover_ring.notouch_hover_ring-violet-650(to="#bio")
-        .w-full.px-16.py-9
-          p.truncate.font-semibold.text-ms.text-violet-650(v-html="bio")
-
-  //- drip to button
-  //- button.w-112.h-112.ml-12.flex.items-center.justify-center.bg-white.rounded-full.pr-4ff
-    //- div.-ml-2.pt-2(style="font-size:2.4em") 💧
-    div.-ml-3ff.font-semiboldff.text-black.pb-4(style="font-size:2.4em") +
-
   
   //- receivers
-  drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
+  drips-list-expands.mb-132(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
 
 
-  //- bio/description
-  //- template(v-if="bio")
-    section#bio.my-120.flex.justify-center.relative
-      h3.sr-only About
-      //- h3.absolute.top-0.left-0.w-full.text-center.text-sm.pt-6.text-violet-650 Bio
-      p.rounded-2xlb.bg-indigo-950.p-28.text-center.text-xl.font-semibold.bg-violet-650.text-white.leading-normal(v-html="bio", style="max-width:30em")
+  //- (memberships list)
+  section(v-if="projects && projects.length")
+    //- wave divider
+    .h-48.-mx-10.w-full_10(:style="{width: 'calc(100% + 2rem)', backgroundImage: `url(${waveBgImgUrl})` }")
+    
+    //- header
+    header#memberships.flex.justify-center.mt-56.pt-56
+      h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
+        .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 🧧
+        .text-xl.ml-12 Memberships
+        .h-40.w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base
+          | {{ projects.length }}
+    
+    //- small text summary
+    p.flex.justify-center.mt-60
+      .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-6.pr-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
+        router-link.flex.items-center.rounded-full.pl-4.py-4.notouch_hover_violet-600.notouch_hover_text-white.mr-5(:to="{name: 'user', params: { address: route.params.address }}")
+          user-avatar.w-24.h-24.mr-7(:address="route.params.address")
+          addr.font-bold(:address="route.params.address")
+        div is raising funds with #[b NFT Memberships] 
+
+    //- projects list
+    .mt-72.flex.flex-wrap.justify-evenly
+      //- projects...
+      template(v-for="(project, i) in projects")
+        //- (excerpted)
+        template(v-if="showAllMemberships || i < 2")
+          project-detail.mb-132(:project="project", @collected="getProjects")
+
+    //- (show all btn)
+    footer.flex.justify-center.-mt-72.mb-120(v-if="projects.length > 2")
+      button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-24.pr-12.font-semibold.text-lg(@click="showAllMemberships = !showAllMemberships")
+        .flex.items-center
+          div {{ showAllMemberships ? 'View Less' : 'View All' }}
+          svg-chevron-down.h-36.w-36.ml-4(:class="{'transform origin-center rotate-180': showAllMemberships}")
 
   
-  //- memberships list
-  section#memberships
-    .mt-80.pt-60(v-if="projects && projects.length")
-      header.flex
-        h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-          div #[addr.font-bold(:address="$route.params.address")] is raising funds with 🧧 #[b NFT Memberships] 
 
-      .mt-120.flex.flex-wrap.justify-evenly
-        //- projects...
-        template(v-for="project in projects")
-          //- user-project(:project="project", @collected="getProjects")
-          project-detail.mb-160(:project="project", @collected="getProjects")
+  //- (nfts list)
+  section(v-if="nfts && nfts.length")
+    //- wave divider
+    .h-48.-mx-10.w-full_10(:style="{width: 'calc(100% + 2rem)', backgroundImage: `url(${waveBgImgUrl})` }")
 
+    //- header
+    header#member-of.flex.justify-center.mt-56.pt-56
+      h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
+        .h-40.w-40.flex.items-center.justify-center.text-xl.-ml-2 🧩
+        .text-xl.ml-12 Member of
+        .h-40.w-40.ml-18.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base
+          | {{ nfts.length }}
 
-  //- nfts list
-  section#member-of
-    div.mt-80.pt-60.px-20(v-if="nfts && nfts.length")
-      header.flex
-        h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
-          div #[addr.font-bold(:address="$route.params.address")] has #[b {{ nfts.length }} NFT Membership{{ nfts.length > 1 ? 's' : ''}}] 🧩
+    //- summary text
+    p.flex.justify-center.mt-60
+      .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-6.pr-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
+        router-link.flex.items-center.rounded-full.pl-4.py-4.notouch_hover_violet-600.notouch_hover_text-white.mr-5(:to="{name: 'user', params: { address: route.params.address }}")
+          user-avatar.w-24.h-24.mr-7(:address="route.params.address")
+          addr.font-bold(:address="route.params.address")
+        div is a member of #[b {{ nfts.length }}] NFT Membership{{ nfts.length > 1 ? 's' : ''}}.
 
-      ul.mt-120.flex.flex-wrap.justify-center
-        //- nfts...
-        li.px-10.w-1x3(v-for="nft in nfts")
+    //- nft list
+    ul.mt-72.flex.flex-wrap.justify-center
+      //- nfts...
+      li.px-10.w-1x3(v-for="(nft, i) in nfts")
+        //- (excerpted)
+        template(v-if="showAllNFTs || i < 3")
           user-nft.w-full(:nft="nft")
 
+    //- (show all btn)
+    footer.flex.justify-center.mt-80.mb-120(v-if="nfts.length > 3")
+      button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-24.pr-12.font-semibold.text-lg(@click="showAllNFTs = !showAllNFTs")
+        .flex.items-center
+          div {{ showAllNFTs ? 'View Less' : 'View All' }}
+          svg-chevron-down.h-36.w-36.ml-4(:class="{'transform origin-center rotate-180': showAllNFTs}")
 
+  
   //- admin modals
   template(v-if="isMyUser")
     //- EDIT PROFILE MODAL

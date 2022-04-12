@@ -77,7 +77,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
         | Drip to #[addr.text-violet-650ff(:address="props.address", @ens="ens => { dripToReceiver = ens }")]
 
     template(v-slot:description)
-      dialog-description.text-violet-650 How much would you like to drip?
+      dialog-description.text-violet-650 Drip DAI every month or split a percent of your own incoming drips.
       //- dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
         template(v-if="dripType === 'monthly'")
           | Send DAI #[b.text-violet-650 every month.]
@@ -94,7 +94,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
           input-radio.w-full(v-model="dripType", value="monthly", name="drip type") DAI/month
         //- option split
         .w-1x2.pl-3
-          input-radio.w-full(v-model="dripType", value="split", name="drip type") % of drips
+          input-radio.w-full(v-model="dripType", value="split", name="drip type") % of your drips
 
       //- input-body.mt-10(v-show="dripType === 'monthly'", label="Pre-pay Months")
         input(v-model="prePayMonths", type="number", min="1", step="1" required)
@@ -104,10 +104,10 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
   modal-splits-edit(v-if="confirmSplits", :open="confirmSplits", :newRecipient="{ receiverInput: dripToReceiver, percent: dripAmt }", @close="confirmSplits = false")
     template(v-slot:header)
-      h6 Confirm Drip Shares
+      h6 Confirm Splitting Drips
 
     template(v-slot:description)
-      p Review all the addresses you will now #[b.text-violet-650 share]<br>your incoming funds with.
+      p Review all the addresses you will now #[b.text-violet-650 split]<br>your incoming funds with.
 
   modal-drips-edit(v-if="confirmDrips", :open="confirmDrips", :newRecipient="{ receiverInput: dripToReceiver, amount: dripAmt }", @close="confirmDrips = false")
     template(v-slot:header)

@@ -137,7 +137,7 @@ onMounted(() => {
     
     //- (owner link)
     template(v-if="props.ownerVisible")
-      .flex.justify-center.-mb-4.-mt-16.relative.z-10.pointer-events-none
+      .flex.justify-center.-mb-2.-mt-26.relative.z-10.pointer-events-none
         user-tag-small.bg-violet-650.shadow-xl.notouch_hover_ring.focus_ring.pointer-events-auto(:address="props.project.projectOwner")
     
     //- title

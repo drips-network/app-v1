@@ -23,8 +23,11 @@ store.dispatch('init')
 const connect = async () => {
   try {
     await store.dispatch('connect')
-    // redirect to profile
-    router.push({ name: 'user', params: { address: store.state.address } })
+    // redirect to profile ?
+    // if (!sessionStorage.getItem('hasLoggedIn')) {
+    //   sessionStorage.setItem('hasLoggedIn', true)
+    //   router.push({ name: 'user', params: { address: store.state.address } })  
+    // }
   } catch (e) {
     // ignore closing web3modal
     if (e !== 'Modal closed by user') {
