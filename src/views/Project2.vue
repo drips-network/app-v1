@@ -73,7 +73,7 @@ article.project-2.pt-40.pb-80
           router-link.flex.items-center.rounded-full.pl-4.pr-1.py-4.notouch_hover_violet-600.notouch_hover_text-white.mr-5(:to="{name: 'user', params: { address: project.projectOwner }}")
             user-avatar.w-24.h-24.mr-7(:address="project.projectOwner")
             addr.font-boldff(:address="project.projectOwner")
-          div is raising funds in an #[b 🧧 NFT Membership] 
+          div is raising funds in this #[b 🧧 NFT Membership] 
     
     //- detail
     section.flex.justify-center

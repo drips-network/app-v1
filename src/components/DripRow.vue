@@ -100,7 +100,7 @@ const receiverRt = computed(() => {
     img.h-20(src="~@/assets/icons/arrow-right-violet.svg")
 
   //- receiver(s)
-  router-link(:to="receiverRt")
+  router-link.w-256(:to="receiverRt")
     addresses-tag(:addresses="props.drip.receiver")
   //- router-link.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
     //- (summary - "10 addresses")
