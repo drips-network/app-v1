@@ -363,7 +363,7 @@ article.profile.pt-40.pb-80
   //- (memberships list)
   section(v-if="projects && projects.length")
     //- wave divider
-    .h-48.-mx-10.w-full_10(:style="{width: 'calc(100% + 2rem)', backgroundImage: `url(${waveBgImgUrl})` }")
+    .bg-img-wave-shadow-violet
     
     //- header
     header#memberships.flex.justify-center.mt-56.pt-56
@@ -401,7 +401,7 @@ article.profile.pt-40.pb-80
   //- (nfts list)
   section(v-if="nfts && nfts.length")
     //- wave divider
-    .h-48.-mx-10.w-full_10(:style="{width: 'calc(100% + 2rem)', backgroundImage: `url(${waveBgImgUrl})` }")
+    .bg-img-wave-shadow-violet
 
     //- header
     header#member-of.flex.justify-center.mt-56.pt-56

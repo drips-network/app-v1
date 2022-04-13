@@ -39,17 +39,17 @@ const connect = async () => {
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.py-10.px-12.pb-104.md_pb-10.text-base.font-sans.leading-normal(style="min-widthff:1024px")
+#app.max-w-screen-2xl.mx-auto.py-10.pb-104.md_pb-10.text-base.font-sans.leading-normal(style="min-widthff:1024px")
   .flex.flex-col.min-h-screen
     //- (wrong network banner)
     template(v-if="$store.getters.isWrongNetwork")
-      .sticky.z-50.top-10.left-0.w-full.h-80.rounded-full.bg-yellow-500.text-black.flex.items-center.justify-between.mb-10
+      .sticky.z-50.top-10.left-0.w-full.h-80.px-12.rounded-full.bg-yellow-500.text-black.flex.items-center.justify-between.mb-10
         .w-80.text-center.text-2xl ⚠️
         .flex-1.text-center.font-semibold Wrong Network! Switch to #[span.capitalize {{ networkName }}]!
         .w-80
 
     //- app header
-    header.flex.items-center.justify-center.md_justify-between
+    header.flex.items-center.justify-center.md_justify-between.px-12
       //- left side (mobile centered)
       .flex.items-center.h-80.rounded-full.bg-indigo-700.pr-32
         //- home / landing site link
@@ -112,7 +112,7 @@ const connect = async () => {
       | 1 ≈ $1
 
   //- footer
-  .mt-144.md_mt-196.mb-64.md_mb-0.flex.flex-wrap.justify-center.md_justify-between
+  .mt-144.md_mt-196.mb-64.md_mb-0.px-12.flex.flex-wrap.justify-center.md_justify-between
     //- radicle link
     a.my-4.order-last.md_order-none.h-80.pl-18.pr-16.flex.items-center.bg-indigo-700.text-violet-650.rounded-full.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
       //- .w-56.h-56.flex.items-center.justify-center.bg-indigo-900.rounded-full.text-xl 🌱

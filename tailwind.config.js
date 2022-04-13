@@ -849,6 +849,7 @@ module.exports = {
       '11x12': '91.666667%',
       full: '100%',
       full_10: 'calc(100% + 1rem)',
+      full_12: 'calc(100% + 1.2rem)',
       full_40: 'calc(100% + 4rem)',
       screen: '100vw',
       min: 'min-content',

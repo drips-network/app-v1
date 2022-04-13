@@ -135,6 +135,14 @@ button{
   }
 }
 
+/* graphics */
+.bg-img-wave-shadow-violet{
+  background-image: url('../assets/wave-shadow-violet.svg');
+  background-repeat: repeat-x;
+  background-position: center center;
+  @apply h-48;
+}
+
 /* fields */
 input, textarea {
   appearance:none;

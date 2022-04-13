@@ -9,6 +9,8 @@ import UserAvatar from '@/components/UserAvatar.vue'
 import InfoBar from '@/components/InfoBar.vue'
 import HeaderLarge from '@/components/HeaderLarge.vue'
 import SpotlightRecipient from '@/components/SpotlightRecipient.vue'
+import ProjectDetail from '@/components/ProjectDetail.vue'
+import SvgChevronDown from '@/components/SvgChevronDown.vue'
 import store from '@/store'
 import { formatSplitsEvents, filterForCurrentEvents, toDAIPerMo } from '@/utils'
 import content from '../../content/spotlight.js'
@@ -18,9 +20,20 @@ const networkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWOR
 const spotlights = content[networkName] || []
 
 const projects = ref()
+const showAllProjects = ref(false)
 
-const projectsSorted = computed(() => {
-  return projects.value.slice().sort((a, b) => b.progress - a.progress)
+const projectsFiltered = computed(() => {
+  if (!showAllProjects.value) {
+    // limit to 4 projects
+    return projects.value.slice(0, 4)
+  }
+  return projects.value
+  // return projects.value //.slice().sort((a, b) => b.progress - a.progress)
+})
+
+const projectOwnersCount = computed(() => {
+  const owners = projects.value?.map(prj => prj.projectOwner) || []
+  return [...new Set(owners)].length // ES6 de-dupe
 })
 
 const getProjects = async () => {
@@ -28,26 +41,34 @@ const getProjects = async () => {
     const resp = await api({
       query: `
         query {
-          fundingProjects (orderBy: blockTimestampCreated, orderDirection: desc) {
+          fundingProjects (orderBy: daiCollected, orderDirection: desc) {
             id
-            name: projectName
-            created: blockTimestampCreated
-            owner: projectOwner
+            projectOwner
             daiCollected
             daiSplit
+            ipfsHash
             tokenTypes {
-              streaming
+              tokenTypeId
+              id
+              minAmt: minAmtPerSec
+              limit
               currentTotalAmtPerSec
               currentTotalGiven
+              ipfsHash
+              streaming
             }
-            tokens (first: 5) {
+            tokens {
               owner: tokenReceiver
             }
           }
         }
       `
     })
-    projects.value = resp.data?.fundingProjects || []
+    let prjs = resp.data?.fundingProjects || []
+    // filter some out with bad data
+    prjs = prjs.filter(node => node.tokenTypes.length)
+    // set
+    projects.value = prjs
   } catch (e) {
     console.error(e)
   }
@@ -156,7 +177,7 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-article.explore.pt-56.px-24
+article.explore.pt-56
 
   //- (spotlight)
   section.mb-240(v-if="spotlights.length")
@@ -169,24 +190,44 @@ article.explore.pt-56.px-24
       spotlight-recipient(v-for="spotlight in spotlights", :spotlight="spotlight", :allSplits="splits")
 
   //- communities
-  section.mt-24.mb-220
+  section.mt-24.mb-144
     //- (loading)
     template(v-if="!projects")
       loading-bar
 
     //- (list)
     template(v-else)
-      header-large.mb-56(icon="⛲️")
-        header
-          h2 #[b Communities] are raising funds with #[b NFT memberships] 🧩
+      //- wave divider
+      .bg-img-wave-shadow-violet
 
-      ul
+      header.flex.justify-center.mt-56.pt-56
+        h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
+          .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 🧧
+          .text-xl.ml-12 Memberships
+          .h-40.w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base
+            | {{ projects.length }}
+      
+      //- small text summary
+      p.flex.justify-center.mt-60
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
+          div #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
+      
+      //- memberships list
+      .mt-72.px-36.flex.flex-wrap.justify-evenly
         //- projects...
-        li(v-for="(project, i) in projectsSorted")
-          project-thumb.mb-32(:project="project", @progress="val => updateProjectProgress(val, i)", :key="project.id")
+        template(v-for="(project, i) in projectsFiltered")
+          project-detail.mb-132(:project="project", :ownerVisible="true")
 
-      footer.mt-56.flex.justify-center
-        router-link.btn.btn-lgg.btn-outline.pl-48.pr-40.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Community ⛲️
+      //- (show all btn)
+      footer
+        .flex.justify-center.-mt-40(v-if="projects.length > 2")
+          button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-26.pr-12.font-semibold.text-lg(@click="showAllProjects = !showAllProjects")
+            .flex.items-center
+              div {{ showAllProjects ? 'View Less' : 'View All' }}
+              svg-chevron-down.h-36.w-36.ml-4(:class="{'transform origin-center rotate-180': showAllProjects}")
+        
+        .mt-120.flex.justify-center
+          router-link.btn.btn-lgg.btn-outline.pl-40.pr-36.transform.notouch_hover_scale-102.transition.duration-150(:to="{name: 'create-community' }") Create a Membership 🧧
 
   //- drips
   section.mt-24.mb-220
@@ -196,11 +237,26 @@ article.explore.pt-56.px-24
 
     //- (list)
     template(v-else)
-      header-large.mb-56(icon="💧")
+      //- wave divider
+      .bg-img-wave-shadow-violet
+
+      header.flex.justify-center.mt-56.pt-56
+        h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
+          .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 💧
+          .text-xl.ml-12 Drips
+          .h-40.w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base
+            | {{ dripRows.length }}
+      
+      //- small text summary
+      //- p.flex.justify-center.mt-60
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
+          div #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
+
+      //- header-large.mb-56(icon="💧")
         header
           h2 #[b {{ dripRows.length }} address] are #[b dripping] to others.
 
-      section
+      section.px-36
         ul
           li(v-for="drip in dripRows")
             drip-row.my-4(:drip="drip")
