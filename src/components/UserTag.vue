@@ -10,6 +10,7 @@ import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
 import SvgPen from '@/components/SvgPen.vue'
 import ExpandBlock from '@/components/ExpandBlock.vue'
 import SvgDripOff from '@/components/SvgDripOff.vue'
+import SvgCopySmall from '@/components/SvgCopySmall.vue'
 import store from '@/store'
 const props = defineProps(['address'])
 const emit = defineEmits(['dripClick', 'editClick'])
@@ -30,7 +31,18 @@ const getENSSocialUrl = (value, base) => {
     return base + value
   }
 }
+
 const onAvatarClick = () => isMyProfile.value ? emit('editClick') : null
+
+const copyAddressToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(props.address)
+    alert('Address copied to the clipboard!')
+  } catch (e) {
+    alert('Could not copy address!')
+  }
+}
+
 </script>
 
 <template lang="pug">
@@ -45,8 +57,10 @@ const onAvatarClick = () => isMyProfile.value ? emit('editClick') : null
       .ml-32.mr-36.lg_ml-36.lg_mr-40
         div
           //- name
-          h1.text-2xl.font-bold
+          h1.text-2xl.font-bold.flex.items-center
             addr(:address="props.address", :key="props.address")
+            button(@click="copyAddressToClipboard")
+              svg-copy-small.w-32.h-32.ml-8.text-violet-650.notouch_opacity-75.notouch_hover_opacity-100.transform.notouch_hover_scale-110
 
         //- icons
         .mt-4.flex.flex-wrap.-ml-8.items-center
