@@ -85,15 +85,16 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
             //- label
             .font-semibold.text-md
               template(v-if="props.direction === 'in'")
-                //- | Senders
-                | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
+                | Drips in
+                //- | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
-                //- | Drips to
-                template(v-if="props.canEdit")
-                  | You drip&nbsp;
-                template(v-else)
-                  | #[addr(:address="props.address", :youOn="true")] drips&nbsp;
-                | to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
+                | Drips to
+                //- 
+                  template(v-if="props.canEdit")
+                    | You drip&nbsp;
+                  template(v-else)
+                    | #[addr(:address="props.address", :youOn="true")] drips&nbsp;
+                  | to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             
             //- toggle icon
             svg-chevron-down.ml-7.w-28.h-28.transform.origin-center.rotate-180
@@ -111,7 +112,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
         .flex.flex-wrap.justify-center.mt-12.text-base
           //- count
           .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="props.drips.length > 4")
-            | {{ props.drips.length }} supporters
+            | {{ props.drips.length }} addresses
           
           //- (total monthly)
           .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="totalMonthlyRate && props.drips.length > 1")

@@ -41,12 +41,12 @@ const receiverRt = computed(() => {
     .w-full.flex.items-center.justify-center
       template(v-if="props.drip.amount")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>#[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month
+        span <b :class="{'text-greenbright-400ff': props.drip.amount >= 100 }">#[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month&nbsp; {{ props.drip.amount >= 100 ? '🎉' : '' }}
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
       template(v-else-if="props.drip.percent")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>{{ parseFloat(props.drip.percent.toFixed(1)) }}%</b> of incoming drips
+        span(:class="{'text-greenbright-400': props.drip.percent >= 100 }") <b>{{ parseFloat(props.drip.percent.toFixed(0)) }}%</b> of incoming drips {{ props.drip.percent >= 100 ? '🔋' : props.drip.percent >= 60 ? '🌊' : props.drip.percent >= 40 ? '⛲️' : props.drip.percent >= 20 ? '🚿' : '' }}
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
     //- .w-full.flex.items-center.justify-between.text-violet-650.px-24

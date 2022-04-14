@@ -86,6 +86,7 @@ const getDrips = async () => {
       query: `
         query {
           dripsConfigs {
+            timestamp: lastUpdatedBlockTimestamp
             sender: id
             dripsEntries {
               receiver
@@ -104,18 +105,21 @@ const getDrips = async () => {
     // • until resolved: https://github.com/gh0stwheel/drips-subgraph-mainnet-v2/issues/7
     // configs = configs.filter(entry => entry.sender !== entry.receiver)
 
-    // TEMP (no monthly on Explore)
-    drips.value = []
-
     // format for rows
-    // drips.value = configs.map(config => {
-    //   const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
-    //   return {
-    //     sender: config.sender,
-    //     receiver: config.dripsEntries.map(entry => entry.receiver),
-    //     amount: toDAIPerMo(totalAmtPerSec)
-    //   }
-    // })
+    configs = configs.map(config => {
+      const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+      return {
+        sender: config.sender,
+        receiver: config.dripsEntries.map(entry => entry.receiver),
+        amount: toDAIPerMo(totalAmtPerSec),
+        timestamp: config.timestamp
+      }
+    })
+
+    // TEMP (no monthly on Explore)
+    // drips.value = []
+
+    drips.value = configs
   } catch (e) {
     drips.value = []
   }
@@ -130,6 +134,7 @@ const getSplits = async () => {
         query {
           splitsConfigs (first:200, orderBy: lastUpdatedBlockTimestamp, orderDirection: desc) {
             sender: id
+            timestamp: lastUpdatedBlockTimestamp
             splitsEntries {
               receiver
               weight
@@ -163,7 +168,8 @@ const getSplits = async () => {
         return {
           sender: config.sender,
           receiver: config.splitsEntries.map(entry => entry.receiver),
-          percent: totalWeight / store.state.splitsFractionMax * 100
+          percent: totalWeight / store.state.splitsFractionMax * 100,
+          timestamp: config.timestamp
         }
       })
 
@@ -178,7 +184,7 @@ const dripRows = computed(() => {
   const splitsRows = splits.value || []
   const dripsRows = drips.value || []
   const rows = [...dripsRows, ...splitsRows]
-  // rows.sort((a, b) => b.blockNumber - a.blockNumber)
+  rows.sort((a, b) => b.timestamp - a.timestamp)
   return rows
 })
 
@@ -238,6 +244,7 @@ article.explore.pt-56
         header
           h2 #[b {{ dripRows.length }} address] are #[b dripping] to others.
 
+      //- drips...
       section.mt-60.px-36
         ul
           li(v-for="(drip, i) in dripRows")
@@ -281,7 +288,7 @@ article.explore.pt-56
           div #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
       
       //- memberships list
-      .mt-72.px-36.flex.flex-wrap.justify-evenly
+      .mt-72.flex.flex-wrap.justify-evenly
         //- projects...
         template(v-for="(project, i) in projectsFiltered")
           project-detail.mb-132(:project="project", :ownerVisible="true")

@@ -36,6 +36,7 @@ const onAvatarClick = () => isMyProfile.value ? emit('editClick') : null
 
 const copyAddressToClipboard = async () => {
   try {
+    // TODO - suport .eth copy ?
     await navigator.clipboard.writeText(props.address)
     alert('Address copied to the clipboard!')
   } catch (e) {
@@ -49,7 +50,7 @@ const copyAddressToClipboard = async () => {
 .user-tag
   .flex.justify-center
     //- user cell
-    .max-w-5xl.p-16.lg_p-18.rounded-full.bg-indigo-700.flex.items-center.relative
+    .p-16.lg_p-18.rounded-full.bg-indigo-700.flex.items-center.relative
       //- avatar
       .rounded-full.overflow-hidden(@click.stop="onAvatarClick", :class="{'cursor-pointer': isMyProfile}")
         user-avatar.w-80.h-80.lg_w-112.lg_h-112(:address="props.address", blockieSize="64")
@@ -59,7 +60,7 @@ const copyAddressToClipboard = async () => {
           //- name
           h1.text-2xl.font-bold.flex.items-center
             addr(:address="props.address", :key="props.address")
-            button(@click="copyAddressToClipboard")
+            button(@click="copyAddressToClipboard", title="Copy Address")
               svg-copy-small.w-32.h-32.ml-8.text-violet-650.notouch_opacity-75.notouch_hover_opacity-100.transform.notouch_hover_scale-110
 
         //- icons
