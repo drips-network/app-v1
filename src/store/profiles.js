@@ -1,6 +1,9 @@
 import { ethers as Ethers } from 'ethers'
 import { Metadata } from '../../contracts'
+import { ipfsUrl } from '@/utils'
 import bs58 from 'bs58'
+
+const defaultMetadataID = 'drips'
 
 export default {
   namespaced: true,
@@ -186,7 +189,7 @@ export default {
       }
     },
 
-    async updateSignerMetadata ({ dispatch }, { ipfsHash }) {
+    async updateSignerMetadata ({ dispatch }, { ipfsHash, id = defaultMetadataID }) {
       try {
         const provider = await dispatch('getProvider', null, { root: true })
         const contract = getMetadataContract(provider)
@@ -195,14 +198,17 @@ export default {
         const contractSigner = contract.connect(signer)
         // convert ipfs hash to bytes array for contract method (cheaper gas)
         const multihash = toMultiHash(ipfsHash)
+        // convert id to bytes32
+        id = Ethers.utils.formatBytes32String(id)
         // tx
-        return contractSigner.publish(multihash)
+        return contractSigner.publish(id, multihash)
       } catch (e) {
         console.error(e)
+        throw e
       }
     },
 
-    async getMetadataByAddress ({ state, commit, dispatch }, { address, flush = false }) {
+    async getMetadataByAddress ({ state, commit, dispatch }, { address, id = defaultMetadataID, flush = false }) {
       try {
         // use cached?
         // if (!flush) {
@@ -213,18 +219,24 @@ export default {
         const provider = await dispatch('getProvider', null, { root: true })
         const contract = getMetadataContract(provider)
 
-        // get all events
+        // get all events...
         const allEvents = await contract.queryFilter('MultiHash')
 
-        // get address's last update's multi-hash
-        const myLastUpdateHex = allEvents.reverse().find(event => event.args.addr.toLowerCase() === address.toLowerCase())?.args[1]
+        // find address's last update, with matching metadata ID
+        const myLastUpdate = allEvents
+          .reverse()
+          .find(event => {
+            const isAddr = event.args.addr.toLowerCase() === address.toLowerCase()
+            const sameID = Ethers.utils.parseBytes32String(event.args.id) === id
+            return isAddr && sameID
+          })
 
-        // get ipfs content if set
-        if (myLastUpdateHex) {
+        // fetch ipfs content if set
+        if (myLastUpdate?.args.multiHash) {
           // convert to ipfs hash
-          const ipfsHash = hexToBase58(myLastUpdateHex)
+          const ipfsHash = hexToBase58(myLastUpdate?.args.multiHash)
           // fetch...
-          const resp = await fetch(`${import.meta.env.VITE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+          const resp = await fetch(ipfsUrl(ipfsHash))
           const meta = (await resp.json() || null)
           // save
           commit('SAVE_ADDRESS_METADATA', { address, meta })

@@ -9,6 +9,12 @@
         "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
         "indexed": false,
         "internalType": "bytes",
         "name": "multiHash",
@@ -20,6 +26,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
       {
         "internalType": "bytes",
         "name": "multiHash",

@@ -1,11 +1,14 @@
 <script setup>
 import { pinImageToIPFS } from '@/store'
+
 const emit = defineEmits(['read', 'hash', 'error'])
 
 const onImgFileChange = (e) => {
   const input = e.target
+  
   if (input.files && input.files[0]) {
     var reader = new FileReader()
+    
     reader.onload = async function (event) {
       const result = event.target.result
       emit('read', result)
@@ -33,6 +36,7 @@ const onImgFileChange = (e) => {
         // imgSrc.value = imgSrcCurrent
       }
     }
+
     reader.readAsDataURL(input.files[0])
   }
 }

@@ -30,6 +30,7 @@ const getENSSocialUrl = (value, base) => {
     return base + value
   }
 }
+const onAvatarClick = () => isMyProfile.value ? emit('editClick') : null
 </script>
 
 <template lang="pug">
@@ -38,7 +39,7 @@ const getENSSocialUrl = (value, base) => {
     //- user cell
     .max-w-5xl.p-16.lg_p-18.rounded-full.bg-indigo-700.flex.items-center.relative
       //- avatar
-      router-link.block.rounded-full(:to="{name: 'user', params: { address: props.address }}")
+      .rounded-full.overflow-hidden(@click.stop="onAvatarClick", :class="{'cursor-pointer': isMyProfile}")
         user-avatar.w-80.h-80.lg_w-112.lg_h-112(:address="props.address", blockieSize="64")
 
       .ml-32.mr-36.lg_ml-36.lg_mr-40

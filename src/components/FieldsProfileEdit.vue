@@ -20,7 +20,6 @@ const nameInputError = computed(() => {
 })
 
 const onImageUploaded = (ipfsHash) => {
-  console.log(ipfsHash)
   const clone = toRaw(props.modelValue)
   clone.avatar = ipfsHash
   emit('update:modelValue', clone)

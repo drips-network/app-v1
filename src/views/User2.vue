@@ -326,7 +326,7 @@ article.profile.pt-40.pb-80
   drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in")
 
   //- (collectable)
-  template(v-if="isMyUser && allDripsIn.length")
+  template(v-if="isMyUser && (allDripsIn && allDripsIn.length)")
     .flex.justify-center.mb-20
       .h-64.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-32.pr-12(:class="{'text-violet-650': totalFunds === -1}", :key="$route.params.address")
         template(v-if="totalFunds !== -1")
