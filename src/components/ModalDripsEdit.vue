@@ -1,7 +1,7 @@
 <script setup>
 import { useAttrs } from 'vue'
-import Modal from '@/components/Modal'
-import PanelDripsEdit from '@/components/PanelDripsEdit'
+import Modal from '@/components/Modal.vue'
+import PanelDripsEdit from '@/components/PanelDripsEdit.vue'
 const emit = defineEmits(['close'])
 const attrs = useAttrs()
 </script>

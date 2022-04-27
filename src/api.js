@@ -1,6 +1,6 @@
-const apiUrl = process.env.VUE_APP_GRAPH_API
+const apiUrl = import.meta.env.VITE_APP_GRAPH_API
 
-const cacheAPISec = process.env.VUE_APP_CACHE_API_SEC // string
+const cacheAPISec = import.meta.env.VITE_APP_CACHE_API_SEC // string
 
 export default async function ({ query, variables }) {
   const id = btoa(JSON.stringify({ query, variables }))
@@ -97,9 +97,31 @@ query ($id: ID!) {
 }
 `
 
+export const queryDripsByReceiver = `
+query ($receiver: Bytes!) {
+  dripsEntries (where: { receiver: $receiver} ) {
+    # id
+    sender: user
+    receiver
+    amtPerSec
+ }
+}
+`
+
 export const querySplitsBySender = `
-query ($sender: Bytes!) {
-  splitsEntries (first:100, where: { sender: $sender }) {
+query ($sender: Bytes!, $first: Int!) {
+  splitsEntries (first: $first, where: { sender: $sender }) {
+    # id
+    sender
+    receiver
+    weight
+  }
+}
+`
+
+export const querySplitsByReceiver = `
+query ($receiver: Bytes!, $first: Int!) {
+  splitsEntries (first: $first, where: { receiver: $receiver }) {
     # id
     sender
     receiver

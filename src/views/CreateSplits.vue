@@ -1,6 +1,6 @@
 <script setup>
-import Panel from '@/components/Panel'
-import PanelSplitsEdit from '@/components/PanelSplitsEdit'
+import Panel from '@/components/Panel.vue'
+import PanelSplitsEdit from '@/components/PanelSplitsEdit.vue'
 import store from '@/store'
 import { useRouter } from 'vue-router'
 

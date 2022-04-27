@@ -3,7 +3,7 @@ import store from '@/store'
 
 export const oneMonth = 30 * 24 * 60 * 60
 
-export const ipfsUrl = hash => process.env.VUE_APP_IPFS_GATEWAY + '/ipfs/' + hash
+export const ipfsUrl = hash => import.meta.env.VITE_APP_IPFS_GATEWAY + '/ipfs/' + hash
 
 // clip to nearest hundredth (dont round up)
 export const round = (num, dec = 2) => (Math.floor(num * 100) / 100).toFixed(dec)

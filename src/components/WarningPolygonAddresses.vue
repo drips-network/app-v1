@@ -1,5 +1,5 @@
 <script setup>
-import FormMessage from '@/components/FormMessage'
+import FormMessage from '@/components/FormMessage.vue'
 </script>
 
 <template lang="pug">

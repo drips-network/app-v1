@@ -1,9 +1,9 @@
 <script setup>
 import { ref, toRaw, computed, onMounted } from 'vue'
 import api from '@/api'
-import ProjectStat from '@/components/ProjectStat'
-import SvgDai from '@/components/SvgDai'
-import IconSplit from '@/components/IconSplit'
+import ProjectStat from '@/components/ProjectStat.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import IconSplit from '@/components/IconSplit.vue'
 import { toDAI, toDAIPerMo } from '@/utils'
 import { BigNumber as bn } from 'ethers'
 import store from '@/store'

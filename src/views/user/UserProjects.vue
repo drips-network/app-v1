@@ -1,54 +1,37 @@
 <script setup>
-import UserProject from '@/components/UserProject'
-import { ref, onBeforeMount } from 'vue'
+// import UserProject from '@/components/UserProject.vue'
+// import { ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
-import api from '@/api'
-import InfoBar from '@/components/InfoBar'
-import Addr from '@/components/Addr'
-import LoadingBar from '@/components/LoadingBar'
+// import api from '@/api'
+// import InfoBar from '@/components/InfoBar.vue'
+import Addr from '@/components/Addr.vue'
+// import LoadingBar from '@/components/LoadingBar.vue'
+import ProjectDetail from '@/components/ProjectDetail.vue'
 
 const route = useRoute()
+const props = defineProps(['projects'])
+const emit = defineEmits(['collected'])
 
-const projects = ref()
-
-const getUsersProjects = async () => {
-  try {
-    const resp = await api({
-      variables: { projectOwner: route.params.address },
-      query: `
-        query ($projectOwner: Bytes!) {
-          fundingProjects (where: { projectOwner: $projectOwner }) {
-            id
-            projectOwner
-            daiSplit
-            daiCollected
-            tokenTypes {
-              # tokenTypeId
-              streaming
-              limit
-              currentTotalAmtPerSec
-              currentTotalGiven
-            }
-            tokens {
-              owner: tokenReceiver
-              giveAmt
-              amtPerSec
-            }
-          }
-        }
-      `
-    })
-    projects.value = resp.data.fundingProjects
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-onBeforeMount(() => getUsersProjects())
 </script>
 
 <template lang="pug">
 section.user-projects
+  header.my-80.flex
+    h2.sr-only Memberships
+    p.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms(:class="{'animate-pulse': !props.projects}")
+      div
+        template(v-if="!props.projects")
+          | Loading...
+        template(v-else)
+          | #[addr.font-bold(:address="$route.params.address")] is raising funds with 🧧 #[b NFT Memberships] 
+
+  .flex.flex-wrap.justify-evenly(v-if="props.projects && props.projects.length")
+    //- projects...
+    template(v-for="project in props.projects")
+      //- user-project(:project="project", @collected="getProjects")
+      project-detail(:project="project", @collected="$emit('collected')")
+
+//- section.user-projects
   h2.sr-only Projects
 
   //- p.mx-40.mb-40.border.border-violet-700.rounded-full.text-md.text-violet-650.h-80.flex.items-center.justify-center

@@ -3,8 +3,8 @@ import { ref, computed, onMounted, toRaw } from 'vue'
 import { utils } from 'ethers'
 import { formatSplitsEvents } from '@/utils'
 import store from '@/store'
-import Addr from '@/components/Addr'
-import UserAvatar from '@/components/UserAvatar'
+import Addr from '@/components/Addr.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 const props = defineProps(['spotlight', 'recipient', 'allSplits', 'sender'])
 const highlight = computed(() => props.spotlight.highlight)

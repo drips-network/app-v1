@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import store from '@/store'
-import Panel from '@/components/Panel'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import InputBody from '@/components/InputBody'
+import Panel from '@/components/Panel.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
+import InputBody from '@/components/InputBody.vue'
 
 const props = defineProps({
   projectAddress: String

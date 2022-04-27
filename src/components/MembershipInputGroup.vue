@@ -1,6 +1,6 @@
 <script setup>
 import { reactive } from 'vue'
-import InputBody from '@/components/InputBody'
+import InputBody from '@/components/InputBody.vue'
 
 const props = defineProps({
   membership: Object

@@ -1,9 +1,10 @@
 <script setup>
 import { computed } from 'vue'
-import UserAvatar from '@/components/UserAvatar'
-import Addr from '@/components/Addr'
-import SvgDai from '@/components/SvgDai'
-import FlexTruncate from '@/components/FlexTruncate'
+import UserAvatar from '@/components/UserAvatar.vue'
+import Addr from '@/components/Addr.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import FlexTruncate from '@/components/FlexTruncate.vue'
+import AddressesTag from '@/components/AddressesTag.vue'
 const props = defineProps(['drip', 'alternateColors'])
 const isMultiple = computed(() => props.drip.receiver.length > 1)
 const altBg = drip => drip.percent && props.alternateColors
@@ -40,12 +41,12 @@ const receiverRt = computed(() => {
     .w-full.flex.items-center.justify-center
       template(v-if="props.drip.amount")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>#[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month
+        span <b :class="{'text-greenbright-400ff': props.drip.amount >= 100 }">#[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month&nbsp; {{ props.drip.amount >= 100 ? '🎉' : '' }}
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
       template(v-else-if="props.drip.percent")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>{{ parseFloat(props.drip.percent.toFixed(1)) }}%</b> of incoming drips
+        span(:class="{'text-greenbright-400': props.drip.percent >= 100 }") <b>{{ parseFloat(props.drip.percent.toFixed(0)) }}%</b> of incoming drips {{ props.drip.percent >= 100 ? '🔋' : props.drip.percent >= 60 ? '🌊' : props.drip.percent >= 40 ? '⛲️' : props.drip.percent >= 20 ? '🚿' : '' }}
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
     //- .w-full.flex.items-center.justify-between.text-violet-650.px-24
@@ -99,7 +100,9 @@ const receiverRt = computed(() => {
     img.h-20(src="~@/assets/icons/arrow-right-violet.svg")
 
   //- receiver(s)
-  router-link.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
+  router-link.w-256(:to="receiverRt")
+    addresses-tag(:addresses="props.drip.receiver")
+  //- router-link.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12.w-260.border-2.border-transparent.notouch_hover_border-violet-600(:class="{'bg-indigo-800': altBg(drip) }", :to="receiverRt")
     //- (summary - "10 addresses")
     template(v-if="isMultiple")
       //- .w-full.text-center.font-bold {{ props.drip.receiver.length }} addresses
@@ -109,8 +112,9 @@ const receiverRt = computed(() => {
         li(v-for="(address, i) in props.drip.receiver.slice(0, 6)", :class="{'-ml-28': i < 5}")
           user-avatar.w-54.h-54(:address="address", blockieSize="54", :key="address")
 
+        //- (extra count)
         template(v-if="props.drip.receiver.length - 6 > 0")
-          .-ml-6.order-first.min-w-54.h-54.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold
+          .-ml-8.order-first.min-w-54.h-54.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold
             | +{{ props.drip.receiver.length - 6}}
     //- (single receiver)
     template(v-else)

@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* fonts */
-/* @font-face {
-  font-family: 'kaeru-kaeru';
-  src: url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff2') format('woff2'),
-       url('../assets/fonts/kaeru-kaeru/kaerukaeru-Regular.woff') format('woff');
-  font-style: normal;
-} */
 
 @font-face {
   font-family: 'cheee';
@@ -18,7 +11,12 @@
 }
 
 html {
-  font-size: 10px; /* 1rem / Tailwind default */
+  font-size: 8px; /* 1rem / Tailwind default */
+}
+@screen md {
+  html {
+    font-size:10px;
+  }
 }
 
 .overlay{
@@ -99,6 +97,20 @@ html {
     @apply notouch_hover_bg-orange-500;
   }
 }
+.btn-outline-green{
+  /* set .border class on element for desired thickness */
+  @apply border-greenbright-500 text-greenbright-500;
+  &:not([disabled]) {
+    @apply notouch_hover_ring-1 notouch_hover_ring-greenbright-500 focus_ring-1;
+  }
+}
+.btn-outline-violet{
+  /* set .border class on element for desired thickness */
+  @apply border-violet-650 text-violet-650;
+  &:not([disabled]) {
+    @apply notouch_hover_ring-1 notouch_hover_ring-violet-650 focus_ring-1;
+  }
+}
 .btn-violet{
   @apply bg-violet-600 text-white;
   &:not([disabled]) {
@@ -112,11 +124,23 @@ html {
   &.router-link-exact-active { @apply bg-violet-600 text-white }
   @apply border-2 border-transparent notouch_hover_border-violet-600;
 }
+.btn-focus-violet {
+  @apply notouch_hover_ring notouch_hover_ring-violet-650 focus_ring focus_ring-violet-650;
+}
 
 button{
+  font-weight:inherit;
   &[disabled] {
     @apply cursor-not-allowed;
   }
+}
+
+/* graphics */
+.bg-img-wave-shadow-violet{
+  background-image: url('../assets/wave-shadow-violet.svg');
+  background-repeat: repeat-x;
+  background-position: center center;
+  @apply h-48;
 }
 
 /* fields */

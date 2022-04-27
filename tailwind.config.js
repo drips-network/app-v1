@@ -1,7 +1,8 @@
+// const defaultTheme = require('tailwindcss/defaultTheme')
+
+/** @type {import("@types/tailwindcss/tailwind-config").TailwindConfig } */
 module.exports = {
-  purge: ['./public/*.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  presets: [],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   separator: '_',
   theme: {
     screens: {
@@ -28,6 +29,7 @@ module.exports = {
       11: '1.1rem',
       12: '1.2rem',
       14: '1.4rem',
+      15: '1.5rem',
       16: '1.6rem',
       18: '1.8rem',
       20: '2.0rem',
@@ -60,9 +62,11 @@ module.exports = {
       196: '19.6rem',
       220: '22rem',
       240: '24rem',
+      256: '25.6rem',
       260: '26rem'
     },
     colors: {
+      current: 'currentColor',
       transparent: 'transparent',
       black: 'black',
 
@@ -79,7 +83,7 @@ module.exports = {
         800: 'rgb(31 29 110)' // duller border, match shadow
       },
       indigo: {
-        700: '#17164B',
+        700: 'rgb(25 24 90)', // '#17164B',
         800: '#12123C',
         850: '#0E0E30',
         900: '#0a0930', // #090928', // dark: rgb(9 14 24)', // softer: #0e1522', // figma: #101828', > deeper/saturated: #090928
@@ -108,7 +112,8 @@ module.exports = {
         500: '#0FA7BC'
       },
 
-      white: 'white'
+      white: 'rgb(245,245,245)',
+      'white-a60': 'rgba(255,255,255,0.60)'
     },
     fontSize: {
       '2xs': ['0.8rem', { lineHeight: '1.2rem' }],
@@ -228,6 +233,7 @@ module.exports = {
       DEFAULT: '1px',
       0: '0px',
       2: '2px',
+      3: '3px',
       4: '4px',
       6: '6px',
       8: '8px'
@@ -238,6 +244,7 @@ module.exports = {
       md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       // lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       // xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      xl: '0 4px 24px rgb(0 0 0 / 48%)',
       // '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       // inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       none: 'none',
@@ -558,7 +565,7 @@ module.exports = {
       md: '28rem',
       lg: '32rem',
       xl: '36rem',
-      '2xl': '42rem',
+      '2xl': '40rem',
       '3xl': '48rem',
       '4xl': '56rem',
       '5xl': '64rem',
@@ -843,6 +850,7 @@ module.exports = {
       '11x12': '91.666667%',
       full: '100%',
       full_10: 'calc(100% + 1rem)',
+      full_12: 'calc(100% + 1.2rem)',
       full_40: 'calc(100% + 4rem)',
       screen: '100vw',
       min: 'min-content',
@@ -896,7 +904,7 @@ module.exports = {
     backgroundAttachment: ['responsive'],
     backgroundBlendMode: ['responsive'],
     backgroundClip: ['responsive'],
-    backgroundColor: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
+    backgroundColor: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus', 'focus-visible'],
     backgroundImage: ['responsive'],
     backgroundOpacity: ['responsive', 'dark', 'group-hover', 'focus-within', 'hover', 'focus'],
     backgroundPosition: ['responsive'],
@@ -986,11 +994,11 @@ module.exports = {
     pointerEvents: ['responsive'],
     position: ['responsive'],
     resize: ['responsive'],
-    ringColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
-    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
-    ringOffsetWidth: ['responsive', 'focus-within', 'focus', 'hover'],
-    ringOpacity: ['responsive', 'dark', 'focus-within', 'focus', 'hover'],
-    ringWidth: ['responsive', 'focus-within', 'focus', 'hover'],
+    ringColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover', 'focus-visible'],
+    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus', 'hover', 'focus-visible'],
+    ringOffsetWidth: ['responsive', 'focus-within', 'focus', 'hover', 'focus-visible'],
+    ringOpacity: ['responsive', 'dark', 'focus-within', 'focus', 'hover', 'focus-visible'],
+    ringWidth: ['responsive', 'focus-within', 'focus', 'hover', 'focus-visible'],
     rotate: ['responsive', 'hover', 'focus'],
     saturate: ['responsive'],
     scale: ['responsive', 'hover', 'focus', 'group-hover'],
@@ -1022,6 +1030,7 @@ module.exports = {
     zIndex: ['responsive', 'focus-within', 'focus']
   },
   plugins: [
-    require('@tailwindcss/aspect-ratio')
+    require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/line-clamp')
   ]
 }

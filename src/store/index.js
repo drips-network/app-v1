@@ -1,13 +1,17 @@
 import { createStore } from 'vuex'
 import { toRaw } from 'vue'
 import { ethers as Ethers, BigNumber as bn } from 'ethers'
-import Web3Modal from 'web3modal'
-import WalletConnectProvider from '@walletconnect/web3-provider'
-import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender } from '@/api'
+import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender, querySplitsByReceiver, queryDripsByReceiver } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
+import Web3Modal from 'web3modal'
+// Wallet Connect - directly import .js file since import breaks `vite build`
+// see: https://github.com/vitejs/vite/issues/7257
+import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js'
+
 // contracts
 import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
+import profiles from './profiles'
 
 let provider, signer, walletProvider
 
@@ -17,7 +21,7 @@ const networks = {
   137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com' } },
   80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com' } }
 }
-const deployNetworkName = JSON.parse(process.env.VUE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
+const deployNetworkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
 const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
 
 // setup web3 modal
@@ -38,11 +42,11 @@ const web3Modal = new Web3Modal({
 let initializing = false
 
 export default createStore({
-  // modules: { },
+  modules: { profiles },
   state () {
     return {
       networkId: null,
-      address: null,
+      address: null, // connected address
       addresses: {},
 
       // TODO - get this from the contract?
@@ -58,6 +62,7 @@ export default createStore({
     },
     isWalletAddr: (state) => (addr) => addr === state.address,
     isWrongNetwork: state => state.networkId && networks[state.networkId]?.name !== deployNetwork.name,
+    isEthereum: state => networks[state.networkId]?.layer === 'ethereum',
     isPolygon: state => networks[state.networkId]?.layer === 'polygon',
     label: state => name => label(name, deployNetwork?.layer)
   },
@@ -133,9 +138,29 @@ export default createStore({
       }
     },
 
+    // for use elsewhere in the app since state.provider is not accessible with vuex proxying... :(
+    async getProvider ({ dispatch }) {
+      if (!provider) await dispatch('init')
+      return provider
+    },
+
+    // for use elsewhere in the app since state.provider is not accessible with vuex proxying... :(
+    async getSigner ({ dispatch }) {
+      try {
+        if (!signer) await dispatch('connect')
+        return signer
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
     getNetworkId ({ commit }, provider) {
       return provider.getNetwork()
-        .then(network => commit('SET_NETWORK_ID', network.chainId))
+        .then(network => {
+          commit('SET_NETWORK_ID', network.chainId)
+          return network.chainId
+        })
         .catch(console.error)
     },
 
@@ -157,11 +182,13 @@ export default createStore({
         // commit('SET_CONTRACTS', provider)
 
         dispatch('listenToWalletProvider')
-        return
+        return true
       } catch (e) {
-        console.error('@connect', e)
+        // console.error('@connect', e)
+
         // clear wallet in case
         dispatch('disconnect')
+
         // throw error so stops any flows (closes modal too)
         throw e
       }
@@ -209,10 +236,6 @@ export default createStore({
         console.error('disconnected?', error)
         dispatch('disconnect')
       })
-    },
-
-    getProvider () {
-      return provider
     },
 
     async createProject ({ state, dispatch }, { project }) {
@@ -306,7 +329,7 @@ export default createStore({
         }
 
         // fetch meta from ipfs...
-        const meta = await fetch(`${process.env.VUE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
+        const meta = await fetch(`${import.meta.env.VITE_APP_IPFS_GATEWAY}/ipfs/${ipfsHash}`)
         return meta.json()
       } catch (e) {
         console.error('@getProjectMeta', e)
@@ -555,6 +578,16 @@ export default createStore({
       }
     },
 
+    async getDripsByReceiver ({ state }, receiver) {
+      try {
+        const resp = await api({ query: queryDripsByReceiver, variables: { receiver, first: 100 } })
+        return resp.data?.dripsEntries || []
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
     // async getDripsReceivers ({ state, dispatch }, address) {
     //   try {
     //     if (!provider) await dispatch('init')
@@ -618,9 +651,25 @@ export default createStore({
       }
     },
 
-    async getSplitsBySender ({ state }, address) {
+    async getSplitsBySender ({ state }, sender) {
       try {
-        const resp = await api({ query: querySplitsBySender, variables: { sender: address } })
+        const resp = await api({ query: querySplitsBySender, variables: { sender, first: 100 } })
+        let entries = resp.data?.splitsEntries || []
+        // format
+        entries = entries.map(entry => ({
+          ...entry,
+          percent: entry.weight / state.splitsFractionMax * 100
+        }))
+        return entries
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
+
+    async getSplitsByReceiver ({ state }, receiver) {
+      try {
+        const resp = await api({ query: querySplitsByReceiver, variables: { receiver, first: 100 } })
         let entries = resp.data?.splitsEntries || []
         // format
         entries = entries.map(entry => ({
@@ -724,7 +773,7 @@ export default createStore({
           await dispatch('init')
         }
 
-        // ENS enabled?
+        // exit if non-ENS Network
         if (networks[state.networkId].layer !== 'ethereum') {
           return null
         }
@@ -744,6 +793,7 @@ export default createStore({
 
         if (ens) {
           // get records async...
+          // TODO - ens has sdk to get all records at once?
           const resolver = await provider.getResolver(ens)
           const records = ['avatar', 'url', 'com.twitter', 'vnd.twitter', 'com.github', 'vnd.github', 'com.discord', 'vnd.discord']
           // records...
@@ -755,6 +805,26 @@ export default createStore({
         }
 
         return { ens }
+      } catch (e) {
+        console.error(e)
+        return null
+      }
+    },
+
+    // fetch/queue profile info. since ENS records require fetching each one,
+    // simply start the queuing process and components should expect it eventually
+    async getAddressName ({ state, getters, commit, dispatch }, { address, flush }) {
+      try {
+        // saved?
+        if (!flush) {
+          const saved = state.addresses[address]
+          if (saved !== undefined) return
+        }
+
+        // fetch ENS
+        dispatch('resolveAddress', { address })
+        // fetch Metadata
+        // dispatch('getMetadataByAddress', { address, flush })
       } catch (e) {
         console.error(e)
         return null
@@ -866,6 +936,7 @@ export default createStore({
         localStorage.setItem('dripsLogs', JSON.stringify(logs))
       }
     }
+
   }
 })
 

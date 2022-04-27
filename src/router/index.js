@@ -42,22 +42,29 @@ const routes = [
       }
     ]
   },
+  
+  // nft memberships
+  {
+    path: '/memberships/:address',
+    name: 'project', // TODO rename
+    component: () => import(/* webpackChunkName: "project" */ '../views/Project2.vue')
+  },
+  
+  // (redirect old communities to nft membership page)
   {
     path: '/communities/:address',
-    name: 'project', // TODO rename
-    component: () => import(/* webpackChunkName: "project" */ '../views/Project.vue')
+    redirect: to => {
+      return { name: 'project', params: { address: to.params.address }}
+    },
   },
+
 
   // user / address
   {
     path: '/:address',
-    component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
+    name: 'user',
+    component: () => import(/* webpackChunkName: "user" */ '../views/User2.vue'),
     children: [
-      {
-        path: '',
-        name: 'user',
-        redirect: { name: 'user-drips-out' }
-      },
       // projects
       {
         path: 'communities',
@@ -97,7 +104,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior (to, from, savedPosition) {
     if (to.hash) {

@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import store from '@/store'
 import { useRoute, useRouter } from 'vue-router'
-import Panel from '@/components/Panel'
+import Panel from '@/components/Panel.vue'
 const route = useRoute()
 const router = useRouter()
 const entryPanel = ref()
@@ -30,7 +30,7 @@ watch(route, (to) => {
 </script>
 
 <template lang="pug">
-section.py-72
+section.pt-72.px-10
 
   panel.mx-auto.transition.duration-200(ref="entryPanel", icon="☔️", label="Create Drips", :collapsed="!isIndex", :isEditable="false", @open="router.push({name: 'create' })", :class="{'opacity-30 notouch_hover_opacity-100 transition duration-150': !isIndex}")
     template(v-slot:header)
@@ -44,29 +44,29 @@ section.py-72
 
     //- funding options as tiles
     .flex.flex-wrap.-mx-10.mt-40
-      .w-1x2.px-10
-        .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
+      .w-full.md_w-1x2.px-10.mb-20
+        .aspect-w-5.aspect-h-4.md_aspect-w-1.md_aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-drips' }")
             div.pb-24
               div.text-2xl.mb-20 💧
               .text-xl.font-semibold.mb-16 Drip Monthly
               p.text-violet-600.px-10.leading-tight Stream DAI #[span.font-bold every month]<br>to any Ethereum address.
 
-      .w-1x2.px-10
-        .aspect-w-1.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
+      .w-full.md_w-1x2.px-10.mb-20
+        .aspect-w-5.aspect-h-4.md_aspect-w-1.md_aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-splits' }")
             div.pb-24
               div.text-3xl.mb-20 💦
               .text-xl.font-semibold.mb-16 Split your drips
-              p.text-violet-600.px-10.leading-tight(style="max-widthff:15em") Split a #[b percent] of your incoming drips with any Ethereum address.
+              p.text-violet-600.px-20.leading-tight(style="max-widthff:15em") Split a #[b percent] of your incoming drips with any Ethereum address.
 
-      .w-full.px-10.mt-20
-        .aspect-w-2.aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
+      .w-full.px-10
+        .aspect-w-5.aspect-h-4.md_aspect-w-2.md_aspect-h-1.relative.rounded-2xl.shadow-md-blue.border.border-transparent.notouch_hover_border-violet-500
           router-link.absolute.overlay.flex.items-center.justify-center(:to="{name: 'create-community' }")
             div.pb-24
-              div.text-3xl.mb-20 ⛲️
-              .text-xl.font-semibold.mb-16 Create a Community
-              p.mx-auto.text-violet-600.px-10.leading-tight(style="max-width:26em") Fund your community by issuing #[b memberships] and optionally #[b drip to others] every time you get paid.
+              div.text-3xl.mb-20 ⛲
+              .text-xl.font-semibold.mb-16 Create a Membership
+              p.mx-auto.text-violet-600.px-20.leading-tight(style="max-width:25em") Raise funds from your community with monthly or single-purchase #[b NFT memberships].
 
   section.pt-24(ref="childRoute")
     router-view(:key="$route.path")

@@ -1,15 +1,15 @@
 <script setup>
 import { ref, computed } from 'vue'
-import Modal from '@/components/Modal'
-import Panel from '@/components/Panel'
-import AvailableFundsBar from '@/components/AvailableFundsBar'
-import TxLink from '@/components/TxLink'
-import SvgDai from '@/components/SvgDai'
+import Modal from '@/components/Modal.vue'
+import Panel from '@/components/Panel.vue'
+import AvailableFundsBar from '@/components/AvailableFundsBar.vue'
+import TxLink from '@/components/TxLink.vue'
+import SvgDai from '@/components/SvgDai.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
 import { getDripPctFromAmts, round, toDAI } from '@/utils'
 import store from '@/store'
 import { utils } from 'ethers'
-import FormMessage from '@/components/FormMessage'
+import FormMessage from '@/components/FormMessage.vue'
 
 const props = defineProps(['projectAddress', 'amts', 'tx'])
 const emit = defineEmits(['close', 'collected'])
@@ -65,17 +65,19 @@ modal(v-bind="$attrs", @close="emit('close')")
 
     template(v-slot:description)
       dialog-description
-        p.mx-auto.leading-snug.text-violet-650(style="max-width:25em")
+        p.mx-auto.leading-snug.text-violet-650ff(style="max-width:25em")
           template(v-if="!hasFunds")
             | There are no funds to collect.
           template(v-else)
             template(v-if="props.projectAddress")
-              | Your community has #[b collectable funds].
+              | Your membership has #[b collectable funds]!
             template(v-else)
-              | You have #[b funds to collect].
+              | You have #[b funds to collect]!
             template(v-if="hasSplits")
               br
-              | #[b {{ dripPct }}]% will be sent to the addresses you're #[b splitting incoming drips] with. The&nbsp;rest will be transferred to your wallet.
+              | You are dripping #[b {{ dripPct }}]% to other addresses.
+              br
+              | The&nbsp;rest will be transferred to your wallet.
             template(v-else)
               br
               | These funds can be transferred to your wallet.
@@ -98,7 +100,7 @@ modal(v-bind="$attrs", @close="emit('close')")
           //- splits deduction row
           .h-80.mt-5.rounded-full.bg-indigo-700.flex.justify-between.items-center.px-12.text-violet-650
             .flex-1.flex.justify-between.items-center
-              h4.ml-16.text-xl.font-semibold 💧 Splitting {{ dripPct }}%
+              h4.ml-16.text-xl.font-semibold 💧 Dripping {{ dripPct }}%
               .flex.items-center.mr-16
                 .text-2xl.font-semibold.flex.items-center
                   //- (less than ">")

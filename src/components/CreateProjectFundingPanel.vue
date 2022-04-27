@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 import store from '@/store'
-import Panel from '@/components/Panel'
-import InputBody from '@/components/InputBody'
+import Panel from '@/components/Panel.vue'
+import InputBody from '@/components/InputBody.vue'
 import { toWeiPerSec } from '@/utils'
 
 const props = defineProps({

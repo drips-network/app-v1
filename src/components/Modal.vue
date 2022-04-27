@@ -5,7 +5,7 @@ import {
   // DialogTitle,
   // DialogDescription
 } from '@headlessui/vue'
-import Panel from '@/components/Panel'
+import Panel from '@/components/Panel.vue'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -17,7 +17,7 @@ const close = () => emit('close')
 </script>
 
 <template lang="pug">
-dialog-body.fixed.inset-0.z-10.overflow-y-auto.flex.py-60.px-30(:open="isOpen", @close="close")
+dialog-body.fixed.inset-0.z-30.overflow-y-auto.flex.py-60.px-30(:open="isOpen", @close="close")
 
   dialog-overlay.fixed.overlay.bg-indigo-900.opacity-75
 

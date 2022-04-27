@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed, onBeforeMount } from 'vue'
-import AvatarBlockie from '@/components/AvatarBlockie'
-import UserAvatar from '@/components/UserAvatar'
-import Addr from '@/components/Addr'
-import FlexTruncate from '@/components/FlexTruncate'
-import ProjectProgressBar from '@/components/ProjectProgressBar'
+import AvatarBlockie from '@/components/AvatarBlockie.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import Addr from '@/components/Addr.vue'
+import FlexTruncate from '@/components/FlexTruncate.vue'
+import ProjectProgressBar from '@/components/ProjectProgressBar.vue'
 import store from '@/store'
 import { ipfsUrl } from '@/utils'
 
@@ -59,7 +59,7 @@ onBeforeMount(() => getMeta())
 
   //- progress bar row
   .mt-6.mx-1.h-80.rounded-full.bg-indigo-800(:class="{'animate-pulse': !meta}")
-    project-progress-bar.text-white(v-if="meta", :meta="meta", :project="props.project", :currentFundingWei="currentFundingWei", @progress="e => $emit('progress', e)")
+    project-progress-bar.text-white(v-if="meta && props.project", :meta="meta", :project="props.project", :currentFundingWei="currentFundingWei", @progress="e => $emit('progress', e)")
 
   //- info row
   .h-56.mt-10.flex.w-full.items-center.justify-between.font-semibold.text-base

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, reactive, toRaw, markRaw } from 'vue'
-import Panel from '@/components/Panel'
-import InputBody from '@/components/InputBody'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
+import Panel from '@/components/Panel.vue'
+import InputBody from '@/components/InputBody.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
 // import MembershipInputGroup from '@/components/MembershipInputGroup'
 
 const newTempl = () => ({

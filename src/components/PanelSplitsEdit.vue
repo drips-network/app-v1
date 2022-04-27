@@ -3,15 +3,15 @@ import { ref, computed, toRaw, onBeforeMount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { formatSplits, validateAddressInput } from '@/utils'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
-import Panel from '@/components/Panel'
-import InputBody from '@/components/InputBody'
-import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle'
-import SvgX from '@/components/SvgX'
+import Panel from '@/components/Panel.vue'
+import InputBody from '@/components/InputBody.vue'
+import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
+import SvgX from '@/components/SvgX.vue'
 import store from '@/store'
-import TxLink from '@/components/TxLink'
-import LoadingBar from '@/components/LoadingBar'
-import FormMessage from '@/components/FormMessage'
-import WarningPolygonAddresses from '@/components/WarningPolygonAddresses'
+import TxLink from '@/components/TxLink.vue'
+import LoadingBar from '@/components/LoadingBar.vue'
+import FormMessage from '@/components/FormMessage.vue'
+import WarningPolygonAddresses from '@/components/WarningPolygonAddresses.vue'
 
 const props = defineProps(['newRecipient', 'cancelBtn', 'projectAddress'])
 const emit = defineEmits(['close', 'updated', 'viewSplits'])
@@ -96,7 +96,7 @@ const update = async () => {
 
     // success
     emit('updated')
-    txMsg.value = { status: 1, message: 'Confirmed! View your drips on your profile!' }
+    txMsg.value = { status: 1, message: 'Confirmed! View your drips!' }
   } catch (e) {
     // console.error(e)
     // alert('Error: \n' + e.message || e)

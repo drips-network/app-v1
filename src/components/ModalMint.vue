@@ -1,28 +1,29 @@
 <script setup>
-import { ref, reactive, computed, inject, toRaw } from 'vue'
+import { ref, reactive, computed, toRaw } from 'vue'
 import store from '@/store'
 import { BigNumber as bn, constants } from 'ethers'
 import { ipfsUrl, fromWei, toDAI, toWei, toWeiPerSec } from '@/utils'
-import Modal from '@/components/Modal'
-import TxLink from '@/components/TxLink'
+import Modal from '@/components/Modal.vue'
+import TxLink from '@/components/TxLink.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
-import Panel from '@/components/Panel'
-import SvgDai from '@/components/SvgDai'
-import InputBody from '@/components/InputBody'
-import FormMessage from '@/components/FormMessage'
+import Panel from '@/components/Panel.vue'
+import SvgDai from '@/components/SvgDai.vue'
+import InputBody from '@/components/InputBody.vue'
+import FormMessage from '@/components/FormMessage.vue'
 
 const props = defineProps({
-  projectAddress: String,
-  tokenType: Object
+  project: Object,
+  meta: Object,
 })
 const emit = defineEmits(['close', 'minted'])
 
-const meta = inject('projectMeta')
-
 // token attributes
-const isStreaming = toRaw(props.tokenType?.streaming)
-const typeId = toRaw(props.tokenType.tokenTypeId)
-const minAmt = toRaw(props.tokenType.minAmt)
+const tokenType = toRaw(props.project.tokenTypes[0])
+const isStreaming = toRaw(tokenType.streaming)
+const typeId = toRaw(tokenType.tokenTypeId)
+const minAmt = toRaw(tokenType.minAmt)
+
+// min
 let minDAI = isStreaming ? toDAI(bn.from(minAmt).mul(30 * 24 * 60 * 60), 'exact') // bn
   : toDAI(minAmt, 'exact')
 // rounding
@@ -55,7 +56,7 @@ const approve = async () => {
 
     // send...
     state.approveTxMsg = { message: 'Confirm the transaction in your wallet.' }
-    state.approveTx = await store.dispatch('approveDAIContract', props.projectAddress)
+    state.approveTx = await store.dispatch('approveDAIContract', props.project.id)
 
     // wait for confirmation...
     state.approveTxMsg = { message: 'Waiting for transaction confirmation...' }
@@ -77,9 +78,9 @@ const mint = async () => {
     if (!store.state.address) await store.dispatch('connect')
 
     // check allowance
-    const allowance = await store.dispatch('getAllowance', props.projectAddress)
+    const allowance = await store.dispatch('getAllowance', props.project.id)
     // !! not allowed
-    if (allowance.lt(props.tokenType.minAmt)) {
+    if (allowance.lt(tokenType.minAmt)) {
       state.approved = false
       state.approveVisible = true
       return
@@ -94,7 +95,7 @@ const mint = async () => {
 
       // mint streaming...
       state.mintTx = await store.dispatch('mintStreamingNFT', {
-        projectAddress: props.projectAddress,
+        projectAddress: props.project.id,
         typeId,
         topUpAmt,
         amtPerSec
@@ -102,7 +103,7 @@ const mint = async () => {
     } else {
       // mint one-time...
       state.mintTx = await store.dispatch('mintNFT', {
-        projectAddress: props.projectAddress,
+        projectAddress: props.project.id,
         typeId,
         giveAmt: toWei(amountDAI.value)
       })
@@ -128,28 +129,28 @@ modal(v-bind="$attrs", @close="$emit('close')")
 
     template(v-slot:header)
       dialog-title(tabindex="0")
-        | Join Community
+        | Join
         br
         | "{{ meta.name }}"
 
     template(v-slot:description)
       dialog-description.text-base.mx-auto.leading-relaxed.text-violet-650
         .mx-auto.px-24(v-if="isStreaming", style="max-width:28em")
-          | Drip funds <b>every month</b> and receive a unique <b>Membership NFT</b> 🧩. #[b Top-up periodically] to ensure your membership doesn't become #[b inactive]. You can #[b withdraw] excess funds at any time.
+          | Drip funds <b>every month</b> and receive a unique <b>Member NFT</b> 🧩. #[b Top-up periodically] to ensure your membership doesn't become #[b inactive]. You can #[b withdraw] excess funds at any time.
         .mx-auto(v-else, style="max-width:24em")
-          | Join this community by purchasing a unique<br><b>NFT Membership</b> 🧩 with a one-time payment.
+          | Make a one-time payment to become a member and receive this NFT 🧩 in your wallet.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
     //- (image)
-    template(v-if="props.tokenType.ipfsHash")
+    template(v-if="tokenType.ipfsHash")
       figure.bg-indigo-950.rounded-xl.relative.mb-48.flex.p-56.relative
         //- label
         .absolute.top-0.left-0.w-full.text-center.text-sm.pt-4.font-normal.text-violet-600.opacity-90
-          | Membership NFT
+          | Member NFT
         //- wrapper
         .w-full.relative
           .aspect-w-8.aspect-h-7
-            img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(props.tokenType.ipfsHash)", alt="NFT Membership Image")
+            img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(tokenType.ipfsHash)", alt="NFT Membership Image")
 
     //- inputs
     form(@submit.prevent, validate)

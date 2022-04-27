@@ -1,45 +1,32 @@
 <script setup>
-import { ref, onBeforeMount } from 'vue'
+// import { ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
-import api from '@/api'
-import UserNft from '@/components/UserNFT'
-import InfoBar from '@/components/InfoBar'
-import Addr from '@/components/Addr'
-import LoadingBar from '@/components/LoadingBar'
+// import api from '@/api'
+import UserNft from '@/components/UserNFT.vue'
+// import InfoBar from '@/components/InfoBar.vue'
+import Addr from '@/components/Addr.vue'
+// import LoadingBar from '@/components/LoadingBar.vue'
 
 const route = useRoute()
-
-const nfts = ref()
-
-const fetchUserNFTs = (tokenReceiver) => {
-  return api({
-    variables: { tokenReceiver },
-    query: `
-      query ($tokenReceiver: Bytes!) {
-        tokens (where: {tokenReceiver: $tokenReceiver}) {
-          tokenId
-          tokenType { streaming }
-          owner: tokenReceiver
-          projectAddress: tokenRegistryAddress
-          amount: amtPerSec
-        }
-      }
-    `
-  })
-}
-
-onBeforeMount(async () => {
-  try {
-    const resp = await fetchUserNFTs(route.params.address)
-    nfts.value = resp.data?.tokens || []
-  } catch (e) {
-    console.error(e)
-  }
-})
+const props = defineProps(['nfts'])
 </script>
 
 <template lang="pug">
-section.user-memberships
+section.px-20
+  header.flex
+    h2.mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.pl-24.pr-20.h-44.font-semiboldff.text-violet-650.text-ms
+      div
+        template(v-if="!props.nfts")
+          | Loading...
+        template(v-else) 
+          | #[addr.font-bold(:address="$route.params.address")] has #[b {{ props.nfts.length }} NFT Membership{{ props.nfts.length > 1 ? 's' : ''}}] 🧩
+
+  ul.mt-60.grid.grid-cols-2.gap-40(v-if="props.nfts && props.nfts.length")
+    //- nfts...
+    li.mb-ff.flex(v-for="nft in nfts")
+      user-nft.w-full(:nft="nft")
+
+//- section.user-memberships
   //- .flex.justify-center.mb-40
     .mx-auto.bg-indigo-800.rounded-2xlb.py-24.px-32.text-md.text-violet-650
       | <b>Drips</b> from <b>Memberships</b> appear here.
