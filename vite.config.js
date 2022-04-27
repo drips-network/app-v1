@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import { splitVendorChunkPlugin } from 'vite'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    // splits build into app.js and vendor.js
+    // TODO - chunk vendor further
+    splitVendorChunkPlugin()
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
