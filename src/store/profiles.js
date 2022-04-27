@@ -1,6 +1,7 @@
 import { ethers as Ethers } from 'ethers'
 import { Metadata } from '../../contracts'
 import { ipfsUrl } from '@/utils'
+import api, { queryIdentityMetadataByAddress } from '@/api'
 import bs58 from 'bs58'
 
 const defaultMetadataID = 'drips'
@@ -216,26 +217,16 @@ export default {
         //   if (saved) return saved
         // }
 
-        const provider = await dispatch('getProvider', null, { root: true })
-        const contract = getMetadataContract(provider)
-
-        // get all events...
-        const allEvents = await contract.queryFilter('MultiHash')
-
-        // find address's last update, with matching metadata ID
-        const myLastUpdate = allEvents
-          .reverse()
-          .find(event => {
-            const isAddr = event.args.addr.toLowerCase() === address.toLowerCase()
-            const sameID = Ethers.utils.parseBytes32String(event.args.id) === id
-            return isAddr && sameID
-          })
+        // query api...
+        const resp = await api({ query: queryIdentityMetadataByAddress, variables: { id: address } })
+        
+        const myMultiHash = resp?.data?.identityMetaData?.multiHash
 
         // fetch ipfs content if set
-        if (myLastUpdate?.args.multiHash) {
+        if (myMultiHash) {
           // convert to ipfs hash
-          const ipfsHash = hexToBase58(myLastUpdate?.args.multiHash)
-          // fetch...
+          const ipfsHash = hexToBase58(myMultiHash)
+          // fetch from ipfs...
           const resp = await fetch(ipfsUrl(ipfsHash))
           const meta = (await resp.json() || null)
           // save

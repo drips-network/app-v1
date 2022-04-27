@@ -129,3 +129,12 @@ query ($receiver: Bytes!, $first: Int!) {
   }
 }
 `
+
+export const queryIdentityMetadataByAddress = `
+query ($id: ID!) {
+  identityMetaData (id: $id) {
+    id
+    multiHash
+  }
+}
+`
