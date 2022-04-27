@@ -248,13 +248,13 @@ article.explore.pt-56
       section.mt-60.px-36
         ul
           li(v-for="(drip, i) in dripRows")
-            template(v-if="showAllDrips || i < 12")
+            template(v-if="showAllDrips || i <= 12")
               drip-row.my-4(:drip="drip")
             //- user-drips-detail(:config="config")
 
       //- (show all btn)
       footer
-        .flex.justify-center.mt-36(v-if="dripRows.length > 2")
+        .flex.justify-center.mt-36(v-if="dripRows.length > 12")
           button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-26.pr-12.font-semibold.text-lg(@click="showAllDrips = !showAllDrips")
             .flex.items-center
               div {{ showAllDrips ? 'View Less' : `View All ${ dripRows.length }` }}

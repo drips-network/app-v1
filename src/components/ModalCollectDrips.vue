@@ -103,10 +103,8 @@ modal(v-bind="$attrs", @close="emit('close')")
               h4.ml-16.text-xl.font-semibold 💧 Dripping {{ dripPct }}%
               .flex.items-center.mr-16
                 .text-2xl.font-semibold.flex.items-center
-                  //- (less than ">")
-                  template(v-if="props.amts && props.amts[1].gt(0) && Number(toSplits) < 0.01") >
                   //- (negative sign)
-                  template(v-if="toSplits > 0") -
+                  template(v-if="props.amts && props.amts[1].gt(0)") –
                   //- amount
                   | {{ toSplits !== -1 ? toSplits : '...' }}
                   //-

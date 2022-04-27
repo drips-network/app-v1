@@ -86,7 +86,7 @@ const connect = async () => {
           //- explore link
           router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'explore'}") Explore
           //- create link
-          router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Create
+          router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Drip
           //- (profile btn)
           template(v-if="$store.state.address")
             .btn.btn-md.bg-indigo-900
