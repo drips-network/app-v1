@@ -1,11 +1,14 @@
 import { createStore } from 'vuex'
 import { toRaw } from 'vue'
 import { ethers as Ethers, BigNumber as bn } from 'ethers'
-import Web3Modal from 'web3modal'
-import WalletConnectProvider from '@walletconnect/web3-provider'
 import api, { queryProjectMeta, queryProject, queryDripsConfigByID, querySplitsBySender, querySplitsByReceiver, queryDripsByReceiver } from '@/api'
 import { oneMonth, toWei, validateSplits, getDripsWithdrawable } from '@/utils'
 import label from '@/labels'
+import Web3Modal from 'web3modal'
+// Wallet Connect - directly import .js file since import breaks `vite build`
+// see: https://github.com/vitejs/vite/issues/7257
+import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js'
+
 // contracts
 import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../contracts'
 import profiles from './profiles'
