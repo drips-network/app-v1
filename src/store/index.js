@@ -46,6 +46,7 @@ export default createStore({
   state () {
     return {
       networkId: null,
+      deployNetworkId: Number(Object.keys(networks).find(id => networks[id].name === deployNetworkName)),
       address: null, // connected address
       addresses: {},
 

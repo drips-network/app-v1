@@ -4,6 +4,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import store from '@/store'
+import { utils } from 'ethers'
 import SvgLogo from '@/components/SvgLogo.vue'
 import SvgLogoDrop from '@/components/SvgLogoDrop.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -23,11 +24,6 @@ store.dispatch('init')
 const connect = async () => {
   try {
     await store.dispatch('connect')
-    // redirect to profile ?
-    // if (!sessionStorage.getItem('hasLoggedIn')) {
-    //   sessionStorage.setItem('hasLoggedIn', true)
-    //   router.push({ name: 'user', params: { address: store.state.address } })  
-    // }
   } catch (e) {
     // ignore closing web3modal
     if (e !== 'Modal closed by user') {
@@ -36,17 +32,36 @@ const connect = async () => {
     }
   }
 }
+
+const switchToAppNetwork = async () => {
+  try {
+    if (!window.ethereum) { throw new Error('No provider to change network') }
+
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: utils.hexValue(store.state.deployNetworkId) }]
+    })
+
+    // reload app
+    window.location.reload()
+  } catch (e) {
+    console.error(e)
+    alert('Could not switch networks. Try switching in your wallet and reloading the page.')
+  }
+}
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.py-10.pb-104.md_pb-10.text-base.font-sans.leading-normal(style="min-widthff:1024px")
-  .flex.flex-col.min-h-screen
+#app.max-w-screen-2xl.mx-auto.py-10.pb-104.md_pb-10.text-base.font-sans.leading-normal
+  .flex.w-full.flex-col.min-h-screen
     //- (wrong network banner)
     template(v-if="$store.getters.isWrongNetwork")
-      .sticky.z-50.top-10.left-0.w-full.h-80.px-12.rounded-full.bg-yellow-500.text-black.flex.items-center.justify-between.mb-10
-        .w-80.text-center.text-2xl ⚠️
-        .flex-1.text-center.font-semibold Wrong Network! Switch to #[span.capitalize {{ networkName }}]!
-        .w-80
+      .sticky.z-50.top-10.left-0.w-full.px-12.mb-10
+        button.rounded-full.bg-yellow-500.text-black.flex.w-full.items-center.justify-between.notouch_hover_ring(@click="switchToAppNetwork")
+          .w-80.text-center.text-2xl ⚠️
+          .h-80.flex-1.flex.items-center.justify-center.text-center.font-semibold
+            div Switch to #[span.capitalize {{ networkName }}] network
+          .w-80.flex.items-center.justify-center.text-xl &rarr;
 
     //- app header
     header.flex.items-center.justify-center.md_justify-between.px-12
