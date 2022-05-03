@@ -249,7 +249,7 @@ article.explore.pt-56
         ul
           li(v-for="(drip, i) in dripRows")
             template(v-if="showAllDrips || i <= 12")
-              drip-row.my-4(:drip="drip")
+              drip-row.mb-112.md_my-4(:drip="drip")
             //- user-drips-detail(:config="config")
 
       //- (show all btn)

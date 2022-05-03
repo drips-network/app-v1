@@ -11,7 +11,8 @@
 }
 
 html {
-  font-size: 8px; /* 1rem / Tailwind default */
+  /* lazy mobile sizing... */
+  font-size: 7px; /* 1rem / Tailwind default */
 }
 @screen md {
   html {
