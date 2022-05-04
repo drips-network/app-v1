@@ -13,6 +13,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+
+// TODO - ignore 'close' event fired when web3modal connect
 const close = () => emit('close')
 </script>
 
