@@ -220,7 +220,7 @@ article.explore.pt-56
   section.mt-24.mb-144
     //- (loading)
     template(v-if="!splits")
-      loading-bar
+      loading-bar.mx-12
 
     //- (list)
     template(v-else)
@@ -268,7 +268,7 @@ article.explore.pt-56
   section.mt-24.mb-144
     //- (loading)
     template(v-if="!projects")
-      loading-bar
+      loading-bar.mx-12
 
     //- (list)
     template(v-else)

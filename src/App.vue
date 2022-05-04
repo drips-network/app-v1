@@ -1,8 +1,8 @@
 <script setup>
 // This app is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, toRaw } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import store from '@/store'
 import { utils } from 'ethers'
 import SvgLogo from '@/components/SvgLogo.vue'
@@ -17,13 +17,21 @@ import Addr from '@/components/Addr.vue'
 
 const networkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWORK
 const networkMenu = ref(false)
+const route = useRoute()
 const router = useRouter()
+const hasConnected = ref(toRaw(store.state.address) !== null)
 
 store.dispatch('init')
 
-const connect = async () => {
+const connect = async (goToProfile = false) => {
   try {
     await store.dispatch('connect')
+
+    if (goToProfile) {
+      router.push({name: 'user', params: { address: store.state.address }})
+    }
+
+    hasConnected.value = true
   } catch (e) {
     // ignore closing web3modal
     if (e !== 'Modal closed by user') {
@@ -95,13 +103,13 @@ const switchToAppNetwork = async () => {
                 | polygon
 
       //- right side (mobile bottom fixed)
-      nav.app__nav.fixed.z-30.bottom-0.left-0.w-full.px-10.pb-10.md_static.md_p-0.md_w-auto.flex.justify-center.bg-gradient-to-b.from-transparent.to-indigo-900
+      nav.app__nav.fixed.z-30.bottom-0.left-0.w-full.px-10.pb-10.md_static.md_p-0.md_w-auto.flex.justify-center.bg-gradient-to-b.from-transparent.to-indigo-900(:class="{'hidden md_flex': !store.state.address}")
         //- bubble
         .flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.pr-16.pl-12
           //- explore link
           router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'explore'}") Explore
           //- create link
-          router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100(:to="{name: 'create'}") Drip
+          router-link.app__nav__link.mr-5.text-md.font-semibold.border-2.border-transparent.notouch_hover_border-violet-650.h-56.px-24.rounded-full.flex.items-center.justify-center.notouch_hover_text-white.transition.duration-100.order-last.md_order-none(:to="{name: 'create'}") Drip
           //- (profile btn)
           template(v-if="$store.state.address")
             .btn.btn-md.bg-indigo-900
@@ -116,7 +124,7 @@ const switchToAppNetwork = async () => {
                 svg-x.h-12.w-12(strokeWidth="2")
           //- (connect btn)
           template(v-else)
-            button.btn.btn-md.btn-darker.px-24.text-md.font-semibold(@click="connect") Connect
+            button.btn.btn-md.btn-darker.px-24.text-md.font-semibold(@click="connect($route.name === 'explore')") Connect
 
     main#main.flex-1.flex
       router-view.w-full(:key="$route.params && JSON.stringify($route.params)")
@@ -125,6 +133,13 @@ const switchToAppNetwork = async () => {
     .bg-indigo-900.text-ms.text-violet-650.rounded-full.font-semibold.flex.items-center
       svg-dai.h-12
       | 1 ≈ $1
+
+  //- view profile banner
+  template(v-if="!hasConnected && !store.state.address && !$route.name.startsWith('create')")
+    .sticky.mt-144.md_mt-196.z-30.bottom-0.pb-10.left-0.w-full.px-10.mt-10.bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+      .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16(class="bg-greenbright-400")
+        .flex.flex-1.items-center Connect a wallet to view your profile :)
+        button.h-54.ml-24.border-2ff.rounded-full.pl-28.pr-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="connect(true)") Connect
 
   //- footer
   .mt-144.md_mt-196.mb-64.md_mb-0.px-12.flex.flex-wrap.justify-center.md_justify-between
@@ -154,6 +169,8 @@ const switchToAppNetwork = async () => {
       a.ml-10.text-md.font-semibold.h-54.w-104.rounded-full.flex.items-center.justify-center.bg-indigo-950.notouch_hover_ring(href="https://www.coinbase.com/price/dai", target="_blank", rel="noopener noreferrer")
         svg-dai.h-16
         | 1 ≈ $1
+
+  
     //-
       .h-52.bg-indigo-900.border-2ff.border-violet-700.text-violet-650.text-lg.font-semibold.px-24.rounded-full.flex.items-center.justify-center
         svg-dai.h-16
