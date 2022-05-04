@@ -69,9 +69,9 @@ const switchToAppNetwork = async () => {
       .flex.items-center.h-80.rounded-full.bg-indigo-700.pr-32
         //- home / landing site link
         router-link.flex.items-center.-mt-px(to="/")
-          .w-80.flex.justify-center.items-center.pb-px
-            svg-logo-drop
-          svg-logo.text-violet-650
+          .w-80.flex.justify-center.items-center.pb-px.-mr-6
+            svg-logo-drop(style="height:3.6rem")
+          svg-logo.text-violet-650(style="height:3.2rem")
 
         //- network changer
         .ml-24.relative.text-mss.leading-none

@@ -17,6 +17,6 @@ ul.flex.justify-start.items-center.flex-row-reverse
 
   //- "+6" counter
   template(v-if="props.addresses.length - props.limit > 0")
-    .-ml-11.order-first.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold(:style="{ minWidth: props.height + 'px', height: props.height + 'px' }")
+    .-ml-11.order-first.flex.items-center.justify-center.bg-indigo-950.rounded-full.font-semibold(:style="{ minWidth: `calc(5.4rem * ${props.height} / 54)`, height: `calc(5.4rem * ${props.height} / 54)` }")
       | +{{ props.addresses.length - limit}}
 </template>
