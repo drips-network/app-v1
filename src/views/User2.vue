@@ -417,12 +417,12 @@ article.profile.pt-40.pb-80
         router-link.flex.items-center.rounded-full.pl-4.py-4.notouch_hover_violet-600.notouch_hover_text-white.mr-5(:to="{name: 'user', params: { address: route.params.address }}")
           user-avatar.w-24.h-24.mr-7(:address="route.params.address")
           addr.font-bold(:address="route.params.address")
-        div is a member of #[b {{ nfts.length }}] NFT Membership{{ nfts.length > 1 ? 's' : ''}}.
+        div has joined {{ nfts.length }} #[b NFT Membership{{ nfts.length > 1 ? 's' : ''}}].
 
     //- nft list
-    ul.mt-72.flex.flex-wrap.justify-center
+    ul.mt-72.grid.grid-cols-1.sm_grid-cols-2.lg_grid-cols-3.px-10
       //- nfts...
-      li.px-10.w-1x3(v-for="(nft, i) in nfts")
+      li.px-10.my-10(v-for="(nft, i) in nfts")
         //- (excerpted)
         template(v-if="showAllNFTs || i < 3")
           user-nft.w-full(:nft="nft")
