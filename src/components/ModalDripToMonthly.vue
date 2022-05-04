@@ -13,10 +13,8 @@ import { constants } from 'ethers'
 
 const props = defineProps(['address'])
 
-const dripType = ref()
-
 const dripAmt = ref(10)
-// const dripType = ref('monthly')
+const dripType = ref('monthly')
 
 const dripToReceiver = ref(props.address)
 
@@ -57,12 +55,11 @@ const confirmSplits = ref(false)
 const confirmDrips = ref(false)
 
 const dripTx = ref()
-
 const drip = () => {
   if (dripType.value === 'split') {
     confirmSplits.value = true
   }
-  if (dripType.value === 'drip') {
+  if (dripType.value === 'monthly') {
     confirmDrips.value = true
   }
 }
@@ -80,43 +77,30 @@ modal(v-bind="$attrs", @close="$emit('close')")
         | Drip to #[addr.text-violet-650ff(:address="props.address", @ens="ens => { dripToReceiver = ens }")]
 
     template(v-slot:description)
-      dialog-description.text-violet-650
-        template(v-if="dripType === 'split'") What #[b percent] of your drips would you like to split?
-        template(v-else-if="dripType === 'drip'") How much would you like to drip #[b every month]?
-        template(v-else-if="dripType") How much would you like to drip?
-        template(v-else) How would you like to drip?
+      dialog-description.text-violet-650 How much would you like to drip?
+      //- dialog-description.mx-auto.leading-relaxed(style="max-widthff:26em")
+        template(v-if="dripType === 'monthly'")
+          | Send DAI #[b.text-violet-650 every month.]
+        template(v-if="dripType === 'split'")
+          | Share a <b class="text-violet-650">percent</b> of your incoming funds.
 
-    //- (select type ui)
-    div(v-if="!dripType")
-      .mt-40.flex.justify-center.flex-wrap
-        button.btn.btn-lg.btn-violet.mx-3.my-3.px-40(@click="dripType = 'give'") Drip Once 💧
-        button.btn.btn-lg.btn-violet.mx-3.my-3.px-40(@click="dripType = 'drip'") Drip Monthly 🗓
-        button.btn.btn-lg.btn-violet.mx-3.my-3.px-40(@click="dripType = 'split'") Split your Drips 💦
+    form(@submit.prevent="drip", validate)
+      //- amount input
+      input.h-80.w-full.flex.items-center.justify-center.rounded-full.border.border-violet-700.focus_border-violet-600.text-2xl.font-semibold(type="number", v-model="dripAmt", min="0.01", step="0.01")
 
-      .mt-40.flex.justify-center
-        button.btn.btn-lg.btn-outline.px-40(@click="$emit('close')") Cancel
+      .mt-10.flex
+        //- option monthly
+        .w-1x2.pr-3
+          input-radio.w-full(v-model="dripType", value="monthly", name="drip type") DAI/month
+        //- option split
+        .w-1x2.pl-3
+          input-radio.w-full(v-model="dripType", value="split", name="drip type") % of drips
 
-    //- (input ui)
-    form(v-if="dripType", @submit.prevent="drip", validate)
-      //- (give input)
-      template(v-if="dripType === 'give'")
-        input-body(label="DAI amount", theme="outline", symbol="dai")
-          input(type="number", v-model="dripAmt", min="0.01", step="0.01", v-autofocus)
+      //- input-body.mt-10(v-show="dripType === 'monthly'", label="Pre-pay Months")
+        input(v-model="prePayMonths", type="number", min="1", step="1" required)
 
-      //- (monthly input)
-      template(v-else-if="dripType === 'drip'")
-        input-body(label="DAI per month", theme="outline", symbol="daipermo")
-          input(type="number", v-model="dripAmt", min="0.01", step="0.01", v-autofocus)
-
-      //- (split input)
-      template(v-else-if="dripType === 'split'")
-        input-body(label="Percent to split", theme="outline", symbol="percent")
-          input(type="number", v-model="dripAmt", min="0.01", max="100", step="0.01", v-autofocus)
-
-      //- buttons
-      .mt-40.mb-6.flex.justify-center
-        button.btn.btn-lg.btn-outline.px-40.mx-3(@click.prevent="dripType = null; dripAmt = 10") Cancel
-        button.btn.btn-lg.btn-violet.px-40.mx-3(type="submit") Review
+      .mt-40.mb-6
+        button.btn.btn-lg.btn-violet.px-60.mx-auto(type="submit") Review
 
   modal-splits-edit(v-if="confirmSplits", :open="confirmSplits", :newRecipient="{ receiverInput: dripToReceiver, percent: dripAmt }", @close="confirmSplits = false")
     template(v-slot:header)
