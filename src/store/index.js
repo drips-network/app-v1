@@ -336,12 +336,17 @@ export default createStore({
 
     /* See how much DAI an address is allowed to spend on behalf of the signed-in user */
     async getAllowance ({ state, dispatch }, address) {
-      if (!state.address) await dispatch('connect')
-      // if no address defined, set to DripsHub address
-      address = address || DaiDripsHub.address
-      // get
-      const daiContract = getDAIContract()
-      return daiContract.allowance(state.address, address)
+      try {
+        if (!state.address) await dispatch('connect')
+        // if no address defined, set to DripsHub address
+        address = address || DaiDripsHub.address
+        // get
+        const daiContract = getDAIContract()
+        return daiContract.allowance(state.address, address)
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
     },
 
     /* mint non-streaming / one-time payment nft */
@@ -591,6 +596,31 @@ export default createStore({
     //     throw e
     //   }
     // },
+
+    async dripOnce ({ dispatch }, { address, amt }) {
+      const actionId = new Date().getTime()
+      try {
+        if (!signer) await dispatch('connect')
+
+        const contract = getHubContract()
+        const contractSigner = contract.connect(signer)
+
+        // log intent
+        dispatch('log', { label: 'drip once: intent', data: { arguments: arguments[1], contract: contract.address }, actionId })
+
+        // sign...
+        const tx = await contractSigner['give(address,uint128)'](address, amt)
+
+        // log tx
+        console.log('new tx - drip once:', tx)
+        dispatch('log', { label: 'drip once: tx', data: { tx }, actionId })
+
+        return tx
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
+    },
 
     async updateUserDrips ({ state, getters, dispatch }, { lastUpdate, lastBalance, currentReceivers, balanceDelta, newReceivers }) {
       const actionId = new Date().getTime()
