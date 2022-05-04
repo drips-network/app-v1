@@ -2,11 +2,12 @@
 import { ref, markRaw, onBeforeMount, computed } from 'vue'
 import store from '@/store'
 import { utils } from 'ethers'
-import { toDAIPerMo, ipfsUrl } from '@/utils'
+import { toDAI, toDAIPerMo, ipfsUrl } from '@/utils'
 import SvgPlusMinus from '@/components/SvgPlusMinus.vue'
 import SvgDai from '@/components/SvgDai.vue'
 import TxLink from '@/components/TxLink.vue'
 import FlexTruncate from '@/components/FlexTruncate.vue'
+import SvgDripOff from '@/components/SvgDripOff.vue'
 // import SvgNftTest2 from '@/components/SvgNFTTest2'
 
 // temp
@@ -17,7 +18,7 @@ const props = defineProps({
 })
 
 const nft = markRaw(props.nft)
-const nftRate = toDAIPerMo(nft.amount).toFixed(2)
+const nftRate = toDAIPerMo(nft.amount) // .toFixed(2)
 const tokenId = nft.tokenId
 const nftMeta = ref({})
 const nftExpiryDate = ref()
@@ -133,59 +134,82 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-.user-nft.shadow-sm-blue.rounded-2xl.p-28.flex.flex-col
-  //- TODO redesign owner actions below tile(?)
-  header.flex.items-center
-    //- avatar
-    router-link.-ml-2.h-36.w-36.rounded-full.overflow-hidden.relative.mr-16.bg-indigo-800(:to="{name: 'project', params: { address: projectAddress }}")
-      img.absolute.overlay.object-cover.object-center(v-if="projectMeta.image", :src="ipfsUrl(projectMeta.image)")
-      img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
-    //- community name
-    flex-truncate.flex-1.text-left.text-violet-600
-      h6.inline.text-xl.font-semibold.-mt-3ff
-        router-link(:to="{name: 'project', params: { address: projectAddress }}")
-          | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
-    //- no
-    .ml-40.mr-6.text-xl.font-semibold.text-violet-800 {{ '#' + tokenId }}
+.user-nft
+  .shadow-sm-blue.rounded-2xl.p-28.flex.flex-col
+    //- TODO redesign owner actions below tile(?)
+    header.flex.items-center
+      //- 
+      //- avatar
+      router-link.-ml-2.h-36.w-36.rounded-full.overflow-hidden.relative.mr-16.bg-indigo-800(:to="{name: 'project', params: { address: projectAddress }}")
+        img.absolute.overlay.object-cover.object-center(v-if="projectMeta.image", :src="ipfsUrl(projectMeta.image)")
+        img.absolute.overlay.object-cover.object-center(v-else, src="~@/assets/project-avatar-default.png")
+      //- community name
+      flex-truncate.flex-1.text-left.text-violet-600
+        h6.inline.text-xl.font-semibold.-mt-3ff
+          router-link(:to="{name: 'project', params: { address: projectAddress }}")
+            | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
+      //- no
+      .ml-40.mr-6.text-xl.font-semibold.text-violet-800 {{ '#' + tokenId }}
 
-  .flex-1.pt-12
-    figure.mt-54.mb-56.rounded-xl.relative.flex.w-full.relative
-      //- wrapper
-      .w-5x6.mx-auto.relative
-        .aspect-w-8.aspect-h-8
-          //- (custom nft image)
-          template(v-if="nftMeta.image")
-            img.absolute.overlay.object-contain.object-center(:src="ipfsUrl(nftMeta.image)", alt="Member Token Image")
+    .flex-1.pt-12
+      figure.mt-54.mb-54.rounded-xl.relative.flex.w-full.relative
+        //- wrapper
+        .w-5x6.mx-auto.relative
+          .aspect-w-8.aspect-h-8
+            //- (custom nft image)
+            template(v-if="nftMeta.image")
+              img.absolute.overlay.object-contain.object-center(:src="ipfsUrl(nftMeta.image)", alt="Member Token Image")
 
-    //- (owner actions)
-    template(v-if="nft.owner === $store.state.address && nft.tokenType.streaming")
+        //- (rate note)
+        //- template(v-if="adjust")
+        //- .flex.justify-center.px-1
+          .w-full.flex.justify-between.bg-indigo-950.rounded-lg.text-mss.text-violet-650.text-center.py-12.px-20
+            div Monthly Membership
+            div {{ nftRate }} DAI/mo
+
+    footer.mt-26.flex.h-32.leading-none.justify-between.items-center
+      //- (mo supporter tag)
+      div.text-base.text-violet-600.flex
+        //- .flex.bg-indigo-950.rounded-lg.text-center.py-12.px-16 Monthly
+        .flex.items-center.bg-indigo-950.rounded-lg.text-center.py-12.px-16.font-semibold.text-ms
+          svg-dai.w-14.h-14.mr-3
+          template(v-if="nft.tokenType.streaming") {{ nftRate }}/mo
+          template(v-else) {{ toDAI(nft.amount) }}
+      //- opensea link
+      a.text-violet-600.mt-2.mr-2.text-ms(:href="`https://opensea.io/assets/${projectAddress}/${tokenId}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
+
+  //- (owner actions)
+  template(v-if="nft.owner === $store.state.address && nft.tokenType.streaming")
+    .w-full.flex.justify-center
+      svg-drip-off.mt-5.h-20.text-indigo-700.transform.rotate-180
+    .bg-indigo-700.rounded-2xl.pt-10.pb-12.px-12
       //- balance/valid
       .grid(:class="{'grid-cols-2 gap-5': !adjust}")
         //- balance
         div
-          .font-semibold.text-center.mb-12.text-violet-650 Balance
-          .h-80.rounded-full.bg-indigo-950.flex.items-center
-            svg-dai.w-32.h-32.ml-16.mr-6
+          .font-semibold.text-center.mb-8.text-violet-650 Balance
+          .h-80.rounded-full.bg-indigo-800.flex.items-center
+            svg-dai.w-30.h-30.ml-20.mr-6
             .flex-1
-              .text-2xl.w-full.text-center.font-semibold {{ balanceDAI }}
+              .text-xll.w-full.text-center.font-semibold {{ balanceDAI }}
             button.flex-shrink-0.h-54.w-54.bg-violet-650.flex.items-center.justify-center.rounded-full.mr-12.ml-2.notouch_hover_ring.transform(@click="toggleAdjust", :class="{'rotate-45': adjust}")
               svg-plus-minus
         //- valid for
         div(v-show="!adjust")
-          .font-semibold.text-center.mb-12.text-violet-650 Inactive in
-          .h-80.rounded-full.bg-indigo-950.flex.items-center
-            .text-2xl.w-full.text-center.font-semibold(:title="nftExpiryDate")
+          .font-semibold.text-center.mb-8.text-violet-650 Inactive in
+          .h-80.rounded-full.bg-indigo-800.flex.items-center
+            .text-xll.w-full.text-center.font-semibold(:title="nftExpiryDate")
               template(v-if="nftActiveForDays === null") -
               span.text-red-500(v-else-if="nftActiveForDays < 0") INACTIVE
               span.text-red-500(v-else-if="nftActiveForDays < 1") &lt;1 day
               //- template(v-else-if="nftActiveForDays < 2") 1 day
-              span(v-else, :class="{'text-red-500': nftActiveForDays < 10}")
+              span(v-else, :class="{'text-orange-500': nftActiveForDays < 10}")
                 | {{ Math.ceil(nftActiveForDays) }} days
 
       //- (edit balance buttons)
       .my-10.grid.grid-cols-2.gap-5(v-show="adjust === 'edit'")
-        button.btn.btn-lg.btn-outline.font-semibold.text-xl(@click="adjust = 'add'") Add
-        button.btn.btn-lg.btn-outline.font-semibold.text-xl(@click="showWithdrawForm") Withdraw
+        button.btn.btn-lg.btn-violet.font-semibold.text-xl(@click="adjust = 'add'") Add
+        button.btn.btn-lg.btn-violet.font-semibold.text-xl(@click="showWithdrawForm") Withdraw
 
       //- (add balance)
       form.my-10(v-if="adjust === 'add'", validate, @submit.prevent="topUp")
@@ -219,19 +243,4 @@ onBeforeMount(() => {
           | Withdraw
 
         tx-link(v-if="withdrawTx", :tx="withdrawTx")
-
-      //- (rate note)
-      //- template(v-if="adjust")
-      //- .flex.justify-center.px-1
-        .w-full.flex.justify-between.bg-indigo-950.rounded-lg.text-mss.text-violet-650.text-center.py-12.px-20
-          div Monthly Membership
-          div {{ nftRate }} DAI/mo
-
-  footer.mt-26.flex.h-32.leading-none.justify-between.items-center
-    div
-      template(v-if="nft.tokenType.streaming")
-        .flex.justify-ff.bg-indigo-950.rounded-lg.text-mss.text-violet-600.text-center.py-12.px-20
-          div Monthly Supporter &nbsp;–&nbsp; {{ nftRate }} DAI/mo
-    //- opensea link
-    a.text-violet-600.mt-2.mr-2(:href="`https://opensea.io/assets/${projectAddress}/${tokenId}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
 </template>

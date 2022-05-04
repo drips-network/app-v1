@@ -88,7 +88,7 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
                 | Drips in
                 //- | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
-                | Drips to
+                | Drips out
                 //- 
                   template(v-if="props.canEdit")
                     | You drip&nbsp;
@@ -116,15 +116,16 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
           
           //- (total monthly)
           .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="totalMonthlyRate && props.drips.length > 1")
-            svg-dai.mr-2(size="xs")
+            | dripping 
+            svg-dai.ml-5.mr-2(size="xs")
             | {{ totalMonthlyRate }}/mo
 
           //- (avg percent)
           .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="avgPct && props.drips.length > 1")
             template(v-if="props.direction === 'in'")
-              | {{ avgPct }}% avg.
+              | + {{ avgPct }}% avg.
             template(v-if="props.direction === 'out'")
-              | {{ totalPct }}% total
+              | splitting {{ totalPct }}%
 
           //- (edit btn)
           .h-40.p-6.bg-indigo-950.rounded-full.flex(v-if="props.canEdit")

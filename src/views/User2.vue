@@ -341,7 +341,7 @@ article.profile.pt-40.pb-80
   div.mx-auto.flex.flex-col
     user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'", @dripClick="dripModalOpen = true")
     
-    section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650(v-if="(projects && projects.length) || (nfts && nfts.length)")
+    //- section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650(v-if="(projects && projects.length) || (nfts && nfts.length)")
       //- (memberships)
       router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
         .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
@@ -420,9 +420,9 @@ article.profile.pt-40.pb-80
         div has joined {{ nfts.length }} #[b NFT Membership{{ nfts.length > 1 ? 's' : ''}}].
 
     //- nft list
-    ul.mt-72.grid.grid-cols-1.sm_grid-cols-2.lg_grid-cols-3.px-10
+    ul.mt-72.flex.flex-wrap.justify-evenly
       //- nfts...
-      li.px-10.my-10(v-for="(nft, i) in nfts")
+      li.w-full.max-w-4xl.my-36(v-for="(nft, i) in nfts")
         //- (excerpted)
         template(v-if="showAllNFTs || i < 3")
           user-nft.w-full(:nft="nft")
