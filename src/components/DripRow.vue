@@ -32,21 +32,25 @@ const receiverRt = computed(() => {
   //- drip icon
   .w-80.h-80.flex.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
     //- img(src="~@/assets/icons/drip-row-icon.svg")
-    span(v-if="props.drip.amount", style="font-size:1.75em") 💧
-    span(v-else-if="props.drip.percent", style="font-size:1.8em") 💧
+    span(style="font-size:1.75em") 💧
+    //- span(v-else-if="props.drip.percent", style="font-size:1.8em") 💧
 
   .flex-1.flex.bg-indigo-700.rounded-full.px-20.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
 
     .w-full.flex.items-center.justify-center
       template(v-if="props.drip.amount")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>#[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }}</b> every month
+        span.font-semibold drips #[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.amount }} every month
         //- span #[addr.font-bold(:address="props.drip.receiver")]
 
       template(v-else-if="props.drip.percent")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span <b>{{ parseFloat(props.drip.percent.toFixed(1)) }}%</b> of incoming drips
+        span.font-semibold splits {{ parseFloat(props.drip.percent.toFixed(1)) }}% of incoming drips
         //- span #[addr.font-bold(:address="props.drip.receiver")]
+
+      template(v-else-if="props.drip.give")
+        //- span #[addr.font-bold(:address="props.drip.sender")]
+        span.font-semibold dripped #[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.give }}
 
     //- .w-full.flex.items-center.justify-between.text-violet-650.px-24
       template(v-if="props.drip.amount")

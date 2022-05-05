@@ -107,3 +107,14 @@ query ($sender: Bytes!) {
   }
 }
 `
+export const queryGivesByReceiver = `
+query getGivesByReceiver ($address: Bytes!) {
+  gives (where: { receiver: $address }) {
+    id
+    sender 
+    receiver
+    amount
+    timestamp: blockTimestampGiven
+  }
+}
+`
