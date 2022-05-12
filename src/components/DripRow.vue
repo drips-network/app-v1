@@ -31,19 +31,22 @@ const receiverRt = computed(() => {
     //- drip icon
     .w-80.h-80.flex.items-center.justify-center.md_bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
       //- img(src="~@/assets/icons/drip-row-icon.svg")
-      span(v-if="props.drip.amount", style="font-size:1.75em") 💧
-      span(v-else-if="props.drip.percent", style="font-size:1.8em") 💧
+      span(v-if="props.drip.percent", style="font-size:1.8em") 💦
+      span(v-else, style="font-size:1.75em") 💧
+      
 
   .hidden.md_flex.flex-1.h-80.items-center.justify-center.bg-indigo-700.rounded-full.px-20.mr-2.font-semibold(:class="['text-violet-650/65', {'bg-indigo-800': altBg(drip) }]")
       template(v-if="props.drip.amount")
         //- span #[addr.font-bold(:address="props.drip.sender")]
         span drips #[span.text-violet-650 #[svg-dai.inline-block.mr-2(style="height:0.8em; transform:translateY(-0.07em)")]{{ props.drip.amount }}] every month&nbsp; #[span.text-black {{ props.drip.amount >= 100 ? '🎉' : '' }}]
-        //- span #[addr.font-bold(:address="props.drip.receiver")]
 
       template(v-else-if="props.drip.percent")
-        //- span #[addr.font-bold(:address="props.drip.sender")]
         span(:class="{'text-greenbright-400': props.drip.percent >= 100 }") splits #[span.text-violet-650 {{ parseFloat(props.drip.percent.toFixed(0)) }}%] of incoming drips #[span.text-black {{ props.drip.percent >= 100 ? '🔋' : props.drip.percent >= 60 ? '🌊' : props.drip.percent >= 40 ? '⛲️' : props.drip.percent >= 20 ? '🚿' : '' }}]
         //- span #[addr.font-bold(:address="props.drip.receiver")]
+
+      template(v-else-if="props.drip.give")
+        //- span #[addr.font-bold(:address="props.drip.sender")]
+        span dripped #[span.text-violet-650 #[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.give }}]
   
   //- (right arrow)
   .hidden.md_flex.h-80.w-80.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")

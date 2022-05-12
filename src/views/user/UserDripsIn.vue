@@ -6,19 +6,21 @@ import InfoBar from '@/components/InfoBar.vue'
 import LoadingBar from '@/components/LoadingBar.vue'
 import Addr from '@/components/Addr.vue'
 import store from '@/store'
-import { toDAIPerMo } from '@/utils'
-import api from '@/api'
+import { toDAI, toDAIPerMo } from '@/utils'
+import api, { queryGivesByReceiver } from '@/api'
 
 const route = useRoute()
 
 const dripsIn = ref()
 const splitsIn = ref()
+const givesIn = ref()
 
 const allDripsIn = computed(() => {
-  if (!dripsIn.value && !splitsIn.value) return undefined
+  if (!dripsIn.value && !splitsIn.value && !givesIn.value) return undefined
   const dIn = dripsIn.value || []
   const sIn = splitsIn.value || []
-  return [...dIn, ...sIn]
+  const gIn = givesIn.value || []
+  return [...dIn, ...sIn, ...gIn].sort((a, b) => b.timestamp - a.timestamp)
 })
 
 const getDripsIn = async () => {
@@ -31,6 +33,9 @@ const getDripsIn = async () => {
             sender: user
             receiver
             amtPerSec
+            dripsConfig {
+              timestamp: lastUpdatedBlockTimestamp
+            }
           }
         }
         `,
@@ -41,7 +46,8 @@ const getDripsIn = async () => {
     dripsIn.value = resp.data?.dripsEntries.map(entry => ({
       ...entry,
       receiver: [entry.receiver],
-      amount: toDAIPerMo(entry.amtPerSec)
+      amount: toDAIPerMo(entry.amtPerSec),
+      timestamp: entry.dripsConfig.timestamp
     }))
   } catch (e) {
     console.error(e)
@@ -59,6 +65,9 @@ const getSplitsIn = async () => {
             sender
             receiver
             weight
+            splitsConfig {
+              timestamp: lastUpdatedBlockTimestamp
+            }
           }
         }
         `,
@@ -69,7 +78,8 @@ const getSplitsIn = async () => {
     splitsIn.value = resp.data?.splitsEntries.map(entry => ({
       ...entry,
       receiver: [entry.receiver],
-      percent: entry.weight / store.state.splitsFractionMax * 100
+      percent: entry.weight / store.state.splitsFractionMax * 100,
+      timestamp: entry.splitsConfig.timestamp
     }))
   } catch (e) {
     console.error(e)
@@ -77,9 +87,27 @@ const getSplitsIn = async () => {
   }
 }
 
+const getGivesIn = async () => {
+  try {
+    const resp = await api({ query: queryGivesByReceiver, variables: { address: route.params.address } })
+    let gives = resp.data.gives
+    // format for DripRow.vue
+    gives = gives.map(give => {
+      give.give = toDAI(give.amount)
+      give.receiver = [give.receiver]
+      delete give.amount
+      return give
+    })
+    givesIn.value = gives
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 onBeforeMount(() => {
   getDripsIn()
   getSplitsIn()
+  getGivesIn()
 })
 </script>
 

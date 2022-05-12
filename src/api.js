@@ -130,6 +130,18 @@ query ($receiver: Bytes!, $first: Int!) {
 }
 `
 
+export const queryGivesByReceiver = `
+query getGivesByReceiver ($address: Bytes!) {
+  gives (where: { receiver: $address }) {
+    id
+    sender 
+    receiver
+    amount
+    timestamp: blockTimestampGiven
+  }
+}
+`
+
 export const queryIdentityMetadataByAddress = `
 query ($id: ID!) {
   identityMetaData (id: $id) {
