@@ -15,13 +15,15 @@ router-link.my-4.mx-3.user-tag-small.flex.items-center.rounded-full.p-8.transiti
   template(v-if="props.drip")
     .h-44.flex.items-center.px-8.bg-indigo-900.rounded-full
       //- drip icon
-      div(style="font-size:1.25em") 💧
+      div.mx-1(v-if="props.drip.percent", style="font-size:1.2em") 💦
+      div(v-else, style="font-size:1.25em") 💧
 
       //- amount
       div.font-semibold.text-violet-650.mx-6
         template(v-if="props.drip.amount")
           .flex.items-center.leading-none
-            svg-dai(size="xs", style="margin-right:0.15em")
-            | {{ props.drip.amount }}/mo
+            | {{ props.drip.amount }}
+            svg-dai(size="xs", style="margin-left:0.375em")
+            | /mo
         template(v-else-if="props.drip.percent") {{ props.drip.percent }}%
 </template>

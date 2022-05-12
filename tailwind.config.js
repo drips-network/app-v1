@@ -75,7 +75,7 @@ module.exports = {
       },
 
       violet: {
-        // 400: '#382099', // nft thumb title
+        400: '#382099', // nft thumb title
         500: '#212064', // subtle borders
         600: '#4949DD', // bright bg's
         650: '#5151ff', // brighter for text
@@ -623,6 +623,7 @@ module.exports = {
       40: '0.4',
       50: '0.5',
       60: '0.6',
+      65: '0.65',
       70: '0.7',
       75: '0.75',
       80: '0.8',

@@ -94,7 +94,8 @@ const getDripsIn = async () => {
     dripsIn.value = entries.map(drip => ({
       ...drip,
       receiver: [drip.receiver], // [drip[0]],
-      amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
+      amount: toDAIPerMo(drip.amtPerSec), // toDAIPerMo(drip[1])
+      amtPerSec: drip.amtPerSec,
     }))
   } catch (e) {
     console.error(e)
@@ -140,12 +141,15 @@ let getWithdrawable
 const getDripsOut = async () => {
   try {
     const config = await store.dispatch('getDripsBySender', route.params.address)
+    console.log({ config })
     // format + save
     dripsOut.value = config.receivers.map(drip => ({
       sender: route.params.address,
-      receiver: [drip.receiver], // [drip[0]],
-      amount: toDAIPerMo(drip.amtPerSec) // toDAIPerMo(drip[1])
+      receiver: [drip.receiver],
+      amount: toDAIPerMo(drip.amtPerSec), 
+      amtPerSec: drip.amtPerSec,
     }))
+    console.log(dripsOut.value)
     getWithdrawable = config.withdrawable
     withdrawable.value = getWithdrawable()
   } catch (e) {
@@ -247,6 +251,8 @@ onMounted(() => {
   getDripsOut()
   getProjects()
   getNFTs()
+  // debug events
+  store.dispatch('getDripsReceiversByEvents', route.params.address)
 })
 
 provide('isMyUser', isMyUser)

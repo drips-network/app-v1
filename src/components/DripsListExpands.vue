@@ -8,6 +8,8 @@ import SvgChevronDown from '@/components/SvgChevronDown.vue'
 import UserTagSmall from '@/components/UserTagSmall.vue'
 import SvgPen from '@/components/SvgPen.vue'
 import SvgDai from '@/components/SvgDai.vue'
+import { toDAIPerMo } from '@/utils'
+import { BigNumber as bn } from 'ethers'
 const props = defineProps({
   address: { type: String, default: undefined },
   drips: { type: Array, default: undefined },
@@ -26,7 +28,8 @@ const addresses = computed(() => {
 const totalMonthlyRate = computed(() => {
   const amtDrips = props.drips?.filter(d => d.amount !== undefined)
   if (props.drips?.length > 1) {
-    return amtDrips.reduce((acc, curr) => acc + curr.amount, 0)
+    const totalAmtPerSec = amtDrips.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+    return toDAIPerMo(totalAmtPerSec)
   }
   return false
 })
@@ -85,10 +88,10 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
             //- label
             .font-semibold.text-md
               template(v-if="props.direction === 'in'")
-                | Drips in
+                | Drips In
                 //- | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
               template(v-else)
-                | Drips out
+                | Drips Out
                 //- 
                   template(v-if="props.canEdit")
                     | You drip&nbsp;
@@ -116,14 +119,14 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
           
           //- (total monthly)
           .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="totalMonthlyRate && props.drips.length > 1")
-            | dripping 
-            svg-dai.ml-5.mr-2(size="xs")
-            | {{ totalMonthlyRate }}/mo
+            | dripping {{ totalMonthlyRate }}
+            svg-dai.ml-4(size="xs")
+            | /mo
 
           //- (avg percent)
           .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="avgPct && props.drips.length > 1")
             template(v-if="props.direction === 'in'")
-              | + {{ avgPct }}% avg.
+              | avg. split {{ avgPct }}%
             template(v-if="props.direction === 'out'")
               | splitting {{ totalPct }}%
 

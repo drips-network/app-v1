@@ -1,7 +1,7 @@
 <script setup>
 // This app is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import { ref, toRaw } from 'vue'
+import { ref, computed, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import store from '@/store'
 import { utils } from 'ethers'
@@ -20,6 +20,9 @@ const networkMenu = ref(false)
 const route = useRoute()
 const router = useRouter()
 const hasConnected = ref(toRaw(store.state.address) !== null)
+const profileBannerVisible = computed(() => {
+  return !hasConnected.vaue && !store.state.address && !route.name?.startsWith('create')
+})
 
 store.dispatch('init')
 
@@ -135,7 +138,7 @@ const switchToAppNetwork = async () => {
       | 1 ≈ $1
 
   //- view profile banner
-  template(v-if="!hasConnected && !store.state.address && !$route.name.startsWith('create')")
+  template(v-if="profileBannerVisible")
     .sticky.mt-144.md_mt-196.z-30.bottom-0.pb-10.left-0.w-full.px-10.mt-10.bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
       .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16(class="bg-greenbright-400")
         .flex.flex-1.items-center Connect a wallet to view your profile :)

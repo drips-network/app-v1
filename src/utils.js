@@ -6,7 +6,7 @@ export const oneMonth = 30 * 24 * 60 * 60
 export const ipfsUrl = hash => import.meta.env.VITE_APP_IPFS_GATEWAY + '/ipfs/' + hash
 
 // clip to nearest hundredth (dont round up)
-export const round = (num, dec = 2) => (Math.floor(num * 100) / 100).toFixed(dec)
+export const round = (num, dec = 2) => Number((Math.floor(num * 100) / 100).toFixed(dec))
 
 export const fromWei = (wei) => {
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
@@ -30,11 +30,20 @@ export const toDAI = (wei, frmt = 'pretty', roundTo) => {
   return round(dai, roundTo)
 }
 
-export const toDAIPerMo = (wei) => {
+export const toDAIPerMo = (wei, roundTo = 2) => {
+  // convert to BN
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)
-  const dai = utils.formatEther(wei.mul(oneMonth))
+  // 
+  let daiPerMo = utils.formatEther(wei.mul(oneMonth))
+
+  if (daiPerMo > 0 && daiPerMo < 0.01) {
+    return '<0.01'
+  }
+
   // round to nearest hundredth
-  return Math.round(dai * 100) / 100
+  daiPerMo = round(daiPerMo, roundTo)
+
+  return daiPerMo.toLocaleString()
 }
 
 export const toWeiPerSec = (dai = 0) => {
