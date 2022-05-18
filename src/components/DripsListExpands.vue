@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import Addr from '@/components/Addr.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import UserAvatarsRow from '@/components/UserAvatarsRow.vue'
@@ -8,8 +8,9 @@ import SvgChevronDown from '@/components/SvgChevronDown.vue'
 import UserTagSmall from '@/components/UserTagSmall.vue'
 import SvgPen from '@/components/SvgPen.vue'
 import SvgDai from '@/components/SvgDai.vue'
-import { toDAIPerMo } from '@/utils'
+import { toDAI, toDAIPerMo } from '@/utils'
 import { BigNumber as bn } from 'ethers'
+
 const props = defineProps({
   address: { type: String, default: undefined },
   drips: { type: Array, default: undefined },
@@ -17,12 +18,22 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false }
 })
 
+
 const emit = defineEmits(['editDrips'])
 
 const addresses = computed(() => {
   return props.direction === 'in' ? props.drips?.map(d => d.sender)
     : props.drips?.filter(d => d.receiver.length).map(d => d.receiver[0])
 })
+
+const addressesCount = computed(() => {
+  // de-dupe for subaccounts
+  return [...new Set(addresses.value)].length
+})
+
+// balance
+const withdrawable = inject('withdrawable')
+const balance = computed(() => withdrawable.value ? toDAI(withdrawable.value) : '...')
 
 // calc monthly
 const totalMonthlyRate = computed(() => {
@@ -52,9 +63,9 @@ const toggle = () => { expanded.value = !expanded.value }
 </script>
 
 <template lang="pug">
-section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.direction === 'in'}")
+section.drips-list-expands.flex.flex-col.font-semibold(:class="{'flex-col-reverse': props.direction === 'in'}")
   //- drip icon
-  .w-full.flex.justify-center.opacity-90(:class="expanded && props.direction === 'in' ? 'my-32' : 'my-5'")
+  .w-full.flex.justify-center.opacity-90(:class="{'my-8': !expanded, 'my-24': expanded}")
     .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
       | 💧
 
@@ -62,14 +73,14 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
     .w-full.flex.justify-center
       //- (loading...)
       template(v-if="!addresses")
-        .h-80.px-40.rounded-full.bg-indigo-950.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
+        .h-80.px-40.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
 
       //- (no drips)
       template(v-else-if="!addresses.length")
         //- empty / add drip btn
-        button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.font-semibold.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="!props.canEdit", :class="{'pointer-events-none': !props.canEdit}", @click="$emit('editDrips')")
+        button.h-80.px-40.rounded-full.bg-indigo-950ff.bg-indigo-700ff.text-violet-650.flex.items-center.justify-center.text-md.border-dashed.border-3.text-violet-700.min-w-144.notouch_hover_text-violet-650.group(:disabled="!props.canEdit", :class="{'pointer-events-none': !props.canEdit}", @click="$emit('editDrips')")
           template(v-if="props.canEdit")
-            svg-plus-minus-radicle.transform.scale-105
+            svg-plus-minus-radicle.h-26.w-26
 
       //- (view senders btn)
       template(v-else)
@@ -84,9 +95,9 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
             user-avatars-row(:addresses="addresses", :limit="6", height="44")
 
           //- (summary text)
-          p.h-64.pl-24.pr-12.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center(v-show="expanded")
+          p.h-64.pl-28.pr-16.rounded-full.bg-indigo-950.text-white.flex.items-center.justify-center(v-show="expanded")
             //- label
-            .font-semibold.text-md
+            .text-md
               template(v-if="props.direction === 'in'")
                 | Drips In
                 //- | {{ addresses.length }} address{{ addresses.length > 1 ? 'es drip' : ' drips'}} to #[addr(:address="props.address", :youOn="true")]
@@ -100,46 +111,63 @@ section.drips-list-expands.flex.flex-col(:class="{'flex-col-reverse': props.dire
                   | to {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : ''}}
             
             //- toggle icon
-            svg-chevron-down.ml-7.w-28.h-28.transform.origin-center.rotate-180
+            svg-chevron-down.ml-7.w-28.h-28.transform.origin-center.rotate-180.text-violet-650
 
     //- (expanded list)
     template(v-if="props.drips && expanded")      
-      section.mt-24.relative
+      section.mt-40.relative.flex.flex-col
+
+        //- (balance + edit)
+        //- .flex.flex-wrap.justify-center.text-base.text-white.mb-8(v-if="props.canEdit")
+          //- balance
+          button.h-36.bg-indigo-950.rounded-full.btn-outline-green.border-2.flex.border-violet-700.rounded-full.items-center.text-violet-650.pl-14.pr-10.mx-2(@click="$emit('editDrips')")
+            | Balance {{ balance }}
+            svg-dai.ml-4(size="xs")
+            //- svg-plus-minus-radicle.w-15.h-15.ml-10
+          
+          //- (edit btn)
+          button.h-36.bg-indigo-950.rounded-full.btn-outline-green.border-2.flex.border-violet-700.rounded-full.items-center.text-violet-650.pl-14.pr-2.mx-2(@click="$emit('editDrips')")
+            .text-ms Edit Drips
+            svg-pen.mx-5.h-16.w-16
+
+        //- (stats)
+        .flex.flex-wrap.justify-center.text-base.text-white.mb-12
+          //- count
+          .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="props.drips.length > 1")
+            template(v-if="props.direction === 'in'") {{ addressesCount }} addresses
+            template(v-else) {{ addressesCount }} recipients
+          
+          //- (total monthly)
+          .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="totalMonthlyRate && props.drips.length > 1")
+            template(v-if="props.direction === 'in'") drip {{ totalMonthlyRate }}
+            template(v-else) dripping {{ totalMonthlyRate }}
+            svg-dai.ml-4(size="xs")
+            | /mo
+
+          //- (avg percent)
+          .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="avgPct && props.drips.length > 1")
+            template(v-if="props.direction === 'in'")
+              | split {{ avgPct }}% avg.
+            template(v-if="props.direction === 'out'")
+              | splitting {{ totalPct }}%
+
+          //- (edit btn)
+          button.h-36.bg-indigo-950.rounded-full.btn-outline-green.border-2.flex.border-violet-700.rounded-full.items-center.text-violet-650.pl-14.pr-2.mx-3(v-if="props.canEdit", @click="$emit('editDrips')")
+            .text-ms Edit Drips
+            svg-pen.mx-5.h-16.w-16
+
         //- list
         ul.w-full.flex.flex-wrap.justify-center
           //- drips...
           li(v-for="drip in props.drips")
             user-tag-small.bg-indigo-700.btn-focus-violet(:address="props.direction === 'in' ? drip.sender : drip.receiver[0]", :drip="drip")
         
-        //- (stats)
-        .flex.flex-wrap.justify-center.mt-12.text-base
-          //- count
-          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="props.drips.length > 4")
-            | {{ props.drips.length }} addresses
-          
-          //- (total monthly)
-          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="totalMonthlyRate && props.drips.length > 1")
-            | dripping {{ totalMonthlyRate }}
-            svg-dai.ml-4(size="xs")
-            | /mo
-
-          //- (avg percent)
-          .flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-40.px-22.font-semibold.text-violet-650.mx-1(v-if="avgPct && props.drips.length > 1")
-            template(v-if="props.direction === 'in'")
-              | avg. split {{ avgPct }}%
-            template(v-if="props.direction === 'out'")
-              | splitting {{ totalPct }}%
-
-          //- (edit btn)
-          .h-40.p-6.bg-indigo-950.rounded-full.flex(v-if="props.canEdit")
-            button.btn-outline-green.border.flex.border-violet-700.rounded-full.items-center.font-semibold.text-violet-650.pl-11.pr-2.mx-1(@click="$emit('editDrips')")
-              .text-ms Edit Drips
-              svg-pen.mx-5.h-16.w-16
+        
 
 
         //- (edit btn)
         //- .sticky.bottom-12.left-0.w-full.flex.justify-center.mt-20.-mb-8(v-if="props.canEdit")
-          button.py-4.pl-11.leading-none.rounded-full.flex.items-center.text-ms.btn-outline-green.border.bg-indigo-900.font-semibold(@click="$emit('editDrips')")
+          button.py-4.pl-11.leading-none.rounded-full.flex.items-center.text-ms.btn-outline-green.border.bg-indigo-900(@click="$emit('editDrips')")
             | Edit Drips
             svg-pen.mx-5.h-16.w-16
 

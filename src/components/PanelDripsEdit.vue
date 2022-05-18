@@ -253,7 +253,7 @@ panel(icon="💧")
 
       //- add drip row btn
       button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addDrip")
-        svg-plus-minus-radicle
+        svg-plus-minus-radicle.h-24.w-24
 
       //- topup section
       .mt-72

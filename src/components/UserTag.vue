@@ -64,7 +64,7 @@ const copyAddressToClipboard = async () => {
               svg-copy-small.w-32.h-32.ml-8.text-violet-650.notouch_opacity-75.notouch_hover_opacity-100.transform.notouch_hover_scale-110
 
         //- icons
-        .mt-4.flex.flex-wrap.-ml-8.items-center
+        .mt-6.flex.flex-wrap.-ml-8.items-center
           //- (website)
           template(v-if="record('url')")
             a.block.px-4.notouch_hover_text-greenbright-500.mt-8.-mb-12(:href="record('url')", target="_blank", rel="noopener noreferrer", title="Website")
@@ -95,7 +95,7 @@ const copyAddressToClipboard = async () => {
           </svg>
 
           .absolute.overlay.flex.items-center.justify-center.pt-8
-            svg-plus-minus-radicle.text-indigo-900.lg_transform.lg_scale-125
+            svg-plus-minus-radicle.h-24.w-24.lg_h-30.lg_w-30.text-indigo-900
             //- svg-plus-minus.text-indigo-900(style="transform:scale(1.25)")
 
       //- (edit btn)
@@ -114,6 +114,6 @@ const copyAddressToClipboard = async () => {
 
     //-
     .w-full.flex.justify-center.mb-1
-      expand-block.relative.max-w-4xl.bg-indigo-700.rounded-2xl.text-center.px-32.pt-20.pb-24.font-semibold.text-lg.text-violet-650.leading-snug(:html="record('description')", expandedClasses="line-clamp-3", chevronInsetClass="bottom-0")
+      expand-block.relative.max-w-4xl.bg-indigo-700.rounded-2xl.text-center.px-32.pt-20.pb-24.font-semibold.text-lg.text-white.leading-snug(:html="record('description')", expandedClasses="line-clamp-3", chevronInsetClass="bottom-0")
 
 </template>

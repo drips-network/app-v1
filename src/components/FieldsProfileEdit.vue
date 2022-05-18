@@ -37,7 +37,7 @@ div
       span.sr-only Avatar Image
       //- input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
       input-upload-file-ipfs.hidden(@read="e => { imgSrc = e }", @hash="onImageUploaded", @error="imgSrc = imgSrcCurrent")
-      svg-plus-minus-radicle
+      svg-plus-minus-radicle.h-24.w-24
 
       //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB
     //- (image)

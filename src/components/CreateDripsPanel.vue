@@ -92,7 +92,7 @@ panel.mx-auto(icon="💧")
               input(v-model="drips[i].percent", type="number", min="0.01", max="100", step="0.01", placeholder="%")
 
     button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
-      svg-plus-minus-radicle
+      svg-plus-minus-radicle.h-24.w-24
 
     .mt-40.flex.justify-center
       //- .mx-5

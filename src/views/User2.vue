@@ -41,7 +41,7 @@ const isMyUser = computed(() => store.state.address === route.params.address)
 const editDripsSelect = ref(false)
 const edit = ref(null) // 'drips' | 'splits' | 'profile'
 const collectableAmts = ref()
-const totalFunds = computed(() => {
+const collectableTotal = computed(() => {
   return !collectableAmts.value ? -1
     : toDAI(collectableAmts.value[0].add(collectableAmts.value[1]))
 })
@@ -135,9 +135,12 @@ const getSplitsOut = async () => {
   }
 }
 
-// get drips out
+// balance / withdrawable
 const withdrawable = ref()
+const balance = computed(() => withdrawable.value ? toDAI(withdrawable.value) : -1)
 let getWithdrawable
+
+// get drips out
 const getDripsOut = async () => {
   try {
     const config = await store.dispatch('getDripsBySender', route.params.address)
@@ -333,20 +336,22 @@ article.profile.pt-40.pb-80
 
   //- (collectable)
   template(v-if="isMyUser && (allDripsIn && allDripsIn.length)")
-    .flex.justify-center.mb-20
-      .h-64.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-32.pr-12(:class="{'text-violet-650': totalFunds === -1}", :key="$route.params.address")
-        template(v-if="totalFunds !== -1")
-          svg-dai(size="sm", style="margin-right:0.15em")
-          | {{ totalFunds }}
+    .flex.justify-center.mb-28
+      .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': collectableTotal === -1}", :key="$route.params.address")
+        template(v-if="collectableTotal !== -1")
+          | {{ collectableTotal }}
+          svg-dai(size="sm", style="margin-left:0.15em")
         template(v-else)
           .animate-pulse ...
         
-        button.ml-20.btn.btn-sm.border-2.btn-outline-violet.text-md.font-semibold.px-14(@click="collectModalOpen = true") Collect
+        button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="collectModalOpen = true") Collect
 
   //- user tag row
   div.mx-auto.flex.flex-col
     user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'", @dripClick="dripModalOpen = true")
     
+    //- memberships + nft counts
+
     //- section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650(v-if="(projects && projects.length) || (nfts && nfts.length)")
       //- (memberships)
       router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
@@ -362,6 +367,19 @@ article.profile.pt-40.pb-80
           span.text-mss(v-if="nfts") {{ nfts.length}}
           span.animate-pulse(v-else) ...
   
+  //- (balance)
+  template(v-if="isMyUser && (dripsOut && dripsOut.length)")
+    .flex.justify-center.mt-28
+      .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': balance === -1}", :key="$route.params.address")
+        template(v-if="balance !== -1")
+          | {{ balance }}
+          svg-dai(size="sm", style="margin-left:0.15em")
+        template(v-else)
+          .animate-pulse ...
+        
+        button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="edit = 'drips'")
+          | Deposit
+
   //- receivers
   drips-list-expands.mb-132(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
 

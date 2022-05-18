@@ -66,10 +66,10 @@ panel.mx-auto(icon="🏅")
             template(v-if="ii === membership.perks.length - 1")
               .absolute.top-0.right-0.h-full.flex.items-center.justify-center.pr-12
                 button.bg-indigo-800.flex.items-center.justify-center.h-54.w-54.rounded-full(@click.prevent="addPerk(i)")
-                  svg-plus-minus-radicle
+                  svg-plus-minus-radicle.h-24.w-24
 
     button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addMembership", style="border-style:dashed")
-      svg-plus-minus-radicle
+      svg-plus-minus-radicle.h-24.w-24
 
     .mt-40
       button.btn.btn-lg.btn-indigo.mx-auto.min-w-sm(type="submit") Next

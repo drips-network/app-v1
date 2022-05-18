@@ -177,7 +177,7 @@ panel(icon="💦")
               svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
 
       button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addSplit", aria-label="Add Split")
-        svg-plus-minus-radicle
+        svg-plus-minus-radicle.h-24.w-24
 
       //- btns
       .mt-40

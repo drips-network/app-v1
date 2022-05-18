@@ -39,7 +39,7 @@ const connect = async (goToProfile = false) => {
     // ignore closing web3modal
     if (e !== 'Modal closed by user') {
       console.error(e)
-      alert('Error connecting wallet')
+      alert(`Couldn't connect wallet. Is it locked?\n\n(${e})`)
     }
   }
 }

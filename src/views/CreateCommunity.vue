@@ -403,7 +403,7 @@ projectAddress.value = isDev ? route.query.project : null
               svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
 
       button.mt-10.block.w-full.rounded-full.h-80.flex.items-center.justify-center.border.border-violet-500(@click.prevent="addDrip", style="border-style:dashed")
-        svg-plus-minus-radicle
+        svg-plus-minus-radicle.h-24.w-24
 
       //- (polygon address warning)
       template(v-if="$store.getters.isPolygon && drips.find(d => d.address && d.address.trim().length)")
