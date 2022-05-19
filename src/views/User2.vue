@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted, provide, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import UserTag from '@/components/UserTag.vue'
-import AvatarBlockie from '@/components/AvatarBlockie.vue'
 import Addr from '@/components/Addr.vue'
 import AddressesTag from '@/components/AddressesTag.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -21,6 +20,7 @@ import SvgDai from '@/components/SvgDai.vue'
 import SvgPen from '@/components/SvgPen.vue'
 import ProjectDetail from '@/components/ProjectDetail.vue'
 import DripsListExpands from '@/components/DripsListExpands.vue'
+import SvgX from '@/components/SvgX.vue'
 import store from '@/store'
 import { utils } from 'ethers'
 import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
@@ -235,7 +235,7 @@ const getProjects = async () => {
   }
 }
 
-// profile
+// get profile
 const getProfile = () => {
   // if empty set to null (undefined is loading state)
   store.dispatch('profiles/getProfile', { address: route.params.address })
@@ -243,6 +243,14 @@ const getProfile = () => {
       profileMeta.value = toRaw(store.state.profiles.profiles[route.params.address]?.meta) || null
     })
     .catch(() => { profileMeta.value = null })
+}
+
+// edit profile hint
+console.log(typeof sessionStorage.getItem('editProfileHintHidden'))
+const editProfileHint = ref(!sessionStorage.getItem('editProfileHintHidden'))
+const hideEditProfileHint = () => {
+  sessionStorage.setItem('editProfileHintHidden', 1)
+  editProfileHint.value = false
 }
 
 onMounted(() => {
@@ -319,18 +327,20 @@ export default {
 </script>
 
 <template lang="pug">
-article.profile.pt-40.pb-80
+article.profile.pt-80.lg_pt-40.pb-80
 
-  //- (your profile...)
-  template(v-if="isMyUser")
-    .flex.justify-center.mb-40
-      .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.h-44.font-semiboldff.text-greenbright-400.text-ms
-        .px-22 This is your profile!
-        //- (edit btn)
-        template(v-if="profileMeta !== undefined")
-          button.-ml-8.mr-12.py-4.pl-11.leading-none.font-semibold.rounded-full.flex.items-center.btn-outline-green.border(@click="edit = 'profile'")
-            | Edit
-            svg-pen.mx-5.h-16.w-16
+  //- (edit profile hint banner)
+  template(v-if="isMyUser && editProfileHint")
+    .mb-60.-mt-20.lg_mb-0.lg_fixed.bottom-80.lg_bottom-0.left-0.z-30.lg_pb-20.w-full.px-10.lg_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+      //- body
+      .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative(class="bg-greenbright-400")
+        .flex.flex-1.items-center This is your profile :)
+        //- edit btn
+        button.h-54.ml-24.border-2ff.rounded-full.px-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="edit = 'profile'")
+          | Edit
+        //- hide edit hint btn
+        button.p-12.ml-8.notouch_hover_scale-110.transform.transition.duration-150(@click="hideEditProfileHint")
+          svg-x.h-12.w-12(strokeWidth="2", strokeCap="round")
 
   //- 
   //- senders
@@ -387,7 +397,7 @@ article.profile.pt-40.pb-80
 
 
   //- (memberships list)
-  section(v-if="projects && projects.length")
+  section.mt-132(v-if="projects && projects.length")
     //- wave divider
     .bg-img-wave-shadow-violet
     
@@ -416,7 +426,7 @@ article.profile.pt-40.pb-80
           project-detail.mb-132(:project="project", @collected="getProjects")
 
     //- (show all btn)
-    footer.flex.justify-center.-mt-40.mb-120(v-if="projects.length > 2")
+    footer.flex.justify-center.-mt-40(v-if="projects.length > 2")
       button.btn-mdd.rounded-full.btn-darkest.text-violet-650.pl-26.pr-12.font-semibold.text-lg(@click="showAllMemberships = !showAllMemberships")
         .flex.items-center
           div {{ showAllMemberships ? 'View Less' : 'View All' }}
@@ -425,7 +435,7 @@ article.profile.pt-40.pb-80
   
 
   //- (nfts list)
-  section(v-if="nfts && nfts.length")
+  section.mt-132(v-if="nfts && nfts.length")
     //- wave divider
     .bg-img-wave-shadow-violet
 

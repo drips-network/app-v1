@@ -31,6 +31,7 @@ const connect = async (goToProfile = false) => {
     await store.dispatch('connect')
 
     if (goToProfile) {
+      sessionStorage.removeItem('editProfileHintHidden')
       router.push({name: 'user', params: { address: store.state.address }})
     }
 

@@ -50,7 +50,7 @@ const copyAddressToClipboard = async () => {
 .user-tag
   .flex.justify-center
     //- user cell
-    .p-16.lg_p-18.rounded-full.bg-indigo-700.flex.items-center.relative
+    .p-18.rounded-full.bg-indigo-700.flex.items-center.relative
       //- avatar
       .rounded-full.overflow-hidden(@click.stop="onAvatarClick", :class="{'cursor-pointer': isMyProfile}")
         user-avatar.w-80.h-80.lg_w-112.lg_h-112(:address="props.address", blockieSize="64")

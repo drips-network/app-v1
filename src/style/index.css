@@ -100,16 +100,16 @@ html {
 }
 .btn-outline-green{
   /* set .border class on element for desired thickness */
-  @apply border-greenbright-500 text-greenbright-500;
+  @apply border-greenbright-500 text-greenbright-500 transition duration-150;
   &:not([disabled]) {
-    @apply notouch_hover_ring-1 notouch_hover_ring-greenbright-500 focus_ring-1;
+    @apply notouch_hover_ring-1 notouch_hover_ring-greenbright-500 focus_ring-1 notouch_hover_text-white;
   }
 }
 .btn-outline-violet{
   /* set .border class on element for desired thickness */
-  @apply border-violet-650 text-violet-650;
+  @apply border-violet-650 text-violet-650 transition duration-150;
   &:not([disabled]) {
-    @apply notouch_hover_ring-1 notouch_hover_ring-violet-650 focus_ring-1;
+    @apply notouch_hover_ring-1 notouch_hover_ring-violet-650 focus_ring-1 notouch_hover_text-white;
   }
 }
 .btn-violet{
