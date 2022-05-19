@@ -65,7 +65,7 @@ modal(v-bind="$attrs", @close="emit('close')")
 
     template(v-slot:description)
       dialog-description
-        p.mx-auto.leading-snug.text-violet-650ff(style="max-width:25em")
+        p.mx-auto(style="max-width:25em")
           template(v-if="!hasFunds")
             | There are no funds to collect.
           template(v-else)

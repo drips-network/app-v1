@@ -15,7 +15,7 @@ import { utils, constants, BigNumber as bn } from 'ethers'
 import { round, toDAI, toWei, toWeiPerSec, toDAIPerMo, validateAddressInput } from '@/utils'
 import store from '@/store'
 
-const props = defineProps(['newRecipient', 'cancelBtn'])
+const props = defineProps(['newRecipient', 'cancelBtn', 'addFundsOnly'])
 const emit = defineEmits(['close', 'updated'])
 const router = useRouter()
 
@@ -39,6 +39,7 @@ let getWithdrawable
 const withdrawable = ref('0')
 // balance (max DAI withdrawable
 const balance = computed(() => toDAI(withdrawable.value, 'exact'))
+const balancePretty = computed(() => toDAI(withdrawable.value))
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
 
 const getDrips = async () => {
@@ -218,15 +219,20 @@ onMounted(async () => {
 </script>
 
 <template lang="pug">
-panel(icon="💧")
+panel(:icon="props.addFundsOnly ? '🚰' : '💧'")
 
   template(v-slot:header)
-    .leading-snug
-      h2 Drip Monthly
+    dialog-title.leading-snug
+      h2(v-if="props.addFundsOnly") Add to Drips Balance
+      h2(v-else) Drip to Others
+
 
   template(v-slot:description)
-    p.text-violet-650.mx-auto.leading-relaxed
-      | Who do you want to send DAI to #[b every month]?
+    dialog-description
+      template(v-if="props.addFundsOnly")
+        p.mx-auto(style="max-width:30em") Your drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
+      template(v-else)
+        p.mx-auto Who do you want to send DAI to #[b every month]?
 
   //- (loading...)
   template(v-if="loading")
@@ -235,48 +241,53 @@ panel(icon="💧")
   //- (edit)
   template(v-else)
     form(@submit.prevent="update", validate)
-      //- drips...
-      template(v-for="(drip, i) in drips")
-        section.my-10.input-group.relative
-          //- address
-          input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
-            //- TODO: validate ethereum address
-            input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
-          //- rate
-          input-body.mt-10(label="Monthly DAI Amount", :isFilled="typeof drips[i].amount === 'number'", theme="dark", symbol="daipermo")
-            input(v-model="drips[i].amount", type="number", min="0.01", step="0.01", placeholder="5", required)
 
-          //- delete row btn (X)
-          .absolute.top-0.right-0.h-full.flex.items-center
-            button.w-32.h-32.flex.items-center.justify-center.-mr-12.bg-indigo-900.rounded-full.border-violet-700.border-2.notouch_hover_border-white(@click.prevent="removeDrip(i)")
-              svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
+      //- (full update)
+      template(v-if="!props.addFundsOnly")
+        //- drips...
+        template(v-for="(drip, i) in drips")
+          section.my-10.input-group.relative
+            //- address
+            input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
+              //- TODO: validate ethereum address
+              input(:ref="el => { receiverInputEls[i] = el }", v-model="drips[i].receiverInput", :placeholder="$store.getters.label('inputAddressPlaceholder')", autocomplete="new-password", required)
+            //- rate
+            input-body.mt-10(label="Monthly DAI Amount", :isFilled="typeof drips[i].amount === 'number'", theme="dark", symbol="daipermo")
+              input(v-model="drips[i].amount", type="number", min="0.01", step="0.01", placeholder="5", required)
 
-      //- add drip row btn
-      button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addDrip")
-        svg-plus-minus-radicle.h-24.w-24
+            //- delete row btn (X)
+            .absolute.top-0.right-0.h-full.flex.items-center
+              button.w-32.h-32.flex.items-center.justify-center.-mr-12.bg-indigo-900.rounded-full.border-violet-700.border-2.notouch_hover_border-white(@click.prevent="removeDrip(i)")
+                svg-x.h-10.w-10(strokeWidth="2" strokeCap="round")
 
-      //- topup section
-      .mt-72
-        div.mb-24.text-3xl 🔋
-        h6.text-2xl.font-semibold.leading-snug Add Funds
-        p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
+        //- add drip row btn
+        button.mt-10.btn.btn-lg.btn-indigo.w-full(@click.prevent="addDrip")
+          svg-plus-minus-radicle.h-24.w-24
 
-        //- balance
-        .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
-          .pl-32.text-xl.font-semibold
-            | Balance
-          .pr-20.flex.items-center(:class="{'text-red-500ff': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
-            span.text-2xl.font-semibold {{ newBalance }}
-            svg-dai.ml-12(size="xl")
+        //- topup section (if not addFundsOnly)
+        .mt-72
+          div.mb-24.text-3xl 🚰
+          h6.text-2xl.font-semibold.leading-snug Add to Drips Balance
+          p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
 
-        //- input
-        .relative.my-10
-          input-body(label="Add DAI to Balance", symbol="dai")
-            input(v-model="topUpDAI", type="number", step="0.01", required)
-          //- (max withdraw note)
-          .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
-            template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
-            template(v-else) There are no funds to withdraw
+      //- balance
+      .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
+        .pl-32.text-xl.font-semibold
+          | Drips Balance
+        .pr-20.flex.items-center(:class="{'text-red-500ff': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
+          span.text-2xl.font-semibold
+            template(v-if="!topUpDAI") {{ balancePretty }}
+            template(v-else) {{ newBalance }}
+          svg-dai.ml-12(size="xl")
+
+      //- edit balance input
+      .relative.my-10
+        input-body(label="Add DAI to Balance", symbol="dai")
+          input(v-model="topUpDAI", type="number", step="0.01", required)
+        //- (max withdraw note)
+        .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
+          template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
+          template(v-else) There are no funds to withdraw
 
       //- (polygon address warning)
       template(v-if="$store.getters.isPolygon")

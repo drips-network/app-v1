@@ -47,7 +47,7 @@ section.panel.panel-dark.w-full.max-w-6xl.text-center
         slot(name="header")
 
       //- description
-      .text-md.leading-normal
+      .text-md.leading-normal.text-violet-650
         slot(name="description")
 
     //- body

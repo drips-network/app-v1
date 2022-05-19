@@ -153,8 +153,10 @@ const getDripsOut = async () => {
       amtPerSec: drip.amtPerSec,
     }))
     console.log(dripsOut.value)
+    // get/set balance
     getWithdrawable = config.withdrawable
     withdrawable.value = getWithdrawable()
+    updateWithdrawable()
   } catch (e) {
     console.error(e)
     dripsOut.value = []
@@ -377,7 +379,7 @@ article.profile.pt-40.pb-80
         template(v-else)
           .animate-pulse ...
         
-        button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="edit = 'drips'")
+        button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="edit = 'funds'")
           | Deposit
 
   //- receivers
@@ -472,9 +474,9 @@ article.profile.pt-40.pb-80
     //- select drip type to edit...
     modal-edit-drips-select(:open="editDripsSelect", @close="editDripsSelect = false", @select="e => { edit = e; editDripsSelect = false }", :edit="allDripsOut && allDripsOut.length")
 
-    //- edit drips...
-    template(v-if="edit === 'drips'")
-      modal-drips-edit(:open="edit === 'drips'", @close="edit = null; getDripsOut()", @updated="getDripsOut", :addFundsOnly="edit === 'funds'")
+    //- (edit drips or balance)
+    template(v-if="['drips', 'funds'].includes(edit)")
+      modal-drips-edit(:open="['drips', 'funds'].includes(edit)", @close="edit = null; getDripsOut()", @updated="getDripsOut", :addFundsOnly="edit === 'funds'")
         template(v-slot:header)
           h6 Drip to Others
         template(v-slot:description)
