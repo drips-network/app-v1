@@ -57,6 +57,11 @@ const avgPct = computed(() => {
   return false
 })
 
+const dripRt = (drip) => {
+  const name = drip.amtPerSec ? 'stream' : drip.percent ? 'split' : 'drip'
+  return { name, params: { id: drip.id }}
+}
+
 // ui
 const expanded = ref(false)
 const toggle = () => { expanded.value = !expanded.value }
@@ -71,9 +76,18 @@ section.drips-list-expands.font-semibold.relative
   //- body
   .relative.z-10.flex.flex-col.px-24(:class="{'flex-col-reverse': props.direction === 'in'}")
     //- drip icon
-    .w-full.flex.justify-center.opacity-90(:class="{'my-8': !expanded, 'my-24': expanded}")
+    //- .w-full.flex.justify-center.opacity-90(:class="{'my-8': !expanded, 'my-24': expanded}")
       .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
         | 💧
+    .w-full.flex.justify-center.opacity-90
+      .h-80.overflow-hidden.items-center.flex
+        div.animate-falling
+          .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
+            | 💧
+          .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
+            | 💧
+          .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
+            | 💧
 
     div
       .w-full.flex.justify-center
@@ -140,8 +154,10 @@ section.drips-list-expands.font-semibold.relative
           .flex.flex-wrap.justify-center.text-base.text-white.mb-12
             //- count
             .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="props.drips.length > 1")
-              template(v-if="props.direction === 'in'") {{ addressesCount }} addresses
-              template(v-else) {{ addressesCount }} recipients
+              template(v-if="props.direction === 'in'")
+                | {{ addressesCount }} address{{ addressesCount > 1 ? 'es' : '' }}
+              template(v-else)
+                | {{ addressesCount }} recipient{{ addressesCount > 1 ? 's' : '' }}
             
             //- (total monthly)
             .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="totalMonthlyRate && props.drips.length > 1")
@@ -161,7 +177,8 @@ section.drips-list-expands.font-semibold.relative
           ul.w-full.flex.flex-wrap.justify-center
             //- drips...
             li(v-for="drip in props.drips")
-              user-tag-small.bg-indigo-700.btn-focus-violet(:address="props.direction === 'in' ? drip.sender : drip.receiver[0]", :drip="drip")
+              router-link.btn-focus-violet.rounded-full.block.my-4.mx-3(:to="dripRt(drip)")
+                user-tag-small.bg-indigo-700(:address="props.direction === 'in' ? drip.sender : drip.receiver[0]", :drip="drip")
           
           //- (edit btn)
           .flex.justify-center.w-full.mt-24(v-if="props.canEdit")

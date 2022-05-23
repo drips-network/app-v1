@@ -137,8 +137,9 @@ onMounted(() => {
     
     //- (owner link)
     template(v-if="props.ownerVisible")
-      .flex.justify-center.-mb-2.-mt-26.relative.z-10.pointer-events-none
-        user-tag-small.bg-violet-650.shadow-xl.notouch_hover_ring.focus_ring.pointer-events-auto(:address="props.project.projectOwner")
+      .flex.justify-center.-mt-24.relative.z-10.pointer-events-none
+        router-link(:to="{name: 'user', params: { address: props.project.projectOwner }}")
+          user-tag-small.bg-violet-650.shadow-xl.notouch_hover_ring.focus_ring.pointer-events-auto(:address="props.project.projectOwner")
     
     //- title
     h3.text-center.text-xll.font-semibold.mt-40.mb-36

@@ -147,6 +147,7 @@ const getDripsOut = async () => {
     console.log({ config })
     // format + save
     dripsOut.value = config.receivers.map(drip => ({
+      id: drip.id,
       sender: route.params.address,
       receiver: [drip.receiver],
       amount: toDAIPerMo(drip.amtPerSec), 

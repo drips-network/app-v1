@@ -145,7 +145,8 @@ module.exports = {
       spin: 'spin 1s linear infinite',
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      bounce: 'bounce 1s infinite'
+      bounce: 'bounce 1s infinite',
+      falling: 'falling 3s linear infinite',
     },
     backdropBlur: (theme) => theme('blur'),
     backdropBrightness: (theme) => theme('brightness'),
@@ -515,6 +516,14 @@ module.exports = {
         '50%': {
           transform: 'none',
           animationTimingFunction: 'cubic-bezier(0,0,0.2,1)'
+        }
+      },
+      falling: {
+        '0%': {
+          transform: 'none'
+        },
+        '100%': {
+          transform: 'translateY(33.33%)'
         }
       }
     },

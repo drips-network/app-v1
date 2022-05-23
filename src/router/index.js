@@ -100,7 +100,22 @@ const routes = [
       //   component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
       // }
     ]
-  }
+  },
+
+  // drip routes
+  {
+    path: '/streams/:id',
+    name: 'stream',
+    component: () => import(/* webpackChunkName: "stream" */ '../views/Stream.vue'),
+  },
+  {
+    path: '/splits/:id',
+    name: 'split'
+  },
+  {
+    path: '/drips/:id',
+    name: 'drip'
+  },
 ]
 
 const router = createRouter({

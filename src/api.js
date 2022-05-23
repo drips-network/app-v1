@@ -90,6 +90,7 @@ query ($id: ID!) {
     balance
     timestamp: lastUpdatedBlockTimestamp
     receivers: dripsEntries {
+      id
       receiver
       amtPerSec
     }
@@ -100,7 +101,7 @@ query ($id: ID!) {
 export const queryDripsByReceiver = `
 query ($receiver: Bytes!) {
   dripsEntries (where: { receiver: $receiver} ) {
-    # id
+    id
     sender: user
     receiver
     amtPerSec
@@ -111,7 +112,7 @@ query ($receiver: Bytes!) {
 export const querySplitsBySender = `
 query ($sender: Bytes!, $first: Int!) {
   splitsEntries (first: $first, where: { sender: $sender }) {
-    # id
+    id
     sender
     receiver
     weight
@@ -122,7 +123,7 @@ query ($sender: Bytes!, $first: Int!) {
 export const querySplitsByReceiver = `
 query ($receiver: Bytes!, $first: Int!) {
   splitsEntries (first: $first, where: { receiver: $receiver }) {
-    # id
+    id
     sender
     receiver
     weight
@@ -147,6 +148,18 @@ query ($id: ID!) {
   identityMetaData (id: $id) {
     id
     multiHash
+  }
+}
+`
+
+export const queryDrip = `
+query ($id: ID!) {
+  dripsEntry (id: $id) {
+    id
+    account
+    amtPerSec
+    sender: user
+    receiver
   }
 }
 `
