@@ -37,6 +37,7 @@
     "pug": "^3.0.2",
     "tailwindcss": "^3.0.23",
     "util": "^0.12.4",
-    "vite": "^2.9.6"
+    "vite": "^2.9.6",
+    "vite-plugin-rewrite-all": "^0.1.2"
   }
 }
