@@ -64,7 +64,8 @@ const switchToAppNetwork = async () => {
 </script>
 
 <template lang="pug">
-#app.max-w-screen-2xl.mx-auto.py-10.pb-104.md_pb-10.text-base.font-sans.leading-normal
+#app.max-w-screen-2xlff.mx-auto.py-10.pb-104.md_pb-10.text-base.font-sans.leading-normal
+  //- min-h-screen body
   .flex.w-full.flex-col.min-h-screen
     //- (wrong network banner)
     template(v-if="$store.getters.isWrongNetwork")
@@ -133,20 +134,15 @@ const switchToAppNetwork = async () => {
     main#main.flex-1.flex
       router-view.w-full(:key="$route.params && JSON.stringify($route.params)")
 
-  //- footer.p-6.mt-144.flex.justify-between.items-end
-    .bg-indigo-900.text-ms.text-violet-650.rounded-full.font-semibold.flex.items-center
-      svg-dai.h-12
-      | 1 ≈ $1
-
-  //- view profile banner
-  template(v-if="profileBannerVisible")
-    .sticky.mt-144.md_mt-196.z-30.bottom-0.pb-10.left-0.w-full.px-10.mt-10.bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
-      .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16(class="bg-greenbright-400")
-        .flex.flex-1.items-center Connect a wallet to view your profile :)
-        button.h-54.ml-24.border-2ff.rounded-full.pl-28.pr-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="connect(true)") Connect
+    //- view profile banner
+    template(v-if="profileBannerVisible")
+      .sticky.mt-10.z-30.bottom-0.pb-10.left-0.w-full.px-10.mt-10.bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+        .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16(class="bg-greenbright-400")
+          .flex.flex-1.items-center Connect a wallet to view your profile :)
+          button.h-54.ml-24.border-2ff.rounded-full.pl-28.pr-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="connect(true)") Connect
 
   //- footer
-  .mt-144.md_mt-196.mb-64.md_mb-0.px-12.flex.flex-wrap.justify-center.md_justify-between
+  .mt-10.mb-64.md_mb-0.px-12.flex.flex-wrap.justify-center.md_justify-between
     //- radicle link
     a.my-4.order-last.md_order-none.h-80.pl-18.pr-16.flex.items-center.bg-indigo-700.text-violet-650.rounded-full.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(href="http://radicle.xyz", target="_blank", rel="noopener noreferrer")
       //- .w-56.h-56.flex.items-center.justify-center.bg-indigo-900.rounded-full.text-xl 🌱

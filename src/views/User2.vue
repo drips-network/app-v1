@@ -328,77 +328,83 @@ export default {
 </script>
 
 <template lang="pug">
-article.profile.pt-80.lg_pt-40.pb-80
+article.profile.w-full.pt-80ff.lg_pt-40ff.pb-80ff
+
 
   //- (edit profile hint banner)
   template(v-if="isMyUser && editProfileHint")
-    .mb-60.-mt-20.lg_mb-0.lg_fixed.bottom-80.lg_bottom-0.left-0.z-30.lg_pb-20.w-full.px-10.lg_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
-      //- body
-      .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative(class="bg-greenbright-400")
-        .flex.flex-1.items-center This is your profile :)
-        //- edit btn
-        button.h-54.ml-24.border-2ff.rounded-full.px-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="edit = 'profile'")
-          | Edit
-        //- hide edit hint btn
-        button.p-12.ml-8.notouch_hover_scale-110.transform.transition.duration-150(@click="hideEditProfileHint")
-          svg-x.h-12.w-12(strokeWidth="2", strokeCap="round")
+    .sticky.top-0.left-0.w-full.z-30.lg_fixed.lg_top-auto.lg_bottom-0
+      .absolute.top-0.left-0.w-full.py-10.lg_static
+        .w-full.px-10.lg_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+          //- body
+          .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative(class="bg-greenbright-400")
+            .flex.flex-1.items-center This is your profile :)
+            //- edit btn
+            button.h-54.ml-24.border-2ff.rounded-full.px-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="edit = 'profile'")
+              | Edit
+            //- hide edit hint btn
+            button.p-12.ml-8.notouch_hover_scale-110.transform.transition.duration-150(@click="hideEditProfileHint")
+              svg-x.h-12.w-12(strokeWidth="2", strokeCap="round")
 
-  //- 
-  //- senders
-  drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in")
+  //- user upper summary
+  section.min-h-screen.-mt-88.flex.w-full.items-center.py-160.borderff
+    .w-full
+      //- 
+      //- senders
+      drips-list-expands(:address="$route.params.address", :drips="allDripsIn", direction="in")
 
-  //- (collectable)
-  template(v-if="isMyUser && (allDripsIn && allDripsIn.length)")
-    .flex.justify-center.mb-28
-      .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': collectableTotal === -1}", :key="$route.params.address")
-        template(v-if="collectableTotal !== -1")
-          | {{ collectableTotal }}
-          svg-dai(size="sm", style="margin-left:0.15em")
-        template(v-else)
-          .animate-pulse ...
+      //- (collectable)
+      template(v-if="isMyUser && (allDripsIn && allDripsIn.length)")
+        .flex.justify-center.mb-20.lg_mb-28
+          .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': collectableTotal === -1}", :key="$route.params.address")
+            template(v-if="collectableTotal !== -1")
+              | {{ collectableTotal }}
+              svg-dai(size="sm", style="margin-left:0.15em")
+            template(v-else)
+              .animate-pulse ...
+            
+            button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="collectModalOpen = true") Collect
+
+      //- user tag row
+      div.mx-auto.flex.flex-col
+        user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'", @dripClick="dripModalOpen = true")
         
-        button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="collectModalOpen = true") Collect
+        //- memberships + nft counts
 
-  //- user tag row
-  div.mx-auto.flex.flex-col
-    user-tag(:address="$route.params.address", :isEditable="isMyUser", @editClick="edit = 'profile'", @dripClick="dripModalOpen = true")
-    
-    //- memberships + nft counts
-
-    //- section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650(v-if="(projects && projects.length) || (nfts && nfts.length)")
-      //- (memberships)
-      router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
-        .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
-        .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-          span.text-mss(v-if="projects") {{ projects.length}}
-          span.animate-pulse(v-else) ...
+        //- section.mt-6.flex.flex-wrap.justify-center.font-semibold.text-ms.text-violet-650(v-if="(projects && projects.length) || (nfts && nfts.length)")
+          //- (memberships)
+          router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#memberships", :class="{'opacity-40 pointer-events-none': projects && !projects.length}")
+            .ml-4.mr-12.flex-1 🧧&nbsp;&nbsp;Memberships
+            .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+              span.text-mss(v-if="projects") {{ projects.length}}
+              span.animate-pulse(v-else) ...
+          
+          //- (nfts)
+          router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#member-of", :class="{'opacity-40 pointer-events-none': nfts && !nfts.length}")
+            .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
+            .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
+              span.text-mss(v-if="nfts") {{ nfts.length}}
+              span.animate-pulse(v-else) ...
       
-      //- (nfts)
-      router-link.rounded-full.min-w-180.p-4.bg-indigo-950.flex.items-center.justify-between.px-10.mx-2.notouch_hover_ring.notouch_hover_ring-violet-650(to="#member-of", :class="{'opacity-40 pointer-events-none': nfts && !nfts.length}")
-        .ml-4.mr-12.flex-1 🧩 &nbsp;&nbsp;Member of
-        .rounded-full.bg-indigo-950.min-w-28.h-28.text-ms.text-white.flex.items-center.justify-center
-          span.text-mss(v-if="nfts") {{ nfts.length}}
-          span.animate-pulse(v-else) ...
-  
-  //- (balance)
-  template(v-if="isMyUser && (dripsOut && dripsOut.length)")
-    .flex.justify-center.mt-28
-      .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': balance === -1}", :key="$route.params.address")
-        template(v-if="balance !== -1")
-          | {{ balance }}
-          svg-dai(size="sm", style="margin-left:0.15em")
-        template(v-else)
-          .animate-pulse ...
-        
-        button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="edit = 'funds'")
-          | Deposit
+      //- (balance)
+      template(v-if="isMyUser && (dripsOut && dripsOut.length)")
+        .flex.justify-center.mt-20.lg_mt-28
+          .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': balance === -1}", :key="$route.params.address")
+            template(v-if="balance !== -1")
+              | {{ balance }}
+              svg-dai(size="sm", style="margin-left:0.15em")
+            template(v-else)
+              .animate-pulse ...
+            
+            button.ml-16.btn.h-36.border-2.btn-outline-violet.text-base.font-semibold.px-12(@click="edit = 'funds'")
+              | Deposit
 
-  //- receivers
-  drips-list-expands.mb-132(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
+      //- receivers
+      drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
 
 
   //- (memberships list)
-  section.mt-132(v-if="projects && projects.length")
+  section(v-if="projects && projects.length")
     //- wave divider
     .bg-img-wave-shadow-violet
     
@@ -459,10 +465,11 @@ article.profile.pt-80.lg_pt-40.pb-80
     //- nft list
     ul.mt-72.flex.flex-wrap.justify-evenly
       //- nfts...
-      li.w-full.max-w-4xl.my-36(v-for="(nft, i) in nfts")
+      template(v-for="(nft, i) in nfts")
         //- (excerpted)
         template(v-if="showAllNFTs || i < 3")
-          user-nft.w-full(:nft="nft")
+          li.w-full.max-w-4xl.my-36
+            user-nft.w-full(:nft="nft")
 
     //- (show all btn)
     footer.flex.justify-center.mt-80.mb-120(v-if="nfts.length > 3")

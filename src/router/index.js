@@ -104,13 +104,14 @@ const routes = [
 
   // drip routes
   {
-    path: '/streams/:id',
+    path: '/drips/:id',
     name: 'stream',
     component: () => import(/* webpackChunkName: "stream" */ '../views/Stream.vue'),
   },
   {
     path: '/splits/:id',
-    name: 'split'
+    name: 'split',
+    component: () => import(/* webpackChunkName: "stream" */ '../views/Split.vue'),
   },
   {
     path: '/drips/:id',

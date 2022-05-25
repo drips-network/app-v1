@@ -143,7 +143,7 @@ onMounted(() => {
     
     //- title
     h3.text-center.text-xll.font-semibold.mt-40.mb-36
-      router-link(:to="{name: 'project', params: { address: props.project.id }}")
+      router-link.notouch_hover_underline(:to="{name: 'project', params: { address: props.project.id }}")
         | {{ meta && meta.name ? meta.name : props.project.name }}
 
     //- details
@@ -296,7 +296,10 @@ onMounted(() => {
                 | Collect
 
   //- drips list
-  drips-list-expands(:address="props.project.id", :drips="splitsOut", direction="out", :canEdit="isMyProject", @editDrips="editSplitsModalOpen = true")
+  .w-full.relative(v-if="isMyProject || (splitsOut && splitsOut.length)")
+    drips-list-expands.z-10(:address="props.project.id", :drips="splitsOut", direction="out", :canEdit="isMyProject", @editDrips="editSplitsModalOpen = true")
+    //- gradient
+    .absolute.top-0.left-0.w-full.h-40.bg-gradient-to-b.from-indigo-900.to-transparent.z-20
 
   
   //- (mint modal)

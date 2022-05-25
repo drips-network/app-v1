@@ -14,12 +14,13 @@ import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../con
 import profiles from './profiles'
 
 let provider, signer, walletProvider
+const infuraId = '1cf5614cae9f49968fe604b818804be6'
 
 const networks = {
-  1: { name: 'mainnet', layer: 'ethereum', infura: 'wss://mainnet.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://etherscan.io' } },
-  4: { name: 'rinkeby', layer: 'ethereum', infura: 'wss://rinkeby.infura.io/ws/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Etherscan', domain: 'https://rinkeby.etherscan.io' } },
-  137: { name: 'polygon', layer: 'polygon', infura: 'https://polygon-mainnet.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://polygonscan.com' } },
-  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: 'https://polygon-mumbai.infura.io/v3/1cf5614cae9f49968fe604b818804be6', explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com' } }
+  1: { name: 'mainnet', layer: 'ethereum', infura: `https://mainnet.infura.io/v3/${infuraId}`, explorer: { name: 'Etherscan', domain: 'https://etherscan.io' } },
+  4: { name: 'rinkeby', layer: 'ethereum', infura: `https://rinkeby.infura.io/v3/${infuraId}`, explorer: { name: 'Etherscan', domain: 'https://rinkeby.etherscan.io' } },
+  137: { name: 'polygon', layer: 'polygon', infura: `https://polygon-mainnet.infura.io/v3/${infuraId}`, explorer: { name: 'Polyscan', domain: 'https://polygonscan.com' } },
+  80001: { name: 'polygon-mumbai', layer: 'polygon', infura: `https://polygon-mumbai.infura.io/v3/${infuraId}`, explorer: { name: 'Polyscan', domain: 'https://mumbai.polygonscan.com' } }
 }
 const deployNetworkName = JSON.parse(import.meta.env.VITE_APP_CONTRACTS_DEPLOY).NETWORK || 'mainnet'
 const deployNetwork = Object.values(networks).find(n => n.name === deployNetworkName)
@@ -32,7 +33,7 @@ const web3Modal = new Web3Modal({
     walletconnect: {
       package: WalletConnectProvider, // required
       options: {
-        infuraId: '1cf5614cae9f49968fe604b818804be6' // required
+        infuraId // required
       }
     }
   },
@@ -136,6 +137,7 @@ export default createStore({
         return true
       } catch (e) {
         console.error(e)
+        throw e
       }
     },
 

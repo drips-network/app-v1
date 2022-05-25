@@ -38,7 +38,7 @@ const copyAddressToClipboard = async () => {
   try {
     // TODO - suport .eth copy ?
     await navigator.clipboard.writeText(props.address)
-    alert('Address copied to the clipboard!')
+    alert(`Address copied to the clipboard!\n\n${props.address}`)
   } catch (e) {
     alert('Could not copy address!')
   }

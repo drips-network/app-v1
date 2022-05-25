@@ -163,3 +163,14 @@ query ($id: ID!) {
   }
 }
 `
+
+export const querySplit = `
+query ($id: ID!) {
+  splitsEntry (id: $id) {
+    id
+    sender
+    receiver
+    weight
+  }
+}
+`

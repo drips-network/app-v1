@@ -68,7 +68,7 @@ const toggle = () => { expanded.value = !expanded.value }
 </script>
 
 <template lang="pug">
-section.drips-list-expands.font-semibold.relative
+section.drips-list-expands.font-semibold.relative.w-full
   //- background
   .absolute.overlay.flex(v-show="expanded", :class="{'pt-60': props.direction === 'out'}")
     .w-full.bg-gradient-to-b.from-transparent.via-indigo-950.to-transparent
@@ -81,7 +81,7 @@ section.drips-list-expands.font-semibold.relative
         | 💧
     .w-full.flex.justify-center.opacity-90
       .h-80.overflow-hidden.items-center.flex
-        div.animate-falling
+        div.animate-falling(v-if="canEdit || (props.drips && props.drips.length)")
           .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
             | 💧
           .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
