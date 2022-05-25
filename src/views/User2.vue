@@ -334,8 +334,8 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.pb-80ff
   //- (edit profile hint banner)
   template(v-if="isMyUser && editProfileHint")
     .sticky.top-0.left-0.w-full.z-30.lg_fixed.lg_top-auto.lg_bottom-0
-      .absolute.top-0.left-0.w-full.py-10.lg_static
-        .w-full.px-10.lg_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+      .absolute.top-0.left-0.w-full.lg_static
+        .w-full.px-10.py-10.bg-gradient-to-t.lg_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
           //- body
           .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative(class="bg-greenbright-400")
             .flex.flex-1.items-center This is your profile :)
@@ -343,8 +343,8 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.pb-80ff
             button.h-54.ml-24.border-2ff.rounded-full.px-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="edit = 'profile'")
               | Edit
             //- hide edit hint btn
-            button.p-12.ml-8.notouch_hover_scale-110.transform.transition.duration-150(@click="hideEditProfileHint")
-              svg-x.h-12.w-12(strokeWidth="2", strokeCap="round")
+            button.p-12.ml-6.notouch_hover_scale-110.transform.transition.duration-150(@click="hideEditProfileHint")
+              svg-x.h-10.w-10(strokeWidth="2", strokeCap="round")
 
   //- user upper summary
   section.min-h-screen.-mt-88.flex.w-full.items-center.py-160.borderff
@@ -355,7 +355,7 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.pb-80ff
 
       //- (collectable)
       template(v-if="isMyUser && (allDripsIn && allDripsIn.length)")
-        .flex.justify-center.mb-20.lg_mb-28
+        .flex.justify-center.mb-24
           .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': collectableTotal === -1}", :key="$route.params.address")
             template(v-if="collectableTotal !== -1")
               | {{ collectableTotal }}
@@ -388,7 +388,7 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.pb-80ff
       
       //- (balance)
       template(v-if="isMyUser && (dripsOut && dripsOut.length)")
-        .flex.justify-center.mt-20.lg_mt-28
+        .flex.justify-center.mt-24
           .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': balance === -1}", :key="$route.params.address")
             template(v-if="balance !== -1")
               | {{ balance }}

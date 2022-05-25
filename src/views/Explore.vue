@@ -218,22 +218,25 @@ article.explore.pt-56
 
   //- drips
   section.mt-24.mb-144
+    //- wave divider
+    .bg-img-wave-shadow-violet
+    
+    header.flex.justify-center.mt-56.pt-56
+      h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
+        .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 💧
+        .text-xl.ml-12 Drips
+        .h-40.min-w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !dripRows}")
+          template(v-if="dripRows")
+            | {{ dripRows.length }}
+    
     //- (loading)
-    template(v-if="!splits")
-      loading-bar.mx-12
+    template(v-if="!projects")
+      .flex.justify-center.mt-60
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
+          span Loading...
 
     //- (list)
     template(v-else)
-      //- wave divider
-      .bg-img-wave-shadow-violet
-
-      header.flex.justify-center.mt-56.pt-56
-        h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
-          .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 💧
-          .text-xl.ml-12 Drips
-          .h-40.w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base
-            | {{ dripRows.length }}
-      
       //- small text summary
       p.flex.justify-center.mt-60
         .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold
@@ -266,22 +269,25 @@ article.explore.pt-56
 
   //- memberships
   section.mt-24.mb-144
-    //- (loading)
-    template(v-if="!projects")
-      loading-bar.mx-12
+    //- wave divider
+    .bg-img-wave-shadow-violet
 
-    //- (list)
-    template(v-else)
-      //- wave divider
-      .bg-img-wave-shadow-violet
-
-      header.flex.justify-center.mt-56.pt-56
+    header.flex.justify-center.mt-56.pt-56
         h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
           .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 🧧
           .text-xl.ml-12 Memberships
-          .h-40.w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base
-            | {{ projects.length }}
-      
+          .h-40.min-w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !projects}")
+            template(v-if="projects")
+              | {{ projects.length }}
+
+    //- (loading)
+    template(v-if="!projects")
+      .flex.justify-center.mt-60
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
+          span Loading...
+
+    //- (list)
+    template(v-else)
       //- small text summary
       p.flex.justify-center.mt-60
         .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff

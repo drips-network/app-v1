@@ -8,7 +8,7 @@ const props = defineProps(['drip'])
 </script>
 
 <template lang="pug">
-article.drip-detail.flex
+article.drip-detail.flex.-mt-88
   //- centered body
   .m-auto.py-80.font-semibold
     //- (error)
@@ -57,7 +57,7 @@ article.drip-detail.flex
         template(v-if="props.drip")
           //- description
           p.flex.justify-center.w-full.relative.z-10
-            .h-60.flex.items-center.justify-center.bg-indigo-700.rounded-full.px-28.font-semibold.text-lg
+            .h-60.flex.items-center.justify-center.bg-violet-600.rounded-full.px-28.font-semibold.text-lg
               //- (stream)
               template(v-if="props.drip.amtPerSec")
                 span #[span.inline-block {{ toDAIPerMo(props.drip.amtPerSec) }}] #[svg-dai.inline-block(style="height:0.8em; transform:translateY(-0.07em); margin-left: .12em")]/mo

@@ -21,7 +21,7 @@ const close = () => emit('close')
 <template lang="pug">
 dialog-body.fixed.inset-0.z-30.overflow-y-auto.flex.py-60.px-30(:open="isOpen", @close="close")
 
-  dialog-overlay.fixed.overlay.bg-indigo-900.opacity-80
+  dialog-overlay.fixed.overlay.bg-indigo-900.opacity-90
 
   slot
 
