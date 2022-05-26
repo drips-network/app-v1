@@ -20,10 +20,14 @@ const props = defineProps(['address', 'drip'])
 
       //- amount
       div.font-semibold.text-violet-650.mx-6
-        template(v-if="props.drip.amount")
+        template(v-if="props.drip.amtPerSec")
           .flex.items-center.leading-none
             | {{ props.drip.amount }}
             svg-dai(size="xs", style="margin-left:0.375em")
             | /mo
         template(v-else-if="props.drip.percent") {{ props.drip.percent }}%
+        template(v-else-if="props.drip.give")
+          .flex.items-center.leading-none
+            | {{ props.drip.give }}
+            svg-dai(size="xs", style="margin-left:0.375em")
 </template>

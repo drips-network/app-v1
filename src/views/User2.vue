@@ -24,7 +24,7 @@ import SvgX from '@/components/SvgX.vue'
 import store from '@/store'
 import { utils } from 'ethers'
 import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
-import api from '@/api'
+import api, { queryGivesByReceiver } from '@/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -57,14 +57,17 @@ const getMyCollectable = () => {
 // drips in
 const splitsIn = ref()
 const dripsIn = ref()
+const givesIn = ref()
 
 const allDripsIn = computed(() => {
-  if (!dripsIn.value && !splitsIn.value) {
+  if (!dripsIn.value && !splitsIn.value && !givesIn.value) {
     return undefined // "loading"
   }
   const dIn = dripsIn.value || []
   const sIn = splitsIn.value || []
-  return [...dIn, ...sIn]
+  const gIn = givesIn.value || []
+  // TODO sort (add timestamps to drips + splits)
+  return [...dIn, ...sIn, ...gIn] //.sort((a, b) => a.timestamp - b.timestamp)
 })
 
 const allSenders = computed(() => {
@@ -100,6 +103,23 @@ const getDripsIn = async () => {
   } catch (e) {
     console.error(e)
     dripsIn.value = []
+  }
+}
+
+// get gives in
+const getGivesIn = async () => {
+  try {
+    const resp = await api({ query: queryGivesByReceiver, variables: { address: route.params.address }})
+    // format + save
+    givesIn.value = resp.data.gives.map(give => ({
+      ...give,
+      give: toDAI(give.amount),
+      receiver: [give.receiver]
+    }))
+    console.log(givesIn.value)
+  } catch (e) {
+    console.error(e)
+    givesIn.value = []
   }
 }
 
@@ -255,9 +275,6 @@ const hideEditProfileHint = () => {
 }
 
 onMounted(() => {
-  if (isMyUser.value) {
-    getMyCollectable()
-  }
   getProfile()
   getSplitsIn()
   getDripsIn()
@@ -265,8 +282,12 @@ onMounted(() => {
   getDripsOut()
   getProjects()
   getNFTs()
+  getGivesIn()
+  if (isMyUser.value) {
+    getMyCollectable()
+  }
   // debug events
-  store.dispatch('getDripsReceiversByEvents', route.params.address)
+  // store.dispatch('getDripsReceiversByEvents', route.params.address)
 })
 
 provide('isMyUser', isMyUser)

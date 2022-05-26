@@ -596,43 +596,43 @@ export default createStore({
       }
     },
 
-    async getDripsReceiversByEvents ({ state, dispatch }, address) {
-      try {
-        if (!provider) await dispatch('init')
+    // async getDripsReceiversByEvents ({ state, dispatch }, address) {
+    //   try {
+    //     if (!provider) await dispatch('init')
 
-        const lastUpdate = {
-          receivers: [],
-          timestamp: 0,
-          balance: 0,
-          withdrawable: () => '0'
-        }
+    //     const lastUpdate = {
+    //       receivers: [],
+    //       timestamp: 0,
+    //       balance: 0,
+    //       withdrawable: () => '0'
+    //     }
 
-        const contract = getHubContract()
-        // fetch events...
-        let events = await contract.queryFilter('DripsUpdated(address,uint256,uint128,(address,uint128)[])')
+    //     const contract = getHubContract()
+    //     // fetch events...
+    //     let events = await contract.queryFilter('DripsUpdated(address,uint256,uint128,(address,uint128)[])')
 
-        if (!address) {
-          return events
-        }
+    //     if (!address) {
+    //       return events
+    //     }
 
-        // filter by the address
-        events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
-        console.log('user drips events', { address, events })
+    //     // filter by the address
+    //     events = events.filter(event => event.args[0].toLowerCase() === address.toLowerCase())
+    //     console.log('user drips events', { address, events })
 
-        if (events.length) {
-          const lastEvent = events.pop()
-          lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
-          lastUpdate.balance = lastEvent.args[1]
-          lastUpdate.receivers = lastEvent.args[2]
-          lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
-        }
+    //     if (events.length) {
+    //       const lastEvent = events.pop()
+    //       lastUpdate.timestamp = (await lastEvent.getBlock()).timestamp
+    //       lastUpdate.balance = lastEvent.args[1]
+    //       lastUpdate.receivers = lastEvent.args[2]
+    //       lastUpdate.withdrawable = () => getDripsWithdrawable(lastEvent)
+    //     }
 
-        return lastUpdate
-      } catch (e) {
-        console.error(e)
-        throw e
-      }
-    },
+    //     return lastUpdate
+    //   } catch (e) {
+    //     console.error(e)
+    //     throw e
+    //   }
+    // },
 
     async dripOnce ({ dispatch }, { address, amt }) {
       const actionId = new Date().getTime()

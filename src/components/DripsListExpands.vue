@@ -18,17 +18,13 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false }
 })
 
-
 const emit = defineEmits(['editDrips'])
 
+// unique addresses
 const addresses = computed(() => {
-  return props.direction === 'in' ? props.drips?.map(d => d.sender)
-    : props.drips?.filter(d => d.receiver.length).map(d => d.receiver[0])
-})
-
-const addressesCount = computed(() => {
-  // de-dupe for subaccounts
-  return [...new Set(addresses.value)].length
+  let addresses = props.direction === 'in' ? props.drips?.map(d => d.sender)
+      : props.drips?.filter(d => d.receiver.length).map(d => d.receiver[0])
+  return addresses && [...new Set(addresses)] // de-dupe
 })
 
 // balance
@@ -37,7 +33,7 @@ const balance = computed(() => withdrawable.value ? toDAI(withdrawable.value) : 
 
 // calc monthly
 const totalMonthlyRate = computed(() => {
-  const amtDrips = props.drips?.filter(d => d.amount !== undefined)
+  const amtDrips = props.drips?.filter(d => d.amtPerSec !== undefined)
   if (props.drips?.length > 1) {
     const totalAmtPerSec = amtDrips.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
     return toDAIPerMo(totalAmtPerSec)
@@ -56,6 +52,8 @@ const avgPct = computed(() => {
   }
   return false
 })
+
+// TODO calc total given (includes drips over time?)
 
 const dripRt = (drip) => {
   const name = drip.amtPerSec ? 'stream' : drip.percent ? 'split' : 'drip'
@@ -93,7 +91,7 @@ section.drips-list-expands.font-semibold.relative.w-full
       .w-full.flex.justify-center
         //- (loading...)
         template(v-if="!addresses")
-          .h-80.px-40.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
+          .h-64.px-32.rounded-full.bg-indigo-950.text-violet-650.flex.items-center.justify-center.text-md.animate-pulse Loading...
 
         //- (no drips)
         template(v-else-if="!addresses.length")
@@ -155,9 +153,9 @@ section.drips-list-expands.font-semibold.relative.w-full
             //- count
             .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="props.drips.length > 1")
               template(v-if="props.direction === 'in'")
-                | {{ addressesCount }} address{{ addressesCount > 1 ? 'es' : '' }}
+                | {{ addresses.length }} address{{ addresses.length > 1 ? 'es' : '' }}
               template(v-else)
-                | {{ addressesCount }} recipient{{ addressesCount > 1 ? 's' : '' }}
+                | {{ addresses.length }} recipient{{ addresses.length > 1 ? 's' : '' }}
             
             //- (total monthly)
             .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="totalMonthlyRate && props.drips.length > 1")
