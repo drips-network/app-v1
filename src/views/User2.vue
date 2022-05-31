@@ -24,7 +24,7 @@ import SvgX from '@/components/SvgX.vue'
 import store from '@/store'
 import { utils } from 'ethers'
 import { toDAI, toDAIPerMo, formatSplitsEvents } from '@/utils'
-import api, { queryGivesByReceiver } from '@/api'
+import api, { queryGivesByReceiver, queryGivesBySender } from '@/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -45,8 +45,6 @@ const collectableTotal = computed(() => {
   return !collectableAmts.value ? -1
     : toDAI(collectableAmts.value[0].add(collectableAmts.value[1]))
 })
-
-watch(isMyUser, (val) => val && getMyCollectable())
 
 const getMyCollectable = () => {
   store.dispatch('getCollectable', { address: route.params.address })
@@ -116,7 +114,6 @@ const getGivesIn = async () => {
       give: toDAI(give.amount),
       receiver: [give.receiver]
     }))
-    console.log(givesIn.value)
   } catch (e) {
     console.error(e)
     givesIn.value = []
@@ -126,14 +123,16 @@ const getGivesIn = async () => {
 // drips out
 const splitsOut = ref()
 const dripsOut = ref()
+const givesOut = ref()
 
 const allDripsOut = computed(() => {
-  if (!dripsOut.value && !splitsOut.value) {
+  if (!dripsOut.value && !splitsOut.value && !givesOut.value) {
     return undefined // "loading"
   }
   const dOut = dripsOut.value || []
   const sOut = splitsOut.value || []
-  return [...dOut, ...sOut]
+  const gOut = givesOut.value || []
+  return [...dOut, ...sOut, ...gOut]
 })
 
 const allReceivers = computed(() => {
@@ -164,7 +163,6 @@ let getWithdrawable
 const getDripsOut = async () => {
   try {
     const config = await store.dispatch('getDripsBySender', route.params.address)
-    console.log({ config })
     // format + save
     dripsOut.value = config.receivers.map(drip => ({
       id: drip.id,
@@ -173,7 +171,6 @@ const getDripsOut = async () => {
       amount: toDAIPerMo(drip.amtPerSec), 
       amtPerSec: drip.amtPerSec,
     }))
-    console.log(dripsOut.value)
     // get/set balance
     getWithdrawable = config.withdrawable
     withdrawable.value = getWithdrawable()
@@ -181,6 +178,26 @@ const getDripsOut = async () => {
   } catch (e) {
     console.error(e)
     dripsOut.value = []
+  }
+}
+
+// get gives out
+const getGivesOut = async () => {
+  try {
+    const resp = await api({ query: queryGivesBySender, variables: { address: route.params.address }})
+    
+    // TODO - merge gives into one item? 
+    // (how to handle timestamp and click to individual gives...)
+
+    // format + save
+    givesOut.value = resp.data.gives.map(give => ({
+      ...give,
+      give: toDAI(give.amount),
+      receiver: [give.receiver]
+    }))
+  } catch (e) {
+    console.error(e)
+    givesOut.value = []
   }
 }
 
@@ -267,7 +284,6 @@ const getProfile = () => {
 }
 
 // edit profile hint
-console.log(typeof sessionStorage.getItem('editProfileHintHidden'))
 const editProfileHint = ref(!sessionStorage.getItem('editProfileHintHidden'))
 const hideEditProfileHint = () => {
   sessionStorage.setItem('editProfileHintHidden', 1)
@@ -283,12 +299,15 @@ onMounted(() => {
   getProjects()
   getNFTs()
   getGivesIn()
+  getGivesOut()
   if (isMyUser.value) {
     getMyCollectable()
   }
   // debug events
   // store.dispatch('getDripsReceiversByEvents', route.params.address)
 })
+
+watch(isMyUser, (val) => val && getMyCollectable())
 
 provide('isMyUser', isMyUser)
 // provide('allDripsOut', allDripsOut)

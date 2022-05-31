@@ -167,7 +167,7 @@ query ($id: ID!) {
 
 export const queryGive = `
 query ($id: ID!) {
-  gives (id: $id) {
+  give (id: $id) {
     id
     sender 
     receiver
