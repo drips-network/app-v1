@@ -59,7 +59,7 @@ const copyAddressToClipboard = async () => {
       .flex-1.min-w-0.ml-32.mr-36.lg_ml-36.lg_mr-40
         //- name
         .min-w-80.text-2xl.font-bold.flex.items-center
-          h1.truncate
+          h1.truncate.leading-snug
             addr(:address="props.address", :key="props.address")
           button(@click="copyAddressToClipboard", title="Copy Address")
             svg-copy-small.w-32.h-32.ml-8.text-violet-650.notouch_opacity-75.notouch_hover_opacity-100.transform.notouch_hover_scale-110

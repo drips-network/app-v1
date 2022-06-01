@@ -38,7 +38,7 @@ const totalMonthlyRate = computed(() => {
     const totalAmtPerSec = amtDrips.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
     return toDAIPerMo(totalAmtPerSec)
   }
-  return false
+  return '0'
 })
 
 // calc percents
@@ -158,7 +158,7 @@ section.drips-list-expands.font-semibold.relative.w-full
                 | {{ addresses.length }} recipient{{ addresses.length > 1 ? 's' : '' }}
             
             //- (total monthly)
-            .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="totalMonthlyRate && props.drips.length > 1")
+            .flex.bg-violet-650.rounded-full.items-center.h-36.px-18.mx-2(v-if="totalMonthlyRate !== '0' && props.drips.length > 1")
               template(v-if="props.direction === 'in'") drip {{ totalMonthlyRate }}
               template(v-else) dripping {{ totalMonthlyRate }}
               svg-dai.ml-4(size="xs")
