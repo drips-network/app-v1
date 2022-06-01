@@ -68,13 +68,15 @@ const switchToAppNetwork = async () => {
   //- min-h-screen body
   .flex.w-full.flex-col.min-h-screen
     //- (wrong network banner)
-    template(v-if="$store.getters.isWrongNetwork")
+    template(v-if="$store.state.address && $store.getters.isWrongNetwork")
       .sticky.z-50.top-10.left-0.w-full.px-12.mb-10
-        button.rounded-full.bg-yellow-500.text-black.flex.w-full.items-center.justify-between.notouch_hover_ring(@click="switchToAppNetwork")
+        .rounded-full.bg-yellow-500.text-black.flex.w-full.items-center.justify-between
           .w-80.text-center.text-2xl ⚠️
           .h-80.flex-1.flex.items-center.justify-center.text-center.font-semibold
-            div Switch to #[span.capitalize {{ networkName }}] network
-          .w-80.flex.items-center.justify-center.text-xl &rarr;
+            .absolute.overlay.flex.items-center.justify-center
+              span Your wallet is connected to the wrong network!
+          button.relative.z-10.h-54.mr-12.rounded-full.pl-28.pr-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900.font-semibold(class="bg-indigo-900/25", @click="switchToAppNetwork")
+            span Switch &rarr;
 
     //- app header
     header.relative.z-30.flex.items-center.justify-center.md_justify-between.px-12

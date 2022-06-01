@@ -14,7 +14,8 @@ import { deploy, RadicleRegistry, DAI, DripsToken, DaiDripsHub } from '../../con
 import profiles from './profiles'
 
 let provider, signer, walletProvider
-const infuraId = '1cf5614cae9f49968fe604b818804be6'
+
+const infuraId = import.meta.env.VITE_APP_INFURA_ID || '1cf5614cae9f49968fe604b818804be6'
 
 const networks = {
   1: { name: 'mainnet', layer: 'ethereum', infura: `https://mainnet.infura.io/v3/${infuraId}`, explorer: { name: 'Etherscan', domain: 'https://etherscan.io' } },
@@ -123,21 +124,38 @@ export default createStore({
       return initializing
     },
 
-    async setupFallbackProvider ({ dispatch }) {
+    async setupFallbackProvider ({ state, dispatch }) {
+      // metamask/browser?
+      if (window.ethereum) {
+        try {
+          const walletProvider = new Ethers.providers.Web3Provider(window.ethereum)  
+          const walletNetworkId = (await walletProvider.getNetwork())?.chainId
+          
+          // !! wrong network
+          if (walletNetworkId !== state.deployNetworkId) {
+            throw new Error(`Wallet connected to wrong network (wallet: ${walletNetworkId}, app: ${state.deployNetworkId})`)
+            // skip to fallback
+          } else {
+            provider = walletProvider
+          }
+        } catch (e) {
+          console.error(e)
+          console.log('Trying fallback provider...')
+        }
+      }
+      
       try {
-        if (window.ethereum) {
-          // metamask/browser
-          provider = new Ethers.providers.Web3Provider(window.ethereum)
-        } else {
+        if (!provider) {
           // infura fallback
           provider = new Ethers.getDefaultProvider(deployNetwork.infura)
         }
+
         // set network
         await dispatch('getNetworkId', provider)
         return true
       } catch (e) {
         console.error(e)
-        throw e
+        throw e  
       }
     },
 
