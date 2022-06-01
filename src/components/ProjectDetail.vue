@@ -46,12 +46,14 @@ if (bn.from(totalCollectedWei).lt(currentFundingWei)) {
   // use current funding if greater than what's been collected
   raised = isStreaming ? toDAIPerMo(currentFundingWei) : toDAI(currentFundingWei)
 } else {
-  // use total collected
   raised = toDAI(totalCollectedWei)
 }
 
-// members
-const membersAddrs = toRaw(props.project.tokens.map(tkn => tkn.owner))
+// unique members
+const membersAddrs = computed(() => {
+  const addrs = props.project.tokens.map(tkn => tkn.owner)
+  return [...new Set(addrs)]
+})
 
 // COLLECTABLE
 const collectModalOpen = ref(false)
@@ -200,7 +202,7 @@ onMounted(() => {
 
   .text-md.font-semibold
     
-    //- members summary row
+    //- (members collapsed row)
     header.relative.mt-4.h-80.flex.items-center.justify-between.pl-32.rounded-full.bg-indigo-700(v-show="!showMembers")
       //- label left
       .text-violet-650.text-md.font-semibold Members
@@ -218,12 +220,13 @@ onMounted(() => {
 
     //- (members list expanded)
     ul.flex.flex-wrap.justify-center.my-5.bg-indigo-700.rounded-2xl.relative.pb-56(v-if="showMembers")
-      .w-full.flex.justify-between.h-80.items-center.font-semibold
+      .w-full.flex.justify-between.h-80.items-center.font-semibold.cursor-pointer(@click.stop="showMembers = false")
         h6.ml-32.text-violet-650 Members
-        .w-54.h-54.mr-6.flex.items-center.justify-center {{ props.project.tokens.length }}
+        .min-w-54.h-54.px-6.mr-12.flex.items-center.justify-center.rounded-full.bg-indigo-950 {{ membersAddrs.length.toLocaleString() }}
 
       li(v-for="token in props.project.tokens")
-        user-tag-small.bg-indigo-850(:address="token.owner")
+        router-link.btn-focus-violet.rounded-full.block.my-4.mx-3(:to="{ name: 'user', params: { address: token.owner }}")
+          user-tag-small.bg-indigo-850(:address="token.owner")
 
       //- close button
       .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
@@ -231,21 +234,26 @@ onMounted(() => {
           svg-chevron-down.w-32.h-32.transform.rotate-180
 
     //- stats
-    .grid.grid-cols-2.gap-4.mt-4
+    .grid.gap-4.mt-4
       //- raised:
       .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
         .text-violet-650 Raised
         .flex.items-center
-          svg-dai.mr-2(size="md")
           | {{ raised }}
+          svg-dai.ml-5(size="sm")
 
       //- available
-      .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
+      //- .h-80.bg-indigo-700.flex.items-center.justify-between.px-32.rounded-full
         .text-violet-650 Available
         div
+          //- (streaming/unlimited)
           template(v-if="isStreaming")
             span(style="font-size:1.5em") ∞
-          template(v-else-if="!props.project.tokens.length") {{ props.project.tokenTypes[0].limit }}
+          //- (no mints)
+          //- template(v-else-if="!props.project.tokens.length") {{ props.project.tokenTypes[0].limit }}
+          //- (>10k avail)
+          template(v-else-if="props.project.tokenTypes[0].limit - props.project.tokens.length > 10000") >10K
+          //- template(v-else-if="props.project.tokenTypes[0].limit <= 10000")
           template(v-else) {{ props.project.tokenTypes[0].limit - props.project.tokens.length }}/{{ props.project.tokenTypes[0].limit }}
 
     //- (collectable)
