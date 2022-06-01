@@ -374,11 +374,11 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.lg_pb-132
 
   //- (edit profile hint banner)
   template(v-if="isMyUser && editProfileHint")
-    .sticky.top-0.left-0.w-full.z-30.md_fixed.md_top-auto.md_bottom-0
+    .sticky.top-0.left-0.w-full.z-30.md_fixed.md_top-auto.md_bottom-0.pointer-events-none
       .absolute.top-0.left-0.w-full.md_static
         .w-full.px-10.py-10.bg-gradient-to-t.md_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
           //- body
-          .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative(class="bg-greenbright-400")
+          .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative.pointer-events-auto(class="bg-greenbright-400")
             .flex.flex-1.items-center This is your profile :)
             //- edit btn
             button.h-54.ml-24.border-2ff.rounded-full.px-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="edit = 'profile'")

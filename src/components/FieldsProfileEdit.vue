@@ -48,14 +48,14 @@ div
 section.mt-40
   .my-10
     input-body(label="Name", :error="nameInputError")
-      input(v-model="modelValue.name", placeholder="My Name", autocomplete="new-password", max-length="20")
+      input(v-model="modelValue.name", placeholder="Drips", autocomplete="new-password", max-length="20")
   .my-10
     input-body(label="Website URL", :isFilled="modelValue.url.length")
-      input(v-model="modelValue.url", placeholder="https://mywebsite.com", type="url")
+      input(v-model="modelValue.url", placeholder="https://drips.network", type="url")
   .my-10
     //- TODO: validate twitter
     input-body(label="Twitter Handle", :isFilled="modelValue['com.twitter'].length")
-      input(v-model="modelValue['com.twitter']", placeholder="sophie")
+      input(v-model="modelValue['com.twitter']", placeholder="dripsnetwork")
   .my-10
     input-body(label="Discord Invite URL", :isFilled="modelValue.discord.length")
       input(v-model="modelValue.discord", placeholder="https://discord.com/...")
@@ -68,6 +68,6 @@ section.mt-40
 
   .my-10
     input-body(label="Bio")
-      textarea.text-center.scrollbars-hidden(v-model="modelValue.description", placeholder="I make it rain." rows="6")
+      textarea.text-center.scrollbars-hidden(v-model="modelValue.description", placeholder="When you drip I drip we drip." rows="6")
 
 </template>
