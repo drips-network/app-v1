@@ -15,7 +15,7 @@ const props = defineProps({
   address: { type: String, default: undefined },
   drips: { type: Array, default: undefined },
   direction: { type: String, default: 'out' },
-  canEdit: { type: Boolean, default: false }
+  canEdit: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['editDrips'])
@@ -68,8 +68,8 @@ const toggle = () => { expanded.value = !expanded.value }
 <template lang="pug">
 section.drips-list-expands.font-semibold.relative.w-full
   //- background
-  .absolute.overlay.flex(v-show="expanded", :class="{'pt-60': props.direction === 'out'}")
-    .w-full.bg-gradient-to-b.from-transparent.via-indigo-950.to-transparent
+  .absolute.overlay.flex(v-show="expanded")
+    .w-full.bg-gradient-radial.from-indigo-950.to-transparent.overflow-visible
 
   //- body
   .relative.z-10.flex.flex-col.px-24(:class="{'flex-col-reverse': props.direction === 'in'}")
