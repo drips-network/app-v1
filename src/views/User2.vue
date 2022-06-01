@@ -215,7 +215,8 @@ const getNFTs = async () => {
             tokenType { streaming }
             owner: tokenReceiver
             projectAddress: tokenRegistryAddress
-            amount: amtPerSec
+            amtPerSec
+            giveAmt
           }
         }
       `

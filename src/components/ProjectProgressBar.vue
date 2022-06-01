@@ -56,7 +56,8 @@ emit('progress', pct.value)
 
     //- (goal)
     template(v-else)
-      svg-dai.mr-4(size="sm")
-      span.text-md.font-semibold
-        | {{ typeof meta.goal === 'number' ? meta.goal.toLocaleString() : '?' }}{{ isStreaming ? '/mo' : '' }}
+      span.flex.items-center.text-md.font-semibold
+        | {{ typeof meta.goal === 'number' ? meta.goal.toLocaleString() : '?' }}
+        svg-dai.ml-6(size="xs")
+        template(v-if="isStreaming") /mo
 </template>

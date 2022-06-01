@@ -18,7 +18,7 @@ const props = defineProps({
 })
 
 const nft = markRaw(props.nft)
-const nftRate = toDAIPerMo(nft.amount) // .toFixed(2)
+const nftRate = toDAIPerMo(nft.amtPerSec) // .toFixed(2)
 const tokenId = nft.tokenId
 const nftMeta = ref({})
 const nftExpiryDate = ref()
@@ -172,9 +172,9 @@ onBeforeMount(() => {
       div.text-base.text-violet-600.flex
         //- .flex.bg-indigo-950.rounded-lg.text-center.py-12.px-16 Monthly
         .flex.items-center.bg-indigo-950.rounded-lg.text-center.py-12.px-16.font-semibold.text-ms
-          svg-dai.w-14.h-14.mr-3
           template(v-if="nft.tokenType.streaming") {{ nftRate }}/mo
-          template(v-else) {{ toDAI(nft.amount) }}
+          template(v-else) {{ toDAI(nft.giveAmt) }}
+          svg-dai.w-14.h-14.ml-5
       //- opensea link
       a.text-violet-600.mt-2.mr-2.text-ms(:href="`https://opensea.io/assets/${projectAddress}/${tokenId}`", target="_blank", rel="noopener noreferrer") OpenSea ↗
 
