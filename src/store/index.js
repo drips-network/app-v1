@@ -508,7 +508,7 @@ export default createStore({
       }
     },
 
-    async getNFTBalance (_, { projectAddress, tokenId }) {
+    async getNFTBalance ({ dispatch }, { projectAddress, tokenId }) {
       try {
         if (!provider) await dispatch('init')
         const contract = getProjectContract(projectAddress)

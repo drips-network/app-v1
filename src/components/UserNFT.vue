@@ -149,7 +149,7 @@ onBeforeMount(() => {
           router-link(:to="{name: 'project', params: { address: projectAddress }}")
             | {{ projectMeta.name ? projectMeta.name : $store.getters.addrShort(projectAddress) }}
       //- no
-      .ml-40.mr-6.text-xl.font-semibold.text-violet-800 {{ '#' + tokenId }}
+      .ml-40.mr-6.text-lg.font-semibold.text-violet-800 {{ '#' + tokenId }}
 
     .flex-1.pt-12
       figure.mt-54.mb-54.rounded-xl.relative.flex.w-full.relative

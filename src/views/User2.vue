@@ -369,14 +369,14 @@ export default {
 </script>
 
 <template lang="pug">
-article.profile.w-full.pt-80ff.lg_pt-40ff.pb-80ff
+article.profile.w-full.pt-80ff.lg_pt-40ff.lg_pb-132
 
 
   //- (edit profile hint banner)
   template(v-if="isMyUser && editProfileHint")
-    .sticky.top-0.left-0.w-full.z-30.lg_fixed.lg_top-auto.lg_bottom-0
-      .absolute.top-0.left-0.w-full.lg_static
-        .w-full.px-10.py-10.bg-gradient-to-t.lg_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+    .sticky.top-0.left-0.w-full.z-30.md_fixed.md_top-auto.md_bottom-0
+      .absolute.top-0.left-0.w-full.md_static
+        .w-full.px-10.py-10.bg-gradient-to-t.md_bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
           //- body
           .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16.relative(class="bg-greenbright-400")
             .flex.flex-1.items-center This is your profile :)
