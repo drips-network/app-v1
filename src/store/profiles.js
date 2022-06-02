@@ -101,7 +101,7 @@ export default {
           if (ensName) {
             const provider = await dispatch('getProvider', null, { root: true })
             const resolver = await provider.getResolver(ensName)
-            value = resolver.getText('avatar')
+            value = await resolver.getText('avatar')
             commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name: 'avatar', value } })
           }
         }

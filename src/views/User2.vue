@@ -279,7 +279,8 @@ const getProfile = () => {
   // if empty set to null (undefined is loading state)
   store.dispatch('profiles/getProfile', { address: route.params.address })
     .then(() => {
-      profileMeta.value = toRaw(store.state.profiles.profiles[route.params.address]?.meta) || null
+      const profile = store.state.profiles.profiles[route.params.address]
+      profileMeta.value = toRaw(profile?.meta) || null
     })
     .catch(() => { profileMeta.value = null })
 }

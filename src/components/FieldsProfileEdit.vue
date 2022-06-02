@@ -3,6 +3,7 @@ import { ref, computed, toRaw } from 'vue'
 import InputBody from '@/components/InputBody.vue'
 import InputUploadFileIpfs from '@/components/InputUploadFileIpfs.vue'
 import SvgPlusMinusRadicle from '@/components/SvgPlusMinusRadicle.vue'
+import SvgXCircle from '@/components/SvgXCircle.vue'
 // import { pinImageToIPFS } from '@/store'
 import { ipfsUrl } from '@/utils'
 import store from '@/store'
@@ -14,36 +15,61 @@ const emit = defineEmits(['update:modelValue'])
 const imgSrcCurrent = props.modelValue.avatar ? ipfsUrl(props.modelValue.avatar) : undefined
 
 const imgSrc = ref(imgSrcCurrent)
+const uploading = ref(false)
 
 const nameInputError = computed(() => {
   return (props.modelValue.name || '').includes('.eth') ? '".eth" will be omitted' : null
 })
 
-const onImageUploaded = (ipfsHash) => {
+const emitUpdate = (value = "") => {
   const clone = toRaw(props.modelValue)
-  clone.avatar = ipfsHash
-  emit('update:modelValue', clone)
+  clone.avatar = value
+  emit('update:modelValue', clone) 
+}
+
+const onImageRead = value => {
+  uploading.value = true
+  imgSrc.value = value
+}
+
+const onImageUploaded = (ipfsHash) => {
+  emitUpdate(ipfsHash)
+  uploading.value = false
+}
+
+const removeImage = () => {
+  imgSrc.value = undefined
+  emitUpdate()
 }
 </script>
 
 <template lang="pug">
 //- avatar image upload
-div
-  .h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950
-    //- (default image)
-    img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
-    //- add image btn
-    label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Avatar Image", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
-      span.sr-only Avatar Image
-      //- input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
-      input-upload-file-ipfs.hidden(@read="e => { imgSrc = e }", @hash="onImageUploaded", @error="imgSrc = imgSrcCurrent")
-      svg-plus-minus-radicle.h-24.w-24
+.flex
+  .relative.mx-auto
+    .h-144.w-144.mx-auto.relative.rounded-full.overflow-hidden.bg-indigo-950(:class="{'animate-pulse': uploading}")
+      //- (default image)
+      img.absolute.overlay.object-cover.pointer-events-none.opacity-50(v-if="!imgSrc", src="~@/assets/project-avatar-default.png")
+      
+      //- add image btn overlay
+      label.absolute.overlay.flex.items-center.justify-center.cursor-pointer.border.border-violet-800.rounded-full(tabindex="0", title="Avatar Image", @keydown="e => e.keyCode === 13 && e.target.querySelector('input').click()")
+        span.sr-only Avatar Image
+        //- input.hidden(type="file", accept=".png,.jpeg,.jpg", @change="onImgFileChange")
+        input-upload-file-ipfs.hidden(@read="onImageRead", @hash="onImageUploaded", @error="imgSrc = imgSrcCurrent")
+        svg-plus-minus-radicle.h-24.w-24
 
-      //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB
-    //- (image)
-    img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
+        //- .absolute.bottom-12.left-0.text-xs.text-violet-650.w-full.text-center max 200KB
+      
+      //- (uploaded image)
+      img.absolute.overlay.object-cover.pointer-events-none(v-if="imgSrc", :src="imgSrc", alt="your project image")
+    
+    //- (remove image btn)
+    button.absolute.-top-8.-right-16.notouch_hover_text-white.text-violet-650(v-if="imgSrc", @click.stop.prevent="removeImage")
+      svg-x-circle.h-28.w-28
 
-  .mt-8.text-sm.text-violet-650 Avatar Image
+//- label
+.mt-8.text-sm.text-violet-650
+  | {{ uploading ? 'Uploading...' : 'Avatar Image' }}
 
 section.mt-40
   .my-10

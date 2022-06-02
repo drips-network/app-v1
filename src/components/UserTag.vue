@@ -19,11 +19,11 @@ const emit = defineEmits(['dripClick', 'editClick'])
 const isMyProfile = computed(() => store.state.address === props.address)
 const profile = computed(() => store.state.profiles.profiles[props.address])
 const ensName = computed(() => profile.value?.ens?.name)
-// const github = computed(() => profile.value['com.github'] || profile.value['vnd.github'])
-// const twitter = computed(() => profile.value['com.twitter'] || profile.value['vnd.twitter'])
-// const discord = computed(() => profile.value['com.discord'] || profile.value['vnd.discord'])
-const avatarBroken = ref(false)
+
 const record = key => store.getters['profiles/record'](props.address, key)
+
+const avatar = computed(() => record('avatar'))
+
 const getENSSocialUrl = (value, base) => {
   try {
     // user erroneously added full URL into ENS com.XXX structure...
@@ -50,10 +50,10 @@ const copyAddressToClipboard = async () => {
 .user-tag
   .flex.justify-center.px-6
     //- user cell
-    .p-16.rounded-full.bg-indigo-700.flex.items-center.relative.max-w-full
+    .p-16.rounded-full.bg-indigo-700.flex.items-center.relative.max-w-full.pr-24
       //- avatar
       .rounded-full.overflow-hidden.w-80.md_w-104.cursor-pointer.relative.notouch_hover_ring
-        user-avatar.aspect-w-1.aspect-h-1(:address="props.address", blockieSize="64")
+        user-avatar.aspect-w-1.aspect-h-1(:address="props.address", blockieSize="64", :key="avatar")
         //- (edit profile click)
         template(v-if="isMyProfile")
           button.block.absolute.overlay.rounded-full(@click.stop="$emit('editClick')")
@@ -63,9 +63,9 @@ const copyAddressToClipboard = async () => {
           a.block.absolute.z-10.overlay.rounded-full(:href="`${$store.getters.network.explorer.domain}/address/${props.address}`", target="_blank", rel="noopener noreferrer", :title="`View on ${$store.getters.network.explorer.name}`")
             span.sr-only View on {{ $store.getters.network.explorer.name }}
 
-      .flex-1.min-w-0.ml-32.mr-16.md_mr-24.md_ml-36
+      .flex-1.min-w-0.ml-32.mr-16.md_mr-24
         //- name
-        .min-w-80.text-2xl.font-bold.flex.items-center
+        .min-w-80.text-xll.md_text-2xl.font-bold.flex.items-center
           h1.truncate.leading-snug.cursor-pointer(@click="copyAddressToClipboard")
             addr(:address="props.address", :key="props.address")
           button(@click="copyAddressToClipboard", title="Copy Address")
@@ -101,14 +101,14 @@ const copyAddressToClipboard = async () => {
 
       //- (drip-to btn)
       template(v-if="!isMyProfile")
-        button.mr-16.lg_mr-18.block.relative.text-violet-650.transform.notouch_hover_scale-110.transition.duration-150(@click.stop="$emit('dripClick')")
+        button.block.ml-10.mr-4.md_mr-12.mb-4.relative.text-violet-650.transform.notouch_hover_scale-110.transition.duration-150(@click.stop="$emit('dripClick')")
           //- drop bg
-          <svg class="h-56 lg_h-72" viewBox="0 0 90 105" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio>
+          <svg class="h-64 lg_h-72" viewBox="0 0 90 105" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio>
           <path d="M15.6969 29.619L15.8371 29.4896L15.9503 29.336C16.0314 29.2259 16.1276 29.1159 16.2413 29.0079L43.1004 3.48239C43.9729 2.65328 45.342 2.65328 46.2144 3.48239L47.1669 2.4801L46.2144 3.48239L73.0736 29.0079C73.1863 29.115 73.2818 29.2241 73.3625 29.3333L73.4752 29.4857L73.6145 29.6143C81.9838 37.3374 87.213 48.3569 87.213 60.5902C87.213 83.9234 68.1727 102.861 44.6583 102.861C21.1438 102.861 2.10352 83.9234 2.10352 60.5902C2.10352 48.3594 7.33064 37.3419 15.6969 29.619Z" fill="currentColor" stroke-width="2.125"/>
           </svg>
 
           .absolute.overlay.flex.items-center.justify-center.pt-8
-            svg-plus-minus-radicle.h-24.w-24.lg_h-30.lg_w-30.text-indigo-900
+            svg-plus-minus-radicle.h-24.w-24.lg_h-30.lg_w-30.text-indigo-950
             //- svg-plus-minus.text-indigo-900(style="transform:scale(1.25)")
 
       //- (edit btn)

@@ -61,6 +61,8 @@ const update = async () => {
     txReceipt.value = await tx.value.wait()
 
     // success!
+    // TODO fetch profile here and compare if it's been picked up from the Graph?
+    // (otherwise closing modal may not show update :/)
     emit('updated', ipfsHash)
     txMsg.value = { status: 1, message: 'Profile updated!' }
     tx.value = null
@@ -80,12 +82,12 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="✏️")
 
     template(v-slot:header)
-      dialog-title Edit Your Profile
+      dialog-title Edit your Profile
 
     template(v-slot:description)
       dialog-description
         p.mx-auto.leading-snug.text-violet-650(style="max-width:24em")
-          | Edit the information on your profile<br>(or override any info from your ENS name.)
+          | Add information to your profile.<br>(overrides info from ENS)
 
     form.mt-40(@submit.prevent="update")
       //- fields
@@ -105,7 +107,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
             | Update
 
         //- (view btn)
-        button.btn.btn-lg.btn-violet.px-36(v-show="txReceipt && !hasChanges", @click.stop="$emit('close')")
+        button.btn.btn-lg.btn-violet.px-36(v-show="txReceipt && !hasChanges", @click.stop.prevent="$emit('close')")
           | View Profile
 
     tx-link(v-if="tx", :tx="tx")
