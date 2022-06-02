@@ -23,6 +23,7 @@ const hasConnected = ref(toRaw(store.state.address) !== null)
 const profileBannerVisible = computed(() => {
   return !hasConnected.vaue && !store.state.address && !route.name?.startsWith('create')
 })
+const testnetsVisible = ref(false)
 
 store.dispatch('init')
 
@@ -103,13 +104,24 @@ const switchToAppNetwork = async () => {
               li.py-2 &nbsp;
               //- ethereum link
               li(v-if="networkName !== 'mainnet'")
-                a.inline-block.py-5.px-20.btn-focus-violet.transition.duration-150(href="https://app.drips.network", class="text-greenbright-400/90")
+                a.inline-block.py-5.px-20.transition.duration-150.notouch_hover_text-white(href="https://app.drips.network", class="text-greenbright-400/90")
                   template(v-if="networkName.includes('polygon')") ethereum
                   template(v-else) mainnet
+              //- rinkeby link
+              li(v-if="testnetsVisible && networkName !== 'rinkeby'")
+                a.inline-block.py-5.px-20.transition.duration-150.opacity-75.notouch_hover_opacity-100.notouch_hover_text-white(href="https://rinkeby.drips.network", class="text-greenbright-400/90")
+                  | rinkeby
               //- polygon link
               li(v-if="networkName !== 'polygon'")
-                a.inline-block.py-5.px-20.text-violet-650.btn-focus-violet.transition.duration-150(href="https://polygon.drips.network")
+                a.inline-block.py-5.px-20.text-violet-650.transition.duration-150.notouch_hover_text-white(href="https://polygon.drips.network")
                   | polygon
+              //- mumbai link
+              li(v-if="testnetsVisible && networkName !== 'mumbai'")
+                a.inline-block.py-5.px-20.text-violet-650.transition.duration-150.opacity-75.notouch_hover_opacity-100.notouch_hover_text-white(href="https://mumbai.drips.network")
+                  | mumbai
+              //- (testnets button)
+              li(v-show="!testnetsVisible")
+                button.inline-block.py-5.px-20.transition.duration-150.notouch_hover_text-white(class="text-white/40", @click="testnetsVisible = true") testnets
 
       //- right side (mobile bottom fixed)
       nav.app__nav.fixed.z-30.bottom-0.left-0.w-full.px-10.pb-10.pt-196.md_static.md_p-0.md_w-auto.flex.justify-center.bg-gradient-to-b.from-transparent.to-indigo-900.pointer-events-none(:class="{'hidden md_flex': !store.state.address}")
