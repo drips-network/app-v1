@@ -78,7 +78,7 @@ section.drips-list-expands.font-semibold.relative.w-full
       .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
         | 💧
     .w-full.flex.justify-center.opacity-90
-      .h-80.overflow-hidden.items-center.flex
+      .h-72.overflow-hidden.items-center.flex
         div.animate-falling(v-if="canEdit || (props.drips && props.drips.length)")
           .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
             | 💧

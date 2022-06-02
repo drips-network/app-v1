@@ -30,7 +30,7 @@ watch(route, (to) => {
 </script>
 
 <template lang="pug">
-section.pt-72.px-10
+section.pt-72.px-10.pb-120
 
   panel.mx-auto.transition.duration-200(ref="entryPanel", icon="☔️", label="Create Drips", :collapsed="!isIndex", :isEditable="false", @open="router.push({name: 'create' })", :class="{'opacity-30 notouch_hover_opacity-100 transition duration-150': !isIndex}")
     template(v-slot:header)

@@ -5,8 +5,10 @@ export const oneMonth = 30 * 24 * 60 * 60
 
 export const ipfsUrl = hash => import.meta.env.VITE_APP_IPFS_GATEWAY + '/ipfs/' + hash
 
+// round up to nearest hundreth
+export const round = (num, dec = 2) => Math.ceil(num * 100) / 100
 // clip to nearest hundredth (dont round up)
-export const round = (num, dec = 2) => Number((Math.floor(num * 100) / 100).toFixed(dec))
+// export const round = (num, dec = 2) => Number((Math.floor(num * 100) / 100).toFixed(dec))
 
 export const fromWei = (wei) => {
   wei = bn.isBigNumber(wei) ? wei : bn.from(wei)

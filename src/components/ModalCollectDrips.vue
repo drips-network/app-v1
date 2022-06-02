@@ -104,7 +104,7 @@ modal(v-bind="$attrs", @close="emit('close')")
               .flex.items-center.mr-16
                 .text-2xl.font-semibold.flex.items-center
                   //- (negative sign)
-                  template(v-if="props.amts && props.amts[1].gt(0)") –
+                  template(v-if="props.amts && props.amts[1].gt(0)") –&nbsp;
                   //- amount
                   | {{ toSplits !== -1 ? toSplits : '...' }}
                   //-

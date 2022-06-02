@@ -222,17 +222,20 @@ onMounted(async () => {
 panel(:icon="props.addFundsOnly ? '🚰' : '💧'")
 
   template(v-slot:header)
-    dialog-title.leading-snug
+    //- dialog-title
+    //- TODO: use <dialog-title> (fix use on CreateDrips.vue, since not modal)
+    .leading-snug
       h2(v-if="props.addFundsOnly") Add to Drips Balance
       h2(v-else) Drip to Others
 
 
   template(v-slot:description)
-    dialog-description
-      template(v-if="props.addFundsOnly")
-        p.mx-auto(style="max-width:30em") Your drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
-      template(v-else)
-        p.mx-auto Who do you want to send DAI to #[b every month]?
+    //- dialog-description
+    //- TODO: use <dialog-description> (fix use on CreateDrips.vue, since not modal)
+    template(v-if="props.addFundsOnly")
+      p.mx-auto(style="max-width:30em") Your drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
+    template(v-else)
+      p.mx-auto Who do you want to send DAI to #[b every month]?
 
   //- (loading...)
   template(v-if="loading")
