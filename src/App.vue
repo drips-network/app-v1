@@ -55,6 +55,8 @@ const switchToAppNetwork = async () => {
       params: [{ chainId: utils.hexValue(store.state.deployNetworkId) }]
     })
 
+    // TODO mobile MM doesn't change network or throw error (confirm chainId here?)
+
     // reload app
     window.location.reload()
   } catch (e) {

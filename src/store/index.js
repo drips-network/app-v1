@@ -28,14 +28,17 @@ const deployNetwork = Object.values(networks).find(n => n.name === deployNetwork
 
 // setup web3 modal
 const web3Modal = new Web3Modal({
-  network: deployNetwork.name, // optional
+  // network: deployNetwork.name, // optional - NOTE, doesn't seem to work with "polygon" as name...
   cacheProvider: true, // optional
   providerOptions: { // required
     walletconnect: {
       package: WalletConnectProvider, // required
       options: {
-        infuraId // required
-      }
+        infuraId, // required
+        rpc: {
+          137: networks[137].infura,
+        }
+      },
     }
   },
   theme: 'dark'
