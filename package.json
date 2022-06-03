@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "postbuild": "npm run lambda:build",
     "serve": "vite preview",
     "lambda": "netlify-lambda serve lambda",
     "lambda:build": "netlify-lambda build lambda"
