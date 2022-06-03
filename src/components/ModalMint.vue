@@ -75,7 +75,14 @@ const mint = async () => {
     state.mintTxMsg = null
 
     // connect wallet?
-    if (!store.state.address) await store.dispatch('connect')
+    if (!store.state.address) {
+      // make web3modal clickable (headlessui Dialog makes it inert)
+      const connectModal = document.getElementById('WEB3_CONNECT_MODAL_ID')
+      connectModal.removeAttribute('inert')
+      connectModal.removeAttribute('aria-hidden')
+
+      await store.dispatch('connect')
+    }
 
     // check allowance
     const allowance = await store.dispatch('getAllowance', props.project.id)

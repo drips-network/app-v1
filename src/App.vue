@@ -219,7 +219,7 @@ const switchToAppNetwork = async () => {
 
 /* purgecss start ignore */
 .web3modal-modal-lightbox{
-  z-index: 50 !important;
+  z-index: 60 !important;
 }
 /* purgecss end ignore */
 </style>
