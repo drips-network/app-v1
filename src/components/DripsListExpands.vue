@@ -87,7 +87,7 @@ section.drips-list-expands.font-semibold.relative.w-full
           .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
             | 💧
 
-    div
+    .-mt-px
       .w-full.flex.justify-center
         //- (loading...)
         template(v-if="!addresses")

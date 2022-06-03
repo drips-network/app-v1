@@ -69,6 +69,8 @@ const update = async () => {
     txMsg.value = null
     txReceipt.value = null
 
+    // TODO catch if (sum of splits > 100)
+
     // resolve receiver inputs
     const splitsResolved = []
     for (var i = 0; i < splits.value.length; i++) {
@@ -99,8 +101,7 @@ const update = async () => {
     txMsg.value = { status: 1, message: 'Confirmed! View your drips!' }
   } catch (e) {
     // console.error(e)
-    // alert('Error: \n' + e.message || e)
-    txMsg.value = { status: -1, message: e.message || e }
+    txMsg.value = { status: -1, message: e.error?.message || e.reason || e }
   }
 }
 

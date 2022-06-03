@@ -126,7 +126,7 @@ html {
   @apply border-2 border-transparent notouch_hover_border-violet-600;
 }
 .btn-focus-violet {
-  @apply notouch_hover_ring notouch_hover_ring-violet-650 focus_ring focus_ring-violet-650 notouch_hover_text-white;
+  @apply notouch_hover_ring notouch_hover_ring-violet-650 focus_ring focus_ring-violet-650 notouch_hover_text-white transition duration-100;
 }
 
 button{

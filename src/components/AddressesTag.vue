@@ -5,7 +5,7 @@ const props = defineProps(['addresses', 'avatarsOnly'])
 </script>
 
 <template lang="pug">
-.addresses-tag.h-80.flex.items-center.justify-endff.rounded-full.bg-indigo-700.px-12
+.addresses-tag.h-80.flex.items-center.rounded-full.bg-indigo-700.px-12
   //- (summary - "10 addresses")
   template(v-if="props.addresses.length > 1 || props.avatarsOnly")
     //- .w-full.text-center.font-bold {{ props.drip.receiver.length }} addresses

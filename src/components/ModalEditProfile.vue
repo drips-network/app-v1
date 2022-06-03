@@ -87,7 +87,8 @@ modal(v-bind="$attrs", @close="$emit('close')")
     template(v-slot:description)
       dialog-description
         p.mx-auto.leading-snug.text-violet-650(style="max-width:24em")
-          | Add information to your profile.<br>(overrides info from ENS)
+          | Add information to your profile.
+          template(v-if="$store.getters.network.layer === 'ethereum'") <br>(overrides info from ENS)
 
     form.mt-40(@submit.prevent="update")
       //- fields

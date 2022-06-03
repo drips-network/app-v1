@@ -266,8 +266,8 @@ onMounted(() => {
             .flex.items-center(:class="{'animate-pulse': !currentFundingWei }")
               template(v-if="!currentFundingWei") ...
               template(v-else)
-                svg-dai.mr-2(size="sm")
                 | {{ toDAIPerMo(currentFundingWei) }}
+                svg-dai.ml-6(size="xs")
                 template(v-if="isStreaming") /mo
                 //- .h-80.w-full.flex.items-center.justify-between
                   .flex-1.text-xl.text-violet-650 
@@ -295,9 +295,9 @@ onMounted(() => {
               //- svg-question-mark-encircled.ml-18
 
           .flex.items-center.text-white
-            svg-dai.mr-2(size="md")
             div(:class="{'animate-pulse': totalCollectableDAI < 0}")
               | {{ totalCollectableDAI < 0 ? '...' : totalCollectableDAI }}
+            svg-dai.ml-5(size="xs")
             //- (collect btn)
             template(v-if="totalCollectable")
               button.-mr-12.ml-20.btn.btn-sm.border-2.btn-outline-violet.px-16.font-semibold.text-md.notouch_hover_ring(, @click="collectModalOpen = true", :disabled="!totalCollectable.gt(0)")

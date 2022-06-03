@@ -69,36 +69,41 @@ const routes = [
       {
         path: 'communities',
         name: 'user-communities',
-        component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
+        redirect: { name: 'user' }
+        // component: () => import(/* webpackChunkName: "user-projects" */ '../views/user/UserProjects.vue')
       },
       // communities
       {
         path: 'communities/joined',
         name: 'user-communities-joined',
-        component: () => import(/* webpackChunkName: "user-communities" */ '../views/user/UserMemberships.vue')
+        redirect: { name: 'user' }
+        // component: () => import(/* webpackChunkName: "user-communities" */ '../views/user/UserMemberships.vue')
       },
       // drips
       {
         path: 'drips',
         name: 'user-drips',
-        redirect: { name: 'user-drips-out' }
+        redirect: { name: 'user' }
       },
       {
         path: 'drips/in',
         name: 'user-drips-in',
-        component: () => import(/* webpackChunkName: "user-drips-in" */ '../views/user/UserDripsIn.vue')
+        redirect: { name: 'user' }
+        // component: () => import(/* webpackChunkName: "user-drips-in" */ '../views/user/UserDripsIn.vue')
       },
       {
         path: 'drips/out',
         name: 'user-drips-out',
-        component: () => import(/* webpackChunkName: "user-drips-out" */ '../views/user/UserDripsOut.vue')
-      }
+        redirect: { name: 'user' }
+        // component: () => import(/* webpackChunkName: "user-drips-out" */ '../views/user/UserDripsOut.vue')
+      },
       // splits
-      // {
-      //   path: 'splits',
-      //   name: 'user-splits',
-      //   component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
-      // }
+      {
+        path: 'splits',
+        name: 'user-splits',
+        redirect: { name: 'user' }
+        // component: () => import(/* webpackChunkName: "user-splits-out" */ '../views/user/UserSplitsOut.vue')
+      }
     ]
   },
 

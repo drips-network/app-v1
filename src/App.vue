@@ -172,9 +172,9 @@ const switchToAppNetwork = async () => {
     .my-4.flex.items-center.text-violet-650.h-80.rounded-full.bg-indigo-700.px-12
 
       //- landing site link
-      a.mr-6.text-lg.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://www.drips.network") About
+      a.mr-6.text-md.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://www.drips.network") About
       //- docs link
-      a.mr-6.text-lg.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://docs.drips.network/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Docs
+      a.mr-6.text-md.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://docs.drips.network/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Docs
       //- twitter link
       a.mr-6.text-lg.font-semibold.btn-focus-violet.h-54.w-54.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://twitter.com/dripsnetwork", target="_blank", rel="noopener noreferrer")
         svg-twitter.w-36

@@ -370,7 +370,7 @@ export default {
 </script>
 
 <template lang="pug">
-article.profile.w-full.pt-80ff.lg_pt-40ff.lg_pb-132
+article.profile.w-full.lg_pb-132
 
 
   //- (edit profile hint banner)
@@ -389,7 +389,7 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.lg_pb-132
               svg-x.h-10.w-10(strokeWidth="2", strokeCap="round")
 
   //- user upper summary
-  section.min-h-screen.-mt-88.flex.w-full.items-center.py-160.borderff
+  section.min-h-screen.-mt-88.flex.w-full.items-center.py-120
     .w-full
       //- 
       //- senders
@@ -397,7 +397,7 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.lg_pb-132
 
       //- (collectable)
       template(v-if="isMyUser && (allDripsIn && allDripsIn.length)")
-        .flex.justify-center.mb-24
+        .flex.justify-center.mb-20
           .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': collectableTotal === -1}", :key="$route.params.address")
             template(v-if="collectableTotal !== -1")
               | {{ collectableTotal }}
@@ -430,7 +430,7 @@ article.profile.w-full.pt-80ff.lg_pt-40ff.lg_pb-132
       
       //- (balance)
       template(v-if="isMyUser && (dripsOut && dripsOut.length)")
-        .flex.justify-center.mt-24
+        .flex.justify-center.mt-20
           .h-60.bg-indigo-950.flex.items-center.borderff.border-violet-700.rounded-full.text-lg.text-violet-650.font-semibold.pl-24.pr-12(:class="{'text-violet-650': balance === -1}", :key="$route.params.address")
             template(v-if="balance !== -1")
               | {{ balance }}

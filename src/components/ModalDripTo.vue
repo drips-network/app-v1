@@ -88,7 +88,7 @@ const give = async () => {
 
     emit('newDrip')
   } catch (e) {
-    txMsg.value = { status: -1, message: e.reason || e.data?.message || e.message || e }
+    txMsg.value = { status: -1, message: e.error?.message || e.reason || e.data?.message || e.message || e }
   }
 }
 
@@ -116,7 +116,7 @@ const approve = async () => {
     approveTxMsg.value = null
   } catch (e) {
     // console.error(e)
-    approveTxMsg.value = { status: -1, message: e.reason || e.message || e }
+    approveTxMsg.value = { status: -1, message: e.error?.message || e.reason || e }
   }
 }
 
