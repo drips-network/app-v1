@@ -33,6 +33,7 @@ const uniqueReceivers = computed(() => [...new Set(props.drip.receiver)])
     .w-80.h-80.flex.items-center.justify-center.md_bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
       //- img(src="~@/assets/icons/drip-row-icon.svg")
       span(v-if="props.drip.percent", style="font-size:1.2em") 💦
+      span(v-else-if="props.drip.give", style="font-size:1.8em") 💧
       span(v-else, style="font-size:1.8em") 💧
       
 
@@ -50,7 +51,7 @@ const uniqueReceivers = computed(() => [...new Set(props.drip.receiver)])
       //- (give)
       template(v-else-if="props.drip.give")
         //- span #[addr.font-bold(:address="props.drip.sender")]
-        span dripped #[span.text-violet-650 #[svg-dai.inline-block.mr-1(style="height:0.9em; transform:translateY(-0.07em)")]{{ props.drip.give }}]
+        span #[span.opacity-65 dripped] {{ props.drip.give }}#[svg-dai.inline-block.ml-3(style="height:0.9em; transform:translateY(-0.07em)")]
   
   //- (right arrow)
   .hidden.md_flex.h-80.w-80.items-center.justify-center.bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")

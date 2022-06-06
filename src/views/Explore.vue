@@ -12,7 +12,7 @@ import SpotlightRecipient from '@/components/SpotlightRecipient.vue'
 import ProjectDetail from '@/components/ProjectDetail.vue'
 import SvgChevronDown from '@/components/SvgChevronDown.vue'
 import store from '@/store'
-import { formatSplitsEvents, filterForCurrentEvents, toDAIPerMo } from '@/utils'
+import { formatSplitsEvents, filterForCurrentEvents, toDAIPerMo, toDAI, oneMonth } from '@/utils'
 import content from '../../content/spotlight.js'
 import { BigNumber as bn } from 'ethers'
 
@@ -103,26 +103,30 @@ const getDrips = async () => {
     })
     let configs = resp.data?.dripsConfigs || []
 
-    // filter for has drips
-    configs = configs.filter(config => config.dripsEntries.length)
-
-    // TEMP filter out sender=receiver
-    // • until resolved: https://github.com/gh0stwheel/drips-subgraph-mainnet-v2/issues/7
-    // configs = configs.filter(entry => entry.sender !== entry.receiver)
+    // filter for has drips, min amt
+    configs = configs
+      .filter(config => {
+        // filter-out empty configs
+        if (!config.dripsEntries.length) {
+          return false
+        }
+        // only min amt
+        const minMoAmt = "4990000000000000000" // 4.99 DAI
+        const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+        return totalAmtPerSec.mul(oneMonth).gte(minMoAmt)
+      })
 
     // format for rows
-    configs = configs.map(config => {
-      const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
-      return {
-        sender: config.sender,
-        receiver: config.dripsEntries.map(entry => entry.receiver),
-        amount: toDAIPerMo(totalAmtPerSec),
-        timestamp: config.timestamp
-      }
-    })
-
-    // TEMP (no monthly on Explore)
-    // drips.value = []
+    configs = configs
+      .map(config => {
+        const totalAmtPerSec = config.dripsEntries.reduce((acc, curr) => acc.add(curr.amtPerSec), bn.from(0))
+        return {
+          sender: config.sender,
+          receiver: config.dripsEntries.map(entry => entry.receiver),
+          amount: toDAIPerMo(totalAmtPerSec),
+          timestamp: config.timestamp
+        }
+      })
 
     drips.value = configs
   } catch (e) {
@@ -184,11 +188,51 @@ const getSplits = async () => {
   }
 }
 
+// get gives 
+const gives = ref()
+const getGives = async () => {
+  try {
+    // min amount? 
+    const minGiveAmt = "1000000000000000000000" // 1000 DAI
+    
+    const resp = await api({
+      query:`
+        query getGives {
+          gives (orderBy: blockTimestampGiven, orderDirection: desc, where: { amount_gte: "${minGiveAmt}" }) {
+            id
+            sender 
+            receiver
+            amount
+            timestamp: blockTimestampGiven
+          }
+        }
+      `
+    })
+    const entries = resp.data?.gives
+
+    // format for DripRow.vue
+    const rows = entries.map(entry => ({
+      sender: entry.sender,
+      receiver: [entry.receiver],
+      timestamp: entry.timestamp,
+      give: toDAI(entry.amount)
+    }))
+
+    gives.value = rows
+  } catch (e) {
+    gives.value = []
+  }
+}
+
 const dripRows = computed(() => {
-  if (!splits.value && !drips.value) return null
+  // loading...
+  if (!splits.value && !drips.value && !gives.value) return null
+
   const splitsRows = splits.value || []
   const dripsRows = drips.value || []
-  const rows = [...dripsRows, ...splitsRows]
+  const givesRows = gives.value || []
+  const rows = [...dripsRows, ...splitsRows, ...givesRows]
+  // sort by time
   rows.sort((a, b) => b.timestamp - a.timestamp)
   return rows
 })
@@ -205,6 +249,7 @@ onBeforeMount(() => {
   getProjects()
   getSplits()
   getDrips()
+  getGives()
 })
 </script>
 
@@ -230,22 +275,22 @@ article.explore.pt-56
       h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
         .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 💧
         .text-xl.ml-12 Drips
-        .h-40.min-w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !dripRows}")
+        .h-40.min-w-40.ml-16.rounded-full.bg-indigo-000.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !dripRows}")
           template(v-if="dripRows")
             | {{ dripRows.length }}
     
     //- (loading)
     template(v-if="!projects")
       .flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
+        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
           span Loading...
 
     //- (list)
     template(v-else)
       //- small text summary
       p.flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold
-          div Recent drips around the network!
+        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold
+          div Big drips around the network!
           //- #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
 
       //- header-large.mb-56(icon="💧")
@@ -281,21 +326,21 @@ article.explore.pt-56
         h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
           .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 🧧
           .text-xl.ml-12 Memberships
-          .h-40.min-w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !projects}")
+          .h-40.min-w-40.ml-16.rounded-full.bg-indigo-000.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !projects}")
             template(v-if="projects")
               | {{ projects.length }}
 
     //- (loading)
     template(v-if="!projects")
       .flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
+        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
           span Loading...
 
     //- (list)
     template(v-else)
       //- small text summary
       p.flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
+        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
           div #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
       
       //- memberships list

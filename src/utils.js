@@ -29,7 +29,7 @@ export const toDAI = (wei, frmt = 'pretty', roundTo) => {
     return '<0.01'
   }
   // rounding
-  return round(dai, roundTo)
+  return round(dai, roundTo).toLocaleString()
 }
 
 export const toDAIPerMo = (wei, roundTo = 2) => {
