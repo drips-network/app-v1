@@ -152,8 +152,8 @@ onMounted(() => {
     .flex.justify-center.flex-wrap
       //- min
       .mx-4.h-64.rounded-full.bg-indigo-800.flex.items-center.justify-center.min-w-144.px-32.text-lg.text-violet-650.font-semibold
-        svg-dai.mr-2(size="md")
         | {{ minAmt }}
+        svg-dai.ml-5(size="md")
         template(v-if="props.project.tokenTypes[0].streaming") /mo
         //- .text-lgg.tracking-tight /MO
           

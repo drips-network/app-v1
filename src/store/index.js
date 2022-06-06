@@ -309,7 +309,7 @@ export default createStore({
     },
 
     async getProject (_, projectAddress) {
-      // query chain fallback handler
+      // helper: query chain fallback handler
       const queryChain = async () => {
         try {
           console.log('Project not found in API (just created?). Querying chain...', projectAddress)
@@ -327,11 +327,13 @@ export default createStore({
       try {
         // check api...
         const resp = await api({ query: queryProject, variables: { id: projectAddress } })
+        console.log({ resp })
 
         if (resp.data?.fundingProject) {
           return resp.data.fundingProject
         }
 
+        // else, query chain
         return queryChain()
       } catch (e) {
         console.error('@getProject', e)

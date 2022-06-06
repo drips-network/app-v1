@@ -39,11 +39,16 @@ const projectOwnersCount = computed(() => {
 
 const getProjects = async () => {
   try {
+    // hidden projects?
+    let excludeIds = import.meta.env.VITE_APP_EXCLUDE_PROJECTS?.split(',')
+    excludeIds = excludeIds ? `id_not_in: ${JSON.stringify(excludeIds)}` : ''
+    
     const resp = await api({
       query: `
         query {
-          fundingProjects (orderBy: daiCollected, orderDirection: desc) {
+          fundingProjects (orderBy: blockTimestampCreated, orderDirection: desc, where: { ${excludeIds} }) {
             id
+            timestamp: blockTimestampCreated
             projectOwner
             daiCollected
             daiSplit
