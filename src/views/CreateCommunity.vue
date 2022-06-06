@@ -281,7 +281,7 @@ projectAddress.value = isDev ? route.query.project : null
     .grid.md_grid-cols-2.mt-40.gap-20
       //- TODO convert to radio buttons for accessibility?
       .aspect-w-5.aspect-h-4.md_aspect-w-1.md_aspect-h-1.relative.rounded-2xl.shadow-md-blue.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_opacity-100.transition.duration-150.group(:class="{'ring ring-violet-650': tokenType === 'subscription'}")
-        button.absolute.overlay.flex.items-center.justify-center(@click="tokenType = 'subscription'")
+        button.absolute.z-10.overlay.flex.items-center.justify-center(@click="tokenType = 'subscription'")
           div.pt-16
             .text-xl.font-semibold.mb-16 Subscription
             p.text-violet-600 Recurring <b>monthly</b> income from<br>your supporters.
@@ -291,7 +291,7 @@ projectAddress.value = isDev ? route.query.project : null
             .rounded-full.w-full.group-hover_bg-violet-650(:class="{'bg-violet-650': tokenType === 'subscription'}")
 
       .aspect-w-5.aspect-h-4.md_aspect-w-1.md_aspect-h-1.relative.rounded-2xl.shadow-md-blue.notouch_hover_ring.notouch_hover_ring-violet-650.notouch_hover_opacity-100.transition.duration-150.group(:class="{'ring ring-violet-650': tokenType === 'onetime'}")
-        button.absolute.overlay.flex.items-center.justify-center(@click="tokenType = 'onetime'")
+        button.absolute.z-10.overlay.flex.items-center.justify-center(@click="tokenType = 'onetime'")
           div.pt-16
             .text-xl.font-semibold.mb-16 Single-purchase
             p.text-violet-600 One-time purchase memberships.<br>&nbsp;
