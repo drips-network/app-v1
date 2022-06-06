@@ -32,8 +32,8 @@ const uniqueReceivers = computed(() => [...new Set(props.drip.receiver)])
     //- drip icon
     .w-80.h-80.flex.items-center.justify-center.md_bg-indigo-700.rounded-full.mr-2(:class="{'bg-indigo-800': altBg(drip) }")
       //- img(src="~@/assets/icons/drip-row-icon.svg")
-      span(v-if="props.drip.percent", style="font-size:1.8em") 💦
-      span(v-else, style="font-size:1.75em") 💧
+      span(v-if="props.drip.percent", style="font-size:1.2em") 💦
+      span(v-else, style="font-size:1.8em") 💧
       
 
   .hidden.md_flex.flex-1.h-80.items-center.justify-center.bg-indigo-700.rounded-full.px-20.mr-2.font-semibold(:class="['text-violet-650', {'bg-indigo-800': altBg(drip) }]")
