@@ -327,7 +327,6 @@ export default createStore({
       try {
         // check api...
         const resp = await api({ query: queryProject, variables: { id: projectAddress } })
-        console.log({ resp })
 
         if (resp.data?.fundingProject) {
           return resp.data.fundingProject

@@ -2,7 +2,7 @@
 import { ref, onMounted, nextTick, computed, toRaw } from 'vue'
 import SvgChevronDown from '@/components/SvgChevronDown.vue'
 import SvgDai from '@/components/SvgDai.vue'
-import { ipfsUrl, toDAI, toDAIPerMo } from '@/utils'
+import { ipfsUrl, toDAI, toDAIPerMo, socialURL } from '@/utils'
 import store from '@/store'
 import ProjectProgressBar from '@/components/ProjectProgressBar.vue'
 import UserAvatarsRow from '@/components/UserAvatarsRow.vue'
@@ -13,6 +13,10 @@ import ModalCollectDrips from '@/components/ModalCollectDrips.vue'
 import ModalEditProjectInfo from '@/components/ModalEditProjectInfo.vue'
 import ModalSplitsEdit from '@/components/ModalSplitsEdit.vue'
 import ModalMint from '@/components/ModalMint.vue'
+import SvgGlobe from '@/components/SvgGlobe.vue'
+import SvgGithub from '@/components/SvgGithub.vue'
+import SvgTwitter from '@/components/SvgTwitter.vue'
+import SvgDiscord from '@/components/SvgDiscord.vue'
 
 const props = defineProps(['project', 'ownerVisible'])
 const emit = defineEmits(['refresh'])
@@ -148,6 +152,25 @@ onMounted(() => {
     h3.text-center.text-xll.font-semibold.mt-40.mb-36
       router-link.notouch_hover_underline(:to="{name: 'project', params: { address: props.project.id }}")
         | {{ meta && meta.name ? meta.name : props.project.name }}
+
+    //- icons
+    .flex.mx-auto.justify-center.items-center.flex-wrap.-mt-20.mb-20(v-if="meta")
+      //- (website)
+      template(v-if="meta.website")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="meta.website", target="_blank", rel="noopener noreferrer", title="Website")
+          svg-globe.block.h-28
+      //- (twitter)
+      template(v-if="meta.twitter")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="socialURL(meta.twitter, 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
+          svg-twitter.block.h-28
+      //- (github)
+      template(v-if="meta.githubProject")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="socialURL(meta.githubProject, 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
+          svg-github.block.h-28
+      //- (discord)
+      template(v-if="meta.discord")
+        a.block.px-4.notouch_hover_text-greenbright-500(:href="socialURL(meta.discord, 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
+          svg-discord.block.h-28
 
     //- details
     .flex.justify-center.flex-wrap

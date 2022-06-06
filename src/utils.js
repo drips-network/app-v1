@@ -267,3 +267,15 @@ export const formatSplitsEvents = events => {
     }
   })
 }
+
+// construct social url that my have 'handle' input
+export const socialURL = (value, base) => {
+  try {
+    // try as full url
+    const url = new URL(value)
+    return url.href
+  } catch (e) {
+    // try as origin + value as social handle
+    return base + value
+  }
+}

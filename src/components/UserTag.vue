@@ -14,6 +14,7 @@ import SvgCopySmall from '@/components/SvgCopySmall.vue'
 import SvgLogoEtherscan from '@/components/SvgLogoEtherscan.vue'
 import FlexTruncate from '@/components/FlexTruncate.vue'
 import store from '@/store'
+import { socialURL } from '@/utils'
 const props = defineProps(['address'])
 const emit = defineEmits(['dripClick', 'editClick'])
 const isMyProfile = computed(() => store.state.address === props.address)
@@ -23,16 +24,6 @@ const ensName = computed(() => profile.value?.ens?.name)
 const record = key => store.getters['profiles/record'](props.address, key)
 
 const avatar = computed(() => record('avatar'))
-
-const getENSSocialUrl = (value, base) => {
-  try {
-    // user erroneously added full URL into ENS com.XXX structure...
-    const url = new URL(value)
-    return url.href
-  } catch (e) {
-    return base + value
-  }
-}
 
 const copyAddressToClipboard = async () => {
   try {
@@ -79,15 +70,15 @@ const copyAddressToClipboard = async () => {
               svg-globe.block.h-28
           //- (twitter)
           template(v-if="record('twitter')")
-            a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('twitter'), 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
+            a.block.px-4.notouch_hover_text-greenbright-500(:href="socialURL(record('twitter'), 'https://twitter.com/')", target="_blank", rel="noopener noreferrer", title="Twitter")
               svg-twitter.block.h-28
           //- (github)
           template(v-if="record('github')")
-            a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('github'), 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
+            a.block.px-4.notouch_hover_text-greenbright-500(:href="socialURL(record('github'), 'https://github.com/')", target="_blank", rel="noopener noreferrer", title="GitHub")
               svg-github.block.h-28
           //- (discord)
           template(v-if="record('discord')")
-            a.block.px-4.notouch_hover_text-greenbright-500(:href="getENSSocialUrl(record('discord'), 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
+            a.block.px-4.notouch_hover_text-greenbright-500(:href="socialURL(record('discord'), 'https://discord.com/')", target="_blank", rel="noopener noreferrer", title="Discord")
               svg-discord.block.h-28
           //- (ens name)
           template(v-if="ensName")
