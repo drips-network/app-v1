@@ -21,6 +21,7 @@ const emit = defineEmits(['refresh'])
 const meta = ref()
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 const isMyProject = computed(() => props.project.projectOwner === store.state.address)
+const ipfsHash = props.project.tokenTypes[0]?.ipfsHash || import.meta.env.VITE_APP_NFT_DEFAULT_IMAGE_HASH
 
 // ui
 const benefitsEl = ref()
@@ -129,7 +130,7 @@ onMounted(() => {
   figure.mx-auto.w-7x12.relative.z-10
     .w-full.relative
       .aspect-w-1.aspect-h-1
-      img.absolute.block.overlay.object-contain.object-bottom.cursor-pointer(:src="ipfsUrl(props.project.tokenTypes[0].ipfsHash)", @click="mintModalOpen = true")
+      img.absolute.block.overlay.object-contain.object-bottom.cursor-pointer(:src="ipfsUrl(ipfsHash)", @click="mintModalOpen = true")
       //- caption
       //- figcaption.absolute.top-full.w-full.left-0.text-center.text-sm.text-violet-650.pt-5
         | Member NFT

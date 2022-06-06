@@ -22,6 +22,7 @@ const tokenType = toRaw(props.project.tokenTypes[0])
 const isStreaming = toRaw(tokenType.streaming)
 const typeId = toRaw(tokenType.tokenTypeId)
 const minAmt = toRaw(tokenType.minAmt)
+const ipfsHash = tokenType.ipfsHash || import.meta.env.VITE_APP_NFT_DEFAULT_IMAGE_HASH
 
 // min
 let minDAI = isStreaming ? toDAI(bn.from(minAmt).mul(30 * 24 * 60 * 60), 'exact') // bn
@@ -135,7 +136,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
   panel.z-10.m-auto(icon="💧")
 
     template(v-slot:header)
-      dialog-title(tabindex="0")
+      dialog-title.focus_outline-none(tabindex="0")
         | Join
         br
         | "{{ meta.name }}"
@@ -149,7 +150,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
     //- (image)
-    template(v-if="tokenType.ipfsHash")
+    template(v-if="ipfsHash")
       figure.bg-indigo-950.rounded-xl.relative.mb-48.flex.p-56.relative
         //- label
         .absolute.top-0.left-0.w-full.text-center.text-sm.pt-4.font-normal.text-violet-600.opacity-90
@@ -157,7 +158,7 @@ modal(v-bind="$attrs", @close="$emit('close')")
         //- wrapper
         .w-full.relative
           .aspect-w-8.aspect-h-7
-            img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(tokenType.ipfsHash)", alt="NFT Membership Image")
+            img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(ipfsHash)", alt="NFT Membership Image")
 
     //- inputs
     form(@submit.prevent, validate)
