@@ -276,7 +276,7 @@ article.explore
       h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
         .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 💧
         .text-xl.ml-12 Drips
-        .h-40.min-w-40.ml-16.rounded-full.bg-indigo-000.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !dripRows}")
+        .h-40.min-w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !dripRows}")
           template(v-if="dripRows")
             | {{ dripRows.length }}
     
@@ -327,7 +327,7 @@ article.explore
         h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
           .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 🧧
           .text-xl.ml-12 Memberships
-          .h-40.min-w-40.ml-16.rounded-full.bg-indigo-000.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !projects}")
+          .h-40.min-w-40.ml-16.rounded-full.bg-indigo-900.flex.items-center.justify-center.text-white.text-base(:class="{'animate-pulse': !projects}")
             template(v-if="projects")
               | {{ projects.length }}
 
