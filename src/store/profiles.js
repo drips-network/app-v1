@@ -17,7 +17,7 @@ export default {
     name: state => (address = '') => {
       const profile = state.profiles[address.toLowerCase()]
       // meta name w/o ".eth" to deter fraud
-      const metaName = profile?.meta?.name.replace(/(\.eth)+/g, '').trim()
+      const metaName = profile?.meta?.name?.replace(/(\.eth)+/g, '').trim()
       return metaName || profile?.ens?.name
     },
     record: state => (address = '', key = '') => {
@@ -94,8 +94,8 @@ export default {
         await dispatch('getMetadataByAddress', { address })
         value = getAvi()
 
-        // else fetch from ENS...
-        if (!value) {
+        // else try ENS...
+        if (value === undefined) {
           const ensName = await dispatch('getENSName', address)
 
           if (ensName) {
@@ -103,6 +103,32 @@ export default {
             const resolver = await provider.getResolver(ensName)
             value = await resolver.getText('avatar')
             commit('SAVE_ADDRESS_ENS_RECORD', { address, record: { name: 'avatar', value } })
+          }
+        }
+
+        // else maybe it's a project
+        if (value === undefined) {
+          const project = await dispatch('getProject', address, { root: true })
+
+          // project token image?
+          const name = project?.name || null
+          const avatar = project?.tokenTypes[0]?.ipfsHash || null
+          // save avatar
+          commit('SAVE_ADDRESS_METADATA', { address, meta: { name: undefined, avatar } })
+          
+          // lookup ipfs meta in case name is actually different than registration...
+          if (project?.ipfsHash) {
+            dispatch('getProjectMeta', { ipfsHash: project.ipfsHash }, { root: true })
+              .then(meta => {
+                const metaName = meta?.name
+                if (!metaName) throw new Error('No meta name')
+                // save meta name
+                commit('SAVE_ADDRESS_METADATA', { address, meta: { name: metaName, avatar } })
+              })
+              .catch(e => {
+                // save project registration name
+                commit('SAVE_ADDRESS_METADATA', { address, meta: { name, avatar } })
+              })
           }
         }
 

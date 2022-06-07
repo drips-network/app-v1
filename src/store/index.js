@@ -317,7 +317,7 @@ export default createStore({
           const ipfsHash = await contract.contractURI()
           return { ipfsHash }
         } catch (e) {
-          console.error(e)
+          // console.warn(e)
           // interpret any error as not found
           return null
         }

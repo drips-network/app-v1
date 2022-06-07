@@ -52,6 +52,7 @@ export const queryProject = `
   query ($id: ID!) {
     fundingProject (id: $id) {
       id
+      name: projectName
       projectOwner
       daiCollected
       daiSplit
