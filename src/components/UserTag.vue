@@ -15,6 +15,8 @@ import SvgLogoEtherscan from '@/components/SvgLogoEtherscan.vue'
 import FlexTruncate from '@/components/FlexTruncate.vue'
 import store from '@/store'
 import { socialURL } from '@/utils'
+import showdown from 'showdown'
+
 const props = defineProps(['address'])
 const emit = defineEmits(['dripClick', 'editClick'])
 const isMyProfile = computed(() => store.state.address === props.address)
@@ -24,6 +26,11 @@ const ensName = computed(() => profile.value?.ens?.name)
 const record = key => store.getters['profiles/record'](props.address, key)
 
 const avatar = computed(() => record('avatar'))
+
+// bio
+const descrip = computed(() => record('description'))
+const markdown = new showdown.Converter()
+const descripHtml = computed(() => descrip.value?.length && markdown.makeHtml(descrip.value))
 
 const copyAddressToClipboard = async () => {
   try {
@@ -108,7 +115,7 @@ const copyAddressToClipboard = async () => {
           svg-pen.w-24.h-24
 
   //- (bio cell)
-  template(v-if="record('description')")
+  template(v-if="descripHtml")
     //- vertical line
     //- .w-2.h-24.bg-indigo-700.mx-auto
 
@@ -118,6 +125,6 @@ const copyAddressToClipboard = async () => {
 
     //-
     .w-full.flex.justify-center.mb-1
-      expand-block.relative.max-w-4xl.bg-indigo-700.rounded-2xl.text-center.px-32.pt-20.pb-24.font-semibold.text-lg.text-white.leading-snug(:html="record('description')", expandedClasses="line-clamp-3", chevronInsetClass="bottom-0")
+      expand-block.relative.max-w-4xl.bg-indigo-700.rounded-2xl.text-center.px-32.pt-20.pb-24.font-semibold.text-lg.text-white.leading-snug(:html="descripHtml", expandedClasses="line-clamp-3", chevronInsetClass="bottom-0")
 
 </template>
