@@ -30,8 +30,7 @@ export default {
   ],
   polygon: [
     {
-      // label: 'human.eth',
-      address: '0xb5bb9a125c2f67f1f2cd9d8992955bb209490afe',
+      address: '0xf7fde6e62522c4251aff03d46a306aa1ba5e04f1',
       highlight: 'sender'
     }
   ],

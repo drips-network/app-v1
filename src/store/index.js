@@ -312,7 +312,7 @@ export default createStore({
       // helper: query chain fallback handler
       const queryChain = async () => {
         try {
-          console.log('Project not found in API (just created?). Querying chain...', projectAddress)
+          // console.log('Project not found in API (just created?). Querying chain...', projectAddress)
           const contract = getProjectContract(projectAddress)
           const ipfsHash = await contract.contractURI()
           return { ipfsHash }

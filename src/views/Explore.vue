@@ -106,8 +106,8 @@ const getDrips = async () => {
     // filter for has drips, min amt
     configs = configs
       .filter(config => {
-        // filter-out empty configs
-        if (!config.dripsEntries.length) {
+        // filter-out empty configs, and strange sender === receiver
+        if (!config.dripsEntries.length || config.sender === config.dripsEntries[0]?.receiver) {
           return false
         }
         // only min amt
@@ -254,10 +254,10 @@ onBeforeMount(() => {
 </script>
 
 <template lang="pug">
-article.explore.pt-56
+article.explore
 
   //- (spotlight)
-  section.mb-240(v-if="spotlights.length")
+  section.mt-56(v-if="spotlights.length")
     header-large.mb-96(icon="✨")
       header
         h2.font-semibold Spotlight
@@ -266,12 +266,13 @@ article.explore.pt-56
       //- spotlights...
       spotlight-recipient(v-for="spotlight in spotlights", :spotlight="spotlight", :allSplits="splits")
 
-  //- drips
-  section.mt-24.mb-144
     //- wave divider
-    .bg-img-wave-shadow-violet
-    
-    header.flex.justify-center.mt-56.pt-56
+    .mt-24.mb-56
+      .bg-img-wave-shadow-violet
+
+  //- drips
+  section.mb-144
+    header.flex.justify-center.pt-56
       h2.h-80.font-semibold.bg-indigo-700.flex.items-center.rounded-full.text-violet-650.px-22
         .h-36.w-36.flex.items-center.justify-center.text-lgg.-ml-2 💧
         .text-xl.ml-12 Drips
@@ -282,14 +283,14 @@ article.explore.pt-56
     //- (loading)
     template(v-if="!projects")
       .flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
           span Loading...
 
     //- (list)
     template(v-else)
       //- small text summary
       p.flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold
           div Big drips around the network!
           //- #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
 
@@ -333,14 +334,14 @@ article.explore.pt-56
     //- (loading)
     template(v-if="!projects")
       .flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semibold.animate-pulse
           span Loading...
 
     //- (list)
     template(v-else)
       //- small text summary
       p.flex.justify-center.mt-60
-        .mx-auto.flex.bg-indigo-050.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
+        .mx-auto.flex.bg-indigo-950.border-violet-700.rounded-full.items-center.px-20.h-44.font-semiboldff.text-violet-650.text-ms.font-semiboldff
           div #[b {{ projectOwnersCount }} addresses] are raising funds with #[b NFT Memberships]
       
       //- memberships list
