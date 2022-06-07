@@ -71,13 +71,14 @@ section.drips-list-expands.font-semibold.relative.w-full
   .absolute.overlay.flex(v-show="expanded")
     .w-full.bg-gradient-radial.from-indigo-950.to-transparent.overflow-visible
 
+
   //- body
   .relative.z-10.flex.flex-col.px-24(:class="{'flex-col-reverse': props.direction === 'in'}")
     //- drip icon
     //- .w-full.flex.justify-center.opacity-90(:class="{'my-8': !expanded, 'my-24': expanded}")
       .relative.w-80.h-80.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em", @click.stop="toggle")
         | 💧
-    .w-full.flex.justify-center.opacity-90
+    .w-full.flex.justify-center.opacity-90.relative
       .h-72.overflow-hidden.items-center.flex
         div.animate-falling(v-if="canEdit || (props.drips && props.drips.length)")
           .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
@@ -86,6 +87,8 @@ section.drips-list-expands.font-semibold.relative.w-full
             | 💧
           .relative.w-80.h-104.flex.items-center.justify-center.overflow-visible.cursor-pointer(style="font-size:2.15em")
             | 💧
+
+      .absolute.top-0.left-0.w-full.h-16.bg-gradient-to-b.from-indigo-900.to-transparent
 
     .-mt-px
       .w-full.flex.justify-center

@@ -332,8 +332,6 @@ onMounted(() => {
   //- drips list
   .w-full.relative(v-if="isMyProject || (splitsOut && splitsOut.length)")
     drips-list-expands.z-10(:address="props.project.id", :drips="splitsOut", direction="out", :canEdit="isMyProject", @editDrips="editSplitsModalOpen = true")
-    //- gradient
-    .absolute.top-0.left-0.w-full.h-40.bg-gradient-to-b.from-indigo-900.to-transparent.z-20
 
   
   //- (mint modal)

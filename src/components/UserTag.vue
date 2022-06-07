@@ -120,8 +120,8 @@ const copyAddressToClipboard = async () => {
     //- .w-2.h-24.bg-indigo-700.mx-auto
 
     //- drip link
-    svg-drip-off.block.h-15.text-indigo-700.mx-auto.mb-px
-    svg-drip-off.block.h-15.text-indigo-700.mx-auto.transform.rotate-180
+    svg-drip-off.block.h-14.text-indigo-700.mx-auto.mb-px
+    svg-drip-off.block.h-14.text-indigo-700.mx-auto.transform.rotate-180
 
     //-
     .w-full.flex.justify-center.mb-1

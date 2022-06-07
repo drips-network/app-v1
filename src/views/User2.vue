@@ -18,6 +18,7 @@ import ModalSplitsEdit from '@/components/ModalSplitsEdit.vue'
 import ModalEditProfile from '@/components/ModalEditProfile.vue'
 import SvgDai from '@/components/SvgDai.vue'
 import SvgPen from '@/components/SvgPen.vue'
+import SvgArrowRight from '@/components/SvgArrowRight.vue'
 import ProjectDetail from '@/components/ProjectDetail.vue'
 import DripsListExpands from '@/components/DripsListExpands.vue'
 import SvgX from '@/components/SvgX.vue'
@@ -292,6 +293,13 @@ const hideEditProfileHint = () => {
   editProfileHint.value = false
 }
 
+// scroll down arrow link
+const scrollDownArrowLink = computed(() => {
+  return projects.value?.length ? '#memberships'
+    : nfts.value?.length ? '#member-of'
+      : false
+})
+
 onMounted(() => {
   getProfile()
   getSplitsIn()
@@ -389,7 +397,7 @@ article.profile.w-full.lg_pb-132
               svg-x.h-10.w-10(strokeWidth="2", strokeCap="round")
 
   //- user upper summary
-  section.min-h-screen.-mt-88.flex.w-full.items-center.py-120
+  section.min-h-screen.-mt-88.flex.w-full.items-center.pt-104.pb-120.relative
     .w-full
       //- 
       //- senders
@@ -443,6 +451,12 @@ article.profile.w-full.lg_pb-132
 
       //- receivers
       drips-list-expands(:address="$route.params.address", :drips="allDripsOut", direction="out", :canEdit="isMyUser", @editDrips="editDripsSelect = true")
+
+      //- (down arrow button)
+      .relative(v-if="scrollDownArrowLink")
+        .absolute.w-full.flex.justify-center.pt-72.animate-bounce
+          router-link.h-36.w-36.notouch_hover_bg-indigo-950.rounded-full.flex.items-center.justify-center(:to="scrollDownArrowLink")
+            svg-arrow-right.h-20.w-20.text-violet-650.transform.rotate-90
 
 
   //- (memberships list)
