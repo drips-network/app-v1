@@ -17,6 +17,7 @@ import SvgGlobe from '@/components/SvgGlobe.vue'
 import SvgGithub from '@/components/SvgGithub.vue'
 import SvgTwitter from '@/components/SvgTwitter.vue'
 import SvgDiscord from '@/components/SvgDiscord.vue'
+import showdown from 'showdown'
 
 const props = defineProps(['project', 'ownerVisible'])
 const emit = defineEmits(['refresh'])
@@ -26,6 +27,10 @@ const meta = ref()
 const isStreaming = toRaw(props.project.tokenTypes[0].streaming)
 const isMyProject = computed(() => props.project.projectOwner === store.state.address)
 const ipfsHash = props.project.tokenTypes[0]?.ipfsHash || import.meta.env.VITE_APP_NFT_DEFAULT_IMAGE_HASH
+
+// prj descrip
+const markdown = new showdown.Converter()
+const descrip = computed(() => meta.value?.descrip?.length && markdown.makeHtml(meta.value.descrip))
 
 // ui
 const benefitsEl = ref()
@@ -185,8 +190,8 @@ onMounted(() => {
       button.mx-4.btn.btn-mdd.btn-violet.text-lg.font-semibold.min-w-144.px-32(@click="mintModalOpen = true") Join
     
     //- benefits/description
-    template(v-if="meta && meta.descrip.length")
-      .mt-40.px-36.text-center.font-semibold.text-md.leading-normal(ref="benefitsEl", v-html="meta.descrip", :class="{'line-clamp-4': !readMore}")
+    template(v-if="descrip")
+      .mt-40.px-36.text-center.font-semibold.text-md.leading-normal.child-links-underline(ref="benefitsEl", v-html="descrip", :class="{'line-clamp-4': !readMore}")
       //- readmore/less btn
       template(v-if="benefitsLong")
         .absolute.bottom-0.left-0.w-full.flex.justify-center.pb-7
