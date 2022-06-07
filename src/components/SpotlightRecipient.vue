@@ -40,7 +40,7 @@ div.mb-196
     .min-h-80.flex.items-center.rounded-full.bg-indigo-700ff.py-10.px-6.mr-2
       //- (sender)
       template(v-if="highlight === 'sender'")
-        router-link.flex.items-center.mx-6.bg-indigo-700.rounded-full.p-12.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user-drips-out', params: { address: props.spotlight.address }}")
+        router-link.flex.items-center.mx-6.bg-indigo-700.rounded-full.p-12.btn-focus-violet(:to="{name: 'user-drips-out', params: { address: props.spotlight.address }}")
           user-avatar.w-80.h-80(:address="props.spotlight.address", blockieSize="80")
           addr.mx-24.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
 
@@ -49,7 +49,7 @@ div.mb-196
         ul.flex.flex-wrap.justify-center.mx-auto.text-violet-650
           //- supporters...
           li(v-for="(supporter, i) in supporters")
-            router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.m-2.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: supporter }}")
+            router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.m-2.btn-focus-violet(:to="{name: 'user', params: { address: supporter }}")
               //- sender avatar / blockie
               user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-800(:address="supporter", blockieSize="44", :key="supporter")
               addr.mx-16.font-semibold(:address="supporter", :key="supporter")
@@ -65,7 +65,7 @@ div.mb-196
     .min-h-80.flex.items-center.rounded-2xlb.bg-indigo-700ff.py-10.px-6
       //- (sender)
       template(v-if="highlight === 'receiver'")
-        router-link.flex.items-center.mx-6.bg-indigo-700.rounded-full.p-12.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user-drips-in', params: { address: props.spotlight.address }}")
+        router-link.flex.items-center.mx-6.bg-indigo-700.rounded-full.p-12.btn-focus-violet(:to="{name: 'user-drips-in', params: { address: props.spotlight.address }}")
           user-avatar.w-80.h-80(:address="props.spotlight.address", blockieSize="80")
           addr.mx-24.font-semibold.text-xl(:address="props.spotlight.address", :key="props.spotlight.address")
 
@@ -73,7 +73,7 @@ div.mb-196
       template(v-else-if="receivers && receivers.length")
         ul.flex.flex-wrap.justify-center.mx-auto.text-violet-650
           li(v-for="(receiver, i) in receivers")
-            router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.m-2.notouch_hover_ring.notouch_hover_text-white.transition.duration-150(:to="{name: 'user', params: { address: receiver }}")
+            router-link.flex.items-center.bg-indigo-700.rounded-full.p-10.m-2.btn-focus-violet(:to="{name: 'user', params: { address: receiver }}")
               //- sender avatar / blockie
               user-avatar.w-44.h-44.flex-shrink-0.bg-indigo-700(:address="receiver", blockieSize="44", :key="receiver")
               addr.mx-16.font-semibold(:address="receiver", :key="receiver")
