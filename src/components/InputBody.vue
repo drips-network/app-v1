@@ -9,7 +9,8 @@ const props = defineProps({
   symbol: String,
   theme: { type: String, default: 'outline' },
   warning: String,
-  error: String
+  error: String,
+  scrollable: Boolean,
 })
 
 const styling = computed(() => {
@@ -34,10 +35,10 @@ const slots = useSlots()
 <template lang="pug">
 .input-body.relative.text-violet-600
   //- (label)
-  label.absolute.top-0.left-0.w-full.text-center.text-mss.pt-4(v-if="label", :class="{'text-red-600': theme === 'red'}") {{ props.label }}
+  label.absolute.z-10.top-0.left-0.w-full.text-center.text-mss.pt-4(v-if="label", :class="{'text-red-600': theme === 'red'}") {{ props.label }}
 
   //- field (input, textarea)
-  .input-body__wrapper.min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.text-white.group(:class="[styling, themeing]")
+  .input-body__wrapper.min-h-80.flex.items-center.font-semibold.rounded-2xlb.text-center.leading-none.text-white.group.overflow-hidden.relative(:class="[styling, themeing]")    
     slot
 
     //- (symbol: dai)
@@ -71,6 +72,15 @@ const slots = useSlots()
         | {{ props.error || props.warning }}
         //- template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
         //- template(v-else) There are no funds to withdraw
+
+    //- (top gradient for scrollable textareas)
+    template(v-if="props.scrollable")
+      .absolute.top-0.left-0.w-full.pointer-events-none
+        .h-16.bg-indigo-900
+        .h-20.bg-gradient-to-b.from-indigo-900.to-transparent
+
+      .absolute.bottom-0.left-0.w-full.pointer-events-none
+        .h-20.bg-gradient-to-t.from-indigo-900.to-transparent
 </template>
 
 <style lang="postcss">

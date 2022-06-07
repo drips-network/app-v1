@@ -7,6 +7,7 @@ import SvgXCircle from '@/components/SvgXCircle.vue'
 // import { pinImageToIPFS } from '@/store'
 import { ipfsUrl } from '@/utils'
 import store from '@/store'
+import showdown from 'showdown'
 
 const props = defineProps(['modelValue', 'isNewProject'])
 const emit = defineEmits(['update:modelValue'])
@@ -16,6 +17,10 @@ const imgSrcCurrent = props.modelValue.avatar ? ipfsUrl(props.modelValue.avatar)
 
 const imgSrc = ref(imgSrcCurrent)
 const uploading = ref(false)
+
+// bio
+const markdown = new showdown.Converter()
+const descriptionPreviewHtml = computed(() => props.modelValue?.descrip?.length && markdown.makeHtml(props.modelValue.descrip))
 
 const nameInputError = computed(() => {
   return (props.modelValue.name || '').includes('.eth') ? '".eth" will be omitted' : null
@@ -92,8 +97,14 @@ section.mt-40
     input-body(label="GitHub URL", :isFilled="modelValue.github.length")
       input(v-model="modelValue.github", placeholder="https://github.com/...", type="url")
 
-  .my-10
-    input-body(label="Bio")
+  .mt-10
+    //- input-body(label="Bio")
       textarea.text-center.scrollbars-hidden(v-model="modelValue.description", placeholder="When you drip I drip we drip." rows="6")
+    input-body.relative(label="Bio (Markdown/HTML)", :scrollable="true")
+      textarea.font-mono.text-center.leading-normal.scrollbars-hidden.py-20(v-model="modelValue.descrip", placeholder="When you drip I drip we drip." rows="6")
+
+    .mt-10.min-h-80.bg-indigo-700.rounded-2xlb.relative.leading-tight(v-if="descriptionPreviewHtml")
+      .absolute.top-0.left-0.w-full.mt-4.text-ceter.text-mss.text-violet-650 Bio Preview
+      div.px-24.pb-20.pt-28.text-center.text-xl.font-semibold.child-links-underline.child-lists-list.leading-relaxed(v-html="descriptionPreviewHtml")
 
 </template>
