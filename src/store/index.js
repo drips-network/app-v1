@@ -964,6 +964,16 @@ export default createStore({
       }
     },
 
+    async getBalanceDAI ({ dispatch }, address) {
+      try {
+        if (!provider) await dispatch('init')
+        const contract = getDAIContract()
+        return contract.balanceOf(address)
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
     // function for saving logs of user actions locally on their computer for debugging
     log ({ state, getters }, { label, data, actionId }) {
       if (localStorage) {

@@ -35,12 +35,37 @@ const receiverInputEls = ref([])
 
 let lastUpdate = null
 
+// drips balance
 let getWithdrawable
 const withdrawable = ref('0')
 // balance (max DAI withdrawable
 const balance = computed(() => toDAI(withdrawable.value, 'exact'))
 const balancePretty = computed(() => toDAI(withdrawable.value))
 const newBalance = computed(() => round(Number(balance.value) + topUpDAI.value))
+
+// wallet balance
+const walletBalance = ref()
+const walletBalancePretty = ref()
+const newWalletBalance = computed(() => round(Number(walletBalance.value) - topUpDAI.value)) // dai exact
+const walletBalanceMax = computed(() => round(walletBalance.value, 2, true))
+
+const getWalletBalance = async () => {
+  try {
+    const wei = await store.dispatch('getBalanceDAI', store.state.address)
+    walletBalance.value = toDAI(wei, 'exact')
+    walletBalancePretty.value = toDAI(wei)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+// total monthly rate
+const totalMonthlyRate = computed(() => (drips.value || []).reduce((acc, curr) => acc + Number(curr.amount), 0))
+
+// invalid topup
+const invalidInput = computed(() => {
+  return topUpDAI.value < -balance.value || topUpDAI.value > walletBalance.value
+})
 
 const getDrips = async () => {
   try {
@@ -183,7 +208,7 @@ const viewMyDrips = () => {
   router.push({ name: 'user-drips-out', params: { address: store.state.address } })
 }
 
-onMounted(async () => {
+const init = async () => {
   try {
     loading.value = true
     drips.value = await getDrips()
@@ -215,7 +240,10 @@ onMounted(async () => {
     console.error(e)
     loading.value = false
   }
-})
+}
+
+init()
+getWalletBalance()
 </script>
 
 <template lang="pug">
@@ -233,7 +261,7 @@ panel(:icon="props.addFundsOnly ? '🚰' : '💧'")
     //- dialog-description
     //- TODO: use <dialog-description> (fix use on CreateDrips.vue, since not modal)
     template(v-if="props.addFundsOnly")
-      p.mx-auto(style="max-width:30em") Your drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
+      p.mx-auto(style="max-width:30em") Your drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out!
     template(v-else)
       p.mx-auto Who do you want to send DAI to #[b every month]?
 
@@ -249,7 +277,7 @@ panel(:icon="props.addFundsOnly ? '🚰' : '💧'")
       template(v-if="!props.addFundsOnly")
         //- drips...
         template(v-for="(drip, i) in drips")
-          section.my-10.input-group.relative
+          section.my-8.input-group.relative
             //- address
             input-body(:label="$store.getters.label('inputAddressLabel')", :isFilled="drips[i].receiverInput === 'length'", theme="dark", format="code")
               //- TODO: validate ethereum address
@@ -273,24 +301,58 @@ panel(:icon="props.addFundsOnly ? '🚰' : '💧'")
           h6.text-2xl.font-semibold.leading-snug Add to Drips Balance
           p.mt-24.mb-40.text-md.mx-auto.text-violet-650.leading-tight(style="max-width:26em") Monthly drips are sent from a #[b.text-violet-650 separate balance] than your wallet. #[b.text-violet-650 Add funds] so your drips don't run out.
 
-      //- balance
-      .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700
-        .pl-32.text-xl.font-semibold
+      //- drips balance
+      .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700.my-8
+        .pl-32.text-lgg.font-semibold
           | Drips Balance
-        .pr-20.flex.items-center(:class="{'text-red-500ff': newBalance < Number(balance), 'text-greenbright-500ff': newBalance > Number(balance) }")
-          span.text-2xl.font-semibold
+        .pr-20.flex.items-center(:class="{'text-red-500': topUpDAI < Number(balance) * -1, 'text-greenbright-500': topUpDAI > 0 }")
+          span.text-xl.font-semibold
             template(v-if="!topUpDAI") {{ balancePretty }}
             template(v-else) {{ newBalance }}
-          svg-dai.ml-12(size="xl")
+          svg-dai.ml-12(size="lg")
+
+      //- drips rate
+      .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700.my-8
+        .pl-32.text-lgg.font-semibold
+          | Monthly Drips
+        .pr-20.flex.items-center
+          span.text-xl.font-semibold {{ totalMonthlyRate }}
+          svg-dai.ml-12(size="lg")
+          //- span.text-lg.font-semibold /mo   
 
       //- edit balance input
-      .relative.my-10
-        input-body(label="Add DAI to Balance", symbol="dai")
-          input(v-model="topUpDAI", type="number", step="0.01", required)
-        //- (max withdraw note)
-        .absolute.bottom-0.left-0.w-full.text-center.text-sm.text-red-600.pb-4(v-if="topUpDAI < -balance")
-          template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}} DAI
-          template(v-else) There are no funds to withdraw
+      .relative.my-8
+        //- TODO "max" btn in input-body component?
+        input-body(label="Add to Drips Balance", symbol="dai")
+          input(v-model="topUpDAI", type="number", step="0.01", :max="walletBalanceMax.toFixed(2)", required, v-autofocus)
+        //- (out of bounds!)
+        .absolute.bottom-0.left-0.w-full.text-center.text-sm.pb-4
+          template(v-if="topUpDAI < -balance")
+            span.text-red-600
+              template(v-if="balance && Number(balance) > 0") Max Withdraw -{{balance}}
+              template(v-else) There are no funds to withdraw
+          template(v-else-if="newWalletBalance < 0")
+            span.text-red-600 Not enough funds in your wallet!
+          template(v-else-if="walletBalancePretty !== undefined")
+            button.text-violet-650(@click.stop.prevent="topUpDAI = walletBalanceMax")
+              | Max ~ {{ walletBalanceMax.toFixed(2) }}
+
+      //- .flex.justify-center.mt-10.mb-60
+        .h-36.px-24.bg-indigo-950.justify-center.text-mss.text-violet-650.rounded-full.flex.items-center Wallet Balance: {{ walletBalancePretty }} #[svg-dai.ml-4(size="xxs")]
+
+      //- wallet balance
+      //- .h-80.flex.justify-between.items-center.rounded-full.bg-indigo-700.my-8
+        .pl-32.text-lgg.font-semibold
+          | Wallet Balance
+        .pr-20.flex.items-center(:class="{'text-red-500': topUpDAI > Number(walletBalance)}")
+          span.text-xl.font-semibold
+            //- (loading)
+            template(v-if="walletBalance === undefined")
+              span.animate-pulse ...
+            template(v-else)
+              template(v-if="!topUpDAI") {{ walletBalancePretty }}
+              template(v-else) {{ newWalletBalance }}
+          svg-dai.ml-12(size="lg")
 
       //- (polygon address warning)
       template(v-if="$store.getters.isPolygon")
@@ -337,7 +399,7 @@ panel(:icon="props.addFundsOnly ? '🚰' : '💧'")
 
           //- (submit btn)
           template(v-else)
-            button.btn.btn-lg.px-40.mr-8(type="submit", :disabled="tx", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
+            button.btn.btn-lg.px-40.mr-8(type="submit", :disabled="tx || invalidInput", @mouseenter="txReceipt = null", :class="{'btn-violet': !txReceipt, 'btn-outline': txReceipt}")
               template(v-if="txReceipt") Success!
               template(v-else-if="tx") Submitting...
               template(v-else) Submit
