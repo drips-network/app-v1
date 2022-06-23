@@ -56,7 +56,9 @@ export default createStore({
       addresses: {},
 
       // TODO - get this from the contract?
-      splitsFractionMax: 1000000
+      splitsFractionMax: 1000000,
+
+      isConnecting: false,
     }
   },
   getters: {
@@ -87,6 +89,9 @@ export default createStore({
     },
     SET_NETWORK_ID (state, id) {
       state.networkId = id
+    },
+    SET_IS_CONNECTING (state, value = false) {
+      state.isConnecting = value
     }
     // SET_CONTRACTS (state, provider) {
     //   console.log('registry', RadicleRegistry.address)
@@ -191,6 +196,8 @@ export default createStore({
     /* connect wallet */
     async connect ({ state, commit, dispatch }) {
       try {
+        commit('SET_IS_CONNECTING', true)
+
         // connect and update provider, signer
         walletProvider = await web3Modal.connect()
         provider = new Ethers.providers.Web3Provider(walletProvider)
@@ -206,8 +213,10 @@ export default createStore({
         // commit('SET_CONTRACTS', provider)
 
         dispatch('listenToWalletProvider')
+        commit('SET_IS_CONNECTING', false)
         return true
       } catch (e) {
+        commit('SET_IS_CONNECTING', false)
         // console.error('@connect', e)
 
         // clear wallet in case

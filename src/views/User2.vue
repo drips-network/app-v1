@@ -252,7 +252,7 @@ const getProjects = async () => {
             daiSplit
             daiCollected
             tokenTypes {
-              # tokenTypeId
+              tokenTypeId
               streaming
               limit
               currentTotalAmtPerSec

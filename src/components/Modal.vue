@@ -6,6 +6,7 @@ import {
   // DialogDescription
 } from '@headlessui/vue'
 import Panel from '@/components/Panel.vue'
+import store from '@/store'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -14,12 +15,16 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
-// TODO - ignore 'close' event fired when web3modal connect
-const close = () => emit('close')
+const onClose = () => {
+  // ignore clicks on web3modal overlay
+  if (!store.state.isConnecting) {
+    emit('close')  
+  }
+}
 </script>
 
 <template lang="pug">
-dialog-body.fixed.inset-0.z-30.overflow-y-auto.flex.py-60.px-30(:open="isOpen", @close="close")
+dialog-body.fixed.inset-0.z-30.overflow-y-auto.flex.py-60.px-30(:open="isOpen", @close="onClose")
 
   dialog-overlay.fixed.overlay.bg-indigo-900.opacity-90
 

@@ -2,7 +2,7 @@
 import { ref, reactive, computed, toRaw } from 'vue'
 import store from '@/store'
 import { BigNumber as bn, constants } from 'ethers'
-import { ipfsUrl, fromWei, toDAI, toWei, toWeiPerSec } from '@/utils'
+import { ipfsUrl, fromWei, toDAI, toWei, toWeiPerSec, round } from '@/utils'
 import Modal from '@/components/Modal.vue'
 import TxLink from '@/components/TxLink.vue'
 import { DialogTitle, DialogDescription } from '@headlessui/vue'
@@ -109,11 +109,24 @@ const mint = async () => {
         amtPerSec
       })
     } else {
-      // mint one-time...
+      // one-time payment:
+      const giveAmt = toWei(amountDAI.value)
+
+      // check balance...
+      if (walletBalanceWei.value === undefined) {
+        await getWalletBalance()
+      }
+      
+      // !! insufficient funds
+      if (walletBalanceWei.value.lt(giveAmt)) {
+        throw new Error('Insufficient funds in your wallet!')
+      }
+      
+      // mint...
       state.mintTx = await store.dispatch('mintNFT', {
         projectAddress: props.project.id,
         typeId,
-        giveAmt: toWei(amountDAI.value)
+        giveAmt,
       })
     }
 
@@ -125,9 +138,26 @@ const mint = async () => {
     state.nft = true
     state.mintTxMsg = { status: 1, message: 'You joined! View your <b>NFT Membership</b>!' }
   } catch (e) {
-    state.mintTxMsg = { status: -1, message: e.message || e }
+    state.mintTxMsg = { status: -1, message: e.reason || e.message || e }
   }
 }
+
+// balance
+const walletBalance = ref()
+const walletBalanceWei = ref()
+const getWalletBalance = async () => {
+  if (!store.state.address) return
+  try {
+    const wei = await store.dispatch('getBalanceDAI', store.state.address)
+    walletBalanceWei.value = wei
+    // round down to nearest DAI hundredth for input[max]
+    walletBalance.value = round(toDAI(wei, 'exact'), 2, true)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+getWalletBalance()
 </script>
 
 <template lang="pug">
@@ -146,11 +176,12 @@ modal(v-bind="$attrs", @close="$emit('close')")
         .mx-auto.px-24(v-if="isStreaming", style="max-width:28em")
           | Drip funds <b>every month</b> and receive a unique <b>Member NFT</b> 🧩. #[b Top-up periodically] to ensure your membership doesn't become #[b inactive]. You can #[b withdraw] excess funds at any time.
         .mx-auto(v-else, style="max-width:24em")
-          | Make a one-time payment to become a member and receive this NFT 🧩 in your wallet.
+          | Make a <b>one-time payment</b> to join and receive this <b>Member NFT 🧩</b> in your wallet.
         //- | Tokens will appear in your wallet, OpenSea and can be used to vote on proposals.
 
-    //- (image)
+    //- (loaded)
     template(v-if="ipfsHash")
+      //- (image)
       figure.bg-indigo-950.rounded-xl.relative.mb-48.flex.p-56.relative
         //- label
         .absolute.top-0.left-0.w-full.text-center.text-sm.pt-4.font-normal.text-violet-600.opacity-90
@@ -160,29 +191,34 @@ modal(v-bind="$attrs", @close="$emit('close')")
           .aspect-w-8.aspect-h-7
             img.mint-modal__nft-image.absolute.overlay.object-contain.object-center.transform.notouch_hover_scale-102.transition.duration-500(:src="ipfsUrl(ipfsHash)", alt="NFT Membership Image")
 
-    //- inputs
-    form(@submit.prevent, validate)
-      //- (subscription fields)
-      template(v-if="isStreaming")
-        //- input rate
-        input-body.my-10(label="DAI per month*", :isFilled="typeof rate === 'number'", symbol="daipermo")
-          input(v-model="rate", type="number", :placeholder="`min ${minDAI}`", :min="minDAI", step="0.01", required)
+      //- inputs
+      form(@submit.prevent, validate)
+        //- (subscription fields)
+        template(v-if="isStreaming")
+          //- input rate
+          input-body.my-10(label="DAI per month*", :isFilled="typeof rate === 'number'", symbol="daipermo")
+            input(v-model="rate", type="number", :placeholder="`min ${minDAI}`", :min="minDAI", step="0.01", required)
 
-        //- input months prepay
-        input-body.my-10(label="Months*", :isFilled="typeof prePayMonths === 'number'", symbol="months")
-          input(v-model="prePayMonths", type="number", placeholder="6", min="1", step="1", required)
+          //- input months prepay
+          input-body.my-10(label="Months*", :isFilled="typeof prePayMonths === 'number'", symbol="months")
+            input(v-model="prePayMonths", type="number", placeholder="6", min="1", step="1", required)
 
-        //- total due
-        .rounded-full.px-28.h-80.bg-indigo-700.flex.justify-between.items-center.font-semibold
-          .text-lg.tracking-wide PAY
-          .text-2xl.flex.items-center
-            | {{ payTotalDAI }}
-            svg-dai.h-28.ml-16
+          //- total due
+          .rounded-full.px-28.h-80.bg-indigo-700.flex.justify-between.items-center.font-semibold
+            .text-lg.tracking-wide PAY
+            .text-2xl.flex.items-center
+              | {{ payTotalDAI }}
+              svg-dai.h-28.ml-16
 
-      //- (one-time fields)
-      template(v-else)
-        input-body(:label="`Amount (min. ${minDAI} DAI)`", symbol="dai")
-          input(v-model="amountDAI", type="number", :placeholder="minDAI", :min="minDAI", step="0.01", required)
+        //- (one-time fields)
+        template(v-else)
+          .relative
+            input-body(:label="`Membership Amount (min ${minDAI} DAI)`", symbol="dai")
+              input(v-model="amountDAI", type="number", :placeholder="minDAI", :min="minDAI", required)
+            //- (out of bounds!)
+            .absolute.bottom-0.left-0.w-full.text-center.text-sm.pb-4(v-if="walletBalance !== undefined")
+              button.text-violet-650(@click.stop.prevent="amountDAI = walletBalance")
+                | Balance ~ {{ walletBalance.toFixed(2) }} DAI
 
       //- (not approved message)
       template(v-if="state.approveVisible")
