@@ -42,6 +42,12 @@ const routes = [
       }
     ]
   },
+
+  {
+    path :'/access',
+    name: 'access',
+    component: () => import(/* webpackChunkName: "access" */ '../views/Access.vue')
+  },
   
   // nft memberships
   {
