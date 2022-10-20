@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Explore from '../views/Explore.vue'
-import Landing from '../views/Landing.vue'
 
 const routes = [
   {
@@ -46,7 +45,22 @@ const routes = [
   {
     path :'/access',
     name: 'access',
-    component: () => import(/* webpackChunkName: "access" */ '../views/Access.vue')
+    component: () => import(/* webpackChunkName: "access" */ '../views/Access.vue'),
+    meta: { type: 'legal' }
+  },
+
+  {
+    path :'/privacy',
+    name: 'privacy',
+    component: () => import(/* webpackChunkName: "privacy" */ '../views/Privacy.vue'),
+    meta: { type: 'legal' }
+  },
+
+  {
+    path :'/disclaimer',
+    name: 'disclaimer',
+    component: () => import(/* webpackChunkName: "disclaimer" */ '../views/Disclaimer.vue'),
+    meta: { type: 'legal' }
   },
   
   // nft memberships

@@ -21,7 +21,7 @@ const route = useRoute()
 const router = useRouter()
 const hasConnected = ref(toRaw(store.state.address) !== null)
 const profileBannerVisible = computed(() => {
-  return !hasConnected.vaue && !store.state.address && !route.name?.startsWith('create') && route.name !== 'access'
+  return !hasConnected.value && !store.state.address && !route.name?.startsWith('create') && route.meta.type !== 'legal'
 })
 const testnetsVisible = ref(false)
 
@@ -175,8 +175,6 @@ const switchToAppNetwork = async () => {
 
       //- landing site link
       a.mr-6.text-md.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://www.drips.network") About
-      //- landing site link
-      router-link.mr-6.text-md.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(to="/access") Access
       //- docs link
       a.mr-6.text-md.font-semibold.btn-focus-violet.h-54.px-18.rounded-full.flex.items-center.justify-center.btn-focus-violet.transition.duration-100(href="https://docs.drips.network/docs/whats-a-drip.html", target="_blank", rel="noopener noreferrer") Docs
       //- twitter link
@@ -189,6 +187,14 @@ const switchToAppNetwork = async () => {
       a.ml-10.text-md.font-semibold.h-54.w-104.rounded-full.flex.items-center.justify-center.bg-indigo-950.btn-focus-violet(href="https://www.coinbase.com/price/dai", target="_blank", rel="noopener noreferrer")
         svg-dai.h-16
         | 1 ≈ $1
+  
+  .py-6.text-violet-650.text-sm.text-center
+    //- privacy link
+    router-link.mx-6.inline-block.text-focus-violet(to="/privacy") Privacy
+    //- access link
+    router-link.mx-6.inline-block.text-focus-violet(to="/access") Access
+    //- disclaimer link
+    router-link.mx-6.inline-block.text-focus-violet(to="/disclaimer") Disclaimer
 
   
     //-
