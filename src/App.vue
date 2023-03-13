@@ -20,11 +20,12 @@ const networkMenu = ref(false)
 const route = useRoute()
 const router = useRouter()
 const hasConnected = ref(toRaw(store.state.address) !== null)
+const versionMenuVisible = ref(false)
+const newVersionBannerVisible = ref(!localStorage.getItem('newVersionBannerHidden'))
 const profileBannerVisible = computed(() => {
-  return !hasConnected.value && !store.state.address && !route.name?.startsWith('create') && route.meta.type !== 'legal'
+  return !newVersionBannerVisible.value && !hasConnected.value && !store.state.address && !route.name?.startsWith('create') && route.meta.type !== 'legal'
 })
 const testnetsVisible = ref(false)
-const versionMenuVisible = ref(false)
 
 store.dispatch('init')
 
@@ -64,6 +65,11 @@ const switchToAppNetwork = async () => {
     console.error(e)
     alert('Could not switch networks. Try switching in your wallet and reloading the page.')
   }
+}
+ 
+function hideNewVersionBanner () {
+  newVersionBannerVisible.value = false
+  localStorage.setItem('newVersionBannerHidden', '1')
 }
 </script>
 
@@ -108,7 +114,7 @@ const switchToAppNetwork = async () => {
               li.py-2 &nbsp;
               //- ethereum link
               li
-                a.inline-block.py-5.px-20.transition.duration-150.notouch_hover_text-white(href="https://beta.drips.network", class="text-greenbright-400/90")
+                a.inline-block.py-5.px-20.transition.duration-150.notouch_hover_text-white(href="https://drips.network", class="text-greenbright-400/90")
                   | v2
 
         //- network switcher
@@ -171,12 +177,25 @@ const switchToAppNetwork = async () => {
     main#main.flex-1.flex
       router-view.w-full(:key="$route.params && JSON.stringify($route.params)")
 
-    //- view profile banner
+    //- (view profile banner)
     template(v-if="profileBannerVisible")
       .sticky.mt-10.z-30.bottom-0.pb-10.left-0.w-full.px-10.bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
-        .h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.items-center.pl-32.pr-16(class="bg-greenbright-400")
-          .flex.flex-1.items-center Connect a wallet to view your profile :)
+        .min-h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.flex-wrap.items-center.pl-32.pr-16.py-12(class="bg-greenbright-400")
+          .flex.flex-1.items-center Connect a wallet to view your profile
           button.h-54.ml-24.border-2ff.rounded-full.pl-28.pr-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", @click="connect(true)") Connect
+    
+    //- (new drips version banner)
+    template(v-if="newVersionBannerVisible")
+      .sticky.mt-10.z-30.bottom-0.pb-10.left-0.w-full.px-10.bg-gradient-to-b.from-transparent.to-indigo-900.flex.justify-center
+        .relative.min-h-80.rounded-full.text-indigo-900.text-md.font-semibold.flex.flex-wrap.items-center.pl-32.pr-16.py-12(class="bg-greenbright-400")
+          .flex.flex-1.items-center
+            div New version of Drips!
+          
+          a.h-54.ml-24.rounded-full.pl-28.pr-24.flex.items-center.justify-center.border-current.focus_ring.notouch_hover_ring.notouch_hover_ring-indigo-900(class="bg-indigo-900/25", href="https://drips.network") Go to V2 ↗
+          
+          button.p-8.ml-8(@click="hideNewVersionBanner")
+            .sr-only hide
+            svg-x.h-12.w-12(strokeWidth="1.5")
 
   //- footer
   .mt-10.mb-64.md_mb-0.px-12.flex.flex-wrap.justify-center.md_justify-between
