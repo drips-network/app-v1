@@ -3,6 +3,16 @@
   publish = "dist"
   environment = { NODE_VERSION = "16" }
   functions = "functions"
+  
+[[redirects]]
+  from = "https://app.drips.network/*"
+  to = "https://app.v1.drips.network/:splat"
+  status = 301
+
+[[redirects]]
+  from = "http://app.drips.network/*"
+  to = "https://app.v1.drips.network/:splat"
+  status = 301
 
 [[redirects]]
   from = "/*"
